@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        
+        /* LOGIN SCREEN STYLES */
+        #login-screen {
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 99999;
+        }
+        .login-box { background: white; padding: 30px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 10px 30px rgba(0,174,239,0.5); border: 2px solid #1a73e8; }
+        .login-box h2 { margin-top: 0; color: #333; font-weight: 900; }
+        .login-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; font-weight: bold; text-align: center; box-sizing: border-box; }
+        #error-msg { color: red; font-weight: bold; margin-top: 10px; display: none; }
+
+        /* MAIN PANEL STYLES */
+        #main-panel { display: none; width: 100%; flex-direction: column; align-items: center; }
+        .card { background: white; width: 100%; max-width: 500px; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); overflow: hidden; margin-bottom: 20px; box-sizing: border-box;}
+        .header { background: #1a73e8; color: white; padding: 12px; text-align: center; font-size: 16px; font-weight: bold; text-transform: uppercase; }
+        .teams-container { display: flex; padding: 15px; gap: 10px; border-bottom: 2px solid #eee; }
+        .team-box { flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .team-input { width: 95%; padding: 8px; border: 2px solid #ddd; border-radius: 6px; font-size: 15px; font-weight: bold; margin-bottom: 8px; text-align: center; }
+        .score-val { font-size: 50px; font-weight: 900; color: #333; margin: 5px 0; }
+        .btn-pm { border: none; color: white; padding: 12px; border-radius: 6px; font-size: 24px; font-weight: bold; cursor: pointer; flex: 1; margin: 0 4px; }
+        .btn-plus { background: #28a745; } .btn-minus { background: #dc3545; }
+        .settings-section { padding: 15px; background: #fafafa; box-sizing: border-box; }
+        .label { font-size: 12px; font-weight: bold; color: #555; margin-bottom: 5px; display: block; text-transform: uppercase; }
+        textarea, .std-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; margin-bottom: 12px; resize: none; box-sizing: border-box; font-family: inherit; }
+        .controls { padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+        .btn-full { border: none; color: white; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-bottom: 5px; width: 100%; box-sizing: border-box;}
+        .btn-blue { background: #1a73e8; } .btn-yellow { background: #fbbc05; color: #000; } .btn-red { background: #ea4335; } .btn-dark { background: #333; }
+        button:active { transform: scale(0.98); }
+    </style>
+</head>
+<body>
+
+<div id="login-screen">
+    <div class="login-box">
+        <h2>🔒 ADMIN LOGIN</h2>
+        <input type="text" id="username" class="login-input" placeholder="Username">
+        <input type="password" id="password" class="login-input" placeholder="Password">
+        <button class="btn-full btn-blue" onclick="checkLogin()">LOGIN</button>
+        <p id="error-msg">ਗਲਤ Username ਜਾਂ Password!</p>
+    </div>
+</div>
+
+<div id="main-panel">
+    <div class="card">
+        <div class="header">Live Score Board</div>
+        <div class="teams-container">
+            <div class="team-box">
+                <input type="text" id="nameA" class="team-input" placeholder="TEAM 1" oninput="updateDB()">
+                <div class="score-val" id="dispA">0</div>
+                <div style="display:flex; width:100%;">
+                    <button class="btn-pm btn-minus" onclick="changeScore('scoreA', -1)">-</button>
+                    <button class="btn-pm btn-plus" onclick="changeScore('scoreA', 1)">+</button>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; font-weight:bold; color:#aaa;">VS</div>
+            <div class="team-box">
+                <input type="text" id="nameB" class="team-input" placeholder="TEAM 2" oninput="updateDB()">
+                <div class="score-val" id="dispB">0</div>
+                <div style="display:flex; width:100%;">
+                    <button class="btn-pm btn-minus" onclick="changeScore('scoreB', -1)">-</button>
+                    <button class="btn-pm btn-plus" onclick="changeScore('scoreB', 1)">+</button>
+                </div>
+            </div>
+        </div>
+        <div class="controls">
+            <button id="visBtn" class="btn-full btn-red" onclick="toggleVis('scoreVisible')">Show/Hide Scoreboard</button>
+            <button class="btn-full btn-yellow" onclick="swapTeams()">Swap Teams</button>
+            <button class="btn-full btn-red" style="background:#777;" onclick="resetScores()">Reset Scores</button>
+            <input type="text" id="roundInp" class="std-input" style="text-align:center; margin-bottom:0;" placeholder="ROUND" oninput="updateDB()">
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="header">Ticker & Branding</div>
+        <div class="settings-section">
+            <textarea id="row1Inp" rows="2" placeholder="Title Line 1" oninput="updateDB()"></textarea>
+            <textarea id="row2Inp" rows="2" placeholder="Title Line 2" oninput="updateDB()"></textarea>
+            <textarea id="row3Inp" rows="2" placeholder="Title Line 3" oninput="updateDB()"></textarea>
+            <button id="tickVisBtn" class="btn-full btn-blue" onclick="toggleVis('tickerVisible')">Show/Hide Ticker</button>
+            <input type="text" id="watermarkInp" class="std-input" placeholder="Channel Name" oninput="updateDB()">
+            <button id="logoBtn" class="btn-full btn-dark" onclick="toggleVis('logoVisible')">Show/Hide Logo</button>
+            <button class="btn-full btn-red" style="margin-top:15px; background:#444;" onclick="logout()">LOGOUT</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- LOGIN SETTINGS ---
+    const ADMIN_USER = "manpreet";
+    const ADMIN_PASS = "0061";
+
+    // ਚੈੱਕ ਕਰੋ ਕਿ ਪਹਿਲਾਂ ਲੌਗਇਨ ਹੈ ਜਾਂ ਨਹੀਂ
+    if(localStorage.getItem('isKabaddiLoggedIn') === 'true') {
+        showPanel();
+    }
+
+    function checkLogin() {
+        const u = document.getElementById('username').value;
+        const p = document.getElementById('password').value;
+        if(u === ADMIN_USER && p === ADMIN_PASS) {
+            localStorage.setItem('isKabaddiLoggedIn', 'true');
+            showPanel();
+        } else {
+            document.getElementById('error-msg').style.display = "block";
+        }
+    }
+
+    function showPanel() {
+        document.getElementById('login-screen').style.display = "none";
+        document.getElementById('main-panel').style.display = "flex";
+    }
+
+    function logout() {
+        localStorage.removeItem('isKabaddiLoggedIn');
+        location.reload();
+    }
+    // ----------------------
+
+    const firebaseConfig = { databaseURL: "https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database().ref("matchData");
+
+    let curA = 0, curB = 0, sVis = true, tVis = true, lVis = true;
+
+    db.on("value", (snap) => {
+        const data = snap.val();
+        if(data) {
+            curA = parseFloat(data.scoreA) || 0; 
+            curB = parseFloat(data.scoreB) || 0;
+            sVis = !!data.scoreVisible; tVis = !!data.tickerVisible; lVis = !!data.logoVisible;
+            
+            document.getElementById('dispA').innerText = curA;
+            document.getElementById('dispB').innerText = curB;
+            document.getElementById('nameA').value = data.nameA || "";
+            document.getElementById('nameB').value = data.nameB || "";
+            document.getElementById('roundInp').value = data.round || "";
+            document.getElementById('row1Inp').value = data.row1Txt || "";
+            document.getElementById('row2Inp').value = data.row2Txt || "";
+            document.getElementById('row3Inp').value = data.row3Txt || "";
+            document.getElementById('watermarkInp').value = data.watermarkTxt || "";
+            
+            updateBtnUI('visBtn', sVis, "Scoreboard");
+            updateBtnUI('tickVisBtn', tVis, "Ticker");
+            updateBtnUI('logoBtn', lVis, "Logo");
+        }
+    });
+
+    function updateBtnUI(id, val, text) {
+        const btn = document.getElementById(id);
+        if(btn) {
+            btn.innerText = val ? "Hide " + text : "Show " + text;
+            btn.style.background = val ? (id==='logoBtn'?'#333':'#dc3545') : "#28a745";
+        }
+    }
+
+    function changeScore(team, val) {
+        let current = (team === 'scoreA' ? curA : curB);
+        let newVal;
+        if (val > 0) {
+            if (curA === 0 && curB === 0) newVal = 1.5;
+            else newVal = current + 1;
+        } else {
+            if (current === 1.5) newVal = 0;
+            else newVal = current - 1;
+            if (newVal < 0) newVal = 0;
+        }
+        db.update({ [team]: newVal });
+    }
+
+    function updateDB() {
+        db.update({
+            nameA: document.getElementById('nameA').value,
+            nameB: document.getElementById('nameB').value,
+            round: document.getElementById('roundInp').value,
+            row1Txt: document.getElementById('row1Inp').value,
+            row2Txt: document.getElementById('row2Inp').value,
+            row3Txt: document.getElementById('row3Inp').value,
+            watermarkTxt: document.getElementById('watermarkInp').value
+        });
+    }
+
+    function toggleVis(field) {
+        let val = (field === 'scoreVisible') ? sVis : (field === 'tickerVisible' ? tVis : lVis);
+        db.child(field).set(!val);
+    }
+
+    function swapTeams() {
+        db.update({ nameA: document.getElementById('nameB').value, nameB: document.getElementById('nameA').value, scoreA: curB, scoreB: curA });
+    }
+
+    function resetScores() {
+        if(confirm("Reset Match Scores?")) db.update({ scoreA: 0, scoreB: 0 });
+    }
+</script>
+</body>
+</html>
