@@ -80,13 +80,22 @@
         }
         @keyframes score-light-sweep { 0% { left: -50%; } 15% { left: 150%; } 100% { left: 150%; } }
         
-        .s-box { 
-            background: linear-gradient(145deg, #00aeef, #004b75); color: #ffffff; 
-            font-size: 45px; font-weight: 900; width: 90px; height: 100%; display: flex; align-items: center; justify-content: center; 
-            transform: skewX(-15deg); text-shadow: 2px 2px 5px #000; 
-            box-shadow: inset 3px 3px 8px rgba(255,255,255,0.6), inset -3px -3px 8px rgba(0,0,0,0.6); 
-            position: relative; z-index: 11; 
-        }
+     .s-box { 
+    background: linear-gradient(145deg, #00aeef, #004b75); 
+    color: #ffffff; 
+    font-size: 40px; /* ਫੌਂਟ ਸਾਈਜ਼ ਥੋੜਾ ਘਟਾਇਆ ਤਾਂ ਜੋ ਨੰਬਰ ਸਪੱਸ਼ਟ ਦਿਸਣ */
+    font-weight: 900; 
+    width: 130px; /* ਇੱਥੇ ਚੌੜਾਈ ਵਧਾਈ ਗਈ ਹੈ */
+    height: 100%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    transform: skewX(-15deg); 
+    text-shadow: 2px 2px 5px #000; 
+    box-shadow: inset 3px 3px 8px rgba(255,255,255,0.6), inset -3px -3px 8px rgba(0,0,0,0.6); 
+    position: relative; 
+    z-index: 11; 
+}
         .s-left { margin-left: -17px; border: 2px solid #5bc0de; border-radius: 4px 0 0 4px; }
         .s-right { margin-right: -17px; border: 2px solid #5bc0de; border-radius: 0 4px 4px 0; }
         .inner-val { transform: skewX(15deg); }
