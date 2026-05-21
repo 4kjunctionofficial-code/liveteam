@@ -1,35 +1,341 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <style>
-        body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Arial', sans-serif; overflow: hidden; }
+<meta charset="UTF-8">
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
-        /* ਸਕੋਰਬੋਰਡ - ਟੀਮਾਂ ਬਾਹਰ, ਸਕੋਰ ਅੰਦਰ */
-        #scoreboard { position: absolute; top: 40px; right: 80px; display: flex; align-items: center; z-index: 9999; }
-        .team-label { background: #e60000; color: white; padding: 10px 20px; font-weight: 900; font-size: 28px; border-radius: 5px; }
-        .score-middle { background: #dcdcdc; color: #000; padding: 10px 20px; font-weight: 900; font-size: 32px; border: 2px solid #555; margin: 0 10px; border-radius: 5px; }
+<style>
+body{
+margin:0;
+padding:0;
+width:1920px;
+height:1080px;
+background:transparent;
+font-family:Arial,sans-serif;
+overflow:hidden;
+position:relative;
+}
 
-        /* ਟਿੱਕਰ - ਫੋਟੋ ਵਾਲਾ ਡਿਜ਼ਾਈਨ */
-        #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 150px; display: flex; align-items: center; }
-        .box-live { width: 300px; height: 100%; background: #e60000; color: white; display: flex; align-items: center; justify-content: center; font-size: 80px; font-weight: 900; clip-path: polygon(0 0, 100% 0, 75% 100%, 0 100%); }
-        .center-bar { flex: 1; height: 70%; background: #666; display: flex; align-items: center; justify-content: center; color: white; font-size: 40px; font-weight: bold; margin: 0 -50px; }
-        .box-right { width: 300px; height: 100%; background: #e60000; clip-path: polygon(25% 0, 100% 0, 100% 100%, 0 100%); }
-    </style>
+/* WhatsApp */
+.whatsapp-bar{
+position:absolute;
+bottom:135px;
+left:10px;
+display:flex;
+align-items:center;
+background:#000;
+color:#fff;
+padding:6px 18px 6px 45px;
+border-radius:25px;
+font-size:22px;
+font-weight:bold;
+z-index:9999;
+}
+.whatsapp-icon{
+position:absolute;
+left:-2px;
+width:44px;
+height:44px;
+background:#e60000;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+.whatsapp-icon svg{
+width:24px;
+height:24px;
+fill:white;
+}
+
+/* LOGO */
+#logo-container{
+position:absolute;
+top:30px;
+left:40px;
+z-index:9999;
+opacity:1;
+transition:.7s;
+}
+#logo-container.hidden{
+opacity:0;
+transform:scale(0);
+}
+#main-logo{
+height:100px;
+max-width:450px;
+}
+
+/* Watermark */
+#single-wm{
+position:absolute;
+color:rgba(255,255,255,.6);
+font-size:35px;
+font-weight:bold;
+text-shadow:2px 2px 5px #000;
+z-index:1;
+}
+
+/* SCOREBOARD */
+#scoreboard{
+position:absolute;
+top:40px;
+right:80px;
+display:flex;
+flex-direction:column;
+align-items:center;
+z-index:9999;
+}
+.main-bar{
+display:flex;
+align-items:center;
+height:65px;
+background:rgba(20,20,20,.95);
+padding:0 5px;
+border-radius:6px;
+}
+.s-box{
+background:linear-gradient(145deg,#e60000,#990000);
+color:#fff;
+font-size:42px;
+font-weight:900;
+width:120px;
+height:100%;
+display:flex;
+align-items:center;
+justify-content:center;
+transform:skewX(-15deg);
+}
+.inner-val{
+transform:skewX(15deg);
+}
+.name-area{
+width:220px;
+color:#fff;
+font-size:28px;
+font-weight:bold;
+text-align:center;
+}
+.vs-text{
+color:#fff;
+font-size:20px;
+font-weight:bold;
+margin:0 10px;
+}
+.round-display{
+margin-top:10px;
+background:rgba(0,0,0,.6);
+padding:5px 15px;
+color:#fff;
+font-size:22px;
+}
+
+/* ===== TICKER ===== */
+
+#ticker-wrap{
+position:absolute;
+bottom:0;
+left:0;
+width:1920px;
+height:120px;
+display:flex;
+z-index:9998;
+}
+
+/* Left LIVE */
+.box-live{
+width:300px;
+background:#ff0000;
+color:white;
+font-size:80px;
+font-weight:900;
+font-family:Impact,sans-serif;
+display:flex;
+align-items:center;
+justify-content:center;
+clip-path:polygon(0 0,100% 0,70% 100%,0 100%);
+text-shadow:3px 3px 5px rgba(0,0,0,.5);
+z-index:3;
+}
+
+/* Center silver */
+.center-wrap{
+flex:1;
+height:60px;
+margin-top:25px;
+margin-left:-50px;
+margin-right:-50px;
+background:linear-gradient(
+to bottom,
+#f8f8f8 0%,
+#dddddd 25%,
+#bbbbbb 50%,
+#dddddd 75%,
+#f8f8f8 100%
+);
+border-top:2px solid #999;
+border-bottom:2px solid #999;
+overflow:hidden;
+display:flex;
+align-items:center;
+z-index:2;
+}
+
+/* Scroll */
+.row-text{
+color:#111;
+font-size:34px;
+font-weight:bold;
+white-space:nowrap;
+width:100%;
+overflow:hidden;
+}
+.scroller{
+display:inline-block;
+padding-left:100%;
+animation:scroll 20s linear infinite;
+}
+@keyframes scroll{
+from{transform:translateX(0);}
+to{transform:translateX(-100%);}
+}
+
+/* Right angle */
+.box-time{
+width:280px;
+background:#ff0000;
+clip-path:polygon(30% 0,100% 0,100% 100%,0 100%);
+margin-left:-20px;
+position:relative;
+display:flex;
+align-items:center;
+justify-content:center;
+color:white;
+font-size:40px;
+font-weight:bold;
+}
+
+/* Hide extra rows */
+.row-1,.row-3{
+display:none;
+}
+
+/* time/date */
+#live-time,#live-date{
+position:absolute;
+}
+</style>
 </head>
+
 <body>
 
+<div class="whatsapp-bar">
+<div class="whatsapp-icon">
+<svg viewBox="0 0 24 24">
+<path d="M.057 24l1.687-6.163C.703 16.033.156 13.988.157 11.891.16 5.348 5.405.003 12.022.003c6.617 0 11.98 5.363 11.98 11.98 0 6.657-5.35 12.002-11.97 12.002-2.012 0-3.992-.501-5.756-1.451L0 24z"/>
+</svg>
+</div>
++91 74007 35730
+</div>
+
+<div id="logo-container">
+<img id="main-logo" src="">
+</div>
+
+<div id="single-wm">M LIVE</div>
+
 <div id="scoreboard">
-    <div class="team-label">TEAM A</div>
-    <div class="score-middle">0 VS 0</div>
-    <div class="team-label">TEAM B</div>
+<div class="main-bar">
+<div class="s-box"><div class="inner-val" id="sA">0</div></div>
+<div class="name-area" id="nA">TEAM 1</div>
+<div class="vs-text">VS</div>
+<div class="name-area" id="nB">TEAM 2</div>
+<div class="s-box"><div class="inner-val" id="sB">0</div></div>
+</div>
+<div class="round-display" id="round-display">LIVE MATCH</div>
 </div>
 
 <div id="ticker-wrap">
-    <div class="box-live">Live</div>
-    <div class="center-bar">WELCOME TO KABADDI LIVE</div>
-    <div class="box-right"></div>
+<div class="box-live">Live</div>
+
+<div class="center-wrap">
+<div class="row-text" id="c2">
+SUBSCRIBE OUR CHANNEL
 </div>
+</div>
+
+<div class="box-time">
+<div id="live-time"></div>
+<div id="live-date" style="display:none;"></div>
+</div>
+</div>
+
+<script>
+const firebaseConfig={
+databaseURL:"https://manpreetteam-a86e9-default-rtdb.firebaseio.com/"
+};
+firebase.initializeApp(firebaseConfig);
+
+const urlParams=new URLSearchParams(window.location.search);
+const matchId=urlParams.get('id')||'defaultMatch';
+const db=firebase.database().ref("matchData/"+matchId);
+
+db.on("value",(snap)=>{
+const data=snap.val()||{};
+
+document.getElementById('sA').innerText=data.scoreA||0;
+document.getElementById('sB').innerText=data.scoreB||0;
+document.getElementById('nA').innerText=data.nameA||"TEAM 1";
+document.getElementById('nB').innerText=data.nameB||"TEAM 2";
+document.getElementById('round-display').innerText=data.round||"LIVE MATCH";
+document.getElementById('single-wm').innerText=data.watermarkTxt||"M LIVE";
+
+setScroll(data.row2Txt||"SUBSCRIBE OUR CHANNEL");
+});
+
+function setScroll(txt){
+document.getElementById('c2').innerHTML=
+`<div class="scroller">${txt}</div>`;
+}
+
+function updateClock(){
+let now=new Date();
+
+document.getElementById('live-time').innerText=
+now.toLocaleTimeString([],{
+hour:'2-digit',
+minute:'2-digit'
+});
+
+document.getElementById('live-date').innerText=
+now.toLocaleDateString('en-GB',{
+day:'2-digit',
+month:'short',
+year:'numeric'
+});
+}
+setInterval(updateClock,1000);
+updateClock();
+
+let showTime=true;
+setInterval(()=>{
+showTime=!showTime;
+document.getElementById('live-time').style.display=
+showTime?'block':'none';
+
+document.getElementById('live-date').style.display=
+showTime?'none':'block';
+},5000);
+
+const wm=document.getElementById('single-wm');
+function moveWM(){
+wm.style.left=(Math.random()*1400+100)+'px';
+wm.style.top=(Math.random()*600+150)+'px';
+}
+moveWM();
+setInterval(moveWM,6000);
+</script>
 
 </body>
 </html>
