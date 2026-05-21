@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Client Master Panel (With Expiry)</title>
+    <title>Multi-Client Master Panel (Dropdown & Expiry)</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
@@ -20,7 +20,8 @@
         .btn-plus { background: #28a745; } .btn-minus { background: #dc3545; }
         .settings-section { padding: 15px; background: #fafafa; box-sizing: border-box; }
         .label { font-size: 12px; font-weight: bold; color: #555; margin-bottom: 5px; display: block; text-transform: uppercase; }
-        textarea, .std-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; margin-bottom: 12px; resize: none; box-sizing: border-box; font-family: inherit; }
+        textarea, .std-input, .std-select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; margin-bottom: 12px; resize: none; box-sizing: border-box; font-family: inherit; }
+        .std-select { font-weight: bold; background: white; cursor: pointer; }
         .controls { padding: 15px; display: flex; flex-direction: column; gap: 8px; }
         .btn-full { border: none; color: white; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-bottom: 5px; width: 100%; box-sizing: border-box;}
         .btn-blue { background: #1a73e8; } .btn-yellow { background: #fbbc05; color: #000; } .btn-red { background: #ea4335; } .btn-dark { background: #333; }
@@ -37,21 +38,38 @@
 <body>
 
 <div id="main-panel">
-    <!-- CLIENT ID SELECTOR -->
+    <!-- CLIENT SELECTION & ADMIN CONTROLS -->
     <div class="card">
-        <div class="header" style="background: #333;">Client Account Manager</div>
+        <div class="header" style="background: #333;">Client Account & Validity Manager</div>
         <div class="client-section">
-            <span class="label">Enter Client ID</span>
-            <input type="text" id="clientIdInp" class="std-input" value="client1" style="margin-bottom:5px; font-weight:bold; text-align:center; text-transform:lowercase;" onchange="switchClient()">
+            <span class="label">Select Client Account</span>
+            <!-- ਇੱਥੇ ਆਪਣੀਆਂ ਸਾਰੀਆਂ IDs ਪਹਿਲਾਂ ਹੀ ਸੈੱਟ ਕਰ ਦਿੱਤੀਆਂ ਹਨ। ਤੁਸੀਂ ਹੋਰ ਵੀ ਜੋੜ ਸਕਦੇ ਹੋ -->
+            <select id="clientIdInp" class="std-select" onchange="switchClient()">
+                <option value="client1">Client 1 (Default)</option>
+                <option value="client2">Client 2</option>
+                <option value="client3">Client 3</option>
+                <option value="client4">Client 4</option>
+                <option value="client5">Client 5</option>
+            </select>
+            
             <div class="url-box"><strong>Overlay URL:</strong> <span id="overlayUrl">Loading...</span></div>
             
-            <!-- ADMIN ONLY: SET EXPIRY & HELPLINE -->
+            <!-- ADMIN: SET EXPIRY & HELPLINE (ਇੱਥੋਂ ਵੈਲਡਿਟੀ ਵਧਾਈ/ਘਟਾਈ ਜਾ ਸਕਦੀ ਹੈ) -->
             <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ccc;">
-                <span class="label" style="color: #444;">Admin Controls (Set Expiry)</span>
-                <div style="display: flex; gap: 5px;">
-                    <input type="date" id="expDateInp" class="std-input" style="margin-bottom:0; padding:5px;">
-                    <input type="text" id="helplineInp" class="std-input" placeholder="Helpline No." style="margin-bottom:0; padding:5px;">
-                    <button class="btn-blue" style="border:none; color:white; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:12px;" onclick="updateExpiryDetails()">SAVE</button>
+                <span class="label" style="color: #444; display: flex; justify-content: space-between;">
+                    <span>Admin Controls (Manage Validity)</span>
+                    <span id="statusLabel" style="font-weight: bold;"></span>
+                </span>
+                <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 140px;">
+                        <span style="font-size: 10px; color:#666;">Expiry Date:</span>
+                        <input type="date" id="expDateInp" class="std-input" style="margin-bottom:0; padding:5px;">
+                    </div>
+                    <div style="flex: 1; min-width: 140px;">
+                        <span style="font-size: 10px; color:#666;">Helpline Number:</span>
+                        <input type="text" id="helplineInp" class="std-input" placeholder="Helpline No." style="margin-bottom:0; padding:5px;">
+                    </div>
+                    <button class="btn-blue" style="border:none; color:white; padding:5px 15px; border-radius:6px; cursor:pointer; font-size:13px; font-weight:bold; width:100%; margin-top:5px;" onclick="updateExpiryDetails()">UPDATE CLIENT VALIDITY</button>
                 </div>
             </div>
         </div>
@@ -123,7 +141,7 @@
     function switchClient() {
         if(db) db.off();
         
-        curClient = document.getElementById('clientIdInp').value.trim().toLowerCase() || "client1";
+        curClient = document.getElementById('clientIdInp').value;
         db = firebase.database().ref("matchData/" + curClient);
         
         let currentUrl = window.location.href.split('?')[0];
@@ -133,7 +151,6 @@
         db.on("value", (snap) => {
             const data = snap.val();
             if(data) {
-                // Expiry Check Logic
                 checkExpiry(data.expiryDate, data.helpline || "98765-XXXXX");
 
                 curA = parseFloat(data.scoreA) || 0; 
@@ -165,9 +182,11 @@
     }
 
     function checkExpiry(expiryDateStr, helpline) {
+        const statusLabel = document.getElementById('statusLabel');
         if(!expiryDateStr) {
-            // ਜੇਕਰ ਕੋਈ ਤਾਰੀਖ਼ ਨਹੀਂ ਹੈ, ਤਾਂ ਸੁਰੱਖਿਆ ਲਈ ਲਾਕ ਕਰੋ
             setLockState(true, helpline);
+            statusLabel.innerText = "No Plan Set";
+            statusLabel.style.color = "#dc3545";
             return;
         }
         const today = new Date();
@@ -177,8 +196,12 @@
 
         if(today > expDate) {
             setLockState(true, helpline);
+            statusLabel.innerText = "EXPIRED";
+            statusLabel.style.color = "#dc3545";
         } else {
             setLockState(false, helpline);
+            statusLabel.innerText = "ACTIVE";
+            statusLabel.style.color = "#28a745";
         }
     }
 
@@ -193,10 +216,14 @@
 
     function updateExpiryDetails() {
         const exp = document.getElementById('expDateInp').value;
-        const hl = document.getElementById('helplineInp').value;
-        if(!exp) { alert("Please select an expiry date!"); return; }
-        db.update({ expiryDate: exp, helpline: hl });
-        alert("Client settings updated successfully!");
+        const hl = document.getElementById('helplineInp').value || "98765-XXXXX";
+        if(!exp) { alert("ਕਿਰਪਾ ਕਰਕੇ ਪਹਿਲਾਂ ਐਕਸਪਾਇਰੀ ਡੇਟ ਸਿਲੈਕਟ ਕਰੋ!"); return; }
+        
+        db.update({ expiryDate: exp, helpline: hl }, (error) => {
+            if(!error) {
+                alert(curClient.toUpperCase() + " ਦੀ ਵੈਲਡਿਟੀ ਸਫਲਤਾਪੂਰਵਕ ਅਪਡੇਟ ਕਰ ਦਿੱਤੀ ਗਈ ਹੈ!");
+            }
+        });
     }
 
     function resetFormToDefault() {
