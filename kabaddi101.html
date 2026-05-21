@@ -31,7 +31,7 @@
             filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.3));
         }
 
-        /* ਵਾਟਰਮਾਰਕ (M LIVE) */
+        /* ਵਾਟਰਮਾਰਕ */
         #single-wm { 
             position: absolute; color: rgba(255, 255, 255, 0.7); font-size: 35px; font-weight: bold; 
             text-transform: uppercase; text-shadow: 2px 2px 5px #000; white-space: nowrap; 
@@ -45,7 +45,7 @@
         }
         #ticker-wrap.hidden { opacity: 0; transform: translateY(160px); }
 
-        /* ਖੱਬੇ ਪਾਸੇ ਵਾਲਾ LIVE ਬਾਕਸ */
+        /* LIVE ਬਾਕਸ */
         .box-live { 
             width: 250px; background: #e60000; color: white; display: flex; align-items: center; 
             justify-content: center; font-size: 75px; font-weight: bold; font-family: 'Impact', 'Arial Black', sans-serif; text-transform: uppercase;
@@ -71,7 +71,7 @@
         .scroller { display: inline-block; padding-left: 100%; animation: scroll-anim 25s linear infinite; }
         @keyframes scroll-anim { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        /* ਸੱਜੇ ਪਾਸੇ ਵਾਲਾ TIME ਬਾਕਸ */
+        /* TIME ਬਾਕਸ */
         .box-time { 
             width: 280px; background: #e60000; color: white; display: flex; align-items: center; 
             justify-content: center; z-index: 12; position: relative; margin-left: -40px;
@@ -85,7 +85,7 @@
         .time-str { color: #ffffff; font-size: 45px; letter-spacing: 1px; }
         .date-str { font-size: 32px; color: #ffffff; }
 
-        /* ਸਕੋਰਬੋਰਡ (Top Right) */
+        /* ਸਕੋਰਬੋਰਡ */
         #scoreboard { 
             position: absolute; top: 40px; right: 80px; display: flex; flex-direction: column; align-items: center; z-index: 9999;
             opacity: 1; transition: all 0.7s ease; 
@@ -135,7 +135,7 @@
     +91 74007 35730
 </div>
 
-<div id="logo-container">
+<div id="logo-container" class="hidden">
     <img id="main-logo" src="" alt="Logo">
 </div>
 
@@ -171,24 +171,27 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const matchId = urlParams.get('id') || 'defaultMatch';
+    
+    // OBS ਲਿੰਕ ਤੋਂ ਸਿੱਧਾ ਲੋਗੋ ਦਾ URL ਚੁੱਕਣ ਲਈ ਸਿਸਟਮ
+    const logoUrlFromParam = urlParams.get('logo'); 
+
     const db = firebase.database().ref("matchData/" + matchId);
 
     db.on("value", (snap) => {
         const data = snap.val() || {}; 
         
-        // --- ਨਵੀਂ ਕੰਡੀਸ਼ਨ (ਜੇ ਲਿੰਕ ਖਾਲੀ ਤਾਂ ਕੋਈ ਲੋਗੋ ਨਹੀਂ ਦਿਖੇਗਾ) ---
+        // --- ਆਟੋਮੈਟਿਕ ਲੋਗੋ ਸਿਸਟਮ ---
         const logoCont = document.getElementById('logo-container');
-        if (data.clientLogoUrl && data.clientLogoUrl.trim() !== "") {
-            document.getElementById('main-logo').src = data.clientLogoUrl;
-            // ਜੇ ਐਡਮਿਨ ਨੇ ਵੈਸੇ ਹਾਈਡ ਨਾ ਕੀਤਾ ਹੋਵੇ, ਤਾਂ ਦਿਖਾਓ
+        if (logoUrlFromParam && logoUrlFromParam.trim() !== "") {
+            document.getElementById('main-logo').src = logoUrlFromParam;
+            // ਜੇ ਲਿੰਕ ਹੈ ਅਤੇ ਐਡਮਿਨ ਨੇ ਹਾਈਡ ਨਹੀਂ ਕੀਤਾ, ਤਾਂ ਦਿਖਾਓ
             if(data.logoVisible !== false) { logoCont.classList.remove('hidden'); }
         } else {
-            // ਜੇ ਲਿੰਕ ਖਾਲੀ ਹੈ ਤਾਂ ਲੋਗੋ ਨੂੰ ਪੱਕਾ ਹਾਈਡ ਕਰ ਦਿਓ
+            // ਜੇ ਲਿੰਕ ਖਾਲੀ ਹੈ (ਕੋਈ ਲੋਗੋ ਨਹੀਂ ਪਾਇਆ), ਤਾਂ ਪੱਕਾ ਹਾਈਡ ਰੱਖੋ
             logoCont.classList.add('hidden');
             document.getElementById('main-logo').src = "";
         }
 
-        // ਬਾਕੀ ਵਿਜ਼ੀਬਿਲਟੀ ਸੈਟਿੰਗਜ਼
         if(data.logoVisible === false) { logoCont.classList.add('hidden'); }
         if(data.scoreVisible === false) { document.getElementById('scoreboard').classList.add('hidden'); } else { document.getElementById('scoreboard').classList.remove('hidden'); }
         
