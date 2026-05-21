@@ -2,63 +2,53 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Arial', sans-serif; overflow: hidden; position: relative; }
-        
-        /* ਟਿੱਕਰ ਸੈਟਿੰਗਜ਼ */
-        #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 160px; display: flex; z-index: 9998; }
-        
-        .box-live { width: 280px; background: #e60000; color: white; display: flex; align-items: center; justify-content: center; font-size: 85px; font-weight: 900; clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%); }
-        
-        .center-wrap { flex: 1; display: flex; flex-direction: column; background: #4a4a4a; margin: 0 -40px; justify-content: center; position: relative; border-top: 4px solid #ffffff; }
-        
-        .row-text { display: flex; align-items: center; font-weight: bold; width: 100%; overflow: hidden; white-space: nowrap; padding-left: 20px; }
-        
-        .row-1 { height: 60px; font-size: 35px; background: #333; color: white; } /* ਪਹਿਲੀ ਲਾਈਨ ਚੌੜੀ */
-        .row-2 { height: 50px; font-size: 30px; background: #969696; color: black; } /* ਹੇਠਲੀਆਂ ਬਰਾਬਰ */
-        .row-3 { height: 50px; font-size: 30px; background: #969696; color: black; }
-        
-        .scroller { display: inline-block; padding-left: 100%; animation: scroll-anim 20s linear infinite; }
-        @keyframes scroll-anim { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; overflow: hidden; }
 
-        .box-time { width: 300px; background: #e60000; color: white; display: flex; align-items: center; justify-content: center; clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%); font-size: 40px; font-weight: bold; border-top: 4px solid #ffffff; }
+        /* ਟਿੱਕਰ ਕੰਟੇਨਰ */
+        #ticker-wrap { 
+            position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 160px; 
+            display: flex; align-items: center; z-index: 9998; 
+        }
+
+        /* ਖੱਬਾ ਲਾਲ ਕੋਨਾ (Left Corner \ ) */
+        .box-live { 
+            width: 280px; height: 100%; background: #e60000; 
+            clip-path: polygon(0 0, 100% 0, 70% 100%, 0 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 80px; font-weight: 900; color: white;
+            border-bottom: 8px solid white; /* ਲਾਲ ਹਿੱਸੇ ਅੰਦਰ ਚਿੱਟੀ ਲਾਈਨ */
+        }
+
+        /* ਵਿਚਕਾਰਲਾ ਚਿੱਟਾ ਹਿੱਸਾ */
+        .center-wrap { 
+            flex: 1; height: 100%; background: white; 
+            display: flex; flex-direction: column; justify-content: center;
+            margin: 0 -40px; border-top: 8px solid #e60000; border-bottom: 8px solid #e60000;
+        }
+
+        .row-text { font-weight: bold; font-size: 35px; color: black; padding-left: 20px; }
+
+        /* ਸੱਜਾ ਲਾਲ ਕੋਨਾ (Right Corner / ) */
+        .box-time { 
+            width: 300px; height: 100%; background: #e60000; 
+            clip-path: polygon(30% 0, 100% 0, 100% 100%, 0 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 45px; font-weight: bold; color: white;
+            border-bottom: 8px solid white;
+        }
     </style>
 </head>
 <body>
 
 <div id="ticker-wrap">
-    <div class="box-live">Live</div>
+    <div class="box-live">LIVE</div>
     <div class="center-wrap">
-        <div class="row-text row-1" id="c1">WELCOME TO LIVE KABADDI</div>
-        <div class="row-text row-2" id="c2">SUBSCRIBE OUR CHANNEL</div>
-        <div class="row-text row-3" id="c3">LIKE & SHARE</div>
+        <div class="row-text">WELCOME TO LIVE KABADDI</div>
+        <div class="row-text">SUBSCRIBE OUR CHANNEL</div>
     </div>
-    <div class="box-time" id="live-time">00:00</div>
+    <div class="box-time">00:00</div>
 </div>
 
-<script>
-    // Firebase ਅਤੇ ਬਾਕੀ ਕੋਡ ਉਹੀ ਰਹੇਗਾ
-    const firebaseConfig = { databaseURL: "https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database().ref("matchData/defaultMatch");
-
-    db.on("value", (snap) => {
-        const data = snap.val() || {};
-        setAlwaysScroll('c1', data.row1Txt || "WELCOME TO LIVE KABADDI");
-        setAlwaysScroll('c2', data.row2Txt || "SUBSCRIBE OUR CHANNEL");
-        setAlwaysScroll('c3', data.row3Txt || "LIKE & SHARE");
-    });
-
-    function setAlwaysScroll(id, txt) {
-        document.getElementById(id).innerHTML = `<div class="scroller">${txt}</div>`;
-    }
-
-    function updateClock() {
-        document.getElementById('live-time').innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
-    setInterval(updateClock, 1000); updateClock();
-</script>
 </body>
 </html>
