@@ -1,14 +1,35 @@
-ਵੀਰੇ, ਮੈਂ ਫੋਟੋ ਦੇਖ ਕੇ ਬਿਲਕੁਲ ਸਮਝ ਗਿਆ ਹਾਂ! ਕਲਾਇੰਟ ਚਾਹੁੰਦਾ ਹੈ ਕਿ ਹੇਠਾਂ ਵਾਲਾ ਟਿਕਰ ਪੂਰਾ 100% ਉਸੇ ਡਿਜ਼ਾਈਨ ਵਰਗਾ ਬਣੇ ਜਿਵੇਂ ਫੋਟੋ ਵਿੱਚ ਹੈ:
+ਵੀਰੇ, ਮੈਂ ਤੇਰੀ ਗੱਲ ਬਿਲਕੁਲ ਸਮਝ ਗਿਆ! ਤੂੰ ਚਾਹੁੰਦਾ ਹੈਂ ਕਿ ਸੁਰੱਖਿਆ ਪੂਰੀ ਪੱਕੀ ਹੋਵੇ—ਜਿਸ ਕਲਾਇੰਟ ਦਾ ਪੈਨਲ (ਮੈਚ ਆਈਡੀ) ਹੈ, ਉਹ ਸਿਰਫ਼ ਆਪਣਾ ਹੀ ਲੋਗੋ ਵਰਤ ਸਕੇ, ਕਿਸੇ ਦੂਜੇ ਕਲਾਇੰਟ ਦਾ ਲੋਗੋ ਚੋਰੀ ਜਾਂ ਗਲਤੀ ਨਾਲ ਵੀ ਨਾ ਲਗਾ ਸਕੇ।
 
-1. **ਖੱਬੇ ਪਾਸੇ (Left Side):** ਲਾਈਵ ਬਾਕਸ ਦੇ ਕੱਟ ਦਾ ਡਿਜ਼ਾਈਨ ਇਸ ਤਰ੍ਹਾਂ ਹੋਵੇ **`/`**
-2. **ਸੱਜੇ ਪਾਸੇ (Right Side):** ਟਾਈਮ ਵਾਲੇ ਬਾਕਸ ਦੇ ਕੱਟ ਦਾ ਡਿਜ਼ਾਈਨ ਇਸ ਤਰ੍ਹਾਂ ਹੋਵੇ **`\`**
-3. **ਸਾਫ਼ ਲਿਖਤ:** `Live` ਸ਼ਬਦ ਬਿਲਕੁਲ ਵੱਡਾ ਅਤੇ ਸਾਫ਼ ਨਜ਼ਰ ਆਵੇ।
+ਇਸ ਲਈ ਮੈਂ ਕੋਡ ਦੇ ਅੰਦਰ ਇੱਕ **ਆਟੋਮੈਟਿਕ ਲਾਕ ਸਿਸਟਮ (Match ID Lock)** ਬਣਾ ਦਿੱਤਾ ਹੈ। ਹੁਣ ਤੁਹਾਨੂੰ ਨਾ ਤਾਂ ਐਡਮਿਨ ਵਿੱਚ ਕੁਝ ਲਿਖਣ ਦੀ ਲੋੜ ਹੈ, ਨਾ ਹੀ ਵਾਟਰਮਾਰਕ ਬਦਲਣ ਦੀ।
 
-ਮੈਂ ਹੇਠਾਂ ਵਾਲੇ ਕੋਡ ਵਿੱਚ **CSS Clips** ਅਤੇ **Borders** ਨੂੰ ਪੂਰੀ ਤਰ੍ਹਾਂ ਬਦਲ ਕੇ 100% ਓਹੀ ਡਿਜ਼ਾਈਨ ਤਿਆਰ ਕਰ ਦਿੱਤਾ ਹੈ।
+### ਇਹ ਨਵਾਂ ਸਿਸਟਮ ਕਿਵੇਂ ਕੰਮ ਕਰੇਗਾ?
 
-### ਨਵਾਂ ਫਿਕਸ ਕੀਤਾ ਹੋਇਆ ਕੋਡ (100% Same Design):
+ਜਦੋਂ ਤੁਸੀਂ OBS ਵਿੱਚ ਲਿੰਕ ਪਾਉਂਦੇ ਹੋ (ਜਿਵੇਂ `?id=malloke`), ਤਾਂ ਕੋਡ ਆਪਣੇ ਆਪ ਉਸ ਆਈਡੀ (`id`) ਨੂੰ ਪੜ੍ਹੇਗਾ ਅਤੇ ਸਿਰਫ਼ ਉਸੇ ਕਲਾਇੰਟ ਦਾ ਲੋਗੋ ਸਕ੍ਰੀਨ 'ਤੇ ਲਗਾਵੇਗਾ।
 
-ਇਸ ਕੋਡ ਨੂੰ ਕਾਪੀ ਕਰਕੇ ਆਪਣੀ ਫਾਈਲ ਵਿੱਚ ਪਾ ਲਓ, ਡਿਜ਼ਾਈਨ ਬਿਲਕੁਲ ਫੋਟੋ ਵਰਗਾ ਹੋ ਜਾਵੇਗਾ:
+* ਜੇ ਲਿੰਕ ਵਿੱਚ `id=malloke` ਹੈ, ਤਾਂ **ਸਿਰਫ਼ ਮੱਲ੍ਹੋਕੇ ਦਾ ਲੋਗੋ** ਹੀ ਖੁੱਲ੍ਹੇਗਾ।
+* ਜੇ ਲਿੰਕ ਵਿੱਚ `id=dholewala` ਹੈ, ਤਾਂ **ਸਿਰਫ਼ ਢੋਲੇਵਾਲਾ ਦਾ ਲੋਗੋ** ਹੀ ਖੁੱਲ੍ਹੇਗਾ।
+* ਜੇ ਕੋਈ ਕਲਾਇੰਟ ਆਪਣੀ ਆਈਡੀ ਵਿੱਚ ਕਿਸੇ ਹੋਰ ਦਾ ਲੋਗੋ ਲਗਾਉਣ ਦੀ ਕੋਸ਼ਿਸ਼ ਵੀ ਕਰੇਗਾ, ਤਾਂ ਕੋਡ ਉਸਨੂੰ ਬਲਾਕ ਕਰ ਦੇਵੇਗਾ ਅਤੇ ਕੋਈ ਲੋਗੋ ਨਹੀਂ ਦਿਖਾਏਗਾ।
+
+---
+
+### ਤੁਹਾਨੂੰ ਕੋਡ ਵਿੱਚ ਸਿਰਫ਼ ਇਹ ਲਿਸਟ ਸੈੱਟ ਕਰਨੀ ਹੈ:
+
+ਕੋਡ ਦੇ ਅੰਦਰ (ਲਾਈਨ ਨੰਬਰ 110 ਦੇ ਕੋਲ) ਮੈਂ ਇਹ ਡਾਟਾ ਪਾ ਦਿੱਤਾ ਹੈ। ਇੱਥੇ ਜਿਹੜੀ ਤੁਸੀਂ **Match ID** (ਜਿਵੇਂ `malloke`) ਰੱਖੋਗੇ, ਉਸੇ ਦੇ ਅੱਗੇ ਉਸਦਾ ਪੱਕਾ ਲੋਗੋ ਲਿੰਕ ਪਾ ਦੇਣਾ:
+
+```javascript
+const clientLogos = {
+    "malloke": "https://raw.githubusercontent.com/.../malloke_logo.png",
+    "dholewala": "https://raw.githubusercontent.com/.../dholewala_logo.png",
+    "gadriwala": "https://raw.githubusercontent.com/.../gadriwala_logo.png"
+};
+
+```
+
+---
+
+### ਪੂਰੀ ਤਰ੍ਹਾਂ ਸੁਰੱਖਿਅਤ ਅਤੇ ਲਾਕ ਕੀਤਾ ਹੋਇਆ ਕੋਡ (Fully Secured Code):
+
+ਇਸ ਕੋਡ ਨੂੰ ਕਾਪੀ ਕਰਕੇ ਸੇਵ ਕਰ ਲਓ, ਹੁਣ ਕੋਈ ਵੀ ਕਲਾਇੰਟ ਹੇਰਾ-ਫੇਰੀ ਨਹੀਂ ਕਰ ਸਕਦਾ:
 
 ```html
 <!DOCTYPE html>
@@ -51,14 +72,14 @@
             z-index: 1; opacity: 1;
         }
 
-        /* 100% ਸੇਮ ਡਿਜ਼ਾਈਨ ਟਿਕਰ ਬਾਕਸ */
+        /* 100% ਸੇਮ ਡਿਜ਼ਾਈਨ ਟਿਕਰ ਬਾਕਸ (ਖੱਬੇ /, ਸੱਜੇ \) */
         #ticker-wrap {
             position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 150px; display: flex; 
             z-index: 9998; opacity: 1; transition: all 0.7s ease; background: transparent;
         }
         #ticker-wrap.hidden { opacity: 0; transform: translateY(160px); }
 
-        /* ਖੱਬੇ ਪਾਸੇ ਵਾਲਾ LIVE ਬਾਕਸ (ਕੱਟ ਵਾਲਾ ਡਿਜ਼ਾਈਨ / ) */
+        /* ਖੱਬਾ LIVE ਬਾਕਸ / */
         .box-live { 
             width: 280px; background: #e60000; color: white; display: flex; align-items: center; 
             justify-content: center; font-size: 85px; font-weight: 900; font-family: 'Impact', 'Arial Black', sans-serif; text-transform: uppercase;
@@ -68,7 +89,7 @@
             text-shadow: 3px 3px 5px rgba(0,0,0,0.4);
         }
 
-        /* ਵਿਚਕਾਰਲੀ 3-ਸਟੈਪ ਗ੍ਰੇ ਪੱਟੀ */
+        /* ਵਿਚਕਾਰਲੀ ਪੱਟੀ */
         .center-wrap { 
             flex: 1; display: flex; flex-direction: column; overflow: hidden; 
             z-index: 10; padding-left: 20px; padding-right: 20px; background: #4a4a4a;
@@ -83,7 +104,7 @@
         .scroller { display: inline-block; padding-left: 100%; animation: scroll-anim 25s linear infinite; }
         @keyframes scroll-anim { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        /* ਸੱਜੇ ਪਾਸੇ ਵਾਲਾ TIME ਬਾਕਸ (ਕੱਟ ਵਾਲਾ ਡਿਜ਼ਾਈਨ \ ) */
+        /* ਸੱਜਾ ਟਾਈਮ ਬਾਕਸ \ */
         .box-time { 
             width: 320px; background: #e60000; color: white; display: flex; align-items: center; 
             justify-content: center; z-index: 12; position: relative;
@@ -178,11 +199,13 @@
     const firebaseConfig = { databaseURL: "https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
 
+    // URL ਤੋਂ Match ID ਚੁੱਕੇਗਾ (ਜਿਵੇਂ ?id=malloke)
     const urlParams = new URLSearchParams(window.location.search);
     const matchId = urlParams.get('id') || 'defaultMatch';
     const db = firebase.database().ref("matchData/" + matchId);
 
-    // ਕਲਾਇੰਟ ਲੋਗੋ ਲਿਸਟ
+    // --- ਲਾਕ ਕੀਤਾ ਹੋਇਆ ਸੁਰੱਖਿਅਤ ਡਾਟਾ ---
+    // ਜਿਹੜੀ Match ID ਹੋਵੇਗੀ, ਸਿਰਫ਼ ਉਹੀ ਲੋਗੋ ਖੁੱਲ੍ਹੇਗਾ। ਦੂਜਾ ਕੋਈ ਨਹੀਂ ਵਰਤ ਸਕਦਾ!
     const clientLogos = {
         "malloke": "https://raw.githubusercontent.com/4kjunctionofficial-code/Manpreetteam/main/taqdeer%20tv.png",
         "dholewala": "https://raw.githubusercontent.com/4kjunctionofficial-code/Manpreetteam/main/taqdeer%20tv.png", 
@@ -193,12 +216,16 @@
         const data = snap.val() || {}; 
         
         const logoCont = document.getElementById('logo-container');
-        const selectedKey = data.selectedClient;
+        
+        // Match ID ਦੇ ਮੁਤਾਬਿਕ ਲੋਗੋ ਲਾਕ ਕਰ ਦਿੱਤਾ
+        const currentId = matchId.trim().toLowerCase();
 
-        if (selectedKey && clientLogos[selectedKey]) {
-            document.getElementById('main-logo').src = clientLogos[selectedKey];
+        if (clientLogos[currentId]) {
+            // ਜੇ ID ਮੈਚ ਹੋ ਗਈ, ਤਾਂ ਸਿਰਫ਼ ਉਸੇ ਦਾ ਲੋਗੋ ਲੋਡ ਹੋਵੇਗਾ
+            document.getElementById('main-logo').src = clientLogos[currentId];
             if(data.logoVisible !== false) { logoCont.classList.remove('hidden'); }
         } else {
+            // ਜੇ ਕੋਈ ਅਣਜਾਣ ਜਾਂ ਗਲਤ ID ਹੈ, ਤਾਂ ਲੋਗੋ ਬਿਲਕੁਲ ਨਹੀਂ ਦਿਖੇਗਾ
             logoCont.classList.add('hidden');
             document.getElementById('main-logo').src = "";
         }
