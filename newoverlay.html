@@ -20,7 +20,7 @@
         }
         .whatsapp-icon svg { width: 24px; height: 24px; fill: white; }
 
-        /* ਉੱਪਰ ਖੱਬੇ ਪਾਸੇ ਕਲਾਇੰਟ ਲੋਗੋ */
+        /* ਉੱਪਰ khabbe ਪਾਸੇ ਕਲਾਇੰਟ ਲੋਗੋ */
         #logo-container {
             position: absolute; top: 30px; left: 40px; z-index: 9999;
             opacity: 1; transition: all 0.7s ease; 
@@ -38,7 +38,7 @@
             z-index: 1; opacity: 1;
         }
 
-        /* 100% ਸੇਮ ਡਿਜ਼ਾਈਨ ਟਿਕਰ ਬਾਕਸ (ਖੱਬੇ /, ਸੱਜੇ \) */
+        /* ਟਿਕਰ ਬਾਕਸ ਡਿਜ਼ਾਈਨ (ਖੱਬੇ /, ਸੱਜੇ \) */
         #ticker-wrap {
             position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 150px; display: flex; 
             z-index: 9998; opacity: 1; transition: all 0.7s ease; background: transparent;
@@ -55,7 +55,7 @@
             text-shadow: 3px 3px 5px rgba(0,0,0,0.4);
         }
 
-        /* ਵਿਚਕਾਰਲੀ ਪੱਟੀ */
+        /* ਵਿਚਕਾਰਲੀ 3-ਸਟੈਪ ਪੱਟੀ */
         .center-wrap { 
             flex: 1; display: flex; flex-direction: column; overflow: hidden; 
             z-index: 10; padding-left: 20px; padding-right: 20px; background: #4a4a4a;
@@ -165,33 +165,30 @@
     const firebaseConfig = { databaseURL: "https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
 
-    // URL ਤੋਂ Match ID ਚੁੱਕੇਗਾ (ਜਿਵੇਂ ?id=malloke)
+    // URL ਤੋਂ ਸਿੱਧੀ ID ਰੀਡ ਕਰੇਗਾ (ਜਿਵੇਂ ?id=test)
     const urlParams = new URLSearchParams(window.location.search);
     const matchId = urlParams.get('id') || 'defaultMatch';
     const db = firebase.database().ref("matchData/" + matchId);
 
-    // --- ਲਾਕ ਕੀਤਾ ਹੋਇਆ ਸੁਰੱਖਿਅਤ ਡਾਟਾ ---
-    // ਜਿਹੜੀ Match ID ਹੋਵੇਗੀ, ਸਿਰਫ਼ ਉਹੀ ਲੋਗੋ ਖੁੱਲ੍ਹੇਗਾ। ਦੂਜਾ ਕੋਈ ਨਹੀਂ ਵਰਤ ਸਕਦਾ!
+    // --- ਲਾਕ ਕੀਤੀ ਹੋਈ ਕਲਾਇੰਟ ਆਈਡੀ ਲਿਸਟ ---
+    // ਜਿਸਦੀ ਜੋ ID ਹੋਵੇਗੀ, ਉਸਨੂੰ ਸਿਰਫ਼ ਓਹੀ ਲੋਗੋ ਦਿਖੇਗਾ, ਕੋਈ ਦੂਜਾ ਲੋਗੋ ਚੋਰੀ ਨਹੀਂ ਕਰ ਸਕਦਾ।
     const clientLogos = {
-        "malloke": "https://raw.githubusercontent.com/4kjunctionofficial-code/Manpreetteam/main/taqdeer%20tv.png",
-        "dholewala": "https://raw.githubusercontent.com/4kjunctionofficial-code/Manpreetteam/main/taqdeer%20tv.png", 
-        "gadriwala": "https://raw.githubusercontent.com/4kjunctionofficial-code/Manpreetteam/main/taqdeer%20tv.png"
+        "test": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Kabaddi_20250805_135004_0000.png"
+        // ਜੇ ਭਵਿੱਖ ਵਿੱਚ ਹੋਰ ਕਲਾਇੰਟ ਜੋੜਨੇ ਹੋਣ ਤਾਂ ਇੱਥੇ ਨਵੀਂ id ਪਾ ਕੇ ਲਿੰਕ ਲਾਕ ਕਰ ਸਕਦੇ ਹੋ, ਜਿਵੇਂ:
+        // "malloke": "ਮੱਲ੍ਹੋਕੇ_ਦਾ_ਲੋਗੋ_ਲਿੰਕ"
     };
 
     db.on("value", (snap) => {
         const data = snap.val() || {}; 
         
         const logoCont = document.getElementById('logo-container');
-        
-        // Match ID ਦੇ ਮੁਤਾਬਿਕ ਲੋਗੋ ਲਾਕ ਕਰ ਦਿੱਤਾ
         const currentId = matchId.trim().toLowerCase();
 
+        // ਆਟੋਮੈਟਿਕ ਆਈਡੀ ਲਾਕ ਸਿਸਟਮ
         if (clientLogos[currentId]) {
-            // ਜੇ ID ਮੈਚ ਹੋ ਗਈ, ਤਾਂ ਸਿਰਫ਼ ਉਸੇ ਦਾ ਲੋਗੋ ਲੋਡ ਹੋਵੇਗਾ
             document.getElementById('main-logo').src = clientLogos[currentId];
             if(data.logoVisible !== false) { logoCont.classList.remove('hidden'); }
         } else {
-            // ਜੇ ਕੋਈ ਅਣਜਾਣ ਜਾਂ ਗਲਤ ID ਹੈ, ਤਾਂ ਲੋਗੋ ਬਿਲਕੁਲ ਨਹੀਂ ਦਿਖੇਗਾ
             logoCont.classList.add('hidden');
             document.getElementById('main-logo').src = "";
         }
