@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Arial', sans-serif; overflow: hidden; position: relative; }
+        
+        /* ਵਟਸਐਪ ਪੱਟੀ */
+        .whatsapp-bar { position: absolute; bottom: 165px; left: 10px; display: flex; align-items: center; background: #000000; color: #ffffff; padding: 6px 18px 6px 45px; border-radius: 25px; font-size: 22px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .whatsapp-icon { position: absolute; left: -2px; width: 44px; height: 44px; background: #e60000; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .whatsapp-icon svg { width: 24px; height: 24px; fill: white; }
+
+        /* ਲੋਗੋ */
+        #logo-container { position: absolute; top: 30px; left: 40px; z-index: 9999; }
+        #main-logo { height: 100px; width: auto; max-width: 450px; }
+
+        /* ਨਵਾਂ ਸਕੋਰਬੋਰਡ ਡਿਜ਼ਾਈਨ */
+        #scoreboard { position: absolute; top: 30px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; z-index: 9999; }
+        .team-box { background: #e60000; color: white; padding: 10px 25px; font-weight: 900; font-size: 30px; border-radius: 5px; min-width: 150px; text-align: center; }
+        .score-center { background: #dcdcdc; color: #000; padding: 5px 20px; font-weight: 900; font-size: 30px; border-radius: 5px; margin: 0 5px; display: flex; flex-direction: column; align-items: center; border: 2px solid #555; }
+        .vs-text { font-size: 24px; }
+        .time-text { font-size: 20px; }
+
+        /* ਟਿਕਰ */
+        #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 150px; display: flex; background: transparent; }
+        .box-live { width: 280px; background: #e60000; color: white; display: flex; align-items: center; justify-content: center; font-size: 85px; font-weight: 900; clip-path: polygon(0 0, 100% 0, 75% 100%, 0 100%); }
+        .center-wrap { flex: 1; display: flex; flex-direction: column; background: #4a4a4a; margin: 0 -70px; padding: 0 90px; justify-content: center; }
+        .row-text { font-weight: bold; font-size: 35px; color: white; white-space: nowrap; overflow: hidden; }
+        .box-time { width: 320px; background: #e60000; color: white; display: flex; align-items: center; justify-content: center; clip-path: polygon(25% 0, 100% 0, 100% 100%, 0 100%); font-size: 45px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="whatsapp-bar">
+    <div class="whatsapp-icon"><svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163... (icon path) ..."/></svg></div>
+    +91 74007 35730
+</div>
+
+<div id="logo-container">
+    <img id="main-logo" src="YOUR_LOGO_URL_HERE">
+</div>
+
+<div id="scoreboard">
+    <div class="team-box" id="nA">TEAM A</div>
+    <div class="score-center">
+        <div id="sA_sB">0 VS 0</div>
+        <div class="time-text" id="match-time">00:00</div>
+    </div>
+    <div class="team-box" id="nB">TEAM B</div>
+</div>
+
+<div id="ticker-wrap">
+    <div class="box-live">Live</div>
+    <div class="center-wrap">
+        <div class="row-text" id="ticker-text">WELCOME TO LIVE KABADDI</div>
+    </div>
+    <div class="box-time" id="live-time">00:00</div>
+</div>
+
+<script>
+    // Firebase ਅਤੇ ਬਾਕੀ ਫੰਕਸ਼ਨ ਉਹੀ ਰਹਿਣਗੇ
+    const firebaseConfig = { databaseURL: "https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database().ref("matchData/defaultMatch");
+
+    db.on("value", (snap) => {
+        const data = snap.val() || {};
+        document.getElementById('nA').innerText = data.nameA || "TEAM A";
+        document.getElementById('nB').innerText = data.nameB || "TEAM B";
+        document.getElementById('sA_sB').innerText = (data.scoreA || "0") + " VS " + (data.scoreB || "0");
+        document.getElementById('ticker-text').innerText = data.row2Txt || "WELCOME TO LIVE KABADDI";
+    });
+</script>
+</body>
+</html>
