@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Master Control Panel - Kabaddi Live</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #0b0d0f; color: white; padding: 20px; margin: 0; }
         .container { max-width: 1000px; margin: auto; background: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #30363d; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
@@ -16,8 +16,8 @@
         .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
         
         label { display: block; margin-bottom: 6px; color: #8b949e; font-size: 13px; font-weight: bold; }
-        input { padding: 12px; background: #161b22; border: 1px solid #30363d; color: white; border-radius: 8px; width: 100%; box-sizing: border-box; }
-        input:focus { border-color: #f39c12; outline: none; }
+        input, select { padding: 12px; background: #161b22; border: 1px solid #30363d; color: white; border-radius: 8px; width: 100%; box-sizing: border-box; }
+        input:focus, select:focus { border-color: #f39c12; outline: none; }
         
         button { padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; }
         .btn-add { background: #f39c12; color: black; margin-top: 15px; width: 100%; font-size: 15px; }
@@ -37,7 +37,9 @@
         .link-btn { color: #58a6ff; text-decoration: none; font-size: 12px; font-weight: bold; }
         .link-btn:hover { text-decoration: underline; }
         
-        .current-expiry { font-size: 11px; color: #f39c12; margin-top: 5px; }
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; margin-top: 5px; }
+        .status-active { background: #238636; color: white; }
+        .status-expired { background: #da3633; color: white; }
     </style>
 </head>
 <body>
@@ -56,8 +58,11 @@
                 <input type="text" id="cPass" placeholder="Password">
             </div>
             <div>
-                <label>ਵੈਲਡਿਟੀ (Date & Time)</label>
-                <input type="datetime-local" id="cExpiry">
+                <label>ਪਲਾਨ ਸਟੇਟਸ (Plan Status)</label>
+                <select id="cStatus">
+                    <option value="false">🟢 Active (ਚਾਲੂ)</option>
+                    <option value="true">🛑 Expired / Locked (ਬੰਦ)</option>
+                </select>
             </div>
         </div>
         <button class="btn-add" onclick="createClient()">ਨਵਾਂ ਕਬੱਡੀ ਕਲਾਇੰਟ ਐਡ ਕਰੋ</button>
@@ -68,8 +73,8 @@
         <table>
             <thead>
                 <tr>
-                    <th>ਕਲਾਇੰਟ ID</th>
-                    <th>ਵੈਲਡਿਟੀ (DD-MM-YYYY Time)</th>
+                    <th>ਕਲਾਇੰਟ ID / ਪਾਸਵਰਡ</th>
+                    <th>ਪਲਾਨ ਸਟੇਟਸ (Status)</th>
                     <th>ਲਾਈਵ ਪੈਨਲ ਲਿੰਕਸ</th>
                     <th>ਐਕਸ਼ਨ</th>
                 </tr>
@@ -80,22 +85,22 @@
 </div>
 
 <script>
-    // ਫਾਇਰਬੇਸ ਕੰਫਿਗਰੇਸ਼ਨ
-    const firebaseConfig = { databaseURL: "https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
+    // 🔗 ਤੁਹਾਡਾ ਨਵਾਂ ਫਾਇਰਬੇਸ ਲਿੰਕ ਇੱਥੇ ਸੈੱਟ ਕਰ ਦਿੱਤਾ ਹੈ
+    const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // 1. ਕਬੱਡੀ ਦੇ ਡਾਟਾ ਸਟਰਕਚਰ ਨਾਲ ਨਵਾਂ ਕਲਾਇੰਟ ਬਣਾਉਣਾ
+    // 1. ਨਵਾਂ ਕਲਾਇੰਟ ਬਣਾਉਣਾ (ਸਕੋਰਬੋਰਡ ਅਤੇ ਲੌਕ ਸਿਸਟਮ ਦੋਵਾਂ ਦੇ ਮੁਤਾਬਕ)
     function createClient() {
         const id = document.getElementById('cID').value.trim().toLowerCase();
-        const pass = document.getElementById('cPass').value;
-        const expiry = document.getElementById('cExpiry').value;
+        const pass = document.getElementById('cPass').value.trim();
+        const isExpired = document.getElementById('cStatus').value === "true";
 
-        if(!id || !pass || !expiry) return alert("ਸਾਰੀ ਜਾਣਕਾਰੀ ਭਰੋ!");
+        if(!id || !pass) return alert("ਕਿਰਪਾ ਕਰਕੇ ID ਅਤੇ ਪਾਸਵਰਡ ਭਰੋ!");
 
         db.ref('users/' + id).set({
             password: pass,
-            expiry: expiry,
+            planStatus: isExpired, // overlay.html ਇਸੇ ਵੈਲਯੂ ਨੂੰ ਰੀਡ ਕਰਕੇ ਸਕ੍ਰੀਨ ਲੌਕ ਕਰੇਗੀ
             matchData: {
                 nameA: "TEAM 1",
                 nameB: "TEAM 2",
@@ -114,7 +119,7 @@
             alert("ਕਬੱਡੀ ਕਲਾਇੰਟ ਸਫ਼ਲਤਾਪੂਰਵਕ ਬਣ ਗਿਆ ਹੈ!");
             document.getElementById('cID').value = "";
             document.getElementById('cPass').value = "";
-            document.getElementById('cExpiry').value = "";
+            document.getElementById('cStatus').value = "false";
         }).catch((error) => {
             alert("ਐਰਰ: " + error.message);
         });
@@ -132,32 +137,29 @@
                 return;
             }
 
-            // GitHub Pages ਜਾਂ ਹੋਸਟਿੰਗ ਦਾ ਬੇਸ ਯੂਆਰਐਲ ਬਿਲਕੁਲ ਸਹੀ ਤਰੀਕੇ ਨਾਲ ਕੱਢਣ ਲਈ
             let currentUrl = window.location.href;
             let baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/')) + '/';
 
             for (let id in data) {
                 const adminL = baseUrl + "admin.html?id=" + id;
                 const overL = baseUrl + "overlay.html?id=" + id;
-
-                // ਤਾਰੀਖ ਨੂੰ ਸਹੀ ਫਾਰਮੈਟ (DD-MM-YYYY) ਵਿੱਚ ਬਦਲਣਾ
-                let formattedDate = "ਪਲਾਨ ਸੈੱਟ ਨਹੀਂ";
-                if (data[id].expiry) {
-                    const d = new Date(data[id].expiry);
-                    if (!isNaN(d.getTime())) {
-                        formattedDate = d.getDate().toString().padStart(2, '0') + "-" + 
-                                        (d.getMonth() + 1).toString().padStart(2, '0') + "-" + 
-                                        d.getFullYear() + " " + 
-                                        d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-                    }
-                }
+                const currentStatus = data[id].planStatus === true;
 
                 tbody.innerHTML += `
                     <tr>
-                        <td><b style="color: #58a6ff; font-size: 15px;">${id}</b></td>
                         <td>
-                            <input type="datetime-local" id="newExp-${id}" value="${data[id].expiry || ''}" style="padding:6px; font-size:12px; width:auto; border-color:#30363d;">
-                            <div class="current-expiry">Current: ${formattedDate}</div>
+                            <b style="color: #58a6ff; font-size: 16px;">${id}</b>
+                            <div style="font-size:12px; color:#8b949e; margin-top:4px;">Chabi: <b>${data[id].password || 'No Pass'}</b></div>
+                        </td>
+                        <td>
+                            <select id="updateStat-${id}" style="padding:6px; font-size:12px; width:auto; border-color:#30363d;">
+                                <option value="false" ${!currentStatus ? 'selected' : ''}>🟢 Active</option>
+                                <option value="true" ${currentStatus ? 'selected' : ''}>🛑 Expired</option>
+                            </select>
+                            <br>
+                            <span class="status-badge ${currentStatus ? 'status-expired' : 'status-active'}">
+                                ${currentStatus ? 'LOCKED' : 'RUNNING'}
+                            </span>
                         </td>
                         <td>
                             <div class="link-group">
@@ -175,16 +177,16 @@
         });
     }
 
-    // 3. ਵੈਲਡਿਟੀ (ਪਲਾਨ ਦੀ ਮਿਤੀ) ਅਪਡੇਟ ਕਰਨਾ
+    // 3. ਪਲਾਨ ਸਟੇਟਸ (ਚਾਲੂ/ਬੰਦ) ਅਪਡੇਟ ਕਰਨਾ
     function updateClient(id) {
-        const newTime = document.getElementById('newExp-' + id).value;
-        if(!newTime) return alert("ਕਿਰਪਾ ਕਰਕੇ ਸਮਾਂ ਚੁਣੋ!");
+        const selectEl = document.getElementById('updateStat-' + id);
+        const nextStatus = selectEl.value === "true";
         
-        db.ref('users/' + id).update({ expiry: newTime })
-          .then(() => alert(id + " ਦੀ ਵੈਲਡਿਟੀ ਸਫ਼ਲਤਾਪੂਰਵਕ ਵਧਾ ਦਿੱਤੀ ਗਈ ਹੈ!"));
+        db.ref('users/' + id).update({ planStatus: nextStatus })
+          .then(() => alert("ਕਲਾਇੰਟ " + id + " ਦਾ ਪਲਾਨ ਸਟੇਟਸ ਸਫ਼ਲਤਾਪੂਰਵਕ ਅਪਡੇਟ ਹੋ ਗਿਆ ਹੈ!"));
     }
 
-    // 4. ਕਲਾਇੰਟ ਅਤੇ ਉਸਦਾ ਸਾਰਾ ਮੈਚ ਡਾਟਾ ਡਲੀਟ ਕਰਨਾ
+    // 4. ਕਲਾਇੰਟ ਡਲੀਟ ਕਰਨਾ
     function deleteClient(id) {
         if(confirm("ਕੀ ਤੁਸੀਂ ਕਲਾਇੰਟ '" + id + "' ਨੂੰ ਡਲੀਟ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ? ਇਸ ਨਾਲ ਕਲਾਇੰਟ ਦਾ ਪੂਰਾ ਕਬੱਡੀ ਡਾਟਾ ਖਤਮ ਹੋ ਜਾਵੇਗਾ।")) {
             db.ref('users/' + id).remove()
@@ -192,7 +194,6 @@
         }
     }
 
-    // ਲਿਸਟ ਨੂੰ ਰਨ ਕਰਨਾ
     loadList();
 </script>
 </body>
