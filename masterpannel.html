@@ -49,7 +49,7 @@
         <div class="grid-inputs">
             <div>
                 <label>ਕਲਾਇੰਟ ID (User ID)</label>
-                <input type="text" id="cID" placeholder="e.g. malloke01">
+                <input type="text" id="cID" placeholder="e.g. mudki">
             </div>
             <div>
                 <label>ਪਾਸਵਰਡ (Password)</label>
@@ -80,7 +80,7 @@
 </div>
 
 <script>
-    // ਫਾਇਰਬੇਸ ਕੰਫਿਗਰੇਸ਼ਨ (ਤੁਹਾਡੇ ਕਬੱਡੀ ਪ੍ਰੋਜੈਕਟ ਦੇ ਮੁਤਾਬਕ ਸੈੱਟ ਕੀਤੀ ਗਈ ਹੈ)
+    // ਫਾਇਰਬੇਸ ਕੰਫਿਗਰੇਸ਼ਨ
     const firebaseConfig = { databaseURL: "https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
@@ -93,7 +93,6 @@
 
         if(!id || !pass || !expiry) return alert("ਸਾਰੀ ਜਾਣਕਾਰੀ ਭਰੋ!");
 
-        // ਨਵੇਂ ਕਲਾਇੰਟ ਦਾ ਡਾਟਾ ਜੋ ਸਿੱਧਾ ਐਡਮਿਨ/ਓਵਰਲੇਅ ਨਾਲ ਮੈਚ ਕਰੇਗਾ
         db.ref('users/' + id).set({
             password: pass,
             expiry: expiry,
@@ -133,8 +132,11 @@
                 return;
             }
 
+            // GitHub Pages ਜਾਂ ਹੋਸਟਿੰਗ ਦਾ ਬੇਸ ਯੂਆਰਐਲ ਬਿਲਕੁਲ ਸਹੀ ਤਰੀਕੇ ਨਾਲ ਕੱਢਣ ਲਈ
+            let currentUrl = window.location.href;
+            let baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/')) + '/';
+
             for (let id in data) {
-                const baseUrl = window.location.href.split('master.html')[0];
                 const adminL = baseUrl + "admin.html?id=" + id;
                 const overL = baseUrl + "overlay.html?id=" + id;
 
