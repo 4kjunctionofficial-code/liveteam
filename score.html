@@ -3,43 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; overflow: hidden; }
+        body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Arial', sans-serif; overflow: hidden; }
 
-        /* ਟਿੱਕਰ ਕੰਟੇਨਰ */
-        #ticker-wrap { 
-            position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 160px; 
-            display: flex; align-items: center; z-index: 9998; 
-        }
+        /* --- ਸਕੋਰਬੋਰਡ ਡਿਜ਼ਾਈਨ --- */
+        #scoreboard { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; z-index: 9999; }
+        .team-box { background: #e60000; color: white; padding: 10px 20px; font-weight: 900; font-size: 28px; border-radius: 5px; min-width: 150px; text-align: center; }
+        .score-center { background: #dcdcdc; color: #000; padding: 5px 15px; font-weight: 900; font-size: 30px; border-radius: 5px; margin: 0 5px; border: 2px solid #555; text-align: center; }
 
-        /* ਖੱਬਾ ਲਾਲ ਕੋਨਾ (Left Corner \ ) */
-        .box-live { 
-            width: 280px; height: 100%; background: #e60000; 
-            clip-path: polygon(0 0, 100% 0, 70% 100%, 0 100%);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 80px; font-weight: 900; color: white;
-            border-bottom: 8px solid white; /* ਲਾਲ ਹਿੱਸੇ ਅੰਦਰ ਚਿੱਟੀ ਲਾਈਨ */
-        }
+        /* --- ਟਿੱਕਰ ਡਿਜ਼ਾਈਨ --- */
+        #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 160px; display: flex; align-items: center; z-index: 9998; }
+
+        /* ਖੱਬਾ ਲਾਲ ਕੋਨਾ ( \ ) */
+        .box-live { width: 280px; height: 100%; background: #e60000; clip-path: polygon(0 0, 100% 0, 70% 100%, 0 100%); display: flex; align-items: center; justify-content: center; font-size: 80px; font-weight: 900; color: white; border-bottom: 8px solid white; }
 
         /* ਵਿਚਕਾਰਲਾ ਚਿੱਟਾ ਹਿੱਸਾ */
-        .center-wrap { 
-            flex: 1; height: 100%; background: white; 
-            display: flex; flex-direction: column; justify-content: center;
-            margin: 0 -40px; border-top: 8px solid #e60000; border-bottom: 8px solid #e60000;
-        }
-
+        .center-wrap { flex: 1; height: 100%; background: white; display: flex; flex-direction: column; justify-content: center; margin: 0 -40px; border-top: 8px solid #e60000; border-bottom: 8px solid #e60000; }
         .row-text { font-weight: bold; font-size: 35px; color: black; padding-left: 20px; }
 
-        /* ਸੱਜਾ ਲਾਲ ਕੋਨਾ (Right Corner / ) */
-        .box-time { 
-            width: 300px; height: 100%; background: #e60000; 
-            clip-path: polygon(30% 0, 100% 0, 100% 100%, 0 100%);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 45px; font-weight: bold; color: white;
-            border-bottom: 8px solid white;
-        }
+        /* ਸੱਜਾ ਲਾਲ ਕੋਨਾ ( / ) */
+        .box-time { width: 300px; height: 100%; background: #e60000; clip-path: polygon(30% 0, 100% 0, 100% 100%, 0 100%); display: flex; align-items: center; justify-content: center; font-size: 45px; font-weight: bold; color: white; border-bottom: 8px solid white; }
     </style>
 </head>
 <body>
+
+<div id="scoreboard">
+    <div class="team-box">TEAM A</div>
+    <div class="score-center">0 VS 0</div>
+    <div class="team-box">TEAM B</div>
+</div>
 
 <div id="ticker-wrap">
     <div class="box-live">LIVE</div>
