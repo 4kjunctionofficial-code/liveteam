@@ -10,69 +10,73 @@
             background: transparent; overflow: hidden; position: relative; 
         }
         
-        /* 100% ਓਰਿਜਨਲ ਇਮੇਜ ਬੈਕਗ੍ਰਾਊਂਡ - ਪੱਟੀਆਂ ਬਿਲਕੁਲ ਸੇਮ ਰਹਿਣਗੀਆਂ */
+        /* 100% ਹੂਬਹੂ ਓਰਿਜਨਲ ਫੋਟੋ ਬੈਕਗ੍ਰਾਊਂਡ - ਜਿਸ ਨਾਲ ਪੱਟੀਆਂ ਸੇਮ ਰਹਿਣਗੀਆਂ */
         #bg-overlay {
             position: absolute; top: 0; left: 0; width: 1920px; height: 1080px;
             background: url('https://raw.githubusercontent.com/4kjunctionofficial-code/Manpreetteam/main/Star%20Kabaddi%20new_20260327_211333_0000.png') no-repeat center center;
             background-size: 100% 100%; pointer-events: none; z-index: 5;
         }
 
-        /* ਟਿਕਰ ਟੈਕਸਟ - ਜੋ ਗ੍ਰੇਅ ਪੱਟੀਆਂ ਦੇ ਬਿਲਕੁਲ ਉੱਪਰ ਫਿੱਟ ਬੈਠੇਗਾ */
-        #ticker-text-container {
+        /* ਉੱਪਰ ਖੱਬੇ ਪਾਸੇ ਲੋਗੋ ਕੰਟੇਨਰ (ਓਰਿਜਨਲ ਲੋਗੋ ਦੇ ਬਿਲਕੁਲ ਉੱਪਰ ਓਵਰਲੈਪ ਹੋਵੇਗਾ) */
+        #logo-container {
+            position: absolute; top: 22px; left: 12px; z-index: 9999;
+            opacity: 1; transition: all 0.7s ease; 
+        }
+        #logo-container.hidden { opacity: 0; transform: scale(0); }
+        #main-logo {
+            height: 90px; width: auto; max-width: 320px; object-fit: contain;
+        }
+
+        /* ਵਾਟਰਮਾਰਕ (M LIVE) */
+        #single-wm { 
+            position: absolute; color: rgba(255, 255, 255, 0.7); font-size: 35px; font-weight: bold; 
+            text-transform: uppercase; text-shadow: 2px 2px 5px #000; white-space: nowrap; 
+            z-index: 1; opacity: 1;
+        }
+
+        /* ਟਿਕਰ ਟੈਕਸਟ ਏਰੀਆ - ਜੋ ਓਰਿਜਨਲ ਗ੍ਰੇਅ ਪੱਟੀਆਂ ਦੇ ਬਿਲਕੁਲ ਉੱਪਰ ਆਵੇਗਾ */
+        #ticker-text-layer {
             position: absolute; bottom: 0px; left: 245px; width: 1405px; height: 150px; 
             display: flex; flex-direction: column; justify-content: center;
-            z-index: 9998; opacity: 1; transition: all 0.5s ease;
+            z-index: 9998; opacity: 1; transition: all 0.7s ease;
         }
-        #ticker-text-container.hidden { opacity: 0; }
+        #ticker-text-layer.hidden { opacity: 0; }
 
-        /* 3 ਸਟੈੱਪ ਟੈਕਸਟ ਅਲਾਈਨਮੈਂਟ */
+        /* 3 ਸਟੈੱਪ ਟੈਕਸਟ ਸੈਟਿੰਗ */
         .row-text { 
-            display: flex; align-items: center; font-weight: 900; text-transform: uppercase; 
+            display: flex; align-items: center; font-weight: bold; text-transform: uppercase; 
             width: 100%; overflow: hidden; box-sizing: border-box; white-space: nowrap; 
             font-family: 'Arial', sans-serif; 
         }
         
-        .row-1 { color: #ffffff; height: 43px; font-size: 26px; padding-left: 20px; } 
-        .row-2 { color: #111111; height: 58px; font-size: 36px; padding-left: 40px; } 
-        .row-3 { color: #ffcc00; height: 45px; font-size: 26px; padding-left: 20px; }
+        .row-1 { color: white; height: 43px; font-size: 28px; padding-left: 20px; } 
+        .row-2 { color: #111111; height: 58px; font-size: 38px; font-weight: 900; padding-left: 40px; } 
+        .row-3 { color: #ffcc00; height: 45px; font-size: 28px; padding-left: 20px; }
 
         .scroller { display: inline-block; padding-left: 100%; animation: scroll-anim 25s linear infinite; }
         @keyframes scroll-anim { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        /* ਸੱਜੇ ਪਾਸੇ ਵਾਲੇ ਲਾਲ ਬਾਕਸ ਉੱਪਰ ਲਾਈਵ ਟਾਈਮ/ਡੇਟ */
+        /* ਸੱਜੇ ਪਾਸੇ ਵਾਲੇ ਓਰਿਜਨਲ ਲਾਲ ਬਾਕਸ ਉੱਪਰ ਟਾਈਮ ਸੈਟਿੰਗ */
         #time-container {
             position: absolute; bottom: 0px; right: 0px; width: 270px; height: 150px;
             display: flex; align-items: center; justify-content: center; z-index: 9999;
         }
         .time-wrap, .date-wrap { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: 0.8s; font-family: 'Arial', sans-serif; font-weight: bold;}
-        .time-str { color: #ffffff; font-size: 42px; letter-spacing: 1px; font-weight: 900; }
-        .date-str { font-size: 30px; color: #ffffff; font-weight: 900; }
-
-        /* ਕਲਾਇੰਟ ਲੋਗੋ (Top Left) */
-        #logo-container {
-            position: absolute; top: 22px; left: 12px; z-index: 9999;
-            opacity: 1; transition: all 0.5s ease;
-        }
-        #logo-container.hidden { opacity: 0; transform: scale(0); }
-        #main-logo { height: 90px; width: auto; max-width: 320px; object-fit: contain; }
-
-        /* ਰੈਂਡਮ ਵਾਟਰਮਾਰਕ */
-        #single-wm { 
-            position: absolute; color: rgba(255, 255, 255, 0.6); font-size: 32px; font-weight: bold; 
-            font-family: 'Arial', sans-serif; text-transform: uppercase; text-shadow: 2px 2px 5px #000; 
-            white-space: nowrap; z-index: 1;
-        }
+        .time-str { color: #ffffff; font-size: 45px; letter-spacing: 1px; }
+        .date-str { font-size: 32px; color: #ffffff; }
 
         /* ਸਕੋਰਬੋਰਡ (Top Right) */
         #scoreboard { 
-            position: absolute; top: 45px; right: 80px; display: flex; flex-direction: column; align-items: center; z-index: 9999;
-            opacity: 1; transition: all 0.5s ease; 
+            position: absolute; top: 40px; right: 80px; display: flex; flex-direction: column; align-items: center; z-index: 9999;
+            opacity: 1; transition: all 0.7s ease; 
         }
         #scoreboard.hidden { opacity: 0; transform: translateY(-100px); }
+        
         .main-bar { 
             display: flex; align-items: center; height: 65px; background: rgba(20, 20, 20, 0.95); 
             border-radius: 6px; border: 2px solid rgba(255,255,255,0.2); padding: 0 5px; position: relative; overflow: hidden; 
         }
+        
         .s-box { 
             background: linear-gradient(145deg, #e60000, #990000); color: #ffffff; font-size: 42px; font-weight: 900; 
             width: 120px; height: 100%; display: flex; align-items: center; justify-content: center; 
@@ -81,6 +85,7 @@
         .s-left { margin-left: -17px; border-radius: 4px 0 0 4px; }
         .s-right { margin-right: -17px; border-radius: 0 4px 4px 0; }
         .inner-val { transform: skewX(15deg); }
+        
         .name-area { 
             width: 220px; height: 100%; display: flex; align-items: center; overflow: hidden; 
             white-space: nowrap; color: #ffffff; font-size: 28px; font-weight: bold; font-family: 'Arial', sans-serif;
@@ -88,11 +93,13 @@
         }
         .team-scroller { display: inline-block; padding-left: 100%; animation: team-scroll 8s linear infinite; }
         @keyframes team-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        
         .vs-text { 
             color: #ffffff; font-size: 20px; font-weight: 900; margin: 0 10px; text-shadow: 1px 1px 3px #000; 
             background: #333; display: flex; align-items: center; justify-content: center;
             width: 45px; height: 45px; border-radius: 50%; border: 2px solid #e60000; position: relative; z-index: 11;
         }
+
         .round-display {
             color: white; font-size: 22px; font-weight: bold; text-transform: uppercase; font-family: 'Arial', sans-serif;
             margin-top: 15px; text-shadow: 2px 2px 6px #000; letter-spacing: 2px; display: block; background: rgba(0,0,0,0.6); padding: 4px 15px; border-radius: 4px;
@@ -120,7 +127,7 @@
     <div class="round-display" id="round-display">LIVE MATCH</div>
 </div>
 
-<div id="ticker-text-container">
+<div id="ticker-text-layer">
     <div class="row-text row-1" id="c1">WELCOME TO LIVE KABADDI</div>
     <div class="row-text row-2" id="c2">SUBSCRIBE OUR CHANNEL</div>
     <div class="row-text row-3" id="c3">LIKE & SHARE</div>
@@ -155,13 +162,13 @@
         if(data.logoVisible === false) { document.getElementById('logo-container').classList.add('hidden'); } else { document.getElementById('logo-container').classList.remove('hidden'); }
         if(data.scoreVisible === false) { document.getElementById('scoreboard').classList.add('hidden'); } else { document.getElementById('scoreboard').classList.remove('hidden'); }
         
-        // ਟਿਕਰ ਹਾਈਡ ਹੋਣ 'ਤੇ ਬੈਕਗ੍ਰਾਊਂਡ ਪੱਟੀ ਵੀ ਹਾਈਡ ਹੋ ਜਾਵੇਗੀ
+        // ਜਦੋਂ ਐਡਮਿਨ ਟਿਕਰ ਹਾਈਡ ਕਰੇਗਾ ਤਾਂ ਓਰਿਜਨਲ ਪੱਟੀ ਵੀ ਹਾਈਡ ਹੋਵੇਗੀ
         if(data.tickerVisible === false) { 
-            document.getElementById('ticker-text-container').classList.add('hidden'); 
+            document.getElementById('ticker-text-layer').classList.add('hidden'); 
             document.getElementById('bg-overlay').style.display = 'none';
             document.getElementById('time-container').style.display = 'none';
         } else { 
-            document.getElementById('ticker-text-container').classList.remove('hidden'); 
+            document.getElementById('ticker-text-layer').classList.remove('hidden'); 
             document.getElementById('bg-overlay').style.display = 'block';
             document.getElementById('time-container').style.display = 'flex';
         }
