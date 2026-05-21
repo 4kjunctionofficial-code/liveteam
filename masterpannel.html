@@ -3,75 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Live - Master Control Panel</title>
+    <title>Master Control Panel - Kabaddi Live</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #0b0d0f; color: white; padding: 20px; margin: 0; }
-        .container { max-width: 1100px; margin: 30px auto; background: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #30363d; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .container { max-width: 1000px; margin: auto; background: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #30363d; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         h2 { color: #f39c12; text-align: center; text-transform: uppercase; margin-bottom: 25px; font-size: 24px; letter-spacing: 1px; }
         h3 { color: #58a6ff; margin-top: 30px; border-bottom: 1px solid #30363d; padding-bottom: 10px; }
         
-        .add-card { background: #0d1117; padding: 25px; border-radius: 10px; margin-bottom: 30px; border-left: 5px solid #f39c12; }
-        .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
+        .add-card { background: #0d1117; padding: 20px; border-radius: 10px; margin-bottom: 30px; border-left: 5px solid #f39c12; }
+        .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
         
-        label { display: block; margin-bottom: 8px; color: #8b949e; font-size: 14px; font-weight: bold; }
-        input { padding: 12px; background: #161b22; border: 1px solid #30363d; color: white; border-radius: 8px; width: 100%; box-sizing: border-box; font-size: 15px; }
+        label { display: block; margin-bottom: 6px; color: #8b949e; font-size: 13px; font-weight: bold; }
+        input { padding: 12px; background: #161b22; border: 1px solid #30363d; color: white; border-radius: 8px; width: 100%; box-sizing: border-box; }
         input:focus { border-color: #f39c12; outline: none; }
         
         button { padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; }
-        .btn-add { background: #f39c12; color: black; margin-top: 20px; width: 100%; font-size: 16px; letter-spacing: 0.5px; }
+        .btn-add { background: #f39c12; color: black; margin-top: 15px; width: 100%; font-size: 15px; }
         .btn-add:hover { background: #dd850e; }
         
-        .table-responsive { overflow-x: auto; margin-top: 20px; border-radius: 10px; border: 1px solid #30363d; }
+        .table-responsive { overflow-x: auto; margin-top: 20px; }
         table { width: 100%; border-collapse: collapse; background: #0d1117; text-align: left; }
-        th { background: #30363d; color: #f39c12; padding: 15px; font-size: 14px; text-transform: uppercase; }
-        td { padding: 15px; border-bottom: 1px solid #30363d; font-size: 15px; vertical-align: middle; }
-        tr:last-child td { border-bottom: none; }
+        th { background: #30363d; color: #f39c12; padding: 15px; font-size: 14px; }
+        td { padding: 15px; border-bottom: 1px solid #30363d; font-size: 14px; vertical-align: middle; }
         
-        .btn-save { background: #238636; color: white; margin-right: 5px; font-size: 12px; padding: 8px 15px; }
+        .btn-save { background: #238636; color: white; margin-right: 5px; font-size: 12px; padding: 8px 12px; }
         .btn-save:hover { background: #2ea043; }
-        .btn-del { background: #da3633; color: white; font-size: 12px; padding: 8px 15px; }
+        .btn-del { background: #da3633; color: white; font-size: 12px; padding: 8px 12px; }
         .btn-del:hover { background: #f85149; }
         
         .link-group { display: flex; flex-direction: column; gap: 5px; }
-        .link-btn { color: #58a6ff; text-decoration: none; font-size: 13px; font-weight: bold; }
-        .link-btn:hover { text-decoration: underline; color: #1f6feb; }
+        .link-btn { color: #58a6ff; text-decoration: none; font-size: 12px; font-weight: bold; }
+        .link-btn:hover { text-decoration: underline; }
         
-        .current-expiry { font-size: 12px; color: #f39c12; margin-top: 6px; font-weight: 500; }
+        .current-expiry { font-size: 11px; color: #f39c12; margin-top: 5px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🏆 ਕਬੱਡੀ ਲਾਈਵ - ਮਾਸਟਰ ਕੰਟਰੋਲ ਪੈਨਲ</h2>
+    <h2>🔑 ਕਬੱਡੀ ਲਾਈਵ - ਮਾਸਟਰ ਕੰਟਰੋਲ ਪੈਨਲ</h2>
     
     <div class="add-card">
         <div class="grid-inputs">
             <div>
                 <label>ਕਲਾਇੰਟ ID (User ID)</label>
-                <input type="text" id="cID" placeholder="ਉਦਾਹਰਨ: malloke2026">
+                <input type="text" id="cID" placeholder="e.g. malloke01">
             </div>
             <div>
                 <label>ਪਾਸਵਰਡ (Password)</label>
-                <input type="text" id="cPass" placeholder="Password ਸੈੱਟ ਕਰੋ">
+                <input type="text" id="cPass" placeholder="Password">
             </div>
             <div>
-                <label>ਵੈਲਡਿਟੀ (Expiry Date & Time)</label>
+                <label>ਵੈਲਡਿਟੀ (Date & Time)</label>
                 <input type="datetime-local" id="cExpiry">
             </div>
         </div>
         <button class="btn-add" onclick="createClient()">ਨਵਾਂ ਕਬੱਡੀ ਕਲਾਇੰਟ ਐਡ ਕਰੋ</button>
     </div>
 
-    <h3>ਐਕਟਿਵ ਟੂਰਨਾਮੈਂਟ ਲਿਸਟ (Active Clients)</h3>
+    <h3>ਐਕਟਿਵ ਕਲਾਇੰਟ ਲਿਸਟ</h3>
     <div class="table-responsive">
         <table>
             <thead>
                 <tr>
                     <th>ਕਲਾਇੰਟ ID</th>
-                    <th>ਵੈਲਡਿਟੀ ਸੈਟਿੰਗ (DD-MM-YYYY)</th>
-                    <th>ਲਾਈਵ ਲਿੰਕਸ</th>
+                    <th>ਵੈਲਡਿਟੀ (DD-MM-YYYY Time)</th>
+                    <th>ਲਾਈਵ ਪੈਨਲ ਲਿੰਕਸ</th>
                     <th>ਐਕਸ਼ਨ</th>
                 </tr>
             </thead>
@@ -81,52 +80,36 @@
 </div>
 
 <script>
-    // ਫਾਇਰਬੇਸ ਕੰਫਿਗਰੇਸ਼ਨ
-    const firebaseConfig = { databaseURL: "https://manpreetpigeons-default-rtdb.firebaseio.com/" };
+    // ਫਾਇਰਬੇਸ ਕੰਫਿਗਰੇਸ਼ਨ (ਤੁਹਾਡੇ ਕਬੱਡੀ ਪ੍ਰੋਜੈਕਟ ਦੇ ਮੁਤਾਬਕ ਸੈੱਟ ਕੀਤੀ ਗਈ ਹੈ)
+    const firebaseConfig = { databaseURL: "https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // 1. ਕਬੱਡੀ ਦੇ ਪੂਰੇ ਡਾਟਾ ਸਟਰਕਚਰ ਨਾਲ ਨਵਾਂ ਕਲਾਇੰਟ ਬਣਾਉਣਾ
+    // 1. ਕਬੱਡੀ ਦੇ ਡਾਟਾ ਸਟਰਕਚਰ ਨਾਲ ਨਵਾਂ ਕਲਾਇੰਟ ਬਣਾਉਣਾ
     function createClient() {
         const id = document.getElementById('cID').value.trim().toLowerCase();
         const pass = document.getElementById('cPass').value;
         const expiry = document.getElementById('cExpiry').value;
 
-        if(!id || !pass || !expiry) return alert("ਕਿਰਪਾ ਕਰਕੇ ਸਾਰੀ ਜਾਣਕਾਰੀ ਸਹੀ ਤਰ੍ਹਾਂ ਭਰੋ!");
+        if(!id || !pass || !expiry) return alert("ਸਾਰੀ ਜਾਣਕਾਰੀ ਭਰੋ!");
 
-        // ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ ਦਾ ਮੁਕੰਮਲ ਡਾਟਾਬੇਸ ਸਟਰਕਚਰ
+        // ਨਵੇਂ ਕਲਾਇੰਟ ਦਾ ਡਾਟਾ ਜੋ ਸਿੱਧਾ ਐਡਮਿਨ/ਓਵਰਲੇਅ ਨਾਲ ਮੈਚ ਕਰੇਗਾ
         db.ref('users/' + id).set({
             password: pass,
             expiry: expiry,
-            // ਮੈਚ ਦੀ ਮੁੱਖ ਸੈਟਿੰਗਜ਼
-            matchConfig: {
-                tournamentName: "LIVE KABADDI TOURNAMENT",
-                tickerText: "WELCOME TO THE LIVE STREAMING",
-                showScoreboard: true,
-                showTicker: true,
-                showTimer: true,
-                currentRound: "FIRST ROUND", // FIRST ROUND, QUARTER FINAL, SEMI FINAL, FINAL
-                matchType: "OPEN" // OPEN, 65 KG, 75 KG etc
-            },
-            // ਲਾਈਵ ਮੈਚ ਸਕੋਰ ਡਾਟਾ
-            scoreData: {
-                teamA: {
-                    name: "TEAM A",
-                    score: 0,
-                    raids: 0,
-                    stops: 0
-                },
-                teamB: {
-                    name: "TEAM B",
-                    score: 0,
-                    raids: 0,
-                    stops: 0
-                },
-                // ਰੇਡਰ ਅਤੇ ਜਾਫੀ ਦੇ ਲਾਈਵ ਪੁਆਇੰਟਸ ਲਈ ਟਾਈਮਰ/ਸਟੇਟਸ
-                timer: {
-                    seconds: 30,
-                    isRunning: false
-                }
+            matchData: {
+                nameA: "TEAM 1",
+                nameB: "TEAM 2",
+                scoreA: 0,
+                scoreB: 0,
+                round: "LIVE MATCH",
+                row1Txt: "WELCOME TO LIVE KABADDI",
+                row2Txt: "SUBSCRIBE OUR CHANNEL",
+                row3Txt: "LIKE & SHARE",
+                watermarkTxt: "M LIVE",
+                scoreVisible: true,
+                tickerVisible: true,
+                logoVisible: true
             }
         }).then(() => {
             alert("ਕਬੱਡੀ ਕਲਾਇੰਟ ਸਫ਼ਲਤਾਪੂਰਵਕ ਬਣ ਗਿਆ ਹੈ!");
@@ -138,7 +121,7 @@
         });
     }
 
-    // 2. ਲਿਸਟ ਲੋਡ ਕਰਨਾ ਅਤੇ ਰੀਅਲ-ਟਾਈਮ ਦਿਖਾਉਣਾ
+    // 2. ਲਿਸਟ ਲੋਡ ਕਰਨਾ ਅਤੇ ਰੀਅਲ-ਟਾਈਮ ਅਪਡੇਟ ਦਿਖਾਉਣਾ
     function loadList() {
         db.ref('users').on('value', (snapshot) => {
             const data = snapshot.val();
@@ -146,7 +129,7 @@
             tbody.innerHTML = "";
 
             if (!data) {
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#8b949e;">ਕੋਈ ਕਲਾਇੰਟ ਮੌਜੂਦ ਨਹੀਂ ਹੈ।</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#8b949e;">ਕੋਈ ਐਕਟਿਵ ਕਲਾਇੰਟ ਨਹੀਂ ਮਿਲਿਆ।</td></tr>`;
                 return;
             }
 
@@ -155,9 +138,9 @@
                 const adminL = baseUrl + "admin.html?id=" + id;
                 const overL = baseUrl + "overlay.html?id=" + id;
 
-                // ਤਾਰੀਖ ਨੂੰ ਪੰਜਾਬੀ/ਭਾਰਤੀ ਫਾਰਮੈਟ (DD-MM-YYYY) ਵਿੱਚ ਬਦਲਣ ਲਈ
-                let formattedDate = "No Expiry Set";
-                if(data[id].expiry) {
+                // ਤਾਰੀਖ ਨੂੰ ਸਹੀ ਫਾਰਮੈਟ (DD-MM-YYYY) ਵਿੱਚ ਬਦਲਣਾ
+                let formattedDate = "ਪਲਾਨ ਸੈੱਟ ਨਹੀਂ";
+                if (data[id].expiry) {
                     const d = new Date(data[id].expiry);
                     if (!isNaN(d.getTime())) {
                         formattedDate = d.getDate().toString().padStart(2, '0') + "-" + 
@@ -169,15 +152,15 @@
 
                 tbody.innerHTML += `
                     <tr>
-                        <td><b style="color: #58a6ff; font-size:16px;">${id}</b></td>
+                        <td><b style="color: #58a6ff; font-size: 15px;">${id}</b></td>
                         <td>
-                            <input type="datetime-local" id="newExp-${id}" value="${data[id].expiry || ''}" style="padding:6px; font-size:13px; width:auto; border-color:#30363d;">
-                            <div class="current-expiry">ਚਾਲੂ ਪਲਾਨ: ${formattedDate}</div>
+                            <input type="datetime-local" id="newExp-${id}" value="${data[id].expiry || ''}" style="padding:6px; font-size:12px; width:auto; border-color:#30363d;">
+                            <div class="current-expiry">Current: ${formattedDate}</div>
                         </td>
                         <td>
                             <div class="link-group">
-                                <a class="link-btn" href="${adminL}" target="_blank">💻 ਐਡਮਿਨ ਪੈਨਲ (ADMIN)</a>
-                                <a class="link-btn" href="${overL}" target="_blank">📺 ਓਵਰਲੇਅ ਲਿੰਕ (OVERLAY)</a>
+                                <a class="link-btn" href="${adminL}" target="_blank">💻 ADMIN PANEL</a>
+                                <a class="link-btn" href="${overL}" target="_blank">📺 OVERLAY LINK</a>
                             </div>
                         </td>
                         <td>
@@ -193,21 +176,21 @@
     // 3. ਵੈਲਡਿਟੀ (ਪਲਾਨ ਦੀ ਮਿਤੀ) ਅਪਡੇਟ ਕਰਨਾ
     function updateClient(id) {
         const newTime = document.getElementById('newExp-' + id).value;
-        if(!newTime) return alert("ਕਿਰਪਾ ਕਰਕੇ ਕੋਈ ਤਾਰੀਖ ਅਤੇ ਸਮਾਂ ਚੁਣੋ!");
+        if(!newTime) return alert("ਕਿਰਪਾ ਕਰਕੇ ਸਮਾਂ ਚੁਣੋ!");
         
         db.ref('users/' + id).update({ expiry: newTime })
-          .then(() => alert("ਕਲਾਇੰਟ '" + id + "' ਦੀ ਵੈਲਡਿਟੀ ਅਪਡੇਟ ਕਰ ਦਿੱਤੀ ਗਈ ਹੈ!"));
+          .then(() => alert(id + " ਦੀ ਵੈਲਡਿਟੀ ਸਫ਼ਲਤਾਪੂਰਵਕ ਵਧਾ ਦਿੱਤੀ ਗਈ ਹੈ!"));
     }
 
-    // 4. ਕਲਾਇੰਟ ਅਤੇ ਉਸਦਾ ਸਾਰਾ ਸਕੋਰ ਡਾਟਾ ਡਲੀਟ ਕਰਨਾ
+    // 4. ਕਲਾਇੰਟ ਅਤੇ ਉਸਦਾ ਸਾਰਾ ਮੈਚ ਡਾਟਾ ਡਲੀਟ ਕਰਨਾ
     function deleteClient(id) {
-        if(confirm("ਕੀ ਤੁਸੀਂ ਕਲਾਇੰਟ '" + id + "' ਨੂੰ ਡਲੀਟ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ? ਇਸ ਟੂਰਨਾਮੈਂਟ ਦਾ ਸਾਰਾ ਸਕੋਰਬੋਰਡ ਡਾਟਾ ਖਤਮ ਹੋ ਜਾਵੇਗਾ।")) {
+        if(confirm("ਕੀ ਤੁਸੀਂ ਕਲਾਇੰਟ '" + id + "' ਨੂੰ ਡਲੀਟ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ? ਇਸ ਨਾਲ ਕਲਾਇੰਟ ਦਾ ਪੂਰਾ ਕਬੱਡੀ ਡਾਟਾ ਖਤਮ ਹੋ ਜਾਵੇਗਾ।")) {
             db.ref('users/' + id).remove()
-              .then(() => alert("ਕਲਾਇੰਟ ਡਲੀਟ ਕਰ ਦਿੱਤਾ ਗਿਆ।"));
+              .then(() => alert("ਕਲਾਇੰਟ ਸਫ਼ਲਤਾਪੂਰਵਕ ਡਲੀਟ ਕਰ ਦਿੱਤਾ ਗਿਆ।"));
         }
     }
 
-    // ਪੇਜ ਲੋਡ ਹੋਣ 'ਤੇ ਲਿਸਟ ਚਲਾਓ
+    // ਲਿਸਟ ਨੂੰ ਰਨ ਕਰਨਾ
     loadList();
 </script>
 </body>
