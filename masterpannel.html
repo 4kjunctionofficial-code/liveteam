@@ -4,40 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Master Control Panel - Kabaddi Live</title>
-    <!-- Firebase SDK v8 -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #0b0d0f; color: white; padding: 20px; margin: 0; }
         .container { max-width: 1100px; margin: auto; background: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #30363d; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         h2 { color: #f39c12; text-align: center; text-transform: uppercase; margin-bottom: 25px; font-size: 24px; letter-spacing: 1px; }
         h3 { color: #58a6ff; margin-top: 30px; border-bottom: 1px solid #30363d; padding-bottom: 10px; }
-        
         .add-card { background: #0d1117; padding: 20px; border-radius: 10px; margin-bottom: 30px; border-left: 5px solid #f39c12; }
         .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-        
         label { display: block; margin-bottom: 6px; color: #8b949e; font-size: 13px; font-weight: bold; }
         input, select { padding: 12px; background: #161b22; border: 1px solid #30363d; color: white; border-radius: 8px; width: 100%; box-sizing: border-box; font-size: 14px; }
         input:focus, select:focus { border-color: #f39c12; outline: none; }
-        
         button { padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; }
         .btn-add { background: #f39c12; color: black; margin-top: 15px; width: 100%; font-size: 15px; }
         .btn-add:hover { background: #dd850e; }
-        
         .table-responsive { overflow-x: auto; margin-top: 20px; }
         table { width: 100%; border-collapse: collapse; background: #0d1117; text-align: left; }
         th { background: #30363d; color: #f39c12; padding: 15px; font-size: 14px; }
         td { padding: 15px; border-bottom: 1px solid #30363d; font-size: 14px; vertical-align: middle; }
-        
         .btn-edit { background: #f39c12; color: black; font-size: 12px; padding: 8px 12px; margin-right: 5px; }
-        .btn-edit:hover { background: #dd850e; }
         .btn-del { background: #da3633; color: white; font-size: 12px; padding: 8px 12px; }
-        .btn-del:hover { background: #f85149; }
-        
         .link-group { display: flex; flex-direction: column; gap: 5px; }
         .link-btn { color: #58a6ff; text-decoration: none; font-size: 12px; font-weight: bold; }
-        .link-btn:hover { text-decoration: underline; }
-        
         .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; }
         .status-active { background: #238636; color: white; }
         .status-expired { background: #da3633; color: white; }
@@ -48,7 +35,6 @@
 <div class="container">
     <h2>🔑 ਕਬੱਡੀ ਲਾਈਵ - ਮਾਸਟਰ ਕੰਟਰੋਲ ਪੈਨਲ</h2>
     
-    <!-- ਨਵਾਂ / ਐਡਿਟ ਫਾਰਮ -->
     <div class="add-card">
         <h4 id="formTitle" style="margin-top:0; color:#f39c12; text-transform:uppercase;">ਨਵਾਂ ਕਬੱਡੀ ਕਲਾਇੰਟ ਐਡ ਕਰੋ</h4>
         <div class="grid-inputs">
@@ -93,26 +79,29 @@
     </div>
 </div>
 
-<script>
-    // ਕਬੱਡੀ ਲਾਈਵ ਦਾ ਫਾਇਰਬੇਸ ਕਨੈਕਸ਼ਨ
+<!-- ਮਾਡਰਨ ਫਾਇਰਬੇਸ SDK Module ਸੈੱਟਅੱਪ -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getDatabase, ref, set, update, onValue, remove } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+
+    // ਤੁਹਾਡਾ ਸਹੀ ਲਿੰਕ ਇੱਥੇ ਸੈੱਟ ਕਰ ਦਿੱਤਾ ਹੈ
     const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
     let isEditMode = false;
 
-    // 1. ਕਲਾਇੰਟ ਡਾਟਾ ਸੇਵ ਜਾਂ ਅਪਡੇਟ ਕਰਨਾ
-    function saveClient() {
+    // ਗਲੋਬਲ ਫੰਕਸ਼ਨ ਬਣਾਉਣਾ ਤਾਂ ਜੋ HTML ਬਟਨਾਂ ਤੋਂ ਕਲਿੱਕ ਹੋ ਸਕੇ
+    window.saveClient = function() {
         const id = document.getElementById('cID').value.trim().toLowerCase();
         const pass = document.getElementById('cPass').value.trim();
         const expiryVal = document.getElementById('cExpiry').value;
         const isExpired = document.getElementById('cStatus').value === "true";
 
-        if(!id || !pass || !expiryVal) return alert("ਕਿਰਪਾ ਕਰਕੇ ਸਾਰੀ ਜਾਣਕਾਰੀ (ID, ਪਾਸਵਰਡ ਅਤੇ ਐਕਸਪਾਇਰੀ ਟਾਈਮ) ਭਰੋ!");
+        if(!id || !pass || !expiryVal) return alert("ਕਿਰਪਾ ਕਰਕੇ ਸਾਰੀ ਜਾਣਕਾਰੀ ਭਰੋ!");
 
         if(!isEditMode) {
-            // ਨਵਾਂ ਯੂਜ਼ਰ ਬਣਾਉਣ ਵੇਲੇ ਮੈਚ ਡਾਟਾ ਦਾ ਡਿਫਾਲਟ ਸੈੱਟਅੱਪ
-            db.ref('users/' + id).set({
+            set(ref(db, 'users/' + id), {
                 password: pass,
                 planStatus: isExpired,
                 expiryDate: expiryVal,
@@ -131,25 +120,28 @@
                     logoVisible: true
                 }
             }).then(() => {
-                alert("🎯 ਨਵਾਂ ਕਬੱਡੀ ਕਲਾਇੰਟ ਸਫ਼ਲਤਾਪੂਰਵਕ ਬਣ ਗਿਆ ਹੈ!");
+                alert("🎯 ਨਵਾਂ ਕਲਾਇੰਟ ਸਫ਼ਲਤਾਪੂਰਵਕ ਬਣ ਗਿਆ ਹੈ!");
                 resetForm();
+            }).catch((error) => {
+                alert("Firebase Error: " + error.message + "\n\nਜੇ Permission Denied ਹੈ, ਤਾਂ ਫਾਇਰਬੇਸ ਦੇ Rules 'true' ਕਰੋ।");
             });
         } else {
-            // EDIT ਕਰਨ ਵੇਲੇ ਰਨਿੰਗ ਮੈਚ ਦੇ ਸਕੋਰ ਨੂੰ ਛੇੜੇ ਬਿਨਾਂ ਸਿਰਫ ਪਲਾਨ ਅਪਡੇਟ ਕਰਨਾ
-            db.ref('users/' + id).update({
+            update(ref(db, 'users/' + id), {
                 password: pass,
                 planStatus: isExpired,
                 expiryDate: expiryVal
             }).then(() => {
                 alert("🔄 ਕਲਾਇੰਟ ਪਲਾਨ ਸਫ਼ਲਤਾਪੂਰਵਕ ਅਪਡੇਟ ਹੋ ਗਿਆ ਹੈ!");
                 resetForm();
+            }).catch((error) => {
+                alert("Firebase Error: " + error.message);
             });
         }
     }
 
-    // 2. ਰੀਅਲ-ਟਾਈਮ ਲਿਸਟ ਲੋਡ ਕਰਨਾ
+    // ਲਿਸਟ ਲੋਡ ਕਰਨਾ
     function loadList() {
-        db.ref('users').on('value', (snapshot) => {
+        onValue(ref(db, 'users'), (snapshot) => {
             const data = snapshot.val();
             const tbody = document.getElementById('clientTable');
             tbody.innerHTML = "";
@@ -167,88 +159,90 @@
                 const adminL = baseUrl + "admin.html?id=" + id;
                 const overL = baseUrl + "overlay.html?id=" + id;
                 
-                // ਆਟੋ-ਐਕਸਪਾਇਰੀ ਚੈੱਕ ਲੋਜਿਕ
                 let expTime = data[id].expiryDate ? new Date(data[id].expiryDate).getTime() : 0;
                 let autoExpired = now > expTime;
-                
                 let currentStatus = data[id].planStatus === true || autoExpired;
 
-                // ਬੈਕਗਰਾਊਂਡ 'ਚ ਆਟੋ-ਐਕਸਪਾਇਰ ਸਟੇਟਸ ਅਪਡੇਟ
                 if(autoExpired && data[id].planStatus !== true) {
-                    db.ref('users/' + id).update({ planStatus: true });
+                    update(ref(db, 'users/' + id), { planStatus: true });
                 }
 
-                // ਡੇਟ ਫਾਰਮੈਟ ਸਹੀ ਕਰਨਾ
                 let formattedDate = data[id].expiryDate ? data[id].expiryDate.replace('T', ' ') : 'Not Set';
 
-                tbody.innerHTML += `
-                    <tr>
-                        <td>
-                            <b style="color: #58a6ff; font-size: 16px;">${id}</b>
-                            <div style="font-size:12px; color:#8b949e; margin-top:4px;">Chabi: <b>${data[id].password || 'No Pass'}</b></div>
-                        </td>
-                        <td>
-                            <span style="color:#f39c12; font-weight:bold;">${formattedDate}</span>
-                        </td>
-                        <td>
-                            <span class="status-badge ${currentStatus ? 'status-expired' : 'status-active'}">
-                                ${currentStatus ? '🛑 LOCKED / EXPIRED' : '🟢 ACTIVE'}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="link-group">
-                                <a class="link-btn" href="${adminL}" target="_blank">💻 ADMIN PANEL</a>
-                                <a class="link-btn" href="${overL}" target="_blank">📺 OVERLAY LINK</a>
-                            </div>
-                        </td>
-                        <td>
-                            <button class="btn-edit" onclick="editClient('${id}', '${data[id].password}', '${data[id].expiryDate}', ${data[id].planStatus})">EDIT</button>
-                            <button class="btn-del" onclick="deleteClient('${id}')">DEL</button>
-                        </td>
-                    </tr>
+                // ਐਕਸ਼ਨ ਬਟਨਾਂ ਲਈ ਡਾਟਾ ਸਟ੍ਰਿੰਗ ਨੂੰ ਸਹੀ ਕਰਨਾ
+                const safePass = (data[id].password || '').replace(/'/g, "\\'");
+                const safeExpiry = (data[id].expiryDate || '');
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <b style="color: #58a6ff; font-size: 16px;">${id}</b>
+                        <div style="font-size:12px; color:#8b949e; margin-top:4px;">Chabi: <b>${data[id].password || 'No Pass'}</b></div>
+                    </td>
+                    <td><span style="color:#f39c12; font-weight:bold;">${formattedDate}</span></td>
+                    <td>
+                        <span class="status-badge ${currentStatus ? 'status-expired' : 'status-active'}">
+                            ${currentStatus ? '🛑 LOCKED / EXPIRED' : '🟢 ACTIVE'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="link-group">
+                            <a class="link-btn" href="${adminL}" target="_blank">💻 ADMIN PANEL</a>
+                            <a class="link-btn" href="${overL}" target="_blank">📺 OVERLAY LINK</a>
+                        </div>
+                    </td>
+                    <td id="actions-${id}"></td>
                 `;
+
+                tbody.appendChild(tr);
+
+                // ਐਡਿਟ ਅਤੇ ਡਲੀਟ ਬਟਨ ਡਾਇਨਾਮਿਕ ਜੋੜਨਾ
+                const editBtn = document.createElement('button');
+                editBtn.className = 'btn-edit';
+                editBtn.innerText = 'EDIT';
+                editBtn.onclick = () => window.editClient(id, safePass, safeExpiry, data[id].planStatus);
+
+                const delBtn = document.createElement('button');
+                delBtn.className = 'btn-del';
+                delBtn.innerText = 'DEL';
+                delBtn.onclick = () => window.deleteClient(id);
+
+                const actionTd = tr.querySelector(`#actions-${id}`);
+                actionTd.appendChild(editBtn);
+                actionTd.appendChild(delBtn);
             }
         });
     }
 
-    // 3. ਐਡਿਟ ਮੋਡ ਚਾਲੂ ਕਰਨਾ
-    function editClient(id, pass, expiry, status) {
+    window.editClient = function(id, pass, expiry, status) {
         isEditMode = true;
         document.getElementById('formTitle').innerText = "✏️ ਕਲਾਇੰਟ ਪਲਾਨ ਐਡਿਟ ਕਰੋ: " + id.toUpperCase();
-        
         const idInput = document.getElementById('cID');
         idInput.value = id;
-        idInput.disabled = true; // ਐਡਿਟ ਵੇਲੇ ID ਲੌਕ ਰਹੇਗੀ
-        
+        idInput.disabled = true;
         document.getElementById('cPass').value = pass || '';
         document.getElementById('cExpiry').value = expiry || '';
         document.getElementById('cStatus').value = status ? "true" : "false";
-        
         document.getElementById('submitBtn').innerText = "ਅਪਡੇਟ ਪਲਾਨ (Update)";
         document.getElementById('cancelBtn').style.display = "block";
     }
 
-    // 4. ਫਾਰਮ ਰੀਸੈੱਟ ਕਰਨਾ
-    function resetForm() {
+    window.resetForm = function() {
         isEditMode = false;
         document.getElementById('formTitle').innerText = "ਨਵਾਂ ਕਬੱਡੀ ਕਲਾਇੰਟ ਐਡ ਕਰੋ";
-        
         const idInput = document.getElementById('cID');
         idInput.value = "";
         idInput.disabled = false;
-        
         document.getElementById('cPass').value = "";
         document.getElementById('cExpiry').value = "";
         document.getElementById('cStatus').value = "false";
-        
         document.getElementById('submitBtn').innerText = "ਕਬੱਡੀ ਕਲਾਇੰਟ ਸੇਵ ਕਰੋ";
         document.getElementById('cancelBtn').style.display = "none";
     }
 
-    // 5. ਕਲਾਇੰਟ ਡਲੀਟ ਕਰਨਾ
-    function deleteClient(id) {
+    window.deleteClient = function(id) {
         if(confirm("ਕੀ ਤੁਸੀਂ ਕਲਾਇੰਟ '" + id + "' ਨੂੰ ਡਲੀਟ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?")) {
-            db.ref('users/' + id).remove()
+            remove(ref(db, 'users/' + id))
               .then(() => alert("ਕਲਾਇੰਟ ਸਫ਼ਲਤਾਪੂਰਵਕ ਡਲੀਟ ਕਰ ਦਿੱਤਾ ਗਿਆ।"));
         }
     }
