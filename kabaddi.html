@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body { 
+            margin: 0; padding: 0; width: 1920px; height: 1080px; 
+            background: transparent; 
+            overflow: hidden; position: relative; 
+        }
+        
+        /* ਬਿਲਕੁਲ ਸੇਮ ਇਮੇਜ ਬੈਕਗ੍ਰਾਊਂਡ (ਲੋਗੋ ਤੋਂ ਬਿਨਾਂ) */
+        #bg-overlay {
+            position: absolute; top: 0; left: 0; width: 1920px; height: 1080px;
+            background: url('https://raw.githubusercontent.com/4kjunctionofficial-code/Manpreetteam/main/Star%20Kabaddi%20new_20260327_211333_0000.png') no-repeat center center;
+            background-size: contain; pointer-events: none; z-index: 5;
+        }
+
+        /* ਉੱਪਰ ਖੱਬੇ ਪਾਸੇ ਲੋਗੋ (ਜੋ ਡ੍ਰੌਪਡਾਊਨ ਨਾਲ ਬਦਲੇਗਾ) */
+        #logo-container {
+            position: absolute; top: 35px; left: 45px; z-index: 9999;
+            opacity: 1; transition: all 0.5s ease; 
+        }
+        #logo-container.hidden { opacity: 0; transform: scale(0); }
+
+        #main-logo {
+            height: 85px; width: auto; max-width: 350px; object-fit: contain;
+        }
+
+        /* ਸਕਰੀਨ ਤੇ ਘੁੰਮਣ ਵਾਲਾ ਵਾਟਰਮਾਰਕ */
+        #single-wm { 
+            position: absolute; color: rgba(255, 255, 255, 0.6); font-size: 32px; font-weight: bold; 
+            font-family: 'Arial', sans-serif; text-transform: uppercase; text-shadow: 2px 2px 5px #000; 
+            white-space: nowrap; z-index: 1; opacity: 1;
+        }
+
+        /* ਟਿਕਰ ਕੰਟੇਨਰ (ਇਹ ਬੈਕਗ੍ਰਾਊਂਡ ਦੇ ਉੱਪਰ ਟੈਕਸਟ ਫਿੱਟ ਕਰੇਗਾ) */
+        #ticker-wrap {
+            position: absolute; bottom: 0px; left: 245px; width: 1400px; height: 150px; 
+            display: flex; flex-direction: column; justify-content: center;
+            z-index: 9998; opacity: 1; transition: all 0.5s ease;
+        }
+        #ticker-wrap.hidden { opacity: 0; }
+
+        /* 3 ਸਟੈੱਪ ਟੈਕਸਟ ਏਰੀਆ (ਪੱਟੀ ਦੇ ਖਾਨਿਆਂ ਮੁਤਾਬਕ ਸੈਟਿੰਗ) */
+        .row-text { 
+            display: flex; align-items: center; font-weight: 900; text-transform: uppercase; 
+            width: 100%; overflow: hidden; box-sizing: border-box; white-space: nowrap; 
+            font-family: 'Arial', sans-serif; 
+        }
+        
+        .row-1 { color: #ffffff; height: 45px; font-size: 26px; padding-left: 10px; } 
+        .row-2 { color: #111111; height: 58px; font-size: 36px; padding-left: 20px; } 
+        .row-3 { color: #ffcc00; height: 47px; font-size: 26px; padding-left: 10px; }
+
+        .scroller { display: inline-block; padding-left: 100%; animation: scroll-anim 25s linear infinite; }
+        @keyframes scroll-anim { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+        /* ਸੱਜੇ ਪਾਸੇ ਲਾਲ ਬਾਕਸ ਦੇ ਉੱਪਰ ਟਾਈਮ ਅਤੇ ਡੇਟ */
+        #time-container {
+            position: absolute; bottom: 0px; right: 0px; width: 270px; height: 150px;
+            display: flex; align-items: center; justify-content: center; z-index: 9999;
+        }
+        .time-wrap, .date-wrap { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: 0.8s; font-family: 'Arial', sans-serif; font-weight: bold;}
+        .time-str { color: #ffffff; font-size: 42px; letter-spacing: 1px; font-weight: 900; }
+        .date-str { font-size: 30px; color: #ffffff; font-weight: 900; }
+
+        /* ਸਕੋਰਬੋਰਡ (Top Right) */
+        #scoreboard { 
+            position: absolute; top: 45px; right: 80px; display: flex; flex-direction: column; align-items: center; z-index: 9999;
+            opacity: 1; transition: all 0.5s ease; 
+        }
+        #scoreboard.hidden { opacity: 0; transform: translateY(-100px); }
+        
+        .main-bar { 
+            display: flex; align-items: center; height: 65px; background: rgba(20, 20, 20, 0.95); 
+            border-radius: 6px; border: 2px solid rgba(255,255,255,0.2); padding: 0 5px; position: relative; overflow: hidden; 
+        }
+        
+        .s-box { 
+            background: linear-gradient(145deg, #e60000, #990000); color: #ffffff; font-size: 42px; font-weight: 900; 
+            width: 120px; height: 100%; display: flex; align-items: center; justify-content: center; 
+            transform: skewX(-15deg); text-shadow: 2px 2px 4px #000; box-shadow: inset 2px 2px 6px rgba(255,255,255,0.4); position: relative; z-index: 11; 
+        }
+        .s-left { margin-left: -17px; border-radius: 4px 0 0 4px; }
+        .s-right { margin-right: -17px; border-radius: 0 4px 4px 0; }
+        .inner-val { transform: skewX(15deg); }
+        
+        .name-area { 
+            width: 220px; height: 100%; display: flex; align-items: center; overflow: hidden; 
+            white-space: nowrap; color: #ffffff; font-size: 28px; font-weight: bold; font-family: 'Arial', sans-serif;
+            text-align: center; padding: 0 10px; text-shadow: 2px 2px 4px #000; box-sizing: border-box; text-transform: uppercase; position: relative; z-index: 11;
+        }
+        .team-scroller { display: inline-block; padding-left: 100%; animation: team-scroll 8s linear infinite; }
+        @keyframes team-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        
+        .vs-text { 
+            color: #ffffff; font-size: 20px; font-weight: 900; margin: 0 10px; text-shadow: 1px 1px 3px #000; 
+            background: #333; display: flex; align-items: center; justify-content: center;
+            width: 45px; height: 45px; border-radius: 50%; border: 2px solid #e60000; position: relative; z-index: 11;
+        }
+
+        .round-display {
+            color: white; font-size: 22px; font-weight: bold; text-transform: uppercase; font-family: 'Arial', sans-serif;
+            margin-top: 15px; text-shadow: 2px 2px 6px #000; letter-spacing: 2px; display: block; background: rgba(0,0,0,0.6); padding: 4px 15px; border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="bg-overlay"></div>
+
+<div id="logo-container">
+    <img id="main-logo" src="https://raw.githubusercontent.com/4kjunctionofficial-code/Manpreetteam/main/taqdeer%20tv.png" alt="Logo">
+</div>
+
+<div id="single-wm">M LIVE</div>
+
+<div id="scoreboard">
+    <div class="main-bar">
+        <div class="s-box s-left"><div class="inner-val" id="sA">0</div></div>
+        <div class="name-area" id="nA-container"><div id="nA" style="width:100%; text-align:center;">TEAM 1</div></div>
+        <div class="vs-text">VS</div>
+        <div class="name-area" id="nB-container"><div id="nB" style="width:100%; text-align:center;">TEAM 2</div></div>
+        <div class="s-box s-right"><div class="inner-val" id="sB">0</div></div>
+    </div>
+    <div class="round-display" id="round-display">LIVE MATCH</div>
+</div>
+
+<div id="ticker-wrap">
+    <div class="row-text row-1" id="c1">WELCOME TO LIVE KABADDI</div>
+    <div class="row-text row-2" id="c2">SUBSCRIBE OUR CHANNEL</div>
+    <div class="row-text row-3" id="c3">LIKE & SHARE</div>
+</div>
+
+<div id="time-container">
+    <div class="time-wrap" id="t-wrap"><div class="time-str" id="live-time"></div></div>
+    <div class="date-wrap" id="d-wrap" style="opacity:0;"><div class="date-str" id="live-date"></div></div>
+</div>
+
+<script>
+    const firebaseConfig = { databaseURL: "https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
+    firebase.initializeApp(firebaseConfig);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const matchId = urlParams.get('id') || 'defaultMatch';
+    const db = firebase.database().ref("matchData/" + matchId);
+
+    // ਇੱਥੇ ਆਪਣੇ ਕਲਾਇੰਟਾਂ ਦੇ ਲੋਗੋ ਲਿੰਕ ਪਾਓ (ਬੈਕਗ੍ਰਾਊਂਡ ਵਿੱਚੋਂ ਪੁਰਾਣਾ ਲੋਗੋ ਹਟਾ ਦਿੱਤਾ ਹੈ)
+    const clientLogos = {
+        "default": "https://raw.githubusercontent.com/4kjunctionofficial-code/Manpreetteam/main/taqdeer%20tv.png",
+        "malloke": "https://raw.githubusercontent.com/4kjunctionofficial-code/Manpreetteam/main/taqdeer%20tv.png", 
+        "dholewala": "https://raw.githubusercontent.com/4kjunctionofficial-code/Manpreetteam/main/taqdeer%20tv.png", 
+        "gadriwala": "https://raw.githubusercontent.com/4kjunctionofficial-code/Manpreetteam/main/taqdeer%20tv.png" 
+    };
+
+    db.on("value", (snap) => {
+        const data = snap.val() || {}; 
+        
+        const selectedKey = data.selectedClient || "default";
+        document.getElementById('main-logo').src = clientLogos[selectedKey] || clientLogos["default"];
+
+        if(data.logoVisible === false) { document.getElementById('logo-container').classList.add('hidden'); } else { document.getElementById('logo-container').classList.remove('hidden'); }
+        if(data.scoreVisible === false) { document.getElementById('scoreboard').classList.add('hidden'); } else { document.getElementById('scoreboard').classList.remove('hidden'); }
+        
+        // ਟਿਕਰ ਹਾਈਡ ਹੋਣ ਤੇ ਬੈਕਗ੍ਰਾਊਂਡ ਵਾਲੀ ਪੱਟੀ ਵੀ ਹਾਈਡ ਹੋ ਜਾਵੇਗੀ
+        if(data.tickerVisible === false) { 
+            document.getElementById('ticker-wrap').classList.add('hidden'); 
+            document.getElementById('bg-overlay').style.display = 'none';
+            document.getElementById('time-container').style.display = 'none';
+        } else { 
+            document.getElementById('ticker-wrap').classList.remove('hidden'); 
+            document.getElementById('bg-overlay').style.display = 'block';
+            document.getElementById('time-container').style.display = 'flex';
+        }
+        
+        document.getElementById('sA').innerText = data.scoreA !== undefined ? data.scoreA : "0";
+        document.getElementById('sB').innerText = data.scoreB !== undefined ? data.scoreB : "0";
+        setTeamName('nA-container', data.nameA || "TEAM 1");
+        setTeamName('nB-container', data.nameB || "TEAM 2");
+        document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
+        const roundVal = data.round || "";
+        const roundEl = document.getElementById('round-display');
+        roundEl.innerText = roundVal;
+        roundEl.style.display = roundVal.trim() === "" ? "none" : "block";
+        setAlwaysScroll('c1', data.row1Txt || "WELCOME TO LIVE KABADDI"); 
+        setAlwaysScroll('c2', data.row2Txt || "SUBSCRIBE OUR CHANNEL"); 
+        setAlwaysScroll('c3', data.row3Txt || "LIKE & SHARE"); 
+    });
+
+    function setTeamName(containerId, txt) {
+        const el = document.getElementById(containerId);
+        if(txt.length > 12) { el.innerHTML = `<div class="team-scroller">${txt}</div>`; }
+        else { el.innerHTML = `<div style="width:100%; text-align:center;">${txt}</div>`; }
+    }
+
+    function setAlwaysScroll(id, txt) {
+        const el = document.getElementById(id);
+        if(txt && txt.trim().length > 0) { el.innerHTML = `<div class="scroller">${txt}</div>`; }
+        else { el.innerHTML = ""; }
+    }
+
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('live-time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('live-date').innerText = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+    }
+    setInterval(updateClock, 1000); updateClock();
+
+    let isTime = true;
+    setInterval(() => { isTime = !isTime; document.getElementById('t-wrap').style.opacity = isTime ? "1" : "0"; document.getElementById('d-wrap').style.opacity = isTime ? "0" : "1"; }, 5000);
+
+    const wmEl = document.getElementById('single-wm');
+    function moveWM() { wmEl.style.left = (Math.random() * 1400 + 100) + 'px'; wmEl.style.top = (Math.random() * 600 + 150) + 'px'; }
+    moveWM(); setInterval(moveWM, 6000);
+</script>
+</body>
+</html>
