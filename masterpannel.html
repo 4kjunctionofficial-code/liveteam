@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Master Control Panel - Kabaddi Live</title>
+    <!-- Firebase SDK v8 -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
@@ -40,8 +41,6 @@
         .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; }
         .status-active { background: #238636; color: white; }
         .status-expired { background: #da3633; color: white; }
-        
-        .expiry-text { font-size: 12px; color: #8b949e; margin-top: 4px; }
     </style>
 </head>
 <body>
@@ -95,6 +94,7 @@
 </div>
 
 <script>
+    // ਕਬੱਡੀ ਲਾਈਵ ਦਾ ਫਾਇਰਬੇਸ ਕਨੈਕਸ਼ਨ
     const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
@@ -110,8 +110,8 @@
 
         if(!id || !pass || !expiryVal) return alert("ਕਿਰਪਾ ਕਰਕੇ ਸਾਰੀ ਜਾਣਕਾਰੀ (ID, ਪਾਸਵਰਡ ਅਤੇ ਐਕਸਪਾਇਰੀ ਟਾਈਮ) ਭਰੋ!");
 
-        // ਜੇ ਨਵਾਂ ਯੂਜ਼ਰ ਬਣਾ ਰਹੇ ਹਾਂ ਤਾਂ ਮੈਚ ਡਾਟਾ ਦਾ ਡਿਫਾਲਟ ਸੈੱਟਅੱਪ ਭੇਜਣਾ
         if(!isEditMode) {
+            // ਨਵਾਂ ਯੂਜ਼ਰ ਬਣਾਉਣ ਵੇਲੇ ਮੈਚ ਡਾਟਾ ਦਾ ਡਿਫਾਲਟ ਸੈੱਟਅੱਪ
             db.ref('users/' + id).set({
                 password: pass,
                 planStatus: isExpired,
@@ -131,11 +131,11 @@
                     logoVisible: true
                 }
             }).then(() => {
-                alert("🎯 ਨਵਾਂ ਕਲਾਇੰਟ ਸਫ਼ਲਤਾਪੂਰਵਕ ਬਣ ਗਿਆ ਹੈ!");
+                alert("🎯 ਨਵਾਂ ਕਬੱਡੀ ਕਲਾਇੰਟ ਸਫ਼ਲਤਾਪੂਰਵਕ ਬਣ ਗਿਆ ਹੈ!");
                 resetForm();
             });
         } else {
-            // ਜੇ ਸਿਰਫ਼ EDIT ਕਰ ਰਹੇ ਹਾਂ ਤਾਂ ਮੈਚ ਸਕੋਰ ਖਰਾਬ ਕੀਤੇ ਬਿਨਾਂ ਸਿਰਫ ਪਲਾਨ ਅਪਡੇਟ ਕਰਨਾ
+            // EDIT ਕਰਨ ਵੇਲੇ ਰਨਿੰਗ ਮੈਚ ਦੇ ਸਕੋਰ ਨੂੰ ਛੇੜੇ ਬਿਨਾਂ ਸਿਰਫ ਪਲਾਨ ਅਪਡੇਟ ਕਰਨਾ
             db.ref('users/' + id).update({
                 password: pass,
                 planStatus: isExpired,
@@ -167,19 +167,18 @@
                 const adminL = baseUrl + "admin.html?id=" + id;
                 const overL = baseUrl + "overlay.html?id=" + id;
                 
-                // ਐਕਸਪਾਇਰੀ ਚੈੱਕ ਲੋਜਿਕ
+                // ਆਟੋ-ਐਕਸਪਾਇਰੀ ਚੈੱਕ ਲੋਜਿਕ
                 let expTime = data[id].expiryDate ? new Date(data[id].expiryDate).getTime() : 0;
                 let autoExpired = now > expTime;
                 
-                // ਜੇ ਟਾਈਮ ਲੰਘ ਗਿਆ ਹੈ ਜਾਂ ਮੈਨੂਅਲੀ ਲੌਕ ਕੀਤਾ ਹੈ
                 let currentStatus = data[id].planStatus === true || autoExpired;
 
-                // ਜੇ ਟਾਈਮ ਦੇ ਮੁਤਾਬਕ ਆਟੋ-ਐਕਸਪਾਇਰ ਹੋ ਗਿਆ ਹੈ ਤਾਂ ਫਾਇਰਬੇਸ 'ਚ ਵੀ ਅਪਡੇਟ ਕਰ ਦੇਵੇ ਬੈਕਗਰਾਊਂਡ 'ਚ
+                // ਬੈਕਗਰਾਊਂਡ 'ਚ ਆਟੋ-ਐਕਸਪਾਇਰ ਸਟੇਟਸ ਅਪਡੇਟ
                 if(autoExpired && data[id].planStatus !== true) {
                     db.ref('users/' + id).update({ planStatus: true });
                 }
 
-                // ਡੇਟ ਨੂੰ ਪੰਜਾਬੀ/ਸੌਖੇ ਫਾਰਮੈਟ 'ਚ ਦਿਖਾਉਣ ਲਈ
+                // ਡੇਟ ਫਾਰਮੈਟ ਸਹੀ ਕਰਨਾ
                 let formattedDate = data[id].expiryDate ? data[id].expiryDate.replace('T', ' ') : 'Not Set';
 
                 tbody.innerHTML += `
@@ -219,7 +218,7 @@
         
         const idInput = document.getElementById('cID');
         idInput.value = id;
-        idInput.disabled = true; // ਐਡਿਟ ਵੇਲੇ ID ਨਹੀਂ ਬਦਲੀ ਜਾ ਸਕਦੀ
+        idInput.disabled = true; // ਐਡਿਟ ਵੇਲੇ ID ਲੌਕ ਰਹੇਗੀ
         
         document.getElementById('cPass').value = pass || '';
         document.getElementById('cExpiry').value = expiry || '';
