@@ -8,15 +8,15 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #0b0d0f; color: white; padding: 20px; margin: 0; }
-        .container { max-width: 1000px; margin: auto; background: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #30363d; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .container { max-width: 1100px; margin: auto; background: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #30363d; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         h2 { color: #f39c12; text-align: center; text-transform: uppercase; margin-bottom: 25px; font-size: 24px; letter-spacing: 1px; }
         h3 { color: #58a6ff; margin-top: 30px; border-bottom: 1px solid #30363d; padding-bottom: 10px; }
         
         .add-card { background: #0d1117; padding: 20px; border-radius: 10px; margin-bottom: 30px; border-left: 5px solid #f39c12; }
-        .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+        .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
         
         label { display: block; margin-bottom: 6px; color: #8b949e; font-size: 13px; font-weight: bold; }
-        input, select { padding: 12px; background: #161b22; border: 1px solid #30363d; color: white; border-radius: 8px; width: 100%; box-sizing: border-box; }
+        input, select { padding: 12px; background: #161b22; border: 1px solid #30363d; color: white; border-radius: 8px; width: 100%; box-sizing: border-box; font-size: 14px; }
         input:focus, select:focus { border-color: #f39c12; outline: none; }
         
         button { padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; }
@@ -28,8 +28,8 @@
         th { background: #30363d; color: #f39c12; padding: 15px; font-size: 14px; }
         td { padding: 15px; border-bottom: 1px solid #30363d; font-size: 14px; vertical-align: middle; }
         
-        .btn-save { background: #238636; color: white; margin-right: 5px; font-size: 12px; padding: 8px 12px; }
-        .btn-save:hover { background: #2ea043; }
+        .btn-edit { background: #f39c12; color: black; font-size: 12px; padding: 8px 12px; margin-right: 5px; }
+        .btn-edit:hover { background: #dd850e; }
         .btn-del { background: #da3633; color: white; font-size: 12px; padding: 8px 12px; }
         .btn-del:hover { background: #f85149; }
         
@@ -37,9 +37,11 @@
         .link-btn { color: #58a6ff; text-decoration: none; font-size: 12px; font-weight: bold; }
         .link-btn:hover { text-decoration: underline; }
         
-        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; margin-top: 5px; }
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; }
         .status-active { background: #238636; color: white; }
         .status-expired { background: #da3633; color: white; }
+        
+        .expiry-text { font-size: 12px; color: #8b949e; margin-top: 4px; }
     </style>
 </head>
 <body>
@@ -47,15 +49,21 @@
 <div class="container">
     <h2>🔑 ਕਬੱਡੀ ਲਾਈਵ - ਮਾਸਟਰ ਕੰਟਰੋਲ ਪੈਨਲ</h2>
     
+    <!-- ਨਵਾਂ / ਐਡਿਟ ਫਾਰਮ -->
     <div class="add-card">
+        <h4 id="formTitle" style="margin-top:0; color:#f39c12; text-transform:uppercase;">ਨਵਾਂ ਕਬੱਡੀ ਕਲਾਇੰਟ ਐਡ ਕਰੋ</h4>
         <div class="grid-inputs">
             <div>
                 <label>ਕਲਾਇੰਟ ID (User ID)</label>
                 <input type="text" id="cID" placeholder="e.g. mudki">
             </div>
             <div>
-                <label>ਪਾਸਵਰਡ (Password)</label>
+                <label>ਪਾਸਵਰਡ (Chabi)</label>
                 <input type="text" id="cPass" placeholder="Password">
+            </div>
+            <div>
+                <label>ਐਕਸਪਾਇਰੀ ਤਾਰੀਖ ਅਤੇ ਸਮਾਂ</label>
+                <input type="datetime-local" id="cExpiry">
             </div>
             <div>
                 <label>ਪਲਾਨ ਸਟੇਟਸ (Plan Status)</label>
@@ -65,7 +73,8 @@
                 </select>
             </div>
         </div>
-        <button class="btn-add" onclick="createClient()">ਨਵਾਂ ਕਬੱਡੀ ਕਲਾਇੰਟ ਐਡ ਕਰੋ</button>
+        <button class="btn-add" id="submitBtn" onclick="saveClient()">ਕਬੱਡੀ ਕਲਾਇੰਟ ਸੇਵ ਕਰੋ</button>
+        <button class="btn-add" id="cancelBtn" style="background:#444; color:white; display:none; margin-top:10px;" onclick="resetForm()">ਕੈਂਸਲ (Cancel Edit)</button>
     </div>
 
     <h3>ਐਕਟਿਵ ਕਲਾਇੰਟ ਲਿਸਟ</h3>
@@ -73,8 +82,9 @@
         <table>
             <thead>
                 <tr>
-                    <th>ਕਲਾਇੰਟ ID / ਪਾਸਵਰਡ</th>
-                    <th>ਪਲਾਨ ਸਟੇਟਸ (Status)</th>
+                    <th>ਕਲਾਇੰਟ ID / ਚਾਬੀ</th>
+                    <th>ਐਕਸਪਾਇਰੀ ਡੇਟ & ਟਾਈਮ</th>
+                    <th>ਸਟੇਟਸ (Status)</th>
                     <th>ਲਾਈਵ ਪੈਨਲ ਲਿੰਕਸ</th>
                     <th>ਐਕਸ਼ਨ</th>
                 </tr>
@@ -85,47 +95,59 @@
 </div>
 
 <script>
-    // 🔗 ਤੁਹਾਡਾ ਨਵਾਂ ਫਾਇਰਬੇਸ ਲਿੰਕ ਇੱਥੇ ਸੈੱਟ ਕਰ ਦਿੱਤਾ ਹੈ
     const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // 1. ਨਵਾਂ ਕਲਾਇੰਟ ਬਣਾਉਣਾ (ਸਕੋਰਬੋਰਡ ਅਤੇ ਲੌਕ ਸਿਸਟਮ ਦੋਵਾਂ ਦੇ ਮੁਤਾਬਕ)
-    function createClient() {
+    let isEditMode = false;
+
+    // 1. ਕਲਾਇੰਟ ਡਾਟਾ ਸੇਵ ਜਾਂ ਅਪਡੇਟ ਕਰਨਾ
+    function saveClient() {
         const id = document.getElementById('cID').value.trim().toLowerCase();
         const pass = document.getElementById('cPass').value.trim();
+        const expiryVal = document.getElementById('cExpiry').value;
         const isExpired = document.getElementById('cStatus').value === "true";
 
-        if(!id || !pass) return alert("ਕਿਰਪਾ ਕਰਕੇ ID ਅਤੇ ਪਾਸਵਰਡ ਭਰੋ!");
+        if(!id || !pass || !expiryVal) return alert("ਕਿਰਪਾ ਕਰਕੇ ਸਾਰੀ ਜਾਣਕਾਰੀ (ID, ਪਾਸਵਰਡ ਅਤੇ ਐਕਸਪਾਇਰੀ ਟਾਈਮ) ਭਰੋ!");
 
-        db.ref('users/' + id).set({
-            password: pass,
-            planStatus: isExpired, // overlay.html ਇਸੇ ਵੈਲਯੂ ਨੂੰ ਰੀਡ ਕਰਕੇ ਸਕ੍ਰੀਨ ਲੌਕ ਕਰੇਗੀ
-            matchData: {
-                nameA: "TEAM 1",
-                nameB: "TEAM 2",
-                scoreA: 0,
-                scoreB: 0,
-                round: "LIVE MATCH",
-                row1Txt: "WELCOME TO LIVE KABADDI",
-                row2Txt: "SUBSCRIBE OUR CHANNEL",
-                row3Txt: "LIKE & SHARE",
-                watermarkTxt: "M LIVE",
-                scoreVisible: true,
-                tickerVisible: true,
-                logoVisible: true
-            }
-        }).then(() => {
-            alert("ਕਬੱਡੀ ਕਲਾਇੰਟ ਸਫ਼ਲਤਾਪੂਰਵਕ ਬਣ ਗਿਆ ਹੈ!");
-            document.getElementById('cID').value = "";
-            document.getElementById('cPass').value = "";
-            document.getElementById('cStatus').value = "false";
-        }).catch((error) => {
-            alert("ਐਰਰ: " + error.message);
-        });
+        // ਜੇ ਨਵਾਂ ਯੂਜ਼ਰ ਬਣਾ ਰਹੇ ਹਾਂ ਤਾਂ ਮੈਚ ਡਾਟਾ ਦਾ ਡਿਫਾਲਟ ਸੈੱਟਅੱਪ ਭੇਜਣਾ
+        if(!isEditMode) {
+            db.ref('users/' + id).set({
+                password: pass,
+                planStatus: isExpired,
+                expiryDate: expiryVal,
+                matchData: {
+                    nameA: "TEAM 1",
+                    nameB: "TEAM 2",
+                    scoreA: 0,
+                    scoreB: 0,
+                    round: "LIVE MATCH",
+                    row1Txt: "WELCOME TO LIVE KABADDI",
+                    row2Txt: "SUBSCRIBE OUR CHANNEL",
+                    row3Txt: "LIKE & SHARE",
+                    watermarkTxt: "M LIVE",
+                    scoreVisible: true,
+                    tickerVisible: true,
+                    logoVisible: true
+                }
+            }).then(() => {
+                alert("🎯 ਨਵਾਂ ਕਲਾਇੰਟ ਸਫ਼ਲਤਾਪੂਰਵਕ ਬਣ ਗਿਆ ਹੈ!");
+                resetForm();
+            });
+        } else {
+            // ਜੇ ਸਿਰਫ਼ EDIT ਕਰ ਰਹੇ ਹਾਂ ਤਾਂ ਮੈਚ ਸਕੋਰ ਖਰਾਬ ਕੀਤੇ ਬਿਨਾਂ ਸਿਰਫ ਪਲਾਨ ਅਪਡੇਟ ਕਰਨਾ
+            db.ref('users/' + id).update({
+                password: pass,
+                planStatus: isExpired,
+                expiryDate: expiryVal
+            }).then(() => {
+                alert("🔄 ਕਲਾਇੰਟ ਪਲਾਨ ਸਫ਼ਲਤਾਪੂਰਵਕ ਅਪਡੇਟ ਹੋ ਗਿਆ ਹੈ!");
+                resetForm();
+            });
+        }
     }
 
-    // 2. ਲਿਸਟ ਲੋਡ ਕਰਨਾ ਅਤੇ ਰੀਅਲ-ਟਾਈਮ ਅਪਡੇਟ ਦਿਖਾਉਣਾ
+    // 2. ਰੀਅਲ-ਟਾਈਮ ਲਿਸਟ ਲੋਡ ਕਰਨਾ
     function loadList() {
         db.ref('users').on('value', (snapshot) => {
             const data = snapshot.val();
@@ -133,17 +155,32 @@
             tbody.innerHTML = "";
 
             if (!data) {
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#8b949e;">ਕੋਈ ਐਕਟਿਵ ਕਲਾਇੰਟ ਨਹੀਂ ਮਿਲਿਆ।</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#8b949e;">ਕੋਈ ਕਲਾਇੰਟ ਨਹੀਂ ਮਿਲਿਆ।</td></tr>`;
                 return;
             }
 
             let currentUrl = window.location.href;
             let baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/')) + '/';
+            const now = new Date().getTime();
 
             for (let id in data) {
                 const adminL = baseUrl + "admin.html?id=" + id;
                 const overL = baseUrl + "overlay.html?id=" + id;
-                const currentStatus = data[id].planStatus === true;
+                
+                // ਐਕਸਪਾਇਰੀ ਚੈੱਕ ਲੋਜਿਕ
+                let expTime = data[id].expiryDate ? new Date(data[id].expiryDate).getTime() : 0;
+                let autoExpired = now > expTime;
+                
+                // ਜੇ ਟਾਈਮ ਲੰਘ ਗਿਆ ਹੈ ਜਾਂ ਮੈਨੂਅਲੀ ਲੌਕ ਕੀਤਾ ਹੈ
+                let currentStatus = data[id].planStatus === true || autoExpired;
+
+                // ਜੇ ਟਾਈਮ ਦੇ ਮੁਤਾਬਕ ਆਟੋ-ਐਕਸਪਾਇਰ ਹੋ ਗਿਆ ਹੈ ਤਾਂ ਫਾਇਰਬੇਸ 'ਚ ਵੀ ਅਪਡੇਟ ਕਰ ਦੇਵੇ ਬੈਕਗਰਾਊਂਡ 'ਚ
+                if(autoExpired && data[id].planStatus !== true) {
+                    db.ref('users/' + id).update({ planStatus: true });
+                }
+
+                // ਡੇਟ ਨੂੰ ਪੰਜਾਬੀ/ਸੌਖੇ ਫਾਰਮੈਟ 'ਚ ਦਿਖਾਉਣ ਲਈ
+                let formattedDate = data[id].expiryDate ? data[id].expiryDate.replace('T', ' ') : 'Not Set';
 
                 tbody.innerHTML += `
                     <tr>
@@ -152,13 +189,11 @@
                             <div style="font-size:12px; color:#8b949e; margin-top:4px;">Chabi: <b>${data[id].password || 'No Pass'}</b></div>
                         </td>
                         <td>
-                            <select id="updateStat-${id}" style="padding:6px; font-size:12px; width:auto; border-color:#30363d;">
-                                <option value="false" ${!currentStatus ? 'selected' : ''}>🟢 Active</option>
-                                <option value="true" ${currentStatus ? 'selected' : ''}>🛑 Expired</option>
-                            </select>
-                            <br>
+                            <span style="color:#f39c12; font-weight:bold;">${formattedDate}</span>
+                        </td>
+                        <td>
                             <span class="status-badge ${currentStatus ? 'status-expired' : 'status-active'}">
-                                ${currentStatus ? 'LOCKED' : 'RUNNING'}
+                                ${currentStatus ? '🛑 LOCKED / EXPIRED' : '🟢 ACTIVE'}
                             </span>
                         </td>
                         <td>
@@ -168,7 +203,7 @@
                             </div>
                         </td>
                         <td>
-                            <button class="btn-save" onclick="updateClient('${id}')">SAVE</button>
+                            <button class="btn-edit" onclick="editClient('${id}', '${data[id].password}', '${data[id].expiryDate}', ${data[id].planStatus})">EDIT</button>
                             <button class="btn-del" onclick="deleteClient('${id}')">DEL</button>
                         </td>
                     </tr>
@@ -177,18 +212,43 @@
         });
     }
 
-    // 3. ਪਲਾਨ ਸਟੇਟਸ (ਚਾਲੂ/ਬੰਦ) ਅਪਡੇਟ ਕਰਨਾ
-    function updateClient(id) {
-        const selectEl = document.getElementById('updateStat-' + id);
-        const nextStatus = selectEl.value === "true";
+    // 3. ਐਡਿਟ ਮੋਡ ਚਾਲੂ ਕਰਨਾ
+    function editClient(id, pass, expiry, status) {
+        isEditMode = true;
+        document.getElementById('formTitle').innerText = "✏️ ਕਲਾਇੰਟ ਪਲਾਨ ਐਡਿਟ ਕਰੋ: " + id.toUpperCase();
         
-        db.ref('users/' + id).update({ planStatus: nextStatus })
-          .then(() => alert("ਕਲਾਇੰਟ " + id + " ਦਾ ਪਲਾਨ ਸਟੇਟਸ ਸਫ਼ਲਤਾਪੂਰਵਕ ਅਪਡੇਟ ਹੋ ਗਿਆ ਹੈ!"));
+        const idInput = document.getElementById('cID');
+        idInput.value = id;
+        idInput.disabled = true; // ਐਡਿਟ ਵੇਲੇ ID ਨਹੀਂ ਬਦਲੀ ਜਾ ਸਕਦੀ
+        
+        document.getElementById('cPass').value = pass || '';
+        document.getElementById('cExpiry').value = expiry || '';
+        document.getElementById('cStatus').value = status ? "true" : "false";
+        
+        document.getElementById('submitBtn').innerText = "ਅਪਡੇਟ ਪਲਾਨ (Update)";
+        document.getElementById('cancelBtn').style.display = "block";
     }
 
-    // 4. ਕਲਾਇੰਟ ਡਲੀਟ ਕਰਨਾ
+    // 4. ਫਾਰਮ ਰੀਸੈੱਟ ਕਰਨਾ
+    function resetForm() {
+        isEditMode = false;
+        document.getElementById('formTitle').innerText = "ਨਵਾਂ ਕਬੱਡੀ ਕਲਾਇੰਟ ਐਡ ਕਰੋ";
+        
+        const idInput = document.getElementById('cID');
+        idInput.value = "";
+        idInput.disabled = false;
+        
+        document.getElementById('cPass').value = "";
+        document.getElementById('cExpiry').value = "";
+        document.getElementById('cStatus').value = "false";
+        
+        document.getElementById('submitBtn').innerText = "ਕਬੱਡੀ ਕਲਾਇੰਟ ਸੇਵ ਕਰੋ";
+        document.getElementById('cancelBtn').style.display = "none";
+    }
+
+    // 5. ਕਲਾਇੰਟ ਡਲੀਟ ਕਰਨਾ
     function deleteClient(id) {
-        if(confirm("ਕੀ ਤੁਸੀਂ ਕਲਾਇੰਟ '" + id + "' ਨੂੰ ਡਲੀਟ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ? ਇਸ ਨਾਲ ਕਲਾਇੰਟ ਦਾ ਪੂਰਾ ਕਬੱਡੀ ਡਾਟਾ ਖਤਮ ਹੋ ਜਾਵੇਗਾ।")) {
+        if(confirm("ਕੀ ਤੁਸੀਂ ਕਲਾਇੰਟ '" + id + "' ਨੂੰ ਡਲੀਟ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?")) {
             db.ref('users/' + id).remove()
               .then(() => alert("ਕਲਾਇੰਟ ਸਫ਼ਲਤਾਪੂਰਵਕ ਡਲੀਟ ਕਰ ਦਿੱਤਾ ਗਿਆ।"));
         }
