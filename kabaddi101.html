@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Arial', sans-serif; overflow: hidden; position: relative; }
+        
+        /* ਵਟਸਐਪ ਨੰਬਰ ਪੱਟੀ */
+        .whatsapp-bar {
+            position: absolute; bottom: 165px; left: 10px; display: flex; align-items: center;
+            background: #000000; color: #ffffff; padding: 6px 18px 6px 45px; border-radius: 25px;
+            font-size: 22px; font-weight: bold; z-index: 9999;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .whatsapp-icon {
+            position: absolute; left: -2px; width: 44px; height: 44px;
+            background: #e60000; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
+        .whatsapp-icon svg { width: 24px; height: 24px; fill: white; }
+
+        /* ਉੱਪਰ ਖੱਬੇ ਪਾਸੇ ਕਲਾਇੰਟ ਲੋਗੋ */
+        #logo-container {
+            position: absolute; top: 30px; left: 40px; z-index: 9999;
+            opacity: 1; transition: all 0.7s ease; 
+        }
+        #logo-container.hidden { opacity: 0; transform: scale(0); }
+        #main-logo {
+            height: 90px; width: auto; max-width: 350px; object-fit: contain;
+            filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.3));
+        }
+
+        /* ਵਾਟਰਮਾਰਕ (M LIVE) */
+        #single-wm { 
+            position: absolute; color: rgba(255, 255, 255, 0.7); font-size: 35px; font-weight: bold; 
+            text-transform: uppercase; text-shadow: 2px 2px 5px #000; white-space: nowrap; 
+            z-index: 1; opacity: 1;
+        }
+
+        /* 100% ਸੇਮ ਡਿਜ਼ਾਈਨ ਟਿਕਰ ਬਾਕਸ */
+        #ticker-wrap {
+            position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 150px; display: flex; 
+            z-index: 9998; opacity: 1; transition: all 0.7s ease;
+        }
+        #ticker-wrap.hidden { opacity: 0; transform: translateY(160px); }
+
+        /* ਖੱਬੇ ਪਾਸੇ ਵਾਲਾ LIVE ਬਾਕਸ */
+        .box-live { 
+            width: 250px; background: #e60000; color: white; display: flex; align-items: center; 
+            justify-content: center; font-size: 75px; font-weight: bold; font-family: 'Impact', 'Arial Black', sans-serif; text-transform: uppercase;
+            letter-spacing: 1px; z-index: 12; position: relative; margin-right: -40px;
+            padding-right: 20px; box-sizing: border-box;
+        }
+        .box-live::after {
+            content: ''; position: absolute; right: -40px; top: 0; width: 0; height: 0;
+            border-bottom: 150px solid transparent; border-left: 40px solid #e60000;
+        }
+
+        /* ਵਿਚਕਾਰਲੀ 3-ਸਟੈਪ ਗ੍ਰੇ ਪੱਟੀ */
+        .center-wrap { 
+            flex: 1; display: flex; flex-direction: column; overflow: hidden; 
+            z-index: 10; padding-left: 50px; padding-right: 40px; background: #4a4a4a;
+        }
+        .row-text { display: flex; align-items: center; font-weight: bold; text-transform: uppercase; width: 100%; overflow: hidden; box-sizing: border-box; white-space: nowrap; }
+        
+        .row-1 { background: #5a5a5a; color: white; height: 45px; font-size: 28px; border-bottom: 1px solid #444; } 
+        .row-2 { background: #969696; color: #111111; height: 60px; font-size: 38px; font-weight: 900; } 
+        .row-3 { background: #333333; color: #ffcc00; height: 45px; font-size: 28px; border-top: 1px solid #444; }
+
+        .scroller { display: inline-block; padding-left: 100%; animation: scroll-anim 25s linear infinite; }
+        @keyframes scroll-anim { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+        /* ਸੱਜੇ ਪਾਸੇ ਵਾਲਾ TIME ਬਾਕਸ */
+        .box-time { 
+            width: 280px; background: #e60000; color: white; display: flex; align-items: center; 
+            justify-content: center; z-index: 12; position: relative; margin-left: -40px;
+            padding-left: 30px; box-sizing: border-box;
+        }
+        .box-time::before {
+            content: ''; position: absolute; left: -40px; top: 0; width: 0; height: 0;
+            border-top: 150px solid transparent; border-right: 40px solid #e60000;
+        }
+        .time-wrap, .date-wrap { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: 0.8s; font-weight: bold;}
+        .time-str { color: #ffffff; font-size: 45px; letter-spacing: 1px; }
+        .date-str { font-size: 32px; color: #ffffff; }
+
+        /* ਸਕੋਰਬੋਰਡ (Top Right) */
+        #scoreboard { 
+            position: absolute; top: 40px; right: 80px; display: flex; flex-direction: column; align-items: center; z-index: 9999;
+            opacity: 1; transition: all 0.7s ease; 
+        }
+        #scoreboard.hidden { opacity: 0; transform: translateY(-100px); }
+        
+        .main-bar { 
+            display: flex; align-items: center; height: 65px; background: rgba(20, 20, 20, 0.95); 
+            border-radius: 6px; border: 2px solid rgba(255,255,255,0.2); padding: 0 5px; position: relative; overflow: hidden; 
+        }
+        
+        .s-box { 
+            background: linear-gradient(145deg, #e60000, #990000); color: #ffffff; font-size: 42px; font-weight: 900; 
+            width: 120px; height: 100%; display: flex; align-items: center; justify-content: center; 
+            transform: skewX(-15deg); text-shadow: 2px 2px 4px #000; box-shadow: inset 2px 2px 6px rgba(255,255,255,0.4); position: relative; z-index: 11; 
+        }
+        .s-left { margin-left: -17px; border-radius: 4px 0 0 4px; }
+        .s-right { margin-right: -17px; border-radius: 0 4px 4px 0; }
+        .inner-val { transform: skewX(15deg); }
+        
+        .name-area { 
+            width: 220px; height: 100%; display: flex; align-items: center; overflow: hidden; 
+            white-space: nowrap; color: #ffffff; font-size: 28px; font-weight: bold;
+            text-align: center; padding: 0 10px; text-shadow: 2px 2px 4px #000; box-sizing: border-box; text-transform: uppercase; position: relative; z-index: 11;
+        }
+        .team-scroller { display: inline-block; padding-left: 100%; animation: team-scroll 8s linear infinite; }
+        @keyframes team-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        
+        .vs-text { 
+            color: #ffffff; font-size: 20px; font-weight: 900; margin: 0 10px; text-shadow: 1px 1px 3px #000; 
+            background: #333; display: flex; align-items: center; justify-content: center;
+            width: 45px; height: 45px; border-radius: 50%; border: 2px solid #e60000; position: relative; z-index: 11;
+        }
+
+        .round-display {
+            color: white; font-size: 22px; font-weight: bold; text-transform: uppercase;
+            margin-top: 15px; text-shadow: 2px 2px 6px #000; letter-spacing: 2px; display: block; background: rgba(0,0,0,0.6); padding: 4px 15px; border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="whatsapp-bar">
+    <div class="whatsapp-icon">
+        <svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.405.003 12.022.003c3.201.001 6.212 1.244 8.477 3.513 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.35 12.002-11.97 12.002-2.012-.002-3.992-.501-5.756-1.451L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.742.002-2.602-1.01-5.05-2.85-6.893-1.839-1.84-4.287-2.853-6.89-2.854-5.441 0-9.865 4.37-9.869 9.745-.001 1.706.469 3.374 1.359 4.848l-.993 3.626 3.754-.981zM17.48 14.86c-.29-.145-1.714-.846-1.98-.942-.264-.096-.457-.145-.648.145-.19.29-.738.942-.905 1.134-.167.19-.334.212-.623.067-.29-.145-1.223-.45-2.33-1.44-.863-.77-1.445-1.72-1.614-2.012-.17-.29-.018-.447.127-.592.13-.13.29-.335.434-.503.144-.167.192-.28.29-.466.096-.186.047-.35-.024-.495-.072-.145-.648-1.56-.888-2.137-.233-.56-.47-.483-.648-.492-.167-.008-.36-.01-.553-.01-.193 0-.507.073-.77.361-.264.288-1.01.987-1.01 2.407s1.033 2.795 1.178 2.99c.145.19 2.032 3.102 4.922 4.35.688.298 1.224.475 1.643.607.692.22 1.323.19 1.82.115.553-.083 1.714-.7 1.958-1.376.244-.677.244-1.255.172-1.376-.073-.12-.265-.193-.554-.338z"/></svg>
+    </div>
+    +91 74007 35730
+</div>
+
+<div id="logo-container">
+    <img id="main-logo" src="" alt="Logo">
+</div>
+
+<div id="single-wm">M LIVE</div>
+
+<div id="scoreboard">
+    <div class="main-bar">
+        <div class="s-box s-left"><div class="inner-val" id="sA">0</div></div>
+        <div class="name-area" id="nA-container"><div id="nA" style="width:100%; text-align:center;">TEAM 1</div></div>
+        <div class="vs-text">VS</div>
+        <div class="name-area" id="nB-container"><div id="nB" style="width:100%; text-align:center;">TEAM 2</div></div>
+        <div class="s-box s-right"><div class="inner-val" id="sB">0</div></div>
+    </div>
+    <div class="round-display" id="round-display">LIVE MATCH</div>
+</div>
+
+<div id="ticker-wrap">
+    <div class="box-live">Live</div>
+    <div class="center-wrap">
+        <div class="row-text row-1" id="c1">WELCOME TO LIVE KABADDI</div>
+        <div class="row-text row-2" id="c2">SUBSCRIBE OUR CHANNEL</div>
+        <div class="row-text row-3" id="c3">LIKE & SHARE</div>
+    </div>
+    <div class="box-time">
+        <div class="time-wrap" id="t-wrap"><div class="time-str" id="live-time"></div></div>
+        <div class="date-wrap" id="d-wrap" style="opacity:0;"><div class="date-str" id="live-date"></div></div>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = { databaseURL: "https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
+    firebase.initializeApp(firebaseConfig);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const matchId = urlParams.get('id') || 'defaultMatch';
+    const db = firebase.database().ref("matchData/" + matchId);
+
+    db.on("value", (snap) => {
+        const data = snap.val() || {}; 
+        
+        // --- ਨਵੀਂ ਕੰਡੀਸ਼ਨ (ਜੇ ਲਿੰਕ ਖਾਲੀ ਤਾਂ ਕੋਈ ਲੋਗੋ ਨਹੀਂ ਦਿਖੇਗਾ) ---
+        const logoCont = document.getElementById('logo-container');
+        if (data.clientLogoUrl && data.clientLogoUrl.trim() !== "") {
+            document.getElementById('main-logo').src = data.clientLogoUrl;
+            // ਜੇ ਐਡਮਿਨ ਨੇ ਵੈਸੇ ਹਾਈਡ ਨਾ ਕੀਤਾ ਹੋਵੇ, ਤਾਂ ਦਿਖਾਓ
+            if(data.logoVisible !== false) { logoCont.classList.remove('hidden'); }
+        } else {
+            // ਜੇ ਲਿੰਕ ਖਾਲੀ ਹੈ ਤਾਂ ਲੋਗੋ ਨੂੰ ਪੱਕਾ ਹਾਈਡ ਕਰ ਦਿਓ
+            logoCont.classList.add('hidden');
+            document.getElementById('main-logo').src = "";
+        }
+
+        // ਬਾਕੀ ਵਿਜ਼ੀਬਿਲਟੀ ਸੈਟਿੰਗਜ਼
+        if(data.logoVisible === false) { logoCont.classList.add('hidden'); }
+        if(data.scoreVisible === false) { document.getElementById('scoreboard').classList.add('hidden'); } else { document.getElementById('scoreboard').classList.remove('hidden'); }
+        
+        if(data.tickerVisible === false) { 
+            document.getElementById('ticker-wrap').classList.add('hidden'); 
+            document.querySelector('.whatsapp-bar').style.display = 'none';
+        } else { 
+            document.getElementById('ticker-wrap').classList.remove('hidden'); 
+            document.querySelector('.whatsapp-bar').style.display = 'flex';
+        }
+        
+        document.getElementById('sA').innerText = data.scoreA !== undefined ? data.scoreA : "0";
+        document.getElementById('sB').innerText = data.scoreB !== undefined ? data.scoreB : "0";
+        setTeamName('nA-container', data.nameA || "TEAM 1");
+        setTeamName('nB-container', data.nameB || "TEAM 2");
+        document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
+        
+        const roundVal = data.round || "";
+        const roundEl = document.getElementById('round-display');
+        roundEl.innerText = roundVal;
+        roundEl.style.display = roundVal.trim() === "" ? "none" : "block";
+        
+        setAlwaysScroll('c1', data.row1Txt || "WELCOME TO LIVE KABADDI"); 
+        setAlwaysScroll('c2', data.row2Txt || "SUBSCRIBE OUR CHANNEL"); 
+        setAlwaysScroll('c3', data.row3Txt || "LIKE & SHARE"); 
+    });
+
+    function setTeamName(containerId, txt) {
+        const el = document.getElementById(containerId);
+        if(txt.length > 12) { el.innerHTML = `<div class="team-scroller">${txt}</div>`; }
+        else { el.innerHTML = `<div style="width:100%; text-align:center;">${txt}</div>`; }
+    }
+
+    function setAlwaysScroll(id, txt) {
+        const el = document.getElementById(id);
+        if(txt && txt.trim().length > 0) { el.innerHTML = `<div class="scroller">${txt}</div>`; }
+        else { el.innerHTML = ""; }
+    }
+
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('live-time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('live-date').innerText = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+    }
+    setInterval(updateClock, 1000); updateClock();
+
+    let isTime = true;
+    setInterval(() => { isTime = !isTime; document.getElementById('t-wrap').style.opacity = isTime ? "1" : "0"; document.getElementById('d-wrap').style.opacity = isTime ? "0" : "1"; }, 5000);
+
+    const wmEl = document.getElementById('single-wm');
+    function moveWM() { wmEl.style.left = (Math.random() * 1400 + 100) + 'px'; wmEl.style.top = (Math.random() * 600 + 150) + 'px'; }
+    moveWM(); setInterval(moveWM, 6000);
+</script>
+</body>
+</html>
