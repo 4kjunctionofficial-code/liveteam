@@ -1,243 +1,234 @@
 <!DOCTYPE html>
-<html lang="pa">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Master Admin - Kabaddi Scoreboard</title>
+    <!-- Firebase v8 SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        :root {
-            --bg-color: #0f172a;
-            --panel-bg: #1e293b;
-            --accent: #38bdf8;
-            --accent-hover: #0284c7;
-            --text-color: #f8fafc;
-        }
-
-        body {
-            margin: 0; padding: 20px;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Segoe UI', system-ui, sans-serif;
-        }
-
-        .container {
-            max-width: 800px; margin: 0 auto;
-            background: var(--panel-bg);
-            padding: 30px; border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-
-        h2 {
-            margin-top: 0; color: var(--accent);
-            border-bottom: 2px solid #334155; padding-bottom: 10px;
-            font-size: 24px; text-transform: uppercase; letter-spacing: 1px;
-        }
-
-        .config-row {
-            display: flex; gap: 15px; margin-bottom: 25px;
-            background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px;
-        }
-
-        label { font-weight: bold; color: #94a3b8; display: block; margin-bottom: 8px; }
+        body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Arial', sans-serif; overflow: hidden; position: relative; }
         
-        select, input {
-            background: #0f172a; border: 1px solid #475569;
-            color: white; padding: 10px 15px; border-radius: 6px;
-            font-size: 16px; outline: none; width: 100%; box-sizing: border-box;
+        #logo-container {
+            position: absolute; top: -15px; left: 40px; z-index: 9999;
+            opacity: 1; transition: all 0.7s ease; 
         }
-        select:focus, input:focus, textarea:focus { border-color: var(--accent); }
+        #logo-container.hidden { opacity: 0; transform: scale(0); }
 
-        /* Auto-expanding Textarea Box */
-        textarea {
-            background: #0f172a; border: 1px solid #475569;
-            color: white; padding: 12px; border-radius: 6px;
-            font-size: 16px; outline: none; width: 100%; box-sizing: border-box;
-            resize: none; min-height: 50px; max-height: 150px;
-            overflow-y: hidden; font-family: inherit;
+        #main-logo {
+            height: 260px; width: auto; max-width: 380px; object-fit: contain;
+            filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.6));
+            animation: logo-flip 12s infinite ease-in-out; 
         }
-
-        .hint { font-size: 13px; color: #64748b; margin-top: 5px; }
-
-        /* Numbered List Styling */
-        .list-container {
-            margin-top: 20px; background: rgba(0,0,0,0.1);
-            border-radius: 8px; overflow: hidden;
+        @keyframes logo-flip {
+            0%, 85% { transform: perspective(1000px) rotateY(0deg); }
+            90% { transform: perspective(1000px) rotateY(180deg); filter: drop-shadow(0 0 15px rgba(255,255,255,0.8)); }
+            95% { transform: perspective(1000px) rotateY(360deg); }
+            100% { transform: perspective(1000px) rotateY(360deg); }
         }
 
-        .list-item {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 15px; border-bottom: 1px solid #334155;
-            background: #1e293b; transition: 0.2s;
+        #single-wm { 
+            position: absolute; color: white; font-size: 35px; font-weight: bold; 
+            text-transform: uppercase; text-shadow: 2px 2px 5px #000; white-space: nowrap; 
+            z-index: 1; opacity: 1;
         }
-        .list-item:last-child { border-bottom: none; }
-        .list-item:hover { background: #24344d; }
 
-        .item-text { display: flex; gap: 10px; font-size: 16px; word-break: break-all; }
-        .item-num { color: var(--accent); font-weight: bold; min-width: 25px; }
-
-        .delete-btn {
-            background: #ef4444; color: white; border: none;
-            padding: 6px 12px; border-radius: 4px; cursor: pointer;
-            font-size: 13px; font-weight: bold; transition: 0.2s;
+        #ticker-wrap {
+            position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 145px; display: flex; 
+            z-index: 9999; opacity: 1; transition: all 0.7s ease;
+            box-shadow: none !important;
         }
-        .delete-btn:hover { background: #dc2626; }
+        #ticker-wrap.hidden { opacity: 0; transform: translateY(150px); }
 
-        .action-bar { display: flex; justify-content: flex-end; margin-top: 20px; }
-        .save-btn {
-            background: var(--accent); color: #0f172a; border: none;
-            padding: 12px 30px; border-radius: 6px; font-size: 16px;
-            font-weight: bold; cursor: pointer; transition: 0.2s;
+        .center-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; border-top: 2px solid #444; position: relative; }
+        .row-text { display: flex; align-items: center; font-weight: 900; text-transform: uppercase; width: 100%; overflow: hidden; box-sizing: border-box; white-space: nowrap; }
+        
+        .row-1 { background: rgba(0, 0, 0, 0.9); color: white; height: 60px; font-size: 38px; border-bottom: 1px solid rgba(255,255,255,0.1); text-shadow: 2px 2px 3px rgba(0,0,0,0.8); } 
+        .row-2 { background: white; color: #b91c1c; height: 42px; font-size: 28px; text-shadow: none; letter-spacing: 1px; } 
+        .row-3 { background: rgba(0, 0, 0, 0.9); color: #ffcc00; height: 43px; font-size: 28px; border-top: 1px solid rgba(255,255,255,0.1); text-shadow: 2px 2px 3px rgba(0,0,0,0.8); }
+
+        .scroller { display: inline-block; padding-left: 100%; animation: scroll-anim 20s linear infinite; }
+        @keyframes scroll-anim { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+        .box-live, .box-time { 
+            width: 160px; background: linear-gradient(145deg, #00aeef, #006699); 
+            color: white; display: flex; align-items: center; justify-content: center; 
+            font-size: 34px; font-weight: 900; text-shadow: 2px 2px 4px #000; box-shadow: inset 3px 3px 8px rgba(255,255,255,0.5); z-index: 11;
         }
-        .save-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+        .box-time { width: 300px; position: relative; border-left: 2px solid #8ebae6; }
+        .time-wrap, .date-wrap { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: 0.8s; }
+        .time-str { color: #ffcc00; font-size: 44px; letter-spacing: 1px; }
+        .date-str { font-size: 28px; background: rgba(0,0,0,0.4); padding: 5px 20px; border-radius: 10px; }
+
+        #scoreboard { 
+            position: absolute; top: 60px; right: 80px; display: flex; flex-direction: column; align-items: center; z-index: 9999;
+            opacity: 1; transition: all 0.7s ease; 
+            box-shadow: none !important;
+        }
+        #scoreboard.hidden { opacity: 0; transform: translateY(-80px); }
+        
+        .main-bar { 
+            display: flex; align-items: center; height: 60px; background: rgba(20, 20, 20, 0.95); 
+            border-radius: 6px; border: 2px solid rgba(255,255,255,0.2); 
+            z-index: 2; padding: 0 5px; position: relative;
+            box-shadow: none !important;
+        }
+        
+        .main-bar::after {
+            content: ""; position: absolute; top: 0; left: -50%; width: 20%; height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,0.5), rgba(255,255,255,0));
+            transform: skewX(-35deg); animation: score-light-sweep 25s infinite ease-in-out; 
+            pointer-events: none; z-index: 10;
+        }
+        @keyframes score-light-sweep { 0% { left: -50%; } 15% { left: 150%; } 100% { left: 150%; } }
+        
+        /* 🛠️ Auto-Expanding Boxes for Score/Text */
+        .s-box { 
+            background: linear-gradient(145deg, #00aeef, #004b75); 
+            color: #ffffff; 
+            font-size: 40px; 
+            font-weight: 900; 
+            min-width: 130px; 
+            width: auto;
+            padding: 0 15px;
+            height: 100%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transform: skewX(-15deg); 
+            text-shadow: 2px 2px 5px #000; 
+            box-shadow: inset 3px 3px 8px rgba(255,255,255,0.6), inset -3px -3px 8px rgba(0,0,0,0.6); 
+            position: relative; 
+            z-index: 11; 
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        .s-left { margin-left: -17px; border: 2px solid #5bc0de; border-radius: 4px 0 0 4px; }
+        .s-right { margin-right: -17px; border: 2px solid #5bc0de; border-radius: 0 4px 4px 0; }
+        .inner-val { transform: skewX(15deg); white-space: nowrap; }
+        
+        .name-area { 
+            width: 220px; height: 100%; display: flex; align-items: center; overflow: hidden; 
+            white-space: nowrap; color: #ffffff; font-size: 26px; font-weight: bold; 
+            text-align: center; padding: 0 10px; text-shadow: 2px 2px 4px #000; box-sizing: border-box;
+            text-transform: uppercase; position: relative; z-index: 11;
+        }
+        .team-scroller { display: inline-block; padding-left: 100%; animation: team-scroll 8s linear infinite; }
+        @keyframes team-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        
+        .vs-text { 
+            color: #ffffff; font-size: 20px; font-weight: 900; margin: 0 10px; text-shadow: 1px 1px 3px #000; 
+            background: linear-gradient(145deg, #00aeef, #005a8d); 
+            display: flex; align-items: center; justify-content: center;
+            width: 45px; height: 45px; border-radius: 50%; 
+            box-shadow: inset 2px 2px 5px rgba(255,255,255,0.6), 0 0 10px rgba(0,174,239,0.8);
+            border: 2px solid #5bc0de; position: relative; z-index: 11;
+        }
+
+        .round-display {
+            color: white; font-size: 22px; font-weight: bold; text-transform: uppercase;
+            margin-top: 20px; text-shadow: 2px 2px 6px #000; letter-spacing: 2px; display: block; 
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>🎯 Match Ticker Controller</h2>
-    
-    <!-- Client ID Selection -->
-    <div class="config-row">
-        <div style="flex: 1;">
-            <label for="clientId">Select Broadcast Client ID</label>
-            <select id="clientId">
-                <option value="mudki">Mudki Live</option>
-                <option value="malloke">Malloke Ferozepur</option>
-                <option value="dholewala">Dholewala Moga</option>
-            </select>
-        </div>
-    </div>
+<div id="logo-container">
+    <img id="main-logo" src="https://raw.githubusercontent.com/4kjunctionofficial-code/Manpreetteam/main/taqdeer%20tv.png" alt="Logo">
+</div>
 
-    <!-- Match Input Section -->
-    <div style="margin-bottom: 15px;">
-        <label for="tickerInput">Type Info & Press Enter to Add</label>
-        <!-- ਅੱਖਰ ਵਧਣ ਤੇ ਇਹ ਬਾਕਸ ਆਪਣੇ ਆਪ ਵੱਡਾ ਹੋਵੇਗਾ -->
-        <textarea id="tickerInput" placeholder="ਇੱਥੇ ਲਿਖੋ ਅਤੇ Enter ਦਬਾਓ..." rows="1"></textarea>
-        <div class="hint">💡 ਜੇਕਰ ਅੱਖਰ ਜ਼ਿਆਦਾ ਹੋਣਗੇ, ਬਾਕਸ ਆਪਣੇ ਆਪ ਵੱਡਾ ਹੁੰਦਾ ਜਾਵੇਗਾ। Enter ਦੱਬਣ ਤੇ ਲਿਸਟ ਬਣੇਗੀ।</div>
-    </div>
+<div id="single-wm">M LIVE</div>
 
-    <!-- Live Numbered List Preview -->
-    <label>Current Live Lines (Numbered List):</label>
-    <div class="list-container" id="tickerList">
-        <!-- Lines will be loaded here dynamically -->
+<div id="scoreboard">
+    <div class="main-bar">
+        <div class="s-box s-left"><div class="inner-val" id="sA">0</div></div>
+        <div class="name-area" id="nA-container"><div id="nA" style="width:100%; text-align:center;">TEAM 1</div></div>
+        <div class="vs-text">VS</div>
+        <div class="name-area" id="nB-container"><div id="nB" style="width:100%; text-align:center;">TEAM 2</div></div>
+        <div class="s-box s-right"><div class="inner-val" id="sB">0</div></div>
     </div>
+    <div class="round-display" id="round-display">LIVE MATCH</div>
+</div>
 
-    <!-- Push to Firebase Button -->
-    <div class="action-bar">
-        <button class="save-btn" id="updateLiveBtn">Update Live Broadcast</button>
+<div id="ticker-wrap">
+    <div class="box-live">● LIVE</div>
+    <div class="center-wrap">
+        <div class="row-text row-1" id="c1">WELCOME TO LIVE KABADDI</div>
+        <div class="row-text row-2" id="c2">SUBSCRIBE OUR CHANNEL</div>
+        <div class="row-text row-3" id="c3">LIKE & SHARE</div>
+    </div>
+    <div class="box-time">
+        <div class="time-wrap" id="t-wrap"><div class="time-str" id="live-time"></div></div>
+        <div class="date-wrap" id="d-wrap" style="opacity:0;"><div class="date-str" id="live-date"></div></div>
     </div>
 </div>
 
-<!-- Firebase 9+ SDK Module -->
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+<script>
+    // 1. ਤੁਹਾਡਾ ਅਸਲੀ ਫਾਇਰਬੇਸ ਕਨੈਕਸ਼ਨ (ਜੋ ਤੁਹਾਡੇ ਪੁਰਾਣੇ ਕੋਡ ਵਿੱਚ ਸੀ)
+    const firebaseConfig = {
+        databaseURL: "https://kabaddi-b97be-default-rtdb.firebaseio.com"
+    };
+    firebase.initializeApp(firebaseConfig);
+    
+    // 2. 🛠️ ਹਰ ਇੱਕ ਕਲਾਇੰਟ ਲਈ ਵੱਖਰਾ ਡਾਟਾ ਸੈੱਟ ਕਰਨ ਵਾਲਾ ਸਿਸਟਮ (Dynamic Path)
+    // OBS ਵਿੱਚ ਲਿੰਕ ਦੇ ਪਿੱਛੇ ?id=client1 ਲਗਾਉਣ ਨਾਲ ਇਹ ਉਸੇ ਕਲਾਇੰਟ ਦਾ ਡਾਟਾ ਚੁੱਕੇਗਾ
+    const urlParams = new URLSearchParams(window.location.search);
+    const clientId = urlParams.get('id') ? urlParams.get('id').toLowerCase() : 'default';
+    
+    // ਹੁਣ ਡਾਟਾਬੇਸ ਵਿੱਚ ਹਰ ਕਲਾਇੰਟ ਦਾ ਆਪਣਾ ਵੱਖਰਾ ਫੋਲਡਰ ਹੋਵੇਗਾ
+    const db = firebase.database().ref("users/" + clientId + "/matchData");
 
-    const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    const clientIdSelect = document.getElementById('clientId');
-    const tickerInput = document.getElementById('tickerInput');
-    const tickerList = document.getElementById('tickerList');
-    const updateLiveBtn = document.getElementById('updateLiveBtn');
-
-    let currentLines = [];
-
-    // 1. Auto-Expand Box Functionality (ਅੱਖਰਾਂ ਦੇ ਹਿਸਾਬ ਨਾਲ ਬਾਕਸ ਵੱਡਾ ਕਰਨਾ)
-    tickerInput.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
-    });
-
-    // 2. Capture Enter Key & Add to Numbered List
-    tickerInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault(); // ਨਵੀਂ ਲਾਈਨ ਬਣਨ ਤੋਂ ਰੋਕੋ
-            const value = this.value.trim();
-            
-            if (value !== "") {
-                currentLines.push(value);
-                this.value = "";
-                this.style.height = 'auto'; // ਬਾਕਸ ਰੀਸੈੱਟ
-                renderList();
-            }
-        }
-    });
-
-    // 3. Render Numbered List HTML UI
-    function renderList() {
-        tickerList.innerHTML = "";
-        if (currentLines.length === 0) {
-            tickerList.innerHTML = '<div class="list-item" style="color: #64748b;">ਕੋਈ ਡਾਟਾ ਨਹੀਂ ਹੈ, ਨਵਾਂ ਲਿਖ ਕੇ Enter ਦਬਾਓ।</div>';
-            return;
-        }
-
-        currentLines.forEach((line, index) => {
-            const item = document.createElement('div');
-            item.className = 'list-item';
-            item.innerHTML = `
-                <div class="item-text">
-                    <span class="item-num">${index + 1}.</span>
-                    <span>${line}</span>
-                </div>
-                <button class="delete-btn" data-index="${index}">Delete</button>
-            `;
-            tickerList.appendChild(item);
-        });
-
-        // Delete Button Click Handler
-        document.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const idx = parseInt(this.getAttribute('data-index'));
-                currentLines.splice(idx, 1);
-                renderList();
-            });
-        });
-    }
-
-    // 4. Fetch Existing Data from Selected Client
-    function loadClientData() {
-        const client = clientIdSelect.value;
-        const matchRef = ref(db, `users/${client}/matchData`);
+    db.on("value", (snap) => {
+        const data = snap.val() || {}; 
         
-        onValue(matchRef, (snapshot) => {
-            const data = snapshot.val() || {};
-            currentLines = [];
-            
-            // ਓਵਰਲੇਅ ਦੀਆਂ 3 ਪੱਟੀਆਂ ਵਿੱਚੋਂ ਡਾਟਾ ਲੋਡ ਕਰਨਾ
-            if (data.row1Txt) currentLines.push(data.row1Txt);
-            if (data.row2Txt) currentLines.push(data.row2Txt);
-            if (data.row3Txt) currentLines.push(data.row3Txt);
-            
-            renderList();
-        }, { onlyOnce: true });
+        // ਵਿਜ਼ੀਬਿਲਟੀ ਕੰਟਰੋਲ
+        if(data.logoVisible === false) { document.getElementById('logo-container').classList.add('hidden'); } else { document.getElementById('logo-container').classList.remove('hidden'); }
+        if(data.scoreVisible === false) { document.getElementById('scoreboard').classList.add('hidden'); } else { document.getElementById('scoreboard').classList.remove('hidden'); }
+        if(data.tickerVisible === false) { document.getElementById('ticker-wrap').classList.add('hidden'); } else { document.getElementById('ticker-wrap').classList.remove('hidden'); }
+        
+        // ਸਕੋਰਬੋਰਡ ਡਾਟਾ (Auto Expand ਬਾਕਸ)
+        document.getElementById('sA').innerText = data.scoreA !== undefined ? data.scoreA : "0";
+        document.getElementById('sB').innerText = data.scoreB !== undefined ? data.scoreB : "0";
+        
+        setTeamName('nA-container', data.nameA || "TEAM 1");
+        setTeamName('nB-container', data.nameB || "TEAM 2");
+        document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
+        
+        const roundVal = data.round || "";
+        const roundEl = document.getElementById('round-display');
+        roundEl.innerText = roundVal;
+        roundEl.style.display = roundVal.trim() === "" ? "none" : "block";
+        
+        // ਟਿੱਕਰ ਟੈਕਸਟ
+        setAlwaysScroll('c1', data.row1Txt || "WELCOME TO LIVE KABADDI"); 
+        setAlwaysScroll('c2', data.row2Txt || "SUBSCRIBE OUR CHANNEL"); 
+        setAlwaysScroll('c3', data.row3Txt || "LIKE & SHARE"); 
+    });
+
+    function setTeamName(containerId, txt) {
+        const el = document.getElementById(containerId);
+        if(txt.length > 12) { el.innerHTML = `<div class="team-scroller">${txt}</div>`; }
+        else { el.innerHTML = `<div style="width:100%; text-align:center;">${txt}</div>`; }
     }
 
-    clientIdSelect.addEventListener('change', loadClientData);
-    loadClientData(); // ਪਹਿਲੀ ਵਾਰ ਰਨ ਕਰਨ ਲਈ
+    function setAlwaysScroll(id, txt) {
+        const el = document.getElementById(id);
+        if(txt && txt.trim().length > 0) { el.innerHTML = `<div class="scroller">${txt}</div>`; }
+        else { el.innerHTML = ""; }
+    }
 
-    // 5. Push List Back to Firebase for Overlay (Row 1, Row 2, Row 3)
-    updateLiveBtn.addEventListener('click', () => {
-        const client = clientIdSelect.value;
-        const updateRef = ref(db, `users/${client}/matchData`);
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('live-time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('live-date').innerText = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+    }
+    setInterval(updateClock, 1000); updateClock();
 
-        // ਡਾਟਾ ਨੂੰ ਓਵਰਲੇਅ ਦੇ ਪੈਟਰਨ (row1Txt, row2Txt, row3Txt) ਵਿੱਚ ਫਿਟ ਕਰਨਾ
-        const updates = {
-            row1Txt: currentLines[0] || "",
-            row2Txt: currentLines[1] || "",
-            row3Txt: currentLines[2] || ""
-        };
+    let isTime = true;
+    setInterval(() => { isTime = !isTime; document.getElementById('t-wrap').style.opacity = isTime ? "1" : "0"; document.getElementById('d-wrap').style.opacity = isTime ? "0" : "1"; }, 5000);
 
-        // Firebase ਵਿੱਚ ਸੇਵ ਕਰਨਾ (ਬਾਕੀ ਡਾਟਾ ਜਿਵੇਂ ਸਕੋਰ ਖਰਾਬ ਨਹੀਂ ਹੋਵੇਗਾ)
-        set(updateRef, updates)
-        .then(() => {
-            alert("🚀 ਓਵਰਲੇਅ ਟਿੱਕਰ ਲਾਈਵ ਅਪਡੇਟ ਹੋ ਗਿਆ ਹੈ!");
-        })
-        .catch((error) => {
-            console.error("Error updating:", error);
-        });
-    });
+    const wmEl = document.getElementById('single-wm');
+    function moveWM() { wmEl.style.left = (Math.random() * 1400 + 100) + 'px'; wmEl.style.top = (Math.random() * 600 + 150) + 'px'; }
+    moveWM(); setInterval(moveWM, 6000);
 </script>
-
 </body>
 </html>
