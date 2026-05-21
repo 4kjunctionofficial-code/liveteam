@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kabaddi Admin Panel</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         #main-panel { display: flex; width: 100%; flex-direction: column; align-items: center; }
@@ -21,9 +21,25 @@
         .controls { padding: 15px; display: flex; flex-direction: column; gap: 8px; }
         .btn-full { border: none; color: white; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-bottom: 5px; width: 100%; box-sizing: border-box;}
         .btn-blue { background: #1a73e8; } .btn-yellow { background: #fbbc05; color: #000; } .btn-red { background: #ea4335; } .btn-dark { background: #333; }
-        textarea, .std-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; margin-bottom: 12px; resize: none; box-sizing: border-box; font-family: inherit; }
+        
+        /* 🔄 ਬਾਕਸ ਟੈਕਸਟ ਦੇ ਹਿਸਾਬ ਨਾਲ ਆਟੋਮੈਟਿਕ ਵੱਡੇ ਹੋਣ ਲਈ ਸੈਟਿੰਗ */
+        textarea { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid #ccc; 
+            border-radius: 6px; 
+            font-size: 14px; 
+            margin-bottom: 12px; 
+            resize: none; 
+            box-sizing: border-box; 
+            font-family: inherit;
+            min-height: 45px;
+            overflow-y: hidden;
+        }
+        .std-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; margin-bottom: 12px; box-sizing: border-box; font-family: inherit; }
         button:active { transform: scale(0.98); }
         .client-info { background: #333; color: #ffcc00; text-align: center; padding: 5px; font-size: 12px; font-weight: bold; width: 100%; max-width: 500px; border-radius: 5px; margin-bottom: 10px; }
+        .hint-text { font-size: 11px; color: #1a73e8; margin-top: -8px; margin-bottom: 10px; display: block; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -35,16 +51,18 @@
         <div class="header">Live Score Board</div>
         <div class="teams-container">
             <div class="team-box">
-                <input type="text" id="nameA" class="team-input" placeholder="TEAM 1" oninput="updateDB()">
+                <input type="text" id="nameA" class="team-input" placeholder="TEAM 1" oninput="updateDB()" onkeydown="checkTeamShortcut(event, this)">
+                <span class="hint-text">ਲਿਖ ਕੇ Enter ਦਬਾਓ</span>
                 <div class="score-val" id="dispA">0</div>
                 <div style="display:flex; width:100%;">
                     <button class="btn-pm btn-minus" onclick="changeScore('scoreA', -1)">-</button>
                     <button class="btn-pm btn-plus" onclick="changeScore('scoreA', 1)">+</button>
                 </div>
             </div>
-            <div style="display:flex; align-items:center; font-weight:bold; color:#aaa;">VS</div>
+            <div style="display:flex; align-items:center; font-weight:bold; color:#aaa; margin-top: -20px;">VS</div>
             <div class="team-box">
-                <input type="text" id="nameB" class="team-input" placeholder="TEAM 2" oninput="updateDB()">
+                <input type="text" id="nameB" class="team-input" placeholder="TEAM 2" oninput="updateDB()" onkeydown="checkTeamShortcut(event, this)">
+                <span class="hint-text">ਲਿਖ ਕੇ Enter ਦਬਾਓ</span>
                 <div class="score-val" id="dispB">0</div>
                 <div style="display:flex; width:100%;">
                     <button class="btn-pm btn-minus" onclick="changeScore('scoreB', -1)">-</button>
@@ -63,9 +81,11 @@
     <div class="card">
         <div class="header">Ticker & Branding</div>
         <div class="settings-section">
-            <textarea id="row1Inp" rows="2" placeholder="Title Line 1" oninput="updateDB()"></textarea>
-            <textarea id="row2Inp" rows="2" placeholder="Title Line 2" oninput="updateDB()"></textarea>
-            <textarea id="row3Inp" rows="2" placeholder="Title Line 3" oninput="updateDB()"></textarea>
+            <textarea id="row1Inp" rows="1" placeholder="Title Line 1 (ਪਹਿਲਾ ਮੈਚ)" oninput="autoResizeAndUpdate(this)"></textarea>
+            <textarea id="row2Inp" rows="1" placeholder="Title Line 2 (ਦੂਜਾ ਮੈਚ)" oninput="autoResizeAndUpdate(this)"></textarea>
+            <textarea id="row3Inp" rows="1" placeholder="Title Line 3 (ਤੀਜਾ ਮੈਚ)" oninput="autoResizeAndUpdate(this)"></textarea>
+            <button class="btn-full btn-yellow" style="background: #f39c12; color: black; font-size: 12px; padding: 6px;" onclick="clearTickerLines()">ਟਿੱਕਰ ਲਾਈਨਾਂ ਖਾਲੀ ਕਰੋ (Reset)</button>
+            <br><br>
             <button id="tickVisBtn" class="btn-full btn-blue" onclick="toggleVis('tickerVisible')">Show/Hide Ticker</button>
             <input type="text" id="watermarkInp" class="std-input" placeholder="Channel Name" oninput="updateDB()">
             <button id="logoBtn" class="btn-full btn-dark" onclick="toggleVis('logoVisible')">Show/Hide Logo</button>
@@ -74,10 +94,9 @@
 </div>
 
 <script>
-    const firebaseConfig = { databaseURL: "https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
+    const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
 
-    // ਲਿੰਕ ਵਿੱਚੋਂ Client ID ਕੱਢਣ ਲਈ
     const urlParams = new URLSearchParams(window.location.search);
     const clientID = urlParams.get('id');
 
@@ -89,7 +108,6 @@
         document.getElementById('clientDisplay').innerText = "ਕਲਾਇੰਟ ਪੈਨਲ: " + clientID.toUpperCase();
     }
 
-    // ਫਾਇਰਬੇਸ ਦਾ ਨਵਾਂ ਰਸਤਾ (Path) ਹਰੇਕ ਕਲਾਇੰਟ ਲਈ ਵੱਖਰਾ
     const db = firebase.database().ref("users/" + clientID + "/matchData");
 
     let curA = 0, curB = 0, sVis = true, tVis = true, lVis = true;
@@ -106,9 +124,11 @@
             document.getElementById('nameA').value = data.nameA || "";
             document.getElementById('nameB').value = data.nameB || "";
             document.getElementById('roundInp').value = data.round || "";
-            document.getElementById('row1Inp').value = data.row1Txt || "";
-            document.getElementById('row2Inp').value = data.row2Txt || "";
-            document.getElementById('row3Inp').value = data.row3Txt || "";
+            
+            setInputAndResize('row1Inp', data.row1Txt || "");
+            setInputAndResize('row2Inp', data.row2Txt || "");
+            setInputAndResize('row3Inp', data.row3Txt || "");
+            
             document.getElementById('watermarkInp').value = data.watermarkTxt || "";
             
             updateBtnUI('visBtn', sVis, "Scoreboard");
@@ -116,6 +136,66 @@
             updateBtnUI('logoBtn', lVis, "Logo");
         }
     });
+
+    function setInputAndResize(id, val) {
+        const el = document.getElementById(id);
+        if(el) {
+            el.value = val;
+            el.style.height = 'auto';
+            el.style.height = el.scrollHeight + 'px';
+        }
+    }
+
+    function autoResizeAndUpdate(el) {
+        el.style.height = 'auto';
+        el.style.height = el.scrollHeight + 'px';
+        updateDB();
+    }
+
+    // 🎯 ਸਮਾਰਟ ਮਲਟੀ-ਮੈਚ ਸ਼ਾਰਟਕੱਟ (ਵਾਰੀ-ਵਾਰੀ 1, 2, 3 ਲਾਈਨਾਂ ਵਿੱਚ ਸੈੱਟ ਕਰਨਾ)
+    function checkTeamShortcut(event, inputEl) {
+        if (event.key === "Enter") {
+            event.preventDefault(); 
+            const textVal = inputEl.value.trim();
+            if(!textVal) return;
+
+            const r1 = document.getElementById('row1Inp');
+            const r2 = document.getElementById('row2Inp');
+            const r3 = document.getElementById('row3Inp');
+
+            // ਜੇ ਪਹਿਲੀ ਲਾਈਨ ਖਾਲੀ ਹੈ ਜਾਂ "WELCOME" ਲਿਖਿਆ ਹੈ ਤਾਂ ਪਹਿਲੀ 'ਚ ਪਾਓ
+            if (r1.value.trim() === "" || r1.value.includes("WELCOME")) {
+                r1.value = "1. " + textVal;
+                autoResizeAndUpdate(r1);
+                alert("🎯 Match 1 ਸੈੱਟ ਕੀਤਾ: Line 1 ਵਿੱਚ");
+            } 
+            // ਜੇ ਪਹਿਲੀ ਭਰੀ ਹੈ ਪਰ ਦੂਜੀ ਖਾਲੀ ਹੈ ਤਾਂ ਦੂਜੀ 'ਚ ਪਾਓ
+            else if (r2.value.trim() === "" || r2.value.includes("SUBSCRIBE")) {
+                r2.value = "2. " + textVal;
+                autoResizeAndUpdate(r2);
+                alert("🎯 Match 2 ਸੈੱਟ ਕੀਤਾ: Line 2 ਵਿੱਚ");
+            } 
+            // ਜੇ ਦੂਜੀ ਵੀ ਭਰੀ ਹੈ ਤਾਂ ਤੀਜੀ 'ਚ ਪਾਓ
+            else {
+                r3.value = "3. " + textVal;
+                autoResizeAndUpdate(r3);
+                alert("🎯 Match 3 ਸੈੱਟ ਕੀਤਾ: Line 3 ਵਿੱਚ");
+            }
+            
+            inputEl.value = ""; // ਲਿਖਣ ਤੋਂ ਬਾਅਦ ਟੀਮ ਬਾਕਸ ਖਾਲੀ ਕਰ ਦਿਓ ਤਾਂ ਜੋ ਅਗਲਾ ਮੈਚ ਲਿਖ ਸਕੋ
+            updateDB();
+        }
+    }
+
+    // ਟਿੱਕਰ ਲਾਈਨਾਂ ਸਾਫ਼ ਕਰਨ ਲਈ ਫੰਕਸ਼ਨ
+    function clearTickerLines() {
+        document.getElementById('row1Inp').value = "";
+        document.getElementById('row2Inp').value = "";
+        document.getElementById('row3Inp').value = "";
+        autoResizeAndUpdate(document.getElementById('row1Inp'));
+        autoResizeAndUpdate(document.getElementById('row2Inp'));
+        autoResizeAndUpdate(document.getElementById('row3Inp'));
+    }
 
     function updateBtnUI(id, val, text) {
         const btn = document.getElementById(id);
@@ -157,7 +237,12 @@
     }
 
     function swapTeams() {
-        db.update({ nameA: document.getElementById('nameB').value, nameB: document.getElementById('nameA').value, scoreA: curB, scoreB: curA });
+        db.update({ 
+            nameA: document.getElementById('nameB').value, 
+            nameB: document.getElementById('nameA').value, 
+            scoreA: curB, 
+            scoreB: curA 
+        });
     }
 
     function resetScores() {
