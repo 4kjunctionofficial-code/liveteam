@@ -8,123 +8,162 @@
 
 <style>
 body{
-font-family:'Segoe UI',sans-serif;
-background:#f0f2f5;
-margin:0;
-padding:10px;
-display:flex;
-flex-direction:column;
-align-items:center;
+    font-family:'Segoe UI',sans-serif;
+    background:#f0f2f5;
+    margin:0;
+    padding:10px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    min-height:100vh;
+}
+#main-panel{
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
 }
 .card{
-background:white;
-width:100%;
-max-width:650px;
-border-radius:15px;
-box-shadow:0 8px 20px rgba(0,0,0,.15);
-margin-bottom:20px;
-overflow:hidden;
+    background:white;
+    width:100%;
+    max-width:650px;
+    border-radius:15px;
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
+    overflow:hidden;
+    margin-bottom:20px;
 }
 .header{
-background:#1a73e8;
-color:white;
-padding:14px;
-text-align:center;
-font-weight:bold;
-font-size:18px;
+    background:#1a73e8;
+    color:white;
+    padding:14px;
+    text-align:center;
+    font-weight:bold;
+    font-size:18px;
+    text-transform:uppercase;
 }
 .teams-container{
-display:flex;
-padding:20px;
-gap:20px;
+    display:flex;
+    padding:20px;
+    gap:20px;
+    border-bottom:2px solid #eee;
+    transition:0.3s;
 }
 .team-box{
-flex:1;
-display:flex;
-flex-direction:column;
-align-items:center;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
 }
-.team-input,.std-input,select{
-width:100%;
-padding:12px;
-font-size:22px;
-font-weight:bold;
-border:2px solid #ccc;
-border-radius:8px;
-margin-bottom:12px;
-box-sizing:border-box;
+.team-input{
+    width:100%;
+    min-height:55px;
+    padding:12px;
+    border:2px solid #ddd;
+    border-radius:8px;
+    font-size:24px;
+    font-weight:bold;
+    text-align:center;
+    margin-bottom:10px;
+    box-sizing:border-box;
 }
 .score-val{
-font-size:70px;
-font-weight:900;
+    font-size:70px;
+    font-weight:900;
+    color:#333;
+    margin:10px 0;
 }
 .btn-pm{
-flex:1;
-padding:16px;
-font-size:28px;
-border:none;
-border-radius:8px;
-color:white;
-margin:0 5px;
-cursor:pointer;
+    border:none;
+    color:white;
+    padding:16px;
+    border-radius:8px;
+    font-size:28px;
+    font-weight:bold;
+    cursor:pointer;
+    flex:1;
+    margin:0 5px;
 }
 .btn-plus{background:#28a745;}
 .btn-minus{background:#dc3545;}
-.controls,.settings-section{
-padding:15px;
-display:flex;
-flex-direction:column;
-gap:8px;
+
+.controls{
+    padding:15px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
 }
 .btn-full{
-padding:14px;
-border:none;
-border-radius:8px;
-font-weight:bold;
-font-size:15px;
-cursor:pointer;
+    border:none;
+    color:white;
+    padding:14px;
+    border-radius:8px;
+    font-size:15px;
+    font-weight:bold;
+    cursor:pointer;
+    text-transform:uppercase;
+    width:100%;
 }
-.btn-blue{background:#1a73e8;color:white;}
-.btn-yellow{background:#fbbc05;}
-.btn-red{background:#ea4335;color:white;}
-.btn-dark{background:#333;color:white;}
+.btn-blue{background:#1a73e8;}
+.btn-yellow{background:#fbbc05;color:black;}
+.btn-red{background:#ea4335;}
+.btn-dark{background:#333;}
+
+.settings-section{
+    padding:15px;
+    background:#fafafa;
+}
 textarea{
-width:100%;
-min-height:90px;
-padding:16px;
-font-size:24px;
-font-weight:bold;
-border:2px solid #ccc;
-border-radius:8px;
-resize:none;
-overflow:hidden;
-box-sizing:border-box;
+    width:100%;
+    min-height:90px;
+    padding:16px;
+    border:2px solid #ccc;
+    border-radius:8px;
+    font-size:24px;
+    font-weight:bold;
+    margin-bottom:12px;
+    box-sizing:border-box;
+    resize:none;
+    line-height:1.4;
+    overflow:hidden;
+}
+.std-input{
+    width:100%;
+    min-height:55px;
+    padding:12px;
+    border:2px solid #ccc;
+    border-radius:8px;
+    font-size:22px;
+    font-weight:bold;
+    margin-bottom:12px;
+    box-sizing:border-box;
 }
 </style>
 </head>
 <body>
 
-<!-- SCORE -->
+<div id="main-panel">
+
+<!-- SCOREBOARD -->
 <div class="card">
 <div class="header">Live Score Board</div>
 
 <div class="teams-container">
 
 <div class="team-box">
-<input id="nameA" class="team-input" placeholder="TEAM 1">
-<div id="dispA" class="score-val">0</div>
-<div style="display:flex;width:100%">
+<input type="text" id="nameA" class="team-input" placeholder="TEAM 1">
+<div class="score-val" id="dispA">0</div>
+<div style="display:flex;width:100%;">
 <button class="btn-pm btn-minus" onclick="changeScore('scoreA',-1)">-</button>
 <button class="btn-pm btn-plus" onclick="changeScore('scoreA',1)">+</button>
 </div>
 </div>
 
-<div style="display:flex;align-items:center;font-size:26px;">VS</div>
+<div style="display:flex;align-items:center;font-weight:bold;font-size:26px;color:#aaa;">VS</div>
 
 <div class="team-box">
-<input id="nameB" class="team-input" placeholder="TEAM 2">
-<div id="dispB" class="score-val">0</div>
-<div style="display:flex;width:100%">
+<input type="text" id="nameB" class="team-input" placeholder="TEAM 2">
+<div class="score-val" id="dispB">0</div>
+<div style="display:flex;width:100%;">
 <button class="btn-pm btn-minus" onclick="changeScore('scoreB',-1)">-</button>
 <button class="btn-pm btn-plus" onclick="changeScore('scoreB',1)">+</button>
 </div>
@@ -133,12 +172,29 @@ box-sizing:border-box;
 </div>
 
 <div class="controls">
-<button class="btn-full btn-blue" onclick="updateTeamNames()">Update Team Names</button>
-<button class="btn-full btn-red" onclick="toggleScore()">Hide / Show Scoreboard</button>
-<button class="btn-full btn-red" onclick="resetScores()">Reset Scores</button>
-<button class="btn-full btn-yellow" onclick="swapTeamNames()">Only Team Swap</button>
-<button class="btn-full btn-dark" onclick="toggleCameraView()">Camera View</button>
-<input id="roundInp" class="std-input" placeholder="ROUND">
+    <button class="btn-full btn-blue" onclick="updateTeamNames()">Update Team Names</button>
+
+    <button id="visBtn" class="btn-full btn-red" onclick="toggleVis('scoreVisible')">
+        Hide Scoreboard
+    </button>
+
+    <button class="btn-full btn-red" style="background:#777;" onclick="resetScores()">
+        Reset Scores
+    </button>
+
+    <button class="btn-full btn-yellow" onclick="swapTeamNames()">
+        Only Team Swap
+    </button>
+
+    <button id="camBtn" class="btn-full btn-dark" onclick="toggleCameraView()">
+        Camera View
+    </button>
+
+    <button class="btn-full btn-yellow" onclick="swapTeams()">
+        Swap Teams + Score
+    </button>
+
+    <input type="text" id="roundInp" class="std-input" placeholder="ROUND">
 </div>
 </div>
 
@@ -146,175 +202,148 @@ box-sizing:border-box;
 <div class="card">
 <div class="header">Ticker & Branding</div>
 <div class="settings-section">
-<textarea id="row1Inp" oninput="autoGrow(this)" placeholder="Title Line 1"></textarea>
-<textarea id="row2Inp" oninput="autoGrow(this)" placeholder="Title Line 2"></textarea>
-<textarea id="row3Inp" oninput="autoGrow(this)" placeholder="Title Line 3"></textarea>
-<input id="watermarkInp" class="std-input" placeholder="Channel Name">
-<button class="btn-full btn-blue" onclick="updateTicker()">Update Ticker</button>
-</div>
-</div>
 
-<!-- TEAM SELECT -->
-<div class="card">
-<div class="header">Tournament Teams</div>
-<div class="settings-section">
+<textarea id="row1Inp" rows="2" placeholder="Title Line 1" oninput="autoGrow(this)"></textarea>
+<textarea id="row2Inp" rows="2" placeholder="Title Line 2" oninput="autoGrow(this)"></textarea>
+<textarea id="row3Inp" rows="2" placeholder="Title Line 3" oninput="autoGrow(this)"></textarea>
 
-<select id="team1Select" onchange="selectTeam(1)">
-<option value="">Select Team 1</option>
-</select>
+<input type="text" id="watermarkInp" class="std-input" placeholder="Channel Name">
 
-<select id="team2Select" onchange="selectTeam(2)">
-<option value="">Select Team 2</option>
-</select>
+<button class="btn-full btn-blue" onclick="updateTicker()">Update Ticker & Branding</button>
 
-<input id="newTeamInp" class="std-input" placeholder="Add New Team">
-<button class="btn-full btn-blue" onclick="addTeamToList()">Add Team To List</button>
+<button id="tickVisBtn" class="btn-full btn-red" onclick="toggleVis('tickerVisible')">
+    Hide Ticker
+</button>
 
 </div>
+</div>
+
 </div>
 
 <script>
-const firebaseConfig={
-databaseURL:"https://manpreetteam-a86e9-default-rtdb.firebaseio.com/"
+const firebaseConfig = {
+  databaseURL:"https://manpreetteam-a86e9-default-rtdb.firebaseio.com/"
 };
+
 firebase.initializeApp(firebaseConfig);
 
-const matchId=new URLSearchParams(window.location.search).get('id')||'defaultMatch';
-const db=firebase.database().ref("matchData/"+matchId);
+const urlParams = new URLSearchParams(window.location.search);
+const matchId = urlParams.get('id') || 'defaultMatch';
+const db = firebase.database().ref("matchData/" + matchId);
 
-let curA=0,curB=0;
-let scoreVisible=true;
+let curA=0, curB=0;
+let sVis=true, tVis=true;
 let camOpposite=false;
 
-let teamsList=[
-"mudki",
-"gill",
-"faridkot",
-"ludhiana",
-"moga",
-"bathinda",
-"kotkapura",
-"muktsar",
-"firozpur"
-];
+db.on("value",(snap)=>{
+    const data=snap.val();
+    if(data){
+        curA=parseFloat(data.scoreA)||0;
+        curB=parseFloat(data.scoreB)||0;
+        sVis=data.scoreVisible!==false;
+        tVis=data.tickerVisible!==false;
 
-db.on("value",snap=>{
-const data=snap.val();
-if(!data) return;
+        // Button text auto update
+        document.getElementById("visBtn").innerText =
+            sVis ? "Hide Scoreboard" : "Show Scoreboard";
 
-curA=data.scoreA||0;
-curB=data.scoreB||0;
+        document.getElementById("tickVisBtn").innerText =
+            tVis ? "Hide Ticker" : "Show Ticker";
 
-dispA.innerText=curA;
-dispB.innerText=curB;
+        document.getElementById("dispA").innerText=curA;
+        document.getElementById("dispB").innerText=curB;
 
-nameA.value=data.nameA||"";
-nameB.value=data.nameB||"";
+        document.getElementById("nameA").value=data.nameA||"";
+        document.getElementById("nameB").value=data.nameB||"";
 
-roundInp.value=data.round||"";
-row1Inp.value=data.row1Txt||"";
-row2Inp.value=data.row2Txt||"";
-row3Inp.value=data.row3Txt||"";
-watermarkInp.value=data.watermarkTxt||"";
+        document.getElementById("roundInp").value=data.round||"";
+        document.getElementById("row1Inp").value=data.row1Txt||"";
+        document.getElementById("row2Inp").value=data.row2Txt||"";
+        document.getElementById("row3Inp").value=data.row3Txt||"";
+        document.getElementById("watermarkInp").value=data.watermarkTxt||"";
 
-autoGrow(row1Inp);
-autoGrow(row2Inp);
-autoGrow(row3Inp);
+        autoGrow(document.getElementById("row1Inp"));
+        autoGrow(document.getElementById("row2Inp"));
+        autoGrow(document.getElementById("row3Inp"));
 
-if(data.teamsList && data.teamsList.length){
-teamsList=data.teamsList;
-}
-renderTeamDropdowns();
+        camOpposite=data.cameraOpposite||false;
 
-camOpposite=data.cameraOpposite||false;
-document.querySelector(".teams-container").style.flexDirection=
-camOpposite?"row-reverse":"row";
+        document.querySelector(".teams-container").style.flexDirection =
+            camOpposite ? "row-reverse" : "row";
+
+        document.getElementById("camBtn").innerText =
+            camOpposite ? "Camera Oppo View" : "Camera View";
+    }
 });
 
-function changeScore(team,val){
-let c=team==="scoreA"?curA:curB;
-let n;
-if(val>0){
-n=(curA===0&&curB===0)?1.5:c+1;
-}else{
-n=(c===1.5)?0:Math.max(0,c-1);
+function autoGrow(el){
+    el.style.height="auto";
+    el.style.height=el.scrollHeight+"px";
 }
-db.update({[team]:n});
+
+function changeScore(team,val){
+    let current=(team==="scoreA")?curA:curB;
+    let newVal;
+
+    if(val>0){
+        if(curA===0 && curB===0) newVal=1.5;
+        else newVal=current+1;
+    }else{
+        if(current===1.5) newVal=0;
+        else newVal=current-1;
+        if(newVal<0)newVal=0;
+    }
+    db.update({[team]:newVal});
 }
 
 function updateTeamNames(){
-db.update({
-nameA:nameA.value,
-nameB:nameB.value
-});
+    db.update({
+        nameA:document.getElementById("nameA").value,
+        nameB:document.getElementById("nameB").value
+    });
 }
 
 function updateTicker(){
-db.update({
-round:roundInp.value,
-row1Txt:row1Inp.value,
-row2Txt:row2Inp.value,
-row3Txt:row3Inp.value,
-watermarkTxt:watermarkInp.value
-});
+    db.update({
+        round:document.getElementById("roundInp").value,
+        row1Txt:document.getElementById("row1Inp").value,
+        row2Txt:document.getElementById("row2Inp").value,
+        row3Txt:document.getElementById("row3Inp").value,
+        watermarkTxt:document.getElementById("watermarkInp").value
+    });
 }
 
-function toggleScore(){
-scoreVisible=!scoreVisible;
-document.querySelector(".teams-container").style.display=
-scoreVisible?"flex":"none";
-}
-
-function resetScores(){
-if(confirm("Reset Scores?")){
-db.update({scoreA:0,scoreB:0});
-}
+function toggleVis(field){
+    let val = field==="scoreVisible" ? sVis : tVis;
+    db.child(field).set(!val);
 }
 
 function swapTeamNames(){
-db.update({
-nameA:nameB.value,
-nameB:nameA.value
-});
+    db.update({
+        nameA:document.getElementById("nameB").value,
+        nameB:document.getElementById("nameA").value
+    });
+}
+
+function swapTeams(){
+    db.update({
+        nameA:document.getElementById("nameB").value,
+        nameB:document.getElementById("nameA").value,
+        scoreA:curB,
+        scoreB:curA
+    });
+}
+
+function resetScores(){
+    if(confirm("Reset Match Scores?")){
+        db.update({scoreA:0, scoreB:0});
+    }
 }
 
 function toggleCameraView(){
-camOpposite=!camOpposite;
-db.update({cameraOpposite:camOpposite});
-}
-
-function autoGrow(el){
-el.style.height="auto";
-el.style.height=el.scrollHeight+"px";
-}
-
-function renderTeamDropdowns(){
-team1Select.innerHTML='<option value="">Select Team 1</option>';
-team2Select.innerHTML='<option value="">Select Team 2</option>';
-teamsList.forEach(t=>{
-team1Select.innerHTML+=`<option value="${t}">${t}</option>`;
-team2Select.innerHTML+=`<option value="${t}">${t}</option>`;
-});
-}
-
-function selectTeam(n){
-if(n===1){
-nameA.value=team1Select.value;
-}else{
-nameB.value=team2Select.value;
-}
-}
-
-function addTeamToList(){
-let t=newTeamInp.value.trim();
-if(!t) return;
-
-if(!teamsList.includes(t)){
-teamsList.push(t);
-db.update({teamsList});
-renderTeamDropdowns();
-}
-newTeamInp.value="";
+    db.update({
+        cameraOpposite: !camOpposite
+    });
 }
 </script>
 
