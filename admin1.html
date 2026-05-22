@@ -185,16 +185,38 @@ textarea{
 
 </div>
 
-<div class="controls">
-<button class="btn-full btn-blue" onclick="updateTeamNames()">Update Team Names</button>
-<button class="btn-full btn-yellow" onclick="swapTeamNames()">Only Team Swap</button>
-<button id="camBtn" class="btn-full btn-dark" onclick="toggleCameraView()">Camera View</button>
+<<div class="controls">
 
-<button id="visBtn" class="btn-full btn-red" onclick="toggleVis('scoreVisible')">Hide Scoreboard</button>
-<button class="btn-full btn-yellow" onclick="swapTeams()">Swap Teams + Score</button>
-<button class="btn-full btn-red" style="background:#777;" onclick="resetScores()">Reset Scores</button>
+    <!-- TEAM BUTTON -->
+    <button class="btn-full btn-blue" onclick="updateTeamNames()">
+        Update Team Names
+    </button>
 
-<input type="text" id="roundInp" class="std-input" placeholder="ROUND">
+    <!-- SCORE BUTTONS -->
+    <button id="visBtn" class="btn-full btn-red" onclick="toggleVis('scoreVisible')">
+        Hide Scoreboard
+    </button>
+
+    <button class="btn-full btn-red" style="background:#777;" onclick="resetScores()">
+        Reset Scores
+    </button>
+
+    <!-- OTHER BUTTONS -->
+    <button class="btn-full btn-yellow" onclick="swapTeamNames()">
+        Only Team Swap
+    </button>
+
+    <button id="camBtn" class="btn-full btn-dark" onclick="toggleCameraView()">
+        Camera View
+    </button>
+
+    <button class="btn-full btn-yellow" onclick="swapTeams()">
+        Swap Teams + Score
+    </button>
+
+    <!-- ROUND -->
+    <input type="text" id="roundInp" class="std-input" placeholder="ROUND">
+
 </div>
 </div>
 
