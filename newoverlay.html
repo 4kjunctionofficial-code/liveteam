@@ -72,15 +72,17 @@
     height:48px;
     font-size:28px;
     border-top:1px solid #444;
-}.scroller { 
+}
+        .scroller { 
     display: inline-block; 
     padding-left: 100%; 
     white-space: nowrap;
-    /* ਇੱਥੋਂ animation ਹਟਾ ਦਿੱਤੀ ਗਈ ਹੈ ਕਿਉਂਕਿ JS ਇਸਨੂੰ ਕੰਟਰੋਲ ਕਰ ਰਹੀ ਹੈ */
+    /* ਇੱਥੇ ਕੋਈ duration ਨਹੀਂ ਦੇਣੀ, ਇਹ JS ਨਾਲ ਆਵੇਗੀ */
 }
-        @keyframes scroll-anim { 
+
+@keyframes scroll-anim { 
     0% { transform: translateX(0); } 
-    100% { transform: translateX(-100%); } 
+    100% { transform: translateX(-100%); }  
 }
 
 /* TIME BOX (ਸਭ ਤੋਂ ਉੱਪਰ) */
@@ -196,28 +198,24 @@
         else { el.innerHTML = `<div style="width:100%; text-align:center;">${txt}</div>`; }
     }
 
- // ਇਸ ਨੂੰ ਆਪਣੇ script tag ਵਿੱਚ ਬਦਲੋ
-function setAlwaysScroll(id, txt, speedValue) {
+ // ਇਸ ਨੂੰ ਆਪਣੇ script tag ਵਿੱਚ ਬਦਲੋfunction setAlwaysScroll(id, txt, speedInSeconds) {
     const el = document.getElementById(id);
     if(txt && txt.trim().length > 0) {
         el.innerHTML = `<div class="scroller">${txt}</div>`;
         const scrollDiv = el.querySelector('.scroller');
         
-        // ਟੈਕਸਟ ਦੀ ਲੰਬਾਈ ਨਾਪ ਕੇ ਸਪੀਡ ਸੈੱਟ ਕਰਨਾ
-        // speedValue 100 ਦਾ ਮਤਲਬ ਹੈ 100px ਪ੍ਰਤੀ ਸਕਿੰਟ
-        const textWidth = scrollDiv.offsetWidth;
-        const duration = textWidth / speedValue; 
-        
-        scrollDiv.style.animation = `scroll-anim ${duration}s linear infinite`;
+        // ਇੱਥੇ ਅਸੀਂ ਸਿੱਧਾ ਟਾਈਮ (ਸੈਕਿੰਡ) ਦੇ ਰਹੇ ਹਾਂ, ਕੋਈ ਗਣਿਤ ਨਹੀਂ
+        // ਜਿੰਨਾ ਨੰਬਰ ਛੋਟਾ, ਓਨਾ ਟਿੱਕਰ ਤੇਜ਼ (ਜਿਵੇਂ 10s ਬਹੁਤ ਤੇਜ਼, 25s ਆਮ)
+        scrollDiv.style.animation = `scroll-anim ${speedInSeconds}s linear infinite`;
     } else {
         el.innerHTML = "";
     }
 }
 
-// ਡੇਟਾਬੇਸ ਵਾਲੇ ਹਿੱਸੇ ਵਿੱਚ ਇੱਦਾਂ ਕਾਲ ਕਰੋ (ਆਪਣੀ ਪਸੰਦ ਅਨੁਸਾਰ speedValue ਬਦਲੋ):
-setAlwaysScroll('c1', data.row1Txt || "WELCOME", 80);  // ਰਫ਼ਤਾਰ 80
-setAlwaysScroll('c2', data.row2Txt || "WELCOME", 110); // ਰਫ਼ਤਾਰ 120 (ਤੇਜ਼)
-setAlwaysScroll('c3', data.row3Txt || "WELCOME", 100); // ਰਫ਼ਤਾਰ 100
+// ਡੇਟਾਬੇਸ ਵਾਲੇ ਹਿੱਸੇ ਵਿੱਚ ਇੰਝ ਵਰਤੋ:
+setAlwaysScroll('c1', data.row1Txt || "WELCOME", 20); // 20 ਸੈਕਿੰਡ (ਇਸਨੂੰ ਘਟਾ-ਵਧਾ ਕੇ ਸਪੀਡ ਸੈੱਟ ਕਰੋ)
+setAlwaysScroll('c2', data.row2Txt || "SUBSCRIBE", 15); // 15 ਸੈਕਿੰਡ (ਇਹ ਜ਼ਿਆਦਾ ਤੇਜ਼ ਚੱਲੇਗਾ)
+setAlwaysScroll('c3', data.row3Txt || "LIKE & SHARE", 25); // 25 ਸੈਕਿੰਡ (ਇਹ ਸਭ ਤੋਂ ਹੌਲੀ)
 
     function updateClock() {
         const now = new Date();
