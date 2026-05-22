@@ -45,15 +45,12 @@ body{
     text-transform:uppercase;
 }
 
-#teamPanel{
-    transition:0.3s;
-}
-
 .teams-container{
     display:flex;
     padding:20px;
     gap:20px;
     border-bottom:2px solid #eee;
+    transition:0.3s;
 }
 
 .team-box{
@@ -127,7 +124,7 @@ body{
     background:#fafafa;
 }
 
-/* VADDE TICKER BOXES */
+/* AUTO-GROW TICKER BOXES */
 textarea{
     width:100%;
     min-height:90px;
@@ -138,8 +135,9 @@ textarea{
     font-weight:bold;
     margin-bottom:12px;
     box-sizing:border-box;
-    resize:vertical;
+    resize:none;
     line-height:1.4;
+    overflow:hidden;
 }
 
 .std-input{
@@ -163,7 +161,6 @@ textarea{
 <div class="card">
 <div class="header">Live Score Board</div>
 
-<div id="teamPanel">
 <div class="teams-container">
 
 <div class="team-box">
@@ -187,7 +184,6 @@ textarea{
 </div>
 
 </div>
-</div>
 
 <div class="controls">
 <button class="btn-full btn-blue" onclick="updateTeamNames()">Update Team Names</button>
@@ -207,9 +203,9 @@ textarea{
 <div class="header">Ticker & Branding</div>
 <div class="settings-section">
 
-<textarea id="row1Inp" rows="2" placeholder="Title Line 1"></textarea>
-<textarea id="row2Inp" rows="2" placeholder="Title Line 2"></textarea>
-<textarea id="row3Inp" rows="2" placeholder="Title Line 3"></textarea>
+<textarea id="row1Inp" rows="2" placeholder="Title Line 1" oninput="autoGrow(this)"></textarea>
+<textarea id="row2Inp" rows="2" placeholder="Title Line 2" oninput="autoGrow(this)"></textarea>
+<textarea id="row3Inp" rows="2" placeholder="Title Line 3" oninput="autoGrow(this)"></textarea>
 
 <input type="text" id="watermarkInp" class="std-input" placeholder="Channel Name">
 
@@ -256,14 +252,24 @@ db.on("value",(snap)=>{
         document.getElementById("row3Inp").value=data.row3Txt||"";
         document.getElementById("watermarkInp").value=data.watermarkTxt||"";
 
+        autoGrow(document.getElementById("row1Inp"));
+        autoGrow(document.getElementById("row2Inp"));
+        autoGrow(document.getElementById("row3Inp"));
+
         camOpposite=data.cameraOpposite||false;
-        document.getElementById("teamPanel").style.transform =
-            camOpposite ? "scaleX(-1)" : "scaleX(1)";
+
+        document.querySelector(".teams-container").style.flexDirection =
+            camOpposite ? "row-reverse" : "row";
 
         document.getElementById("camBtn").innerText =
             camOpposite ? "Camera Oppo View" : "Camera View";
     }
 });
+
+function autoGrow(el){
+    el.style.height="auto";
+    el.style.height=el.scrollHeight+"px";
+}
 
 function changeScore(team,val){
     let current=(team==="scoreA")?curA:curB;
@@ -320,7 +326,7 @@ function swapTeams(){
 
 function resetScores(){
     if(confirm("Reset Match Scores?")){
-        db.update({scoreA:0,scoreB:0});
+        db.update({scoreA:0, scoreB:0});
     }
 }
 
