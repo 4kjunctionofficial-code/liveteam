@@ -204,10 +204,9 @@
         roundEl.innerText = roundVal;
         roundEl.style.display = roundVal.trim() === "" ? "none" : "block";
         
-        // ਸਪੀਡ ਸੈੱਟ ਕੀਤੀ (1st & 3rd slow, 2nd med)
-        setAlwaysScroll('c1', data.row1Txt || "WELCOME TO LIVE KABADDI", 'scroll-slow'); 
-        setAlwaysScroll('c2', data.row2Txt || "SUBSCRIBE OUR CHANNEL", 'scroll-med');
-        setAlwaysScroll('c3', data.row3Txt || "LIKE & SHARE", 'scroll-slow');
+        setAlwaysScroll('c1', data.row1Txt || "WELCOME TO LIVE KABADDI"); 
+        setAlwaysScroll('c2', data.row2Txt || "SUBSCRIBE OUR CHANNEL"); 
+        setAlwaysScroll('c3', data.row3Txt || "LIKE & SHARE"); 
     });
 
     function setTeamName(containerId, txt) {
