@@ -73,8 +73,14 @@
     font-size:28px;
     border-top:1px solid #444;
 }
-        .scroller { display: inline-block; padding-left: 100%; animation: scroll-anim 25s linear infinite; }
-        @keyframes scroll-anim { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        .scroller { 
+    display: inline-block; 
+    padding-left: 100%; 
+    white-space: nowrap; }
+        @keyframes scroll-anim { 
+    0% { transform: translateX(0); } 
+    100% { transform: translateX(-100%); } 
+}
 
 /* TIME BOX (ਸਭ ਤੋਂ ਉੱਪਰ) */
 .box-time { 
@@ -190,10 +196,24 @@
     }
 
     function setAlwaysScroll(id, txt) {
-        const el = document.getElementById(id);
-        if(txt && txt.trim().length > 0) { el.innerHTML = `<div class="scroller">${txt}</div>`; }
-        else { el.innerHTML = ""; }
+    const el = document.getElementById(id);
+    if(txt && txt.trim().length > 0) {
+        // ਟੈਕਸਟ ਨੂੰ ਸਕ੍ਰੋਲਰ ਵਿੱਚ ਪਾਓ
+        el.innerHTML = `<div class="scroller">${txt}</div>`;
+        
+        const scrollDiv = el.querySelector('.scroller');
+        const textWidth = scrollDiv.offsetWidth;
+        
+        // ਇੱਥੇ ਸਪੀਡ ਕੰਟਰੋਲ ਕਰੋ (ਜਿੰਨਾ ਨੰਬਰ ਵੱਡਾ, ਓਨਾ ਟਿੱਕਰ ਹੌਲੀ)
+        // 100 ਪਿਕਸਲ ਪ੍ਰਤੀ ਸਕਿੰਟ ਦੀ ਸਪੀਡ ਰੱਖਣ ਲਈ:
+        const speed = 100; 
+        const duration = textWidth / speed; 
+        
+        scrollDiv.style.animation = `scroll-anim ${duration}s linear infinite`;
+    } else {
+        el.innerHTML = "";
     }
+}
 
     function updateClock() {
         const now = new Date();
