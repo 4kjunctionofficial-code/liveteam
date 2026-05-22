@@ -17,27 +17,30 @@
 
         #single-wm { position: absolute; color: rgba(255, 255, 255, 0.7); font-size: 35px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 5px #000; white-space: nowrap; z-index: 1; opacity: 1; }
 
-       /* ticker-wrap ਨੂੰ flex ਬਣਾ ਕੇ ਤਿੰਨਾਂ ਹਿੱਸਿਆਂ ਨੂੰ ਜੋੜੋ */
-#ticker-wrap { 
+ #ticker-wrap { 
     position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 150px; 
-    display: flex; z-index: 9998; transition: all 0.7s ease; background: transparent; 
+    display: flex; z-index: 9998; background: transparent; 
 }
         #ticker-wrap.hidden { opacity: 0; transform: translateY(160px); }
 
  /* RED BOX LIVE - ਖੱਬੇ ਪਾਸੇ ਦਾ / ਡਿਜ਼ਾਈਨ */
+/* LIVE BOX (ਖੱਬਾ) */
 .box-live { 
-    width: 300px; background: #e60000; color: white; display: flex; align-items: center; justify-content: center; 
-    font-size: 70px; font-weight: 900; font-family: 'Impact'; text-transform: uppercase; 
-    clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%); /* / ਡਿਜ਼ਾਈਨ */
+    width: 250px; /* ਥੋੜਾ ਛੋਟਾ ਕੀਤਾ */
+    background: #e60000; color: white; display: flex; align-items: center; justify-content: center; 
+    font-size: 60px; font-weight: 900; font-family: 'Impact';
+    clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%); 
     z-index: 12;
 }
 
-/* Ticker Center - ਹੁਣ ਬਿਨਾਂ ਮਾਰਜਿਨ ਦੇ ਬਕਸਿਆਂ ਨਾਲ ਜੁੜਿਆ ਹੋਇਆ */
+/* TIKKER CENTER (ਚੌੜਾਈ ਵਧਾਈ) */
 .center-wrap { 
-    flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #4a4a4a; 
+    flex: 1; /* ਇਹ ਬਾਕੀ ਬਚੀ ਸਾਰੀ ਜਗ੍ਹਾ ਲੈ ਲਵੇਗਾ */
+    display: flex; flex-direction: column; overflow: hidden; background: #4a4a4a; 
     z-index: 10;
-    border-left: 5px solid #e60000; /* ਲਾਲ ਬਕਸੇ ਨਾਲ ਕਨੈਕਸ਼ਨ */
-    border-right: 5px solid #e60000; 
+    margin-left: -40px; /* ਲਾਲ ਬਾਕਸ ਦੇ ਅੰਦਰ ਜਾਣ ਲਈ */
+    padding-left: 50px; /* ਟਿੱਕਰ ਨੂੰ ਲਾਲ ਬਾਕਸ ਦੇ ਉੱਪਰ ਨਾ ਚੜ੍ਹਨ ਦੇਣ ਲਈ */
+    padding-right: 40px;
 }
         .row-text { display: flex; align-items: center; font-weight: bold; text-transform: uppercase; width: 100%; overflow: hidden; box-sizing: border-box; white-space: nowrap; padding-left: 60px; }
         /* upper line now bigger */
@@ -70,13 +73,14 @@
         .scroller { display: inline-block; padding-left: 100%; animation: scroll-anim 25s linear infinite; }
         @keyframes scroll-anim { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
- /* RED BOX TIME - ਸੱਜੇ ਪਾਸੇ ਦਾ \ ਡਿਜ਼ਾਈਨ */
+/* TIME BOX (ਸੱਜਾ - ਛੋਟਾ ਕੀਤਾ) */
 .box-time { 
-    width: 340px; background: #e60000; color: white; display: flex; align-items: center; justify-content: center; 
-    clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%); /* \ ਡਿਜ਼ਾਈਨ */
+    width: 250px; /* 340 ਤੋਂ ਘਟਾ ਕੇ 250 ਕੀਤਾ */
+    background: #e60000; color: white; display: flex; align-items: center; justify-content: center; 
+    clip-path: polygon(20% 0, 100% 0, 100% 100%, 0 100%); /* ਖੱਬੇ ਪਾਸੇ ਵਾਲਾ \ ਡਿਜ਼ਾਈਨ */
     z-index: 12;
-    margin-left: -50px; /* ਇਹ ਟਿੱਕਰ ਨੂੰ ਲਾਲ ਬਕਸੇ ਦੇ ਅੰਦਰ ਲੈ ਜਾਵੇਗਾ */
-    padding-left: 50px;
+    margin-left: -50px; /* ਟਿੱਕਰ ਦੀਆਂ ਲਾਈਨਾਂ ਇਸਦੇ ਅੰਦਰ ਜਾਣਗੀਆਂ */
+    padding-left: 40px;
 }
         .time-wrap, .date-wrap { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: 0.8s; font-weight: bold; padding-left: 40px; box-sizing: border-box;}
         .time-str { color: #ffffff; font-size: 45px; letter-spacing: 1px; }
