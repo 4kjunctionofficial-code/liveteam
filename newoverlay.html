@@ -73,16 +73,19 @@
     font-size:28px;
     border-top:1px solid #444;
 }
-        .scroller { 
+        .scroll-fast { animation: scroll-anim 12s linear infinite; }
+.scroll-med  { animation: scroll-anim 20s linear infinite; }
+.scroll-slow { animation: scroll-anim 15s linear infinite; }
+
+.scroller { 
     display: inline-block; 
     padding-left: 100%; 
     white-space: nowrap;
-    /* ਇੱਥੇ ਕੋਈ duration ਨਹੀਂ ਦੇਣੀ, ਇਹ JS ਨਾਲ ਆਵੇਗੀ */
 }
 
 @keyframes scroll-anim { 
     0% { transform: translateX(0); } 
-    100% { transform: translateX(-100%); }  
+    100% { transform: translateX(-100%); } 
 }
 
 /* TIME BOX (ਸਭ ਤੋਂ ਉੱਪਰ) */
@@ -196,26 +199,15 @@
         const el = document.getElementById(containerId);
         if(txt.length > 12) { el.innerHTML = `<div class="team-scroller">${txt}</div>`; }
         else { el.innerHTML = `<div style="width:100%; text-align:center;">${txt}</div>`; }
-    }
-
- // ਇਸ ਨੂੰ ਆਪਣੇ script tag ਵਿੱਚ ਬਦਲੋfunction setAlwaysScroll(id, txt, speedInSeconds) {
+    }function setAlwaysScroll(id, txt, speedClass) {
     const el = document.getElementById(id);
     if(txt && txt.trim().length > 0) {
-        el.innerHTML = `<div class="scroller">${txt}</div>`;
-        const scrollDiv = el.querySelector('.scroller');
-        
-        // ਇੱਥੇ ਅਸੀਂ ਸਿੱਧਾ ਟਾਈਮ (ਸੈਕਿੰਡ) ਦੇ ਰਹੇ ਹਾਂ, ਕੋਈ ਗਣਿਤ ਨਹੀਂ
-        // ਜਿੰਨਾ ਨੰਬਰ ਛੋਟਾ, ਓਨਾ ਟਿੱਕਰ ਤੇਜ਼ (ਜਿਵੇਂ 10s ਬਹੁਤ ਤੇਜ਼, 25s ਆਮ)
-        scrollDiv.style.animation = `scroll-anim ${speedInSeconds}s linear infinite`;
+        el.innerHTML = `<div class="scroller ${speedClass}">${txt}</div>`;
     } else {
         el.innerHTML = "";
     }
 }
-
-// ਡੇਟਾਬੇਸ ਵਾਲੇ ਹਿੱਸੇ ਵਿੱਚ ਇੰਝ ਵਰਤੋ:
-setAlwaysScroll('c1', data.row1Txt || "WELCOME", 20); // 20 ਸੈਕਿੰਡ (ਇਸਨੂੰ ਘਟਾ-ਵਧਾ ਕੇ ਸਪੀਡ ਸੈੱਟ ਕਰੋ)
-setAlwaysScroll('c2', data.row2Txt || "SUBSCRIBE", 15); // 15 ਸੈਕਿੰਡ (ਇਹ ਜ਼ਿਆਦਾ ਤੇਜ਼ ਚੱਲੇਗਾ)
-setAlwaysScroll('c3', data.row3Txt || "LIKE & SHARE", 25); // 25 ਸੈਕਿੰਡ (ਇਹ ਸਭ ਤੋਂ ਹੌਲੀ)
+    
 
     function updateClock() {
         const now = new Date();
