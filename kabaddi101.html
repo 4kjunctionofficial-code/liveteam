@@ -87,9 +87,45 @@
     font-size:28px;
     border-top:1px solid #444;
 }
-        .scroller { display: inline-block; padding-left: 100%; animation: scroll-anim 25s linear infinite; }
-        @keyframes scroll-anim { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        .scroller{
+    display:inline-block;
+    white-space:nowrap;
+    padding-left:10%;
+    will-change:transform;
+}
 
+/* Upri line - slow */
+.row-1 .scroller{
+    animation: scrollSlow 45s linear infinite;
+}
+
+/* Vichli line - thori tej */
+.row-2 .scroller{
+    animation: scrollFast 58s linear infinite;
+}
+
+/* Hetli line - slow */
+.row-3 .scroller{
+    animation: scrollSlow 60s linear infinite;
+}
+
+@keyframes scrollSlow{
+    0%{
+        transform:translateX(0);
+    }
+    100%{
+        transform:translateX(-200%);
+    }
+}
+
+@keyframes scrollFast{
+    0%{
+        transform:translateX(0);
+    }
+    100%{
+        transform:translateX(-200%);
+    }
+}
        .box-time{
     width:340px;
     background:#e60000;
@@ -212,12 +248,19 @@
         else { el.innerHTML = `<div style="width:100%; text-align:center;">${txt}</div>`; }
     }
 
-    function setAlwaysScroll(id, txt) {
-        const el = document.getElementById(id);
-        if(txt && txt.trim().length > 0) { el.innerHTML = `<div class="scroller">${txt}</div>`; }
-        else { el.innerHTML = ""; }
-    }
+ function setAlwaysScroll(id, txt){
+    const el = document.getElementById(id);
 
+    if(txt && txt.trim().length > 0){
+        el.innerHTML = `
+            <div class="scroller">
+                ${txt}&nbsp;&nbsp; • &nbsp;&nbsp;${txt}
+            </div>
+        `;
+    }else{
+        el.innerHTML = "";
+    }
+}
     function updateClock() {
         const now = new Date();
         document.getElementById('live-time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
