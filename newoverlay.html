@@ -195,25 +195,28 @@
         else { el.innerHTML = `<div style="width:100%; text-align:center;">${txt}</div>`; }
     }
 
-    function setAlwaysScroll(id, txt) {
+ // ਇਸ ਨੂੰ ਆਪਣੇ script tag ਵਿੱਚ ਬਦਲੋ
+function setAlwaysScroll(id, txt, speedValue) {
     const el = document.getElementById(id);
     if(txt && txt.trim().length > 0) {
-        // ਟੈਕਸਟ ਨੂੰ ਸਕ੍ਰੋਲਰ ਵਿੱਚ ਪਾਓ
         el.innerHTML = `<div class="scroller">${txt}</div>`;
-        
         const scrollDiv = el.querySelector('.scroller');
-        const textWidth = scrollDiv.offsetWidth;
         
-        // ਇੱਥੇ ਸਪੀਡ ਕੰਟਰੋਲ ਕਰੋ (ਜਿੰਨਾ ਨੰਬਰ ਵੱਡਾ, ਓਨਾ ਟਿੱਕਰ ਹੌਲੀ)
-        // 100 ਪਿਕਸਲ ਪ੍ਰਤੀ ਸਕਿੰਟ ਦੀ ਸਪੀਡ ਰੱਖਣ ਲਈ:
-        const speed = 100; 
-        const duration = textWidth / speed; 
+        // ਟੈਕਸਟ ਦੀ ਲੰਬਾਈ ਨਾਪ ਕੇ ਸਪੀਡ ਸੈੱਟ ਕਰਨਾ
+        // speedValue 100 ਦਾ ਮਤਲਬ ਹੈ 100px ਪ੍ਰਤੀ ਸਕਿੰਟ
+        const textWidth = scrollDiv.offsetWidth;
+        const duration = textWidth / speedValue; 
         
         scrollDiv.style.animation = `scroll-anim ${duration}s linear infinite`;
     } else {
         el.innerHTML = "";
     }
 }
+
+// ਡੇਟਾਬੇਸ ਵਾਲੇ ਹਿੱਸੇ ਵਿੱਚ ਇੱਦਾਂ ਕਾਲ ਕਰੋ (ਆਪਣੀ ਪਸੰਦ ਅਨੁਸਾਰ speedValue ਬਦਲੋ):
+setAlwaysScroll('c1', data.row1Txt || "WELCOME", 80);  // ਰਫ਼ਤਾਰ 80
+setAlwaysScroll('c2', data.row2Txt || "WELCOME", 110); // ਰਫ਼ਤਾਰ 120 (ਤੇਜ਼)
+setAlwaysScroll('c3', data.row3Txt || "WELCOME", 100); // ਰਫ਼ਤਾਰ 100
 
     function updateClock() {
         const now = new Date();
