@@ -90,40 +90,24 @@
         .scroller{
     display:inline-block;
     white-space:nowrap;
-    padding-left:10%;
+    position:relative;
     will-change:transform;
 }
-
-/* Upri line - slow */
-.row-1 .scroller{
-    animation: scrollSlow 45s linear infinite;
-}
-
-/* Vichli line - thori tej */
-.row-2 .scroller{
-    animation: scrollFast 58s linear infinite;
-}
-
-/* Hetli line - slow */
-.row-3 .scroller{
-    animation: scrollSlow 60s linear infinite;
-}
-
 @keyframes scrollSlow{
-    0%{
+    from{
         transform:translateX(0);
     }
-    100%{
-        transform:translateX(-200%);
+    to{
+        transform:translateX(-100%);
     }
 }
 
 @keyframes scrollFast{
-    0%{
+    from{
         transform:translateX(0);
     }
-    100%{
-        transform:translateX(-200%);
+    to{
+        transform:translateX(-100%);
     }
 }
        .box-time{
@@ -254,10 +238,33 @@
     if(txt && txt.trim().length > 0){
         el.innerHTML = `
             <div class="scroller">
-                ${txt}&nbsp;&nbsp; • &nbsp;&nbsp;${txt}
+                ${txt}&nbsp;&nbsp; • &nbsp;&nbsp; ${txt}
             </div>
         `;
-    }else{
+
+        const scroller = el.querySelector('.scroller');
+
+        // har row di fixed pixel/sec speed
+        let speed = 1.4; // default
+        if(id === "c2") speed = 1.6; // middle thodi fast
+
+        let x = el.offsetWidth;
+
+        function animate(){
+            x -= speed;
+
+            // jadon poora bahar nikal jave, dubara start
+            if(x < -scroller.offsetWidth){
+                x = el.offsetWidth;
+            }
+
+            scroller.style.transform = `translateX(${x}px)`;
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+    } else {
         el.innerHTML = "";
     }
 }
