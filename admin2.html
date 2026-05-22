@@ -2,262 +2,182 @@
 <html lang="pa">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Football Ultimate Admin - Manpreet Mudki</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0b0d0f; color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        .card { background: #161b22; width: 100%; max-width: 500px; border-radius: 12px; border: 1px solid #30363d; overflow: hidden; margin-bottom: 12px; box-sizing: border-box; }
-        .header { background: #238636; color: white; padding: 8px; text-align: center; font-weight: bold; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
-        
-        /* TICKER STYLE */
-        .ticker-wrap {
-            width: 100%;
-            max-width: 500px;
-            background: #f1c40f;
-            color: #000;
-            overflow: hidden;
-            padding: 5px 0;
-            margin-bottom: 12px;
-            border-radius: 5px;
-            font-weight: bold;
-            white-space: nowrap;
-            position: relative;
-        }
-        .ticker-content {
-            display: inline-block;
-            padding-left: 100%;
-            animation: ticker 15s linear infinite;
-        }
-        @keyframes ticker {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(-100%, 0); }
+        :root { --header-h: 65px; --header-w: 40%; }
+        * { box-sizing: border-box; text-transform: uppercase; margin: 0; padding: 0; }
+        body { background: transparent; font-family: 'Segoe UI', 'Raavi', sans-serif; overflow: hidden; height: 100vh; position: relative; }
+
+        #weather-box { position: absolute; top: 20px; left: 10px; width: 550px; height: 120px; display: none; overflow: hidden; background: transparent; border: none; z-index: 1001; }
+        #weather-frame { width: 550px; height: 120px; border: none; pointer-events: none; transform: scale(1.5); transform-origin: top left; margin-top: -10px; margin-left: 5px; }
+
+        @keyframes sharpFlash {
+            0% { filter: brightness(1); transform: scale(1) skewX(25deg); }
+            50% { filter: brightness(12); transform: scale(1.05) skewX(25deg); }
+            100% { filter: brightness(1); transform: scale(1) skewX(25deg); }
         }
 
-        .teams-container { display: flex; padding: 10px; gap: 5px; background: #0d1117; align-items: center; }
-        .team-box { flex: 2; text-align: center; padding: 10px; border-radius: 8px; background: #161b22; border-top: 4px solid #fff; }
-        .mid-controls { flex: 1; display: flex; flex-direction: column; gap: 8px; align-items: center; }
-        
-        .score-val { font-size: 38px; font-weight: 900; color: #2ecc71; margin: 2px 0; }
-        .std-input { width: 100%; padding: 8px; background: #0d1117; border: 1px solid #30363d; color: white; border-radius: 5px; box-sizing: border-box; margin-top: 5px; font-size: 13px; }
-        .label-text { font-size: 10px; color: #8b949e; display: block; margin-top: 8px; text-align: left; text-transform: uppercase; }
+        @keyframes slowGhaintLight {
+            0% { left: -150%; } 30% { left: 150%; } 100% { left: 150%; } 
+        }
 
-        .btn-pm { border: none; color: white; padding: 5px; border-radius: 5px; font-size: 20px; font-weight: bold; cursor: pointer; flex: 1; margin: 0 2px; }
-        .card-btn { padding: 8px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; color: white; text-transform: uppercase; font-size: 9px; flex: 1; width: 100%; }
+        #result-screen {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -55%); width: 680px; height: 480px;
+            background: rgba(15, 17, 19, 0.98); border: 5px solid #f39c12; border-radius: 30px;
+            box-shadow: 0 0 40px rgba(243, 156, 18, 0.5); z-index: 3000; overflow: hidden; display: none; flex-direction: column;
+        }
 
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; }
-        .flex-row { display: flex; gap: 5px; margin-top: 8px; }
-        
-        #penaltyControlSection { display: none; background: #1c2128; padding: 15px; border-top: 3px solid #f39c12; }
-        .half-btn { background: #30363d; font-size: 9px !important; padding: 5px !important; }
+        .res-header { background: #f39c12; color: #000; text-align: center; padding: 15px 10px; font-size: 38px; font-weight: 1000; border-bottom: 4px solid #fff; }
+        .res-scroll-window { flex: 1; overflow: hidden; position: relative; background: #050505; padding: 20px 25px; }
+        .res-list-area { position: absolute; width: calc(100% - 50px); display: flex; flex-direction: column; align-items: center; }
+        .res-item { font-size: 36px; font-weight: 1000; color: #ffffff; padding: 8px 10px; text-align: center; width: 100%; }
+
+        #cut-flash-alert {
+            position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            background: rgba(220, 0, 0, 0.95); color: #fff; width: 100%; padding: 40px 0; text-align: center;
+            z-index: 9999; display: none; border-top: 5px solid #fff; border-bottom: 5px solid #fff;
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.9); opacity: 0;
+        }
+        #cut-flash-alert.active { display: flex !important; flex-direction: column; animation: alertPopup 4s ease-in-out forwards; }
+        @keyframes alertPopup {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            10% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            20% { transform: translate(-50%, -50%) scale(1); }
+            80% { opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+        }
+        .alert-main-title { font-size: 60px; font-weight: 1000; letter-spacing: 5px; }
+        .alert-pigeon-name { font-size: 50px; font-weight: 900; color: #ffcc00; margin-top: 10px; }
+
+        .main-container { position: absolute; left: 10px; right: 10px; bottom: 56px; height: 280px; display: flex; gap: 10px; }
+        .box { display: none; width: 32.5%; height: 100%; border-radius: 25px; border: 4px solid #fff; overflow: hidden; }
+        .box-inner { width: 100%; height: 100%; position: relative; }
+        .header-wrapper { position: absolute; top: 0; right: 0; width: var(--header-w); background: #000; border-bottom: 3px solid white; border-left: 3px solid white; border-radius: 0 20px 0 20px; color: white; }
+        .box-header { height: var(--header-h); display: flex; align-items: center; border-bottom: 2px solid white; }
+        .header-title { flex: 1; padding-left: 12px; font-weight: 900; font-size: 28px; }
+        .count-tag { background: #fff; color: #000; width: 35%; height: 100%; display: flex; align-items: center; justify-content: center; font-weight: 1000; font-size: 34px; }
+        .sum-card { height: var(--header-h); display: flex; align-items: center; }
+        .sum-val-area { background: #ffcc00; color: #000; width: 35%; height: 100%; display: flex; align-items: center; justify-content: center; font-weight: 1000; font-size: 34px; border-bottom-right-radius: 15px; }
+        .scroll-window { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; }
+        .list-area { position: absolute; width: 100%; display: flex; flex-direction: column; padding-top: 150px; }
+        .item { padding: 5px 20px; font-size: 36px; font-weight: 1000; color: #000; }
+        #box-out .item { color: #fff; }
+
+        .footer { position: absolute; bottom: 2px; left: 10px; width: calc(100% - 20px); height: 55px; background: #fff; display: flex; align-items: center; border: 4px solid #000; border-radius: 15px; z-index: 20; }
+        .live-tag { background: #ff0000; color: #fff; padding: 0 35px; height: 100%; display: flex; align-items: center; font-size: 30px; font-weight: 1000; transform: skewX(-25deg); margin-left: -25px; border-right: 5px solid #fff; }
+        .live-tag span { transform: skewX(25deg); }
+        .ticker-wrap { flex: 1; overflow: hidden; display: flex; align-items: center; }
+        .ticker-move { display: flex; white-space: nowrap; font-size: 31px; font-weight: 1000; }
+        .ticker-content { display: inline-block; padding-right: 800px; }
+        .dt-box-wrap { height: 100%; min-width: 350px; display: flex; align-items: center; justify-content: center; background: #ff0000; color: #fff; transform: skewX(-25deg); margin-right: -25px; border-left: 6px solid #fff; }
+        #clock-box { font-size: 30px; font-weight: 1000; transform: skewX(25deg); }
+        .jhmaka-effect { animation: sharpFlash 0.5s ease-out; }
     </style>
 </head>
 <body>
 
-<!-- LIVE TICKER -->
-<div class="ticker-wrap">
-    <div class="ticker-content" id="tickerText">Waiting for live updates...</div>
+<div id="result-screen"><div class="res-header" id="res-title-text">FINAL RESULT</div><div class="res-scroll-window"><div class="res-list-area" id="res-list-render"></div></div></div>
+
+<div id="cut-flash-alert">
+    <div class="alert-main-title" id="alert-title-lang">PIGEON OUT</div>
+    <div class="alert-pigeon-name" id="alert-pigeon-name">--</div>
 </div>
 
-<div id="main-content" style="width: 100%; max-width: 500px;">
-    
-    <!-- MAIN SCOREBOARD -->
-    <div class="card">
-        <div class="header"><i class="fas fa-futbol"></i> Scoreboard & Quick Actions</div>
-        <div class="teams-container">
-            <div class="team-box" id="boxA">
-                <input type="color" id="colorA" value="#ffffff" oninput="updateDB()" style="width:100%; height:18px; border:none; cursor:pointer;">
-                <input type="text" id="nameA" class="std-input" placeholder="Home Team" oninput="updateDB()">
-                <div class="score-val" id="dispA">0</div>
-                <div style="display:flex; margin-bottom:5px;">
-                    <button class="btn-pm" style="background:#da3633;" onclick="changeScore('scoreA', -1)">-</button>
-                    <button class="btn-pm" style="background:#238636;" onclick="changeScore('scoreA', 1)">+</button>
-                </div>
-                <input type="text" id="playerA" class="std-input" placeholder="No" style="border-color:#f1c40f;">
-                <div class="grid-2">
-                    <button class="card-btn" style="background:#f1c40f; color:000;" onclick="handleCard('A', 'Yellow')">YC</button>
-                    <button class="card-btn" style="background:#e74c3c;" onclick="handleCard('A', 'Red')">RC</button>
-                </div>
-            </div>
+<div id="weather-box"><iframe id="weather-frame" src=""></iframe></div>
 
-            <div class="mid-controls">
-                <button id="visBtn" class="card-btn" style="background:#238636;" onclick="toggleVis('scoreVisible')">SHOW</button>
-                <button class="card-btn" style="background:#333;" onclick="resetOnlyScore()">RESET</button>
-                <div style="font-weight:bold; color:#444;">VS</div>
-            </div>
-
-            <div class="team-box" id="boxB">
-                <input type="color" id="colorB" value="#ffffff" oninput="updateDB()" style="width:100%; height:18px; border:none; cursor:pointer;">
-                <input type="text" id="nameB" class="std-input" placeholder="Away Team" oninput="updateDB()">
-                <div class="score-val" id="dispB">0</div>
-                <div style="display:flex; margin-bottom:5px;">
-                    <button class="btn-pm" style="background:#da3633;" onclick="changeScore('scoreB', -1)">-</button>
-                    <button class="btn-pm" style="background:#238636;" onclick="changeScore('scoreB', 1)">+</button>
-                </div>
-                <input type="text" id="playerB" class="std-input" placeholder="No" style="border-color:#f1c40f;">
-                <div class="grid-2">
-                    <button class="card-btn" style="background:#f1c40f; color:000;" onclick="handleCard('B', 'Yellow')">YC</button>
-                    <button class="card-btn" style="background:#e74c3c;" onclick="handleCard('B', 'Red')">RC</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MATCH INFO -->
-    <div class="card">
-        <div class="header"><i class="fas fa-info-circle"></i> Match Information</div>
-        <div style="padding:12px; background:#0d1117;">
-            <div class="grid-2">
-                <div style="text-align:center; border-right: 1px solid #333; padding-right:10px;">
-                    <div id="timerShow" style="font-size:32px; color:#f1c40f; font-family:monospace;">00:00</div>
-                    <div class="flex-row">
-                        <button class="card-btn" style="background:#238636;" onclick="startTimer()">Start</button>
-                        <button class="card-btn" style="background:#f39c12;" onclick="pauseTimer()">Pause</button>
-                        <button class="card-btn" style="background:#333;" onclick="resetTimer()">00</button>
-                    </div>
-                    <span class="label-text">Duration</span>
-                    <input type="text" id="matchDuration" class="std-input" placeholder="e.g. 20m" oninput="updateDB()">
-                </div>
-                <div style="padding-left:5px;">
-                    <span class="label-text" style="color:#2ecc71;">Match Round</span>
-                    <input type="text" id="matchRound" class="std-input" placeholder="Semi-Final" oninput="updateDB()">
-                    
-                    <span class="label-text" style="color:#f1c40f;">Match Half</span>
-                    <input type="text" id="roundInp" class="std-input" placeholder="1st Half" oninput="updateDB()">
-                    <div class="flex-row">
-                        <button class="card-btn half-btn" onclick="setHalf('1st Half')">1st Half</button>
-                        <button class="card-btn half-btn" onclick="setHalf('2nd Half')">2nd Half</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- SYSTEM EVENTS -->
-    <div class="card">
-        <div class="header" style="background:#333;">Live Ticker Event</div>
-        <div style="padding:10px;">
-            <input type="text" id="eventInp" class="std-input" placeholder="Enter Goal or Event (e.g. Goal by No. 10)" oninput="updateDB()">
-            <p style="font-size: 10px; color: #8b949e; margin-top: 5px;">* ਇਹ ਟੈਕਸਟ ਉੱਪਰ ਪੀਲੀ ਪੱਟੀ (Ticker) ਵਿੱਚ ਚੱਲੇਗਾ।</p>
-            <button class="card-btn" style="background:#e74c3c; margin-top:10px; padding:10px;" onclick="fullReset()">RESET EVERYTHING</button>
-        </div>
-    </div>
+<div class="main-container" id="scoreboard-div">
+    <div id="box-fly" class="box"><div class="box-inner"><div class="header-wrapper"><div class="box-header"><span class="header-title" id="title-fly">FLYING</span><span id="count-fly" class="count-tag">0</span></div><div class="sum-card"><span class="header-title" id="total-fly">TOTAL</span><span id="m-total" class="sum-val-area">0</span></div></div><div class="scroll-window"><div class="list-area" id="list-fly"></div></div></div></div>
+    <div id="box-out" class="box"><div class="box-inner"><div class="header-wrapper"><div class="box-header"><span class="header-title" id="title-out">OUT</span><span id="count-out" class="count-tag">0</span></div><div class="sum-card"><span class="header-title" id="rem-out">REM.</span><span id="m-rem" class="sum-val-area">0</span></div></div><div class="scroll-window"><div class="list-area" id="list-out"></div></div></div></div>
+    <div id="box-time" class="box"><div class="box-inner"><div class="header-wrapper"><div class="box-header"><span class="header-title" id="title-time">TIME</span><span id="count-time" class="count-tag">0</span></div><div class="sum-card"><div id="m-time-val" class="sum-val-area" style="width: 100%; border-bottom-left-radius: 20px;">--</div></div></div><div class="scroll-window"><div class="list-area" id="list-time"></div></div></div></div>
 </div>
+
+<div class="footer"><div class="live-tag"><span>LIVE</span></div><div class="ticker-wrap"><div id="ticker-text" class="ticker-move"></div></div><div class="dt-box-wrap"><div id="clock-box">--:--:--</div></div></div>
 
 <script>
-    const firebaseConfig = { databaseURL: "https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
+    const firebaseConfig = { databaseURL: "https://manpreetpigeons-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
-    const db = firebase.database().ref("matchData");
+    const db = firebase.database();
+    const userID = new URLSearchParams(window.location.search).get('id');
 
-    let curA = 0, curB = 0, seconds = 0, timerInterval = null, sVis = true;
-    let yellowCounts = {};
+    let previousAnimationTime = null;
+    let isResultActive = false;
+    let listPos = { fly: 0, time: 0, out: 0 };
+    let resListPos = 0;
+    let tickerPos = 0;
 
-    function loadData() {
-        db.on("value", (snap) => {
-            const data = snap.val();
-            if(data) {
-                curA = data.scoreA || 0; curB = data.scoreB || 0;
-                sVis = !!data.scoreVisible;
-                
-                document.getElementById('dispA').innerText = curA;
-                document.getElementById('dispB').innerText = curB;
-                document.getElementById('nameA').value = data.nameA || "";
-                document.getElementById('nameB').value = data.nameB || "";
-                document.getElementById('colorA').value = data.colorA || "#ffffff";
-                document.getElementById('colorB').value = data.colorB || "#ffffff";
-                
-                const eventText = data.lastEvent || "Match in Progress...";
-                document.getElementById('eventInp').value = data.lastEvent || "";
-                document.getElementById('tickerText').innerText = eventText + " | Score: " + (data.nameA || "A") + " " + curA + " - " + curB + " " + (data.nameB || "B");
-                
-                document.getElementById('matchRound').value = data.matchRound || "";
-                document.getElementById('roundInp').value = data.round || "";
-                document.getElementById('matchDuration').value = data.duration || "";
-                
-                if(!timerInterval) document.getElementById('timerShow').innerText = data.matchTime || "00:00";
-                document.getElementById('boxA').style.borderTopColor = data.colorA;
-                document.getElementById('boxB').style.borderTopColor = data.colorB;
-                
-                document.getElementById('visBtn').innerText = sVis ? "HIDE" : "SHOW";
-                document.getElementById('visBtn').style.background = sVis ? "#da3633" : "#238636";
+    if(userID) {
+        db.ref('users/' + userID).on('value', snap => {
+            const data = snap.val(); if(!data) return;
+            const pigeons = data.pigeons || [];
+            const conf = data.config || {};
+            const resOver = data.resultOverlay || {};
+
+            // Result Screen logic
+            if(resOver.active === true) {
+                isResultActive = true;
+                document.getElementById('result-screen').style.display = "flex";
+                document.getElementById('scoreboard-div').style.display = "none";
+                document.getElementById('res-title-text').innerText = resOver.title || "FINAL RESULT";
+                let details = resOver.details || "";
+                let lines = details.split(/[\n,]+/).filter(l => l.trim() !== "").map(l => `<div class="res-item">${l.toUpperCase()}</div>`).join('');
+                document.getElementById('res-list-render').innerHTML = `<div class="res-block">${lines}</div><div style="height:100px"></div><div class="res-block">${lines}</div>`;
+            } else {
+                isResultActive = false;
+                document.getElementById('result-screen').style.display = "none";
+                document.getElementById('scoreboard-div').style.display = "flex";
             }
+
+            // Cut Animation Logic
+            if(data.cutAnimation && data.cutAnimation.time && data.cutAnimation.time !== previousAnimationTime) {
+                previousAnimationTime = data.cutAnimation.time;
+                triggerCutFlash(data.cutAnimation.name);
+            }
+
+            // Scoreboard Logic
+            let htmlArr = { fly:[], out:[], time:[] };
+            let counters = { fly: 1, out: 1, time: 1 };
+            pigeons.forEach(p => {
+                if(!p.name) return;
+                htmlArr[p.status].push(`<div class="item">${counters[p.status]++}. ${p.name.toUpperCase()}</div>`);
+            });
+
+            ['fly','time','out'].forEach(id => {
+                const area = document.getElementById(`list-${id}`);
+                const box = document.getElementById(`box-${id}`);
+                if(htmlArr[id].length > 0 && !isResultActive) {
+                    box.style.display = "block";
+                    document.getElementById(`count-${id}`).innerText = htmlArr[id].length;
+                    area.innerHTML = `<div class="content-block">${htmlArr[id].join('')}</div><div style="height:100px"></div><div class="content-block">${htmlArr[id].join('')}</div>`;
+                } else { box.style.display = "none"; }
+            });
+            document.getElementById('m-total').innerText = pigeons.length;
+            document.getElementById('m-rem').innerText = pigeons.length - htmlArr.out.length;
         });
     }
 
-    function updateDB() {
-        db.update({
-            nameA: document.getElementById('nameA').value,
-            nameB: document.getElementById('nameB').value,
-            colorA: document.getElementById('colorA').value,
-            colorB: document.getElementById('colorB').value,
-            lastEvent: document.getElementById('eventInp').value,
-            matchRound: document.getElementById('matchRound').value,
-            round: document.getElementById('roundInp').value,
-            duration: document.getElementById('matchDuration').value,
-            matchTime: document.getElementById('timerShow').innerText
-        });
+    function triggerCutFlash(name) {
+        const alertBox = document.getElementById('cut-flash-alert');
+        document.getElementById('alert-pigeon-name').innerText = name || "PIGEON";
+        alertBox.classList.remove('active');
+        void alertBox.offsetWidth; // Trigger reflow
+        alertBox.classList.add('active');
     }
 
-    function setHalf(val) { document.getElementById('roundInp').value = val; updateDB(); }
-
-    function resetOnlyScore() { if(confirm("Reset Score?")) db.update({ scoreA: 0, scoreB: 0 }); }
-
-    function handleCard(team, type) {
-        let pDetail = document.getElementById('player' + team).value;
-        if(!pDetail) { alert("Enter Player No!"); return; }
-        let teamName = document.getElementById('name' + team).value || team;
-        let eventMsg = "";
-        
-        let key = team + "_" + pDetail;
-        if(type === 'Yellow') {
-            yellowCounts[key] = (yellowCounts[key] || 0) + 1;
-            eventMsg = (yellowCounts[key] >= 2 ? "RED CARD (2nd Yellow): " : "Yellow Card: ") + teamName + " #" + pDetail;
-        } else {
-            eventMsg = "RED CARD: " + teamName + " #" + pDetail;
+    function animate() {
+        if (!isResultActive) {
+            ['fly', 'time', 'out'].forEach(id => {
+                const area = document.getElementById(`list-${id}`);
+                if (area && area.parentElement.parentElement.style.display !== "none") {
+                    listPos[id] -= 1;
+                    if (Math.abs(listPos[id]) >= area.querySelector('.content-block').offsetHeight) listPos[id] = 0;
+                    area.style.transform = `translateY(${listPos[id]}px)`;
+                }
+            });
         }
-        
-        document.getElementById('eventInp').value = eventMsg;
-        updateDB();
+        requestAnimationFrame(animate);
     }
-
-    function changeScore(team, val) {
-        let current = (team === 'scoreA' ? curA : curB);
-        let newScore = Math.max(0, current + val);
-        let teamName = document.getElementById('name' + (team === 'scoreA' ? 'A' : 'B')).value || "Team";
-        
-        if(val > 0) {
-            document.getElementById('eventInp').value = "GOAL!!! " + teamName + " scores!";
-        }
-        
-        db.update({ [team]: newScore });
-        updateDB();
-    }
-
-    function fullReset() {
-        if(confirm("Reset Everything?")) {
-            yellowCounts = {}; seconds = 0; pauseTimer();
-            db.update({ scoreA: 0, scoreB: 0, lastEvent: "Match Reset", matchTime: "00:00", matchRound: "" });
-        }
-    }
-
-    function toggleVis(field) { db.child(field).set(!sVis); }
-
-    function startTimer() {
-        if (timerInterval) return;
-        timerInterval = setInterval(() => {
-            seconds++;
-            let m = Math.floor(seconds / 60), s = seconds % 60;
-            let timeStr = (m < 10 ? "0"+m : m) + ":" + (s < 10 ? "0"+s : s);
-            document.getElementById('timerShow').innerText = timeStr;
-            db.child('matchTime').set(timeStr);
-        }, 1000);
-    }
-    function pauseTimer() { clearInterval(timerInterval); timerInterval = null; updateDB(); }
-    function resetTimer() { seconds = 0; document.getElementById('timerShow').innerText = "00:00"; db.child('matchTime').set("00:00"); }
-
-    loadData();
+    animate();
 </script>
 </body>
 </html>
