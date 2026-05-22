@@ -43,17 +43,21 @@
     text-shadow:3px 3px 5px rgba(0,0,0,0.4);
 }
 
-.center-wrap{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    overflow:hidden;
-    z-index:10;
-    padding-left:-70px;
-    padding-right:-70px;
-    background:#4a4a4a;
-    margin-left:45px;
-    margin-right:45px;
+/* ਟਿੱਕਰ ਪੱਟੀ ਦੀ ਲੰਬਾਈ ਵਧਾਉਣ ਲਈ */
+.center-wrap { 
+    flex: 1; /* ਇਹ ਸਾਰੀ ਖਾਲੀ ਜਗ੍ਹਾ ਲੈ ਲਵੇਗਾ */
+    display: flex; 
+    flex-direction: column; 
+    overflow: hidden; 
+    background: #4a4a4a; 
+    z-index: 5; 
+    
+    /* ਲਾਲ ਬਕਸਿਆਂ ਦੇ ਹੇਠਾਂ ਜਾਣ ਲਈ ਮਾਰਜਿਨ ਸੈੱਟ ਕਰੋ */
+    margin-left: -80px;  /* ਖੱਬੇ ਪਾਸੇ ਥੋੜਾ ਹੋਰ ਅੰਦਰ ਕਰਨ ਲਈ */
+    margin-right: -80px; /* ਸੱਜੇ ਪਾਸੇ ਥੋੜਾ ਹੋਰ ਅੰਦਰ ਕਰਨ ਲਈ */
+    
+    padding-left: 60px;  /* ਟੈਕਸਟ ਨੂੰ ਲਾਲ ਬਕਸੇ ਦੇ ਅੰਦਰੋਂ ਸ਼ੁਰੂ ਕਰਨ ਲਈ */
+    padding-right: 60px;
 }
         .row-text { display: flex; align-items: center; font-weight: bold; text-transform: uppercase; width: 100%; overflow: hidden; box-sizing: border-box; white-space: nowrap; padding-left: 60px; }
         /* upper line now bigger */
