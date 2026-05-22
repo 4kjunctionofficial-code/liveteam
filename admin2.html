@@ -1,330 +1,365 @@
 <!DOCTYPE html>
 <html lang="pa">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #f0f2f5;
-            margin: 0;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
-        #main-panel {
-            display: flex;
-            width: 100%;
-            flex-direction: column;
-            align-items: center;
-        }
+<style>
+body{
+    font-family:'Segoe UI',sans-serif;
+    background:#f0f2f5;
+    margin:0;
+    padding:10px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    min-height:100vh;
+}
+#main-panel{
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+.card{
+    background:white;
+    width:100%;
+    max-width:650px;
+    border-radius:15px;
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
+    overflow:hidden;
+    margin-bottom:20px;
+}
+.header{
+    background:#1a73e8;
+    color:white;
+    padding:14px;
+    text-align:center;
+    font-weight:bold;
+    font-size:18px;
+    text-transform:uppercase;
+}
+.teams-container{
+    display:flex;
+    padding:20px;
+    gap:20px;
+    border-bottom:2px solid #eee;
+    transition:.3s;
+}
+.team-box{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+.team-input{
+    width:100%;
+    min-height:55px;
+    padding:12px;
+    border:2px solid #ddd;
+    border-radius:8px;
+    font-size:24px;
+    font-weight:bold;
+    text-align:center;
+    margin-bottom:10px;
+    box-sizing:border-box;
+}
+.score-val{
+    font-size:70px;
+    font-weight:900;
+    color:#333;
+    margin:10px 0;
+}
+.btn-pm{
+    border:none;
+    color:white;
+    padding:16px;
+    border-radius:8px;
+    font-size:28px;
+    font-weight:bold;
+    cursor:pointer;
+    flex:1;
+    margin:0 5px;
+}
+.btn-plus{background:#28a745;}
+.btn-minus{background:#dc3545;}
 
-        .card {
-            background: white;
-            width: 100%;
-            max-width: 500px;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            overflow: hidden;
-            margin-bottom: 20px;
-            box-sizing: border-box;
-        }
+.controls{
+    padding:15px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+.btn-full{
+    border:none;
+    color:white;
+    padding:14px;
+    border-radius:8px;
+    font-size:15px;
+    font-weight:bold;
+    cursor:pointer;
+    text-transform:uppercase;
+    width:100%;
+}
+.btn-blue{background:#1a73e8;}
+.btn-yellow{background:#fbbc05;color:black;}
+.btn-red{background:#ea4335;}
+.btn-dark{background:#333;}
 
-        .header {
-            background: #1a73e8;
-            color: white;
-            padding: 12px;
-            text-align: center;
-            font-size: 16px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
+.settings-section{
+    padding:15px;
+    background:#fafafa;
+}
 
-        .teams-container {
-            display: flex;
-            padding: 15px;
-            gap: 10px;
-            border-bottom: 2px solid #eee;
-        }
-
-        .team-box {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .team-input {
-            width: 95%;
-            padding: 8px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            font-size: 15px;
-            font-weight: bold;
-            margin-bottom: 8px;
-            text-align: center;
-        }
-
-        .score-val {
-            font-size: 50px;
-            font-weight: 900;
-            color: #333;
-            margin: 5px 0;
-        }
-
-        .btn-pm {
-            border: none;
-            color: white;
-            padding: 12px;
-            border-radius: 6px;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            flex: 1;
-            margin: 0 4px;
-        }
-
-        .btn-plus { background: #28a745; }
-        .btn-minus { background: #dc3545; }
-
-        .settings-section {
-            padding: 15px;
-            background: #fafafa;
-            box-sizing: border-box;
-        }
-
-        textarea, .std-input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 14px;
-            margin-bottom: 12px;
-            resize: none;
-            box-sizing: border-box;
-        }
-
-        .controls {
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .btn-full {
-            border: none;
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            text-transform: uppercase;
-            width: 100%;
-        }
-
-        .btn-blue { background: #1a73e8; }
-        .btn-yellow { background: #fbbc05; color: black; }
-        .btn-red { background: #ea4335; }
-        .btn-dark { background: #333; }
-
-        button:active {
-            transform: scale(0.98);
-        }
-    </style>
+textarea{
+    width:100%;
+    min-height:90px;
+    padding:16px;
+    border:2px solid #ccc;
+    border-radius:8px;
+    font-size:24px;
+    font-weight:bold;
+    margin-bottom:12px;
+    box-sizing:border-box;
+    resize:none;
+    line-height:1.4;
+    overflow:hidden;
+}
+.std-input{
+    width:100%;
+    min-height:55px;
+    padding:12px;
+    border:2px solid #ccc;
+    border-radius:8px;
+    font-size:22px;
+    font-weight:bold;
+    margin-bottom:12px;
+    box-sizing:border-box;
+}
+</style>
 </head>
 <body>
 
 <div id="main-panel">
 
-    <!-- SCOREBOARD -->
-    <div class="card">
-        <div class="header">Live Score Board</div>
+<!-- SCOREBOARD -->
+<div class="card">
+<div class="header">Live Score Board</div>
 
-        <div class="teams-container">
-            <div class="team-box">
-                <input type="text" id="nameA" class="team-input" placeholder="TEAM 1">
-                <div class="score-val" id="dispA">0</div>
-                <div style="display:flex; width:100%;">
-                    <button class="btn-pm btn-minus" onclick="changeScore('scoreA', -1)">-</button>
-                    <button class="btn-pm btn-plus" onclick="changeScore('scoreA', 1)">+</button>
-                </div>
-            </div>
+<div class="teams-container">
 
-            <div style="display:flex; align-items:center; font-weight:bold; color:#aaa;">VS</div>
+<div class="team-box">
+<input type="text" id="nameA" class="team-input" placeholder="TEAM 1">
+<div class="score-val" id="dispA">0</div>
+<div style="display:flex;width:100%;">
+<button class="btn-pm btn-minus" onclick="changeScore('scoreA',-1)">-</button>
+<button class="btn-pm btn-plus" onclick="changeScore('scoreA',1)">+</button>
+</div>
+</div>
 
-            <div class="team-box">
-                <input type="text" id="nameB" class="team-input" placeholder="TEAM 2">
-                <div class="score-val" id="dispB">0</div>
-                <div style="display:flex; width:100%;">
-                    <button class="btn-pm btn-minus" onclick="changeScore('scoreB', -1)">-</button>
-                    <button class="btn-pm btn-plus" onclick="changeScore('scoreB', 1)">+</button>
-                </div>
-            </div>
-        </div>
+<div style="display:flex;align-items:center;font-weight:bold;font-size:26px;color:#aaa;">VS</div>
 
-        <div class="controls">
-            <button class="btn-full btn-blue" onclick="updateTeamNames()">Update Team Names</button>
-            <button class="btn-full btn-yellow" onclick="swapTeamNames()">Only Team Swap</button>
-            <button id="camBtn" class="btn-full btn-dark" onclick="toggleCameraView()">Camera View: Normal</button>
+<div class="team-box">
+<input type="text" id="nameB" class="team-input" placeholder="TEAM 2">
+<div class="score-val" id="dispB">0</div>
+<div style="display:flex;width:100%;">
+<button class="btn-pm btn-minus" onclick="changeScore('scoreB',-1)">-</button>
+<button class="btn-pm btn-plus" onclick="changeScore('scoreB',1)">+</button>
+</div>
+</div>
 
-            <button id="visBtn" class="btn-full btn-red" onclick="toggleVis('scoreVisible')">Show/Hide Scoreboard</button>
-            <button class="btn-full btn-yellow" onclick="swapTeams()">Swap Teams + Score</button>
-            <button class="btn-full btn-red" style="background:#777;" onclick="resetScores()">Reset Scores</button>
+</div>
 
-            <input type="text" id="roundInp" class="std-input" placeholder="ROUND">
-        </div>
-    </div>
+<div class="controls">
+<button class="btn-full btn-blue" onclick="updateTeamNames()">Update Team Names</button>
 
-    <!-- TICKER -->
-    <div class="card">
-        <div class="header">Ticker & Branding</div>
-        <div class="settings-section">
-            <textarea id="row1Inp" rows="2" placeholder="Title Line 1"></textarea>
-            <textarea id="row2Inp" rows="2" placeholder="Title Line 2"></textarea>
-            <textarea id="row3Inp" rows="2" placeholder="Title Line 3"></textarea>
+<button id="visBtn" class="btn-full btn-red" onclick="toggleVis('scoreVisible')">Hide Scoreboard</button>
 
-            <input type="text" id="watermarkInp" class="std-input" placeholder="Channel Name">
+<button class="btn-full btn-red" style="background:#777;" onclick="resetScores()">Reset Scores</button>
 
-            <button class="btn-full btn-blue" onclick="updateTicker()">Update Ticker & Branding</button>
-            <button id="tickVisBtn" class="btn-full btn-red" onclick="toggleVis('tickerVisible')">Show/Hide Ticker</button>
-            <button id="logoBtn" class="btn-full btn-dark" onclick="toggleVis('logoVisible')">Show/Hide Logo</button>
-        </div>
-    </div>
+<button class="btn-full btn-yellow" onclick="swapTeamNames()">Only Team Swap</button>
+
+<button id="camBtn" class="btn-full btn-dark" onclick="toggleCameraView()">Camera View</button>
+
+<button class="btn-full btn-yellow" onclick="swapTeams()">Swap Teams + Score</button>
+
+<input type="text" id="roundInp" class="std-input" placeholder="ROUND">
+</div>
+</div>
+
+<!-- TICKER -->
+<div class="card">
+<div class="header">Ticker & Branding</div>
+<div class="settings-section">
+
+<textarea id="row1Inp" rows="2" placeholder="Title Line 1" oninput="autoGrow(this)"></textarea>
+<textarea id="row2Inp" rows="2" placeholder="Title Line 2" oninput="autoGrow(this)"></textarea>
+<textarea id="row3Inp" rows="2" placeholder="Title Line 3" oninput="autoGrow(this)"></textarea>
+
+<input type="text" id="watermarkInp" class="std-input" placeholder="Channel Name">
+
+<button class="btn-full btn-blue" onclick="updateTicker()">Update Ticker & Branding</button>
+<button id="tickVisBtn" class="btn-full btn-red" onclick="toggleVis('tickerVisible')">Hide Ticker</button>
+
+</div>
+</div>
+
+<!-- ADD TEAM -->
+<div class="card">
+<div class="header">Add Team</div>
+<div class="settings-section">
+
+<input type="text" id="newTeamInp" class="std-input" placeholder="Enter Team Name">
+
+<button class="btn-full btn-blue" onclick="addTeamToScoreboard()">
+Add Team
+</button>
+
+</div>
+</div>
 
 </div>
 
 <script>
-const firebaseConfig = {
-    databaseURL: "https://manpreetteam-a86e9-default-rtdb.firebaseio.com/"
+const firebaseConfig={
+ databaseURL:"https://manpreetteam-a86e9-default-rtdb.firebaseio.com/"
 };
 
 firebase.initializeApp(firebaseConfig);
 
-const urlParams = new URLSearchParams(window.location.search);
-const matchId = urlParams.get('id') || 'defaultMatch';
-const db = firebase.database().ref("matchData/" + matchId);
+const urlParams=new URLSearchParams(window.location.search);
+const matchId=urlParams.get('id')||'defaultMatch';
+const db=firebase.database().ref("matchData/"+matchId);
 
-let curA = 0, curB = 0;
-let sVis = true, tVis = true, lVis = true;
-let camOpposite = false;
+let curA=0,curB=0;
+let sVis=true,tVis=true;
+let camOpposite=false;
 
-db.on("value", (snap) => {
-    const data = snap.val();
+db.on("value",(snap)=>{
+ const data=snap.val();
+ if(data){
+   curA=parseFloat(data.scoreA)||0;
+   curB=parseFloat(data.scoreB)||0;
+   sVis=data.scoreVisible!==false;
+   tVis=data.tickerVisible!==false;
 
-    if(data){
-        curA = parseFloat(data.scoreA) || 0;
-        curB = parseFloat(data.scoreB) || 0;
+   document.getElementById("dispA").innerText=curA;
+   document.getElementById("dispB").innerText=curB;
 
-        sVis = data.scoreVisible !== false;
-        tVis = data.tickerVisible !== false;
-        lVis = data.logoVisible !== false;
-        camOpposite = data.cameraOpposite || false;
+   document.getElementById("nameA").value=data.nameA||"";
+   document.getElementById("nameB").value=data.nameB||"";
 
-        document.getElementById('dispA').innerText = curA;
-        document.getElementById('dispB').innerText = curB;
+   document.getElementById("roundInp").value=data.round||"";
+   document.getElementById("row1Inp").value=data.row1Txt||"";
+   document.getElementById("row2Inp").value=data.row2Txt||"";
+   document.getElementById("row3Inp").value=data.row3Txt||"";
+   document.getElementById("watermarkInp").value=data.watermarkTxt||"";
 
-        document.getElementById('nameA').value = data.nameA || "";
-        document.getElementById('nameB').value = data.nameB || "";
+   autoGrow(document.getElementById("row1Inp"));
+   autoGrow(document.getElementById("row2Inp"));
+   autoGrow(document.getElementById("row3Inp"));
 
-        document.getElementById('roundInp').value = data.round || "";
+   camOpposite=data.cameraOpposite||false;
 
-        document.getElementById('row1Inp').value = data.row1Txt || "";
-        document.getElementById('row2Inp').value = data.row2Txt || "";
-        document.getElementById('row3Inp').value = data.row3Txt || "";
+   document.querySelector(".teams-container").style.flexDirection=
+      camOpposite?"row-reverse":"row";
 
-        document.getElementById('watermarkInp').value = data.watermarkTxt || "";
-
-        document.getElementById('camBtn').innerText =
-            camOpposite ? "Camera View: Opposite" : "Camera View: Normal";
-
-        updateBtnUI('visBtn', sVis, "Scoreboard");
-        updateBtnUI('tickVisBtn', tVis, "Ticker");
-        updateBtnUI('logoBtn', lVis, "Logo");
-    }
+   document.getElementById("camBtn").innerText=
+      camOpposite?"Camera Oppo View":"Camera View";
+ }
 });
 
-function updateBtnUI(id,val,text){
-    const btn=document.getElementById(id);
-    btn.innerText=val?"Hide "+text:"Show "+text;
+function autoGrow(el){
+ el.style.height="auto";
+ el.style.height=el.scrollHeight+"px";
 }
 
 function changeScore(team,val){
-    let current=(team==='scoreA')?curA:curB;
-    let newVal;
+ let current=(team==="scoreA")?curA:curB;
+ let newVal;
 
-    if(val>0){
-        if(curA===0 && curB===0) newVal=1.5;
-        else newVal=current+1;
-    } else {
-        if(current===1.5) newVal=0;
-        else newVal=current-1;
-        if(newVal<0) newVal=0;
-    }
+ if(val>0){
+   if(curA===0&&curB===0)newVal=1.5;
+   else newVal=current+1;
+ }else{
+   if(current===1.5)newVal=0;
+   else newVal=current-1;
+   if(newVal<0)newVal=0;
+ }
 
-    db.update({ [team]: newVal });
+ db.update({[team]:newVal});
 }
 
 function updateTeamNames(){
-    db.update({
-        nameA: document.getElementById('nameA').value,
-        nameB: document.getElementById('nameB').value
-    });
+ db.update({
+   nameA:document.getElementById("nameA").value,
+   nameB:document.getElementById("nameB").value
+ });
 }
 
 function updateTicker(){
-    db.update({
-        round: document.getElementById('roundInp').value,
-        row1Txt: document.getElementById('row1Inp').value,
-        row2Txt: document.getElementById('row2Inp').value,
-        row3Txt: document.getElementById('row3Inp').value,
-        watermarkTxt: document.getElementById('watermarkInp').value
-    });
+ db.update({
+   round:document.getElementById("roundInp").value,
+   row1Txt:document.getElementById("row1Inp").value,
+   row2Txt:document.getElementById("row2Inp").value,
+   row3Txt:document.getElementById("row3Inp").value,
+   watermarkTxt:document.getElementById("watermarkInp").value
+ });
 }
 
 function toggleVis(field){
-    let val;
-    if(field==='scoreVisible') val=sVis;
-    else if(field==='tickerVisible') val=tVis;
-    else val=lVis;
-
-    db.child(field).set(!val);
+ let val=(field==="scoreVisible")?sVis:tVis;
+ db.child(field).set(!val);
 }
 
 function swapTeamNames(){
-    db.update({
-        nameA: document.getElementById('nameB').value,
-        nameB: document.getElementById('nameA').value
-    });
+ db.update({
+   nameA:document.getElementById("nameB").value,
+   nameB:document.getElementById("nameA").value
+ });
 }
 
 function swapTeams(){
-    db.update({
-        nameA: document.getElementById('nameB').value,
-        nameB: document.getElementById('nameA').value,
-        scoreA: curB,
-        scoreB: curA
-    });
+ db.update({
+   nameA:document.getElementById("nameB").value,
+   nameB:document.getElementById("nameA").value,
+   scoreA:curB,
+   scoreB:curA
+ });
 }
 
 function resetScores(){
-    if(confirm("Reset Match Scores?")){
-        db.update({
-            scoreA: 0,
-            scoreB: 0
-        });
-    }
+ if(confirm("Reset Match Scores?")){
+   db.update({scoreA:0,scoreB:0});
+ }
 }
 
 function toggleCameraView(){
-    db.update({
-        cameraOpposite: !camOpposite
-    });
+ db.update({
+   cameraOpposite:!camOpposite
+ });
+}
+
+function addTeamToScoreboard(){
+ let newTeam=document.getElementById("newTeamInp").value.trim();
+ if(!newTeam)return;
+
+ if(document.getElementById("nameA").value===""){
+   document.getElementById("nameA").value=newTeam;
+   db.update({nameA:newTeam});
+ }
+ else if(document.getElementById("nameB").value===""){
+   document.getElementById("nameB").value=newTeam;
+   db.update({nameB:newTeam});
+ }
+ else{
+   document.getElementById("nameB").value=newTeam;
+   db.update({nameB:newTeam});
+ }
+
+ document.getElementById("newTeamInp").value="";
 }
 </script>
 
