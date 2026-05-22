@@ -232,7 +232,7 @@
         else { el.innerHTML = `<div style="width:100%; text-align:center;">${txt}</div>`; }
     }
 
- function setAlwaysScroll(id, txt){
+function setAlwaysScroll(id, txt){
     const el = document.getElementById(id);
 
     if(txt && txt.trim().length > 0){
@@ -244,17 +244,23 @@
 
         const scroller = el.querySelector('.scroller');
 
-        // har row di fixed pixel/sec speed
-        if(id === "c1") speed = 1.2;
-        if(id === "c2") speed = 1.7;
-        if(id === "c3") speed = 1.5; 
+        let speed;
+
+        if(id === "c1"){
+            speed = 1.2;   // upper
+        }
+        else if(id === "c2"){
+            speed = 1.7;   // middle
+        }
+        else if(id === "c3"){
+            speed = 1.5;   // lower
+        }
 
         let x = el.offsetWidth;
 
         function animate(){
             x -= speed;
 
-            // jadon poora bahar nikal jave, dubara start
             if(x < -scroller.offsetWidth){
                 x = el.offsetWidth;
             }
