@@ -90,40 +90,41 @@
         .scroller{
     display:inline-block;
     white-space:nowrap;
-    padding-left:10%;
     will-change:transform;
+    padding-left:0;
 }
 
-/* Upri line - slow */
+/* Upper - slow fixed */
 .row-1 .scroller{
-    animation: scrollSlow 45s linear infinite;
+    animation: scrollSlow 35s linear infinite;
 }
 
-/* Vichli line - thori tej */
+/* Middle - thodi faster fixed */
 .row-2 .scroller{
-    animation: scrollFast 58s linear infinite;
+    animation: scrollFast 28s linear infinite;
 }
 
-/* Hetli line - slow */
+/* Bottom - slow fixed */
 .row-3 .scroller{
-    animation: scrollSlow 60s linear infinite;
+    animation: scrollSlow 35s linear infinite;
 }
 
+/* 1920px screen hisaab naal fixed move */
 @keyframes scrollSlow{
-    0%{
-        transform:translateX(0);
+    from{
+        transform: translateX(1920px);
     }
-    100%{
-        transform:translateX(-200%);
+    to{
+        transform: translateX(-1920px);
     }
 }
 
 @keyframes scrollFast{
-    0%{
-        transform:translateX(0);
+    from{
+        transform: translateX(1920px);
     }
-    100%{
-        transform:translateX(-200%);
+    to{
+        transform: translateX(-1920px);
     }
 }
        .box-time{
@@ -252,11 +253,7 @@
     const el = document.getElementById(id);
 
     if(txt && txt.trim().length > 0){
-        el.innerHTML = `
-            <div class="scroller">
-                ${txt}&nbsp;&nbsp; • &nbsp;&nbsp;${txt}
-            </div>
-        `;
+        el.innerHTML = `<div class="scroller">${txt}</div>`;
     }else{
         el.innerHTML = "";
     }
