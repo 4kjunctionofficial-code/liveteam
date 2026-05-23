@@ -5,38 +5,45 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Arial', sans-serif; overflow: hidden; position: relative; }
+        body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Arial', sans-serif; overflow: hidden; }
 
-        /* Scoreboard (Left Corner) */
-        #scoreboard { position: absolute; top: 20px; left: 20px; display: flex; flex-direction: column; align-items: flex-start; z-index: 9999; }
-        .main-bar { display: flex; align-items: center; background: linear-gradient(to bottom, #d4af37, #8b6914); border: 3px solid #000; border-radius: 8px; padding: 5px; height: 80px; }
-        .s-box { background: #000; color: #fff; font-size: 50px; font-weight: 900; width: 100px; height: 70px; display: flex; align-items: center; justify-content: center; border: 2px solid #ffcc00; border-radius: 5px; margin: 0 10px; }
-        .name-area { font-size: 35px; font-weight: 900; color: #fff; text-transform: uppercase; width: 250px; text-align: center; text-shadow: 2px 2px 4px #000; }
-        .vs-text { font-size: 30px; font-weight: 900; color: #000; margin: 0 10px; }
+        /* Left Corner Scoreboard */
+        #scoreboard { position: absolute; top: 40px; left: 40px; z-index: 9999; }
+        .main-bar { display: flex; align-items: center; background: linear-gradient(145deg, #d4af37, #8b6914); border: 4px solid #000; border-radius: 10px; padding: 5px 15px; height: 90px; }
+        .s-box { background: #000; color: #fff; font-size: 55px; font-weight: 900; width: 110px; height: 75px; display: flex; align-items: center; justify-content: center; border: 2px solid #ffcc00; border-radius: 5px; margin: 0 10px; }
+        .name-area { font-size: 35px; font-weight: 900; color: #fff; text-transform: uppercase; width: 250px; text-align: center; }
+        .vs-text { font-size: 25px; font-weight: 900; color: #fff; background: #000; padding: 10px; border-radius: 50%; }
 
-        /* Ticker (Bottom) */
-        #ticker-wrap { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 1800px; height: 80px; background: #ffcc00; display: flex; align-items: center; border-radius: 5px; z-index: 9998; padding: 0 10px; border: 2px solid #000; }
-        .live-strip { background: #000; color: #fff; padding: 10px 20px; font-weight: 900; font-size: 30px; }
-        .ticker-content { flex: 1; overflow: hidden; color: #000; font-size: 32px; font-weight: bold; white-space: nowrap; margin-left: 20px; }
-        .scroller { display: inline-block; }
+        /* 3-Line Ticker (Bottom) */
+        #ticker-wrap { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 1800px; display: flex; z-index: 9998; border: 3px solid #000; background: #fff; }
+        .live-box { width: 250px; background: #e60000; color: white; display: flex; align-items: center; justify-content: center; font-size: 60px; font-weight: 900; clip-path: polygon(0 0, 90% 0, 100% 100%, 0 100%); }
+        .center-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .row-text { height: 50px; display: flex; align-items: center; font-size: 32px; font-weight: bold; padding-left: 20px; white-space: nowrap; overflow: hidden; }
+        .row-1 { background: #333; color: white; }
+        .row-2 { background: #ccc; color: black; }
+        .row-3 { background: #333; color: white; }
+        .scroller { display: inline-block; animation: scroll 20s linear infinite; }
+        @keyframes scroll { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
     </style>
 </head>
 <body>
 
 <div id="scoreboard">
     <div class="main-bar">
-        <div class="name-area" id="nA">TEAM 1</div>
+        <div class="name-area" id="nA">TEAM A</div>
         <div class="s-box" id="sA">0</div>
-        <div class="vs-text">↔</div>
+        <div class="vs-text">VS</div>
         <div class="s-box" id="sB">0</div>
-        <div class="name-area" id="nB">TEAM 2</div>
+        <div class="name-area" id="nB">TEAM B</div>
     </div>
 </div>
 
 <div id="ticker-wrap">
-    <div class="live-strip">LIVE STREAM</div>
-    <div class="ticker-content" id="ticker-container">
-        <div class="scroller" id="ticker-text">WELCOME TO LIVE KABADDI MATCH - PLEASE SUBSCRIBE!</div>
+    <div class="live-box">LIVE</div>
+    <div class="center-wrap">
+        <div class="row-text row-1"><div class="scroller" id="c1">WELCOME TO LIVE KABADDI - GET READY!</div></div>
+        <div class="row-text row-2"><div class="scroller" id="c2">MATCH UPDATES WILL APPEAR HERE...</div></div>
+        <div class="row-text row-3"><div class="scroller" id="c3">CONTACT FOR LIVE: 7355300784</div></div>
     </div>
 </div>
 
@@ -49,25 +56,14 @@
         const data = snap.val() || {};
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
-        document.getElementById('nA').innerText = data.nameA ?? "TEAM 1";
-        document.getElementById('nB').innerText = data.nameB ?? "TEAM 2";
-        if(data.tickerText) document.getElementById('ticker-text').innerText = data.tickerText;
+        document.getElementById('nA').innerText = data.nameA ?? "TEAM A";
+        document.getElementById('nB').innerText = data.nameB ?? "TEAM B";
+        
+        // 3 Line Update
+        document.getElementById('c1').innerText = data.row1 || "WELCOME TO LIVE KABADDI";
+        document.getElementById('c2').innerText = data.row2 || "MATCH UPDATES HERE";
+        document.getElementById('c3').innerText = data.row3 || "CONTACT: 7355300784";
     });
-
-    // Ticker Animation
-    function startTicker() {
-        const scroller = document.getElementById('ticker-text');
-        const container = document.getElementById('ticker-container');
-        let x = container.offsetWidth;
-        function animate() {
-            x -= 2;
-            if (x < -scroller.offsetWidth) x = container.offsetWidth;
-            scroller.style.transform = `translateX(${x}px)`;
-            requestAnimationFrame(animate);
-        }
-        animate();
-    }
-    startTicker();
 </script>
 </body>
 </html>
