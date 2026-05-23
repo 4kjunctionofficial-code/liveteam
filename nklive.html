@@ -7,7 +7,129 @@
     <style>
         body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Arial', sans-serif; overflow: hidden; position: relative; }
         
-        .whatsapp-bar { position: absolute; bottom: 165px; left: 10px; display: flex; align-items: center; background: #000000; color: #ffffff; padding: 6px 18px 6px 45px; border-radius: 25px; font-size: 22px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .whatsapp-bar { position: absolute; bottom: 165px; left: 10px; display<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Arial', sans-serif; overflow: hidden; position: relative; }
+
+        /* Ticker Container */
+        #ticker-wrap {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            z-index: 9998;
+        }
+
+        .date-bar {
+            width: fit-content;
+            background: #e6c100;
+            color: black;
+            padding: 5px 25px;
+            font-weight: 900;
+            font-size: 26px;
+            border-radius: 10px 10px 0 0;
+            margin-bottom: -5px;
+            margin-left: 20px;
+            text-transform: uppercase;
+        }
+
+        .main-bar-wrapper {
+            display: flex;
+            height: 70px;
+            background: #000;
+            color: white;
+            align-items: center;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 3px solid #e6c100;
+        }
+
+        .box-live {
+            background: #e6c100;
+            color: black;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            font-weight: 900;
+            font-size: 35px;
+        }
+
+        .center-wrap {
+            flex: 1;
+            padding: 0 20px;
+            font-size: 28px;
+            font-weight: bold;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .phone-display {
+            padding: 0 25px;
+            font-weight: 900;
+            font-size: 28px;
+            background: #e6c100;
+            color: black;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            border-left: 3px solid #000;
+        }
+    </style>
+</head>
+<body>
+
+<div id="ticker-wrap">
+    <div class="date-bar" id="date-row">
+        <span id="date-text">Loading...</span>
+    </div>
+    
+    <div class="main-bar-wrapper">
+        <div class="box-live">LIVE</div>
+        <div class="center-wrap">
+            <div id="ticker-content">WELCOME TO LIVE KABADDI</div>
+        </div>
+        <div class="phone-display" id="phone-display">
+            📞 <span id="admin-phone">0000000000</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = { databaseURL: "https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
+    firebase.initializeApp(firebaseConfig);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const matchId = urlParams.get('id') || 'defaultMatch';
+    const db = firebase.database().ref("matchData/" + matchId);
+
+    db.on("value", (snap) => {
+        const data = snap.val() || {}; 
+        
+        // Date/Location Bar Update
+        document.getElementById('date-text').innerText = data.dateBarText || "ਪਿੰਡ - ਅੱਕਾਂਵਾਲੀ ਫਤਿਆਬਾਦ (ਹਰਿਆਣਾ) | ਮਿਤੀ - 3 ਮਈ 2026";
+        
+        // Ticker Content Update
+        document.getElementById('ticker-content').innerText = data.tickerText || "ਕਬੱਡੀ ਓਪਨ ( ਤਿੰਨ ਖਿਡਾਰੀ ਬਾਹਰੋਂ ) | ਫਾਈਨਲ ਮੈਚ - ਬਾਘਾ ਪੁਰਾਣਾ v/s ਮੋਗਾ";
+        
+        // Phone Number Update
+        document.getElementById('admin-phone').innerText = data.phoneNum || "7355300784";
+        
+        // Visibility Control
+        document.getElementById('ticker-wrap').style.display = (data.tickerVisible === false) ? 'none' : 'flex';
+    });
+</script>
+
+</body>
+</html>: flex; align-items: center; background: #000000; color: #ffffff; padding: 6px 18px 6px 45px; border-radius: 25px; font-size: 22px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         .whatsapp-icon { position: absolute; left: -2px; width: 44px; height: 44px; background: #e60000; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .whatsapp-icon svg { width: 24px; height: 24px; fill: white; }
 
