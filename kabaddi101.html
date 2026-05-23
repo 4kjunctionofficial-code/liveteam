@@ -189,92 +189,89 @@
     const matchId = urlParams.get('id') || 'defaultMatch';
     const db = firebase.database().ref("matchData/" + matchId);
 
-    // ਇੱਥੇ ਆਪਣੀ ID ਅਤੇ ਲੋਗੋ ਦਾ ਲਿੰਕ ਲਗਾਓ
     const clientLogos = {
         "test": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Kabaddi%20101%20logo.png"
     };
+
+    // ਟਿੱਕਰ ਨੂੰ ਇੱਕ ਵਾਰ ਸ਼ੁਰੂ ਕਰਨ ਲਈ variables
+    let tickerInitialized = false;
 
     db.on("value", (snap) => {
         const data = snap.val() || {}; 
         const logoCont = document.getElementById('logo-container');
         const currentId = matchId.trim().toLowerCase();
 
-        if (clientLogos[currentId]) {
+        // Logo visibility
+        if (clientLogos[currentId] && data.logoVisible !== false) {
             document.getElementById('main-logo').src = clientLogos[currentId];
-            if(data.logoVisible !== false) { logoCont.classList.remove('hidden'); }
+            logoCont.classList.remove('hidden');
         } else {
             logoCont.classList.add('hidden');
         }
 
-        if(data.logoVisible === false) { logoCont.classList.add('hidden'); }
-        if(data.scoreVisible === false) { document.getElementById('scoreboard').classList.add('hidden'); } else { document.getElementById('scoreboard').classList.remove('hidden'); }
-        if(data.tickerVisible === false) { document.getElementById('ticker-wrap').classList.add('hidden'); document.querySelector('.whatsapp-bar').style.display = 'none'; } else { document.getElementById('ticker-wrap').classList.remove('hidden'); document.querySelector('.whatsapp-bar').style.display = 'flex'; }
+        // Scoreboard & Ticker Wrapper visibility
+        document.getElementById('scoreboard').classList.toggle('hidden', data.scoreVisible === false);
+        const tickerWrap = document.getElementById('ticker-wrap');
+        const whatsappBar = document.querySelector('.whatsapp-bar');
+        tickerWrap.classList.toggle('hidden', data.tickerVisible === false);
+        whatsappBar.style.display = (data.tickerVisible === false) ? 'none' : 'flex';
         
+        // Update basic data
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
         setTeamName('nA-container', data.nameA || "TEAM 1");
         setTeamName('nB-container', data.nameB || "TEAM 2");
         document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
         
-        const roundVal = data.round || "";
         const roundEl = document.getElementById('round-display');
-        roundEl.innerText = roundVal;
-        roundEl.style.display = roundVal.trim() === "" ? "none" : "block";
+        roundEl.innerText = data.round || "";
+        roundEl.style.display = (data.round || "").trim() === "" ? "none" : "block";
         
-        setAlwaysScroll('c1', data.row1Txt || "WELCOME TO LIVE KABADDI"); 
-        setAlwaysScroll('c2', data.row2Txt || "SUBSCRIBE OUR CHANNEL"); 
-        setAlwaysScroll('c3', data.row3Txt || "LIKE & SHARE"); 
+        // ਟਿੱਕਰ ਟੈਕਸਟ ਅਪਡੇਟ (ਐਨੀਮੇਸ਼ਨ ਨੂੰ ਛੇੜੇ ਬਿਨਾਂ)
+        updateTickerContent('c1', data.row1Txt || "WELCOME TO LIVE KABADDI");
+        updateTickerContent('c2', data.row2Txt || "SUBSCRIBE OUR CHANNEL");
+        updateTickerContent('c3', data.row3Txt || "LIKE & SHARE");
+
+        if (!tickerInitialized) {
+            startTicker('c1', 1.4);
+            startTicker('c2', 2.0);
+            startTicker('c3', 1.7);
+            tickerInitialized = true;
+        }
     });
 
     function setTeamName(containerId, txt) {
         const el = document.getElementById(containerId);
-        if(txt.length > 12) { el.innerHTML = `<div class="team-scroller">${txt}</div>`; }
-        else { el.innerHTML = `<div style="width:100%; text-align:center;">${txt}</div>`; }
+        el.innerHTML = txt.length > 12 ? `<div class="team-scroller">${txt}</div>` : `<div style="width:100%; text-align:center;">${txt}</div>`;
     }
 
-function setAlwaysScroll(id, txt){
-    const el = document.getElementById(id);
-
-    if(txt && txt.trim().length > 0){
-        el.innerHTML = `
-            <div class="scroller">
-                ${txt}&nbsp;&nbsp; • &nbsp;&nbsp; ${txt}
-            </div>
-        `;
-
+    // ਇਹ ਫੰਕਸ਼ਨ ਸਿਰਫ ਟੈਕਸਟ ਬਦਲਦਾ ਹੈ, ਐਨੀਮੇਸ਼ਨ ਨਹੀਂ
+    function updateTickerContent(id, txt) {
+        const el = document.getElementById(id);
         const scroller = el.querySelector('.scroller');
-
-        let speed;
-
-        if(id === "c1"){
-            speed = 1.2;   // upper
+        if (scroller) {
+            scroller.innerHTML = `${txt}&nbsp;&nbsp; • &nbsp;&nbsp; ${txt}`;
+        } else {
+            el.innerHTML = `<div class="scroller">${txt}&nbsp;&nbsp; • &nbsp;&nbsp; ${txt}</div>`;
         }
-        else if(id === "c2"){
-            speed = 1.8;   // middle
-        }
-        else if(id === "c3"){
-            speed = 1.5;   // lower
-        }
+    }
 
+    // ਟਿੱਕਰ ਨੂੰ ਇੱਕ ਵਾਰ ਚਲਾਉਣ ਵਾਲਾ ਫੰਕਸ਼ਨ
+    function startTicker(id, speed) {
+        const el = document.getElementById(id);
+        const scroller = el.querySelector('.scroller');
         let x = el.offsetWidth;
 
-        function animate(){
+        function animate() {
             x -= speed;
-
-            if(x < -scroller.offsetWidth){
-                x = el.offsetWidth;
-            }
-
+            if (x < -scroller.offsetWidth) x = el.offsetWidth;
             scroller.style.transform = `translateX(${x}px)`;
             requestAnimationFrame(animate);
         }
-
         animate();
-
-    } else {
-        el.innerHTML = "";
     }
-}
+
+    // Clock functions
     function updateClock() {
         const now = new Date();
         document.getElementById('live-time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -289,5 +286,3 @@ function setAlwaysScroll(id, txt){
     function moveWM() { wmEl.style.left = (Math.random() * 1400 + 100) + 'px'; wmEl.style.top = (Math.random() * 600 + 150) + 'px'; }
     moveWM(); setInterval(moveWM, 6000);
 </script>
-</body>
-</html>
