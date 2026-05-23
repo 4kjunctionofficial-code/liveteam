@@ -1,363 +1,263 @@
 <!DOCTYPE html>
-<html lang="pa">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <meta charset="UTF-8">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Arial', sans-serif; overflow: hidden; position: relative; }
+        
+        .whatsapp-bar { position: absolute; bottom: 165px; left: 10px; display: flex; align-items: center; background: #000000; color: #ffffff; padding: 6px 18px 6px 45px; border-radius: 25px; font-size: 22px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .whatsapp-icon { position: absolute; left: -2px; width: 44px; height: 44px; background: #e60000; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .whatsapp-icon svg { width: 24px; height: 24px; fill: white; }
 
-<style>
-body{
-    font-family:'Segoe UI',sans-serif;
-    background:#f0f2f5;
-    margin:0;
-    padding:10px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    min-height:100vh;
+        #logo-container { position: absolute; top: 30px; left: 40px; z-index: 9999; opacity: 1; transition: all 0.7s ease; }
+        #logo-container.hidden { opacity: 0; transform: scale(0); }
+        #main-logo { height: 100px; width: auto; max-width: 450px; object-fit: contain; filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.3)); }
+
+        #single-wm { position: absolute; color: rgba(255, 255, 255, 0.7); font-size: 35px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 5px #000; white-space: nowrap; z-index: 1; opacity: 1; }
+
+        #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 150px; display: flex; z-index: 9998; opacity: 1; transition: all 0.7s ease; background: transparent; }
+        #ticker-wrap.hidden { opacity: 0; transform: translateY(160px); }
+
+    
+    /* ਨਵਾਂ ਡਿਜ਼ਾਈਨ (ਫੋਟੋ ਵਰਗਾ) */
+    #ticker-container {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 1500px; /* ਤੁਹਾਡੀ ਫੋਟੋ ਦੇ ਸਾਈਜ਼ ਮੁਤਾਬਕ */
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Row 1: ਪੀਲੀ ਪੱਟੀ */
+    #row1-display { 
+        background: #ffcc00; color: black; padding: 4px 40px; font-weight: 900; font-size: 26px; 
+        border-radius: 10px 10px 0 0; width: fit-content; text-transform: uppercase;
+        margin-bottom: -5px; box-shadow: 0px 2px 5px rgba(0,0,0,0.3);
+    }
+
+    /* Row 2: ਕਾਲੀ ਪੱਟੀ (LIVE ਵਾਲੀ) */
+    .row-mid { 
+        background: #000; color: white; display: flex; align-items: center; width: 100%; height: 65px; 
+        border: 3px solid #ffcc00; border-radius: 8px; overflow: hidden;
+    }
+    .live-tag { 
+        background: #ffcc00; color: black; padding: 0 20px; font-weight: 900; font-size: 30px; 
+        height: 100%; display: flex; align-items: center;
+    }
+    #row2-display { flex: 1; padding: 0 20px; font-size: 28px; font-weight: bold; white-space: nowrap; }
+
+    /* Row 3: ਨੰਬਰ ਵਾਲੀ ਪੱਟੀ */
+    .row-bot { 
+        background: #ffcc00; color: black; width: 100%; display: flex; align-items: center; 
+        padding: 5px 20px; border-radius: 0 0 10px 10px; font-weight: bold; font-size: 24px; 
+        justify-content: space-between; box-sizing: border-box; margin-top: -5px;
+    }
+    .phone-box { 
+        background: #000; color: #ffcc00; padding: 2px 20px; border-radius: 5px; font-weight: 900; font-size: 28px;
+        border: 2px solid #fff;
+    }
+        .scroller{
+    display:inline-block;
+    white-space:nowrap;
+    position:relative;
+    will-change:transform;
+}
+@keyframes scrollSlow{
+    from{
+        transform:translateX(0);
+    }
+    to{
+        transform:translateX(-100%);
+    }
 }
 
-#main-panel{
-    width:100%;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
+@keyframes scrollFast{
+    from{
+        transform:translateX(0);
+    }
+    to{
+        transform:translateX(-100%);
+    }
 }
-
-.card{
-    background:white;
-    width:100%;
-    max-width:650px;
-    border-radius:15px;
-    box-shadow:0 8px 20px rgba(0,0,0,.15);
-    overflow:hidden;
-    margin-bottom:20px;
-}
-
-.header{
-    background:#1a73e8;
+       .box-time{
+    width:340px;
+    background:#e60000;
     color:white;
-    padding:14px;
-    text-align:center;
-    font-weight:bold;
-    font-size:18px;
-    text-transform:uppercase;
-}
-
-.teams-container{
     display:flex;
-    padding:20px;
-    gap:20px;
-    border-bottom:2px solid #eee;
-    transition:0.3s;
-}
-
-.team-box{
-    flex:1;
-    display:flex;
-    flex-direction:column;
     align-items:center;
-}
+    justify-content:center;
+    z-index:12;
+    position:relative;
 
-.team-input{
-    width:100%;
-    min-height:55px;
-    padding:12px;
-    border:2px solid #ddd;
-    border-radius:8px;
-    font-size:24px;
-    font-weight:bold;
-    text-align:center;
-    margin-bottom:10px;
+    /* left side \ */
+    clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%);
+
+    padding-left:70px;
     box-sizing:border-box;
 }
+        .time-wrap, .date-wrap { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: 0.8s; font-weight: bold; padding-left: 40px; box-sizing: border-box;}
+        .time-str { color: #ffffff; font-size: 45px; letter-spacing: 1px; }
+        .date-str { font-size: 32px; color: #ffffff; }
 
-.score-val{
-    font-size:70px;
-    font-weight:900;
-    color:#333;
-    margin:10px 0;
-}
-
-.btn-pm{
-    border:none;
-    color:white;
-    padding:16px;
-    border-radius:8px;
-    font-size:28px;
-    font-weight:bold;
-    cursor:pointer;
-    flex:1;
-    margin:0 5px;
-}
-
-.btn-plus{background:#28a745;}
-.btn-minus{background:#dc3545;}
-
-.controls{
-    padding:15px;
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-}
-
-.btn-full{
-    border:none;
-    color:white;
-    padding:14px;
-    border-radius:8px;
-    font-size:15px;
-    font-weight:bold;
-    cursor:pointer;
-    text-transform:uppercase;
-    width:100%;
-}
-
-.btn-blue{background:#1a73e8;}
-.btn-yellow{background:#fbbc05;color:black;}
-.btn-red{background:#ea4335;}
-.btn-dark{background:#333;}
-
-.settings-section{
-    padding:15px;
-    background:#fafafa;
-}
-
-/* AUTO-GROW TICKER BOXES */
-textarea{
-    width:100%;
-    min-height:90px;
-    padding:16px;
-    border:2px solid #ccc;
-    border-radius:8px;
-    font-size:24px;
-    font-weight:bold;
-    margin-bottom:12px;
-    box-sizing:border-box;
-    resize:none;
-    line-height:1.4;
-    overflow:hidden;
-}
-
-.std-input{
-    width:100%;
-    min-height:55px;
-    padding:12px;
-    border:2px solid #ccc;
-    border-radius:8px;
-    font-size:22px;
-    font-weight:bold;
-    margin-bottom:12px;
-    box-sizing:border-box;
-}
-</style>
+        #scoreboard { position: absolute; top: 40px; right: 80px; display: flex; flex-direction: column; align-items: center; z-index: 9999; opacity: 1; transition: all 0.7s ease; }
+        #scoreboard.hidden { opacity: 0; transform: translateY(-100px); }
+        .main-bar { display: flex; align-items: center; height: 65px; background: rgba(20, 20, 20, 0.95); border-radius: 6px; border: 2px solid rgba(255,255,255,0.2); padding: 0 5px; position: relative; overflow: hidden; }
+        .s-box { background: linear-gradient(145deg, #e60000, #990000); color: #ffffff; font-size: 42px; font-weight: 900; width: 120px; height: 100%; display: flex; align-items: center; justify-content: center; transform: skewX(-15deg); text-shadow: 2px 2px 4px #000; box-shadow: inset 2px 2px 6px rgba(255,255,255,0.4); position: relative; z-index: 11; }
+        .s-left { margin-left: -17px; border-radius: 4px 0 0 4px; }
+        .s-right { margin-right: -17px; border-radius: 0 4px 4px 0; }
+        .inner-val { transform: skewX(15deg); }
+        .name-area { width: 220px; height: 100%; display: flex; align-items: center; overflow: hidden; white-space: nowrap; color: #ffffff; font-size: 28px; font-weight: bold; text-align: center; padding: 0 10px; text-shadow: 2px 2px 4px #000; box-sizing: border-box; text-transform: uppercase; position: relative; z-index: 11; }
+        .team-scroller { display: inline-block; padding-left: 100%; animation: team-scroll 8s linear infinite; }
+        @keyframes team-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        .vs-text { color: #ffffff; font-size: 20px; font-weight: 900; margin: 0 10px; text-shadow: 1px 1px 3px #000; background: #333; display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; border-radius: 50%; border: 2px solid #e60000; position: relative; z-index: 11; }
+        .round-display { color: white; font-size: 22px; font-weight: bold; text-transform: uppercase; margin-top: 15px; text-shadow: 2px 2px 6px #000; letter-spacing: 2px; display: block; background: rgba(0,0,0,0.6); padding: 4px 15px; border-radius: 4px; }
+    </style>
 </head>
 <body>
 
-<div id="main-panel">
-
-<!-- SCOREBOARD -->
-<div class="card">
-<div class="header">Live Score Board</div>
-
-<div class="teams-container">
-
-<div class="team-box">
-<input type="text" id="nameA" class="team-input" placeholder="TEAM 1">
-<div class="score-val" id="dispA">0</div>
-<div style="display:flex;width:100%;">
-<button class="btn-pm btn-minus" onclick="changeScore('scoreA',-1)">-</button>
-<button class="btn-pm btn-plus" onclick="changeScore('scoreA',1)">+</button>
-</div>
+<div class="whatsapp-bar">
+    <div class="whatsapp-icon"><svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.405.003 12.022.003c3.201.001 6.212 1.244 8.477 3.513 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.35 12.002-11.97 12.002-2.012-.002-3.992-.501-5.756-1.451L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.742.002-2.602-1.01-5.05-2.85-6.893-1.839-1.84-4.287-2.853-6.89-2.854-5.441 0-9.865 4.37-9.869 9.745-.001 1.706.469 3.374 1.359 4.848l-.993 3.626 3.754-.981zM17.48 14.86c-.29-.145-1.714-.846-1.98-.942-.264-.096-.457-.145-.648.145-.19.29-.738.942-.905 1.134-.167.19-.334.212-.623.067-.29-.145-1.223-.45-2.33-1.44-.863-.77-1.445-1.72-1.614-2.012-.17-.29-.018-.447.127-.592.13-.13.29-.335.434-.503.144-.167.192-.28.29-.466.096-.186.047-.35-.024-.495-.072-.145-.648-1.56-.888-2.137-.233-.56-.47-.483-.648-.492-.167-.008-.36-.01-.553-.01-.193 0-.507.073-.77.361-.264.288-1.01.987-1.01 2.407s1.033 2.795 1.178 2.99c.145.19 2.032 3.102 4.922 4.35.688.298 1.224.475 1.643.607.692.22 1.323.19 1.82.115.553-.083 1.714-.7 1.958-1.376.244-.677.244-1.255.172-1.376-.073-.12-.265-.193-.554-.338z"/></svg></div>
+    +91 74007 35730
 </div>
 
-<div style="display:flex;align-items:center;font-weight:bold;font-size:26px;color:#aaa;">VS</div>
-
-<div class="team-box">
-<input type="text" id="nameB" class="team-input" placeholder="TEAM 2">
-<div class="score-val" id="dispB">0</div>
-<div style="display:flex;width:100%;">
-<button class="btn-pm btn-minus" onclick="changeScore('scoreB',-1)">-</button>
-<button class="btn-pm btn-plus" onclick="changeScore('scoreB',1)">+</button>
-</div>
+<div id="logo-container" class="hidden">
+    <img id="main-logo" src="" alt="Logo">
 </div>
 
+<div id="single-wm">M LIVE</div>
+
+<div id="scoreboard">
+    <div class="main-bar">
+        <div class="s-box s-left"><div class="inner-val" id="sA">0</div></div>
+        <div class="name-area" id="nA-container"><div id="nA" style="width:100%; text-align:center;">TEAM 1</div></div>
+        <div class="vs-text">VS</div>
+        <div class="name-area" id="nB-container"><div id="nB" style="width:100%; text-align:center;">TEAM 2</div></div>
+        <div class="s-box s-right"><div class="inner-val" id="sB">0</div></div>
+    </div>
+    <div class="round-display" id="round-display">LIVE MATCH</div>
 </div>
 
-<<div class="controls">
-
-    <!-- TEAM BUTTON -->
-    <button class="btn-full btn-blue" onclick="updateTeamNames()">
-        Update Team Names
-    </button>
-
-    <!-- SCORE BUTTONS -->
-    <button id="visBtn" class="btn-full btn-red" onclick="toggleVis('scoreVisible')">
-        Hide Scoreboard
-    </button>
-
-    <button class="btn-full btn-red" style="background:#777;" onclick="resetScores()">
-        Reset Scores
-    </button>
-
-    <!-- OTHER BUTTONS -->
-    <button class="btn-full btn-yellow" onclick="swapTeamNames()">
-        Only Team Swap
-    </button>
-
-    <button id="camBtn" class="btn-full btn-dark" onclick="toggleCameraView()">
-        Camera View
-    </button>
-
-    <button class="btn-full btn-yellow" onclick="swapTeams()">
-        Swap Teams + Score
-    </button>
-
-    <!-- ROUND -->
-    <input type="text" id="roundInp" class="std-input" placeholder="ROUND">
-
-</div>
-</div>
-
-<!-- TICKER -->
-<div class="card">
-<div class="header">Ticker & Branding</div>
-<div class="settings-section">
-
-<textarea id="row1Inp" rows="2" placeholder="Title Line 1" oninput="autoGrow(this)"></textarea>
-<textarea id="row2Inp" rows="2" placeholder="Title Line 2" oninput="autoGrow(this)"></textarea>
-<textarea id="row3Inp" rows="2" placeholder="Title Line 3" oninput="autoGrow(this)"></textarea>
-
-<input type="text" id="watermarkInp" class="std-input" placeholder="Channel Name">
-
-<button class="btn-full btn-blue" onclick="updateTicker()">Update Ticker & Branding</button>
-<button id="tickVisBtn" class="btn-full btn-red" onclick="toggleVis('tickerVisible')">Hide Ticker</button>
-
-</div>
-</div>
-
+<div id="ticker-wrap">
+    <div class="box-live">Live</div>
+    <div class="center-wrap">
+        <div class="row-text row-1" id="c1">WELCOME TO LIVE KABADDI</div>
+        <div class="row-text row-2" id="c2">SUBSCRIBE OUR CHANNEL</div>
+        <div class="row-text row-3" id="c3">LIKE & SHARE</div>
+    </div>
+    <div class="box-time">
+        <div class="time-wrap" id="t-wrap"><div class="time-str" id="live-time"></div></div>
+        <div class="date-wrap" id="d-wrap" style="opacity:0;"><div class="date-str" id="live-date"></div></div>
+    </div>
 </div>
 
 <script>
-const firebaseConfig = {
-  databaseURL:"https://manpreetteam-a86e9-default-rtdb.firebaseio.com/"
-};
+    const firebaseConfig = { databaseURL: "https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
+    firebase.initializeApp(firebaseConfig);
 
-firebase.initializeApp(firebaseConfig);
+    const urlParams = new URLSearchParams(window.location.search);
+    const matchId = urlParams.get('id') || 'defaultMatch';
+    const db = firebase.database().ref("matchData/" + matchId);
 
-const urlParams = new URLSearchParams(window.location.search);
-const matchId = urlParams.get('id') || 'defaultMatch';
-const db = firebase.database().ref("matchData/" + matchId);
+    const clientLogos = {
+        "test": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Kabaddi%20101%20logo.png"
+    };
 
-let curA=0, curB=0;
-let sVis=true, tVis=true;
-let camOpposite=false;
+    // ਟਿੱਕਰ ਨੂੰ ਇੱਕ ਵਾਰ ਸ਼ੁਰੂ ਕਰਨ ਲਈ variables
+    let tickerInitialized = false;
 
-db.on("value",(snap)=>{
-    const data=snap.val();
-    if(data){
-        curA=parseFloat(data.scoreA)||0;
-        curB=parseFloat(data.scoreB)||0;
-        sVis=data.scoreVisible!==false;
-        tVis=data.tickerVisible!==false;
+    db.on("value", (snap) => {
+        const data = snap.val() || {}; 
+        const logoCont = document.getElementById('logo-container');
+        const currentId = matchId.trim().toLowerCase();
 
-        document.getElementById("dispA").innerText=curA;
-        document.getElementById("dispB").innerText=curB;
+        // Logo visibility
+        if (clientLogos[currentId] && data.logoVisible !== false) {
+            document.getElementById('main-logo').src = clientLogos[currentId];
+            logoCont.classList.remove('hidden');
+        } else {
+            logoCont.classList.add('hidden');
+        }
 
-        document.getElementById("nameA").value=data.nameA||"";
-        document.getElementById("nameB").value=data.nameB||"";
+        // Scoreboard & Ticker Wrapper visibility
+        document.getElementById('scoreboard').classList.toggle('hidden', data.scoreVisible === false);
+        const tickerWrap = document.getElementById('ticker-wrap');
+        const whatsappBar = document.querySelector('.whatsapp-bar');
+        tickerWrap.classList.toggle('hidden', data.tickerVisible === false);
+        whatsappBar.style.display = (data.tickerVisible === false) ? 'none' : 'flex';
+        
+        // Update basic data
+        document.getElementById('sA').innerText = data.scoreA ?? "0";
+        document.getElementById('sB').innerText = data.scoreB ?? "0";
+        setTeamName('nA-container', data.nameA || "TEAM 1");
+        setTeamName('nB-container', data.nameB || "TEAM 2");
+        document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
+        
+        const roundEl = document.getElementById('round-display');
+        roundEl.innerText = data.round || "";
+        roundEl.style.display = (data.round || "").trim() === "" ? "none" : "block";
+        
+        // ਟਿੱਕਰ ਟੈਕਸਟ ਅਪਡੇਟ (ਐਨੀਮੇਸ਼ਨ ਨੂੰ ਛੇੜੇ ਬਿਨਾਂ)
+        updateTickerContent('c1', data.row1Txt || "WELCOME TO LIVE KABADDI");
+        updateTickerContent('c2', data.row2Txt || "SUBSCRIBE OUR CHANNEL");
+        updateTickerContent('c3', data.row3Txt || "LIKE & SHARE");
 
-        document.getElementById("roundInp").value=data.round||"";
-        document.getElementById("row1Inp").value=data.row1Txt||"";
-        document.getElementById("row2Inp").value=data.row2Txt||"";
-        document.getElementById("row3Inp").value=data.row3Txt||"";
-        document.getElementById("watermarkInp").value=data.watermarkTxt||"";
+        if (!tickerInitialized) {
+            startTicker('c1', 1.4);
+            startTicker('c2', 2.0);
+            startTicker('c3', 1.7);
+            tickerInitialized = true;
+        }
+    });
 
-        autoGrow(document.getElementById("row1Inp"));
-        autoGrow(document.getElementById("row2Inp"));
-        autoGrow(document.getElementById("row3Inp"));
-
-        camOpposite=data.cameraOpposite||false;
-
-        document.querySelector(".teams-container").style.flexDirection =
-            camOpposite ? "row-reverse" : "row";
-
-        document.getElementById("camBtn").innerText =
-            camOpposite ? "Camera Oppo View" : "Camera View";
+    function setTeamName(containerId, txt) {
+        const el = document.getElementById(containerId);
+        el.innerHTML = txt.length > 12 ? `<div class="team-scroller">${txt}</div>` : `<div style="width:100%; text-align:center;">${txt}</div>`;
     }
-});
 
-function autoGrow(el){
-    el.style.height="auto";
-    el.style.height=el.scrollHeight+"px";
-}
-
-function changeScore(team,val){
-    let current=(team==="scoreA")?curA:curB;
-    let newVal;
-
-    if(val>0){
-        if(curA===0 && curB===0) newVal=1.5;
-        else newVal=current+1;
-    }else{
-        if(current===1.5) newVal=0;
-        else newVal=current-1;
-        if(newVal<0)newVal=0;
+    // ਇਹ ਫੰਕਸ਼ਨ ਸਿਰਫ ਟੈਕਸਟ ਬਦਲਦਾ ਹੈ, ਐਨੀਮੇਸ਼ਨ ਨਹੀਂ
+    function updateTickerContent(id, txt) {
+        const el = document.getElementById(id);
+        const scroller = el.querySelector('.scroller');
+        if (scroller) {
+            scroller.innerHTML = `${txt}&nbsp;&nbsp; • &nbsp;&nbsp; ${txt}`;
+        } else {
+            el.innerHTML = `<div class="scroller">${txt}&nbsp;&nbsp; • &nbsp;&nbsp; ${txt}</div>`;
+        }
     }
-    db.update({[team]:newVal});
-}
 
-function updateTeamNames(){
-    db.update({
-        nameA:document.getElementById("nameA").value,
-        nameB:document.getElementById("nameB").value
-    });
-}
+    // ਟਿੱਕਰ ਨੂੰ ਇੱਕ ਵਾਰ ਚਲਾਉਣ ਵਾਲਾ ਫੰਕਸ਼ਨ
+    function startTicker(id, speed) {
+        const el = document.getElementById(id);
+        const scroller = el.querySelector('.scroller');
+        let x = el.offsetWidth;
 
-function updateTicker(){
-    db.update({
-        round:document.getElementById("roundInp").value,
-        row1Txt:document.getElementById("row1Inp").value,
-        row2Txt:document.getElementById("row2Inp").value,
-        row3Txt:document.getElementById("row3Inp").value,
-        watermarkTxt:document.getElementById("watermarkInp").value
-    });
-}
-
-function toggleVis(field){
-    let val = field==="scoreVisible" ? sVis : tVis;
-    db.child(field).set(!val);
-}
-
-function swapTeamNames(){
-    db.update({
-        nameA:document.getElementById("nameB").value,
-        nameB:document.getElementById("nameA").value
-    });
-}
-
-function swapTeams(){
-    db.update({
-        nameA:document.getElementById("nameB").value,
-        nameB:document.getElementById("nameA").value,
-        scoreA:curB,
-        scoreB:curA
-    });
-}
-
-function resetScores(){
-    if(confirm("Reset Match Scores?")){
-        db.update({scoreA:0, scoreB:0});
+        function animate() {
+            x -= speed;
+            if (x < -scroller.offsetWidth) x = el.offsetWidth;
+            scroller.style.transform = `translateX(${x}px)`;
+            requestAnimationFrame(animate);
+        }
+        animate();
     }
-}
 
-function toggleCameraView(){
-    db.update({
-        cameraOpposite: !camOpposite
-    });
-}
+    // Clock functions
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('live-time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('live-date').innerText = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+    }
+    setInterval(updateClock, 1000); updateClock();
+
+    let isTime = true;
+    setInterval(() => { isTime = !isTime; document.getElementById('t-wrap').style.opacity = isTime ? "1" : "0"; document.getElementById('d-wrap').style.opacity = isTime ? "0" : "1"; }, 5000);
+
+    const wmEl = document.getElementById('single-wm');
+    function moveWM() { wmEl.style.left = (Math.random() * 1400 + 100) + 'px'; wmEl.style.top = (Math.random() * 600 + 150) + 'px'; }
+    moveWM(); setInterval(moveWM, 6000);
 </script>
-
-</body>
-</html>
