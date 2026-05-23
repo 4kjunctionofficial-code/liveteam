@@ -137,130 +137,137 @@ body{
 }
 
 /* ================= TICKER ================= */
+/* =========================
+   TICKER WRAP
+========================= */
 #ticker-wrap{
     position:absolute;
     bottom:0;
     left:0;
     width:1920px;
-    height:95px;
+    height:118px;
     display:flex;
     z-index:9998;
     transition:.5s;
 }
+
 #ticker-wrap.hidden{
     opacity:0;
-    transform:translateY(100px);
+    transform:translateY(120px);
 }
 
-/* LEFT LIVE STREAM */
+/* =========================
+   LEFT LIVE STREAM BOX
+========================= */
 .live-box{
-    width:190px;
-    background:linear-gradient(to right,#111,#000);
-    color:white;
+    width:210px;   /* thora chora */
+    background:#111;
+    color:#fff;
+    border-top:4px solid #f3c300;
+    border-bottom:4px solid #f3c300;
     display:flex;
     flex-direction:column;
     justify-content:center;
     align-items:center;
     font-weight:900;
     line-height:1;
-    position:relative;
-    clip-path:polygon(0 0,100% 0,82% 100%,0 100%);
-    border-top:4px solid #f3c300;
-    border-bottom:4px solid #f3c300;
-    border-left:4px solid #f3c300;
-    padding-right:25px;
-    box-sizing:border-box;
-}
-.live-top{
-    font-size:34px;
-    color:#f3c300;
-    text-shadow:2px 2px 3px #000;
-}
-.live-bottom{
-    font-size:28px;
-    color:white;
-    text-shadow:2px 2px 3px #000;
 }
 
-/* CENTER */
+.live-top{
+    font-size:42px;   /* 70% type */
+    color:#f3c300;
+    margin-bottom:2px;
+}
+
+.live-bottom{
+    font-size:34px;
+    color:#fff;
+}
+
+/* =========================
+   CENTER AREA
+========================= */
 .ticker-center{
     flex:1;
     display:flex;
     flex-direction:column;
-    position:relative;
-    padding-top:12px;
 }
 
-/* top village badge */
+/* =========================
+   TOP YELLOW ROW (ROW 1)
+========================= */
 .top-strip{
-    position:absolute;
-    top:-8px;
-    left:50%;
-    transform:translateX(-50%);
-    min-width:520px;
-    max-width:900px;
-    height:28px;
+    height:35px;   /* waddi patti */
     background:#f3c300;
     color:#000;
-    border:2px solid #000;
-    border-radius:8px;
-    padding:0 20px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    overflow:hidden;
-    z-index:5;
-}
-
-/* middle black */
-.main-strip{
-    height:42px;
-    background:#000;
-    color:white;
-    display:flex;
-    align-items:center;
-    overflow:hidden;
-    margin-top:12px;
-}
-
-/* bottom yellow */
-.bottom-strip{
-    height:33px;
-    background:#f3c300;
-    color:black;
-    display:flex;
-    align-items:center;
-    overflow:hidden;
-    padding-left:20px;
-}
-
-/* right phone */
-.phone-box{
-    width:270px;
-    background:linear-gradient(to left,#111,#000);
-    color:#f3c300;
-    font-size:26px;
+    font-size:22px;
     font-weight:900;
     display:flex;
     align-items:center;
     justify-content:center;
-    clip-path:polygon(18% 0,100% 0,100% 100%,0 100%);
-    border-top:4px solid #f3c300;
-    border-bottom:4px solid #f3c300;
-    border-right:4px solid #f3c300;
-    padding-left:25px;
-    box-sizing:border-box;
-    text-shadow:1px 1px 2px #000;
+    text-align:center;
+    padding:0 20px;
 }
 
+/* =========================
+   MAIN BLACK ROW (ROW 2)
+========================= */
+.main-strip{
+    height:48px;
+    background:#000;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    overflow:hidden;
+}
+
+/* =========================
+   BOTTOM YELLOW ROW (ROW 3)
+========================= */
+.bottom-strip{
+    height:35px;
+    background:#f3c300;
+    color:#000;
+    font-size:19px;
+    font-weight:800;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:0 20px;
+}
+
+/* =========================
+   RIGHT PHONE BOX
+========================= */
+.phone-box{
+    width:260px;
+    background:#f3c300;
+    color:#000;
+    font-size:30px;
+    font-weight:900;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-left:3px solid #000;
+}
+
+/* =========================
+   TEXT
+========================= */
 .row-text{
+    flex:1;
     white-space:nowrap;
     overflow:hidden;
-    font-size:24px;
+    font-size:28px;
     font-weight:800;
-    flex:1;
+    display:flex;
+    align-items:center;
 }
 
+/* =========================
+   DOTS
+========================= */
 .dot{
     width:14px;
     height:14px;
@@ -270,13 +277,15 @@ body{
     flex-shrink:0;
 }
 
+/* =========================
+   SCROLL
+========================= */
 .scroller{
     display:inline-block;
     white-space:nowrap;
     position:relative;
     will-change:transform;
-}
-</style>
+}</style>
 </head>
 <body>
 
