@@ -5,62 +5,331 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Arial', sans-serif; overflow: hidden; }
+        body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Arial', sans-serif; overflow: hidden; position: relative; }
+        
+        .whatsapp-bar { position: absolute; bottom: 165px; left: 10px; display: flex; align-items: center; background: #000000; color: #ffffff; padding: 6px 18px 6px 45px; border-radius: 25px; font-size: 22px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .whatsapp-icon { position: absolute; left: -2px; width: 44px; height: 44px; background: #e60000; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .whatsapp-icon svg { width: 24px; height: 24px; fill: white; }
 
-        /* ਸਕੋਰਬੋਰਡ (Left Corner) */
-        #scoreboard { position: absolute; top: 40px; left: 40px; z-index: 9999; }
-        .main-bar { display: flex; align-items: center; background: linear-gradient(145deg, #d4af37, #8b6914); border: 4px solid #000; border-radius: 10px; padding: 5px 15px; height: 90px; }
-        .s-box { background: #000; color: #fff; font-size: 55px; font-weight: 900; width: 110px; height: 75px; display: flex; align-items: center; justify-content: center; border: 2px solid #ffcc00; border-radius: 5px; margin: 0 10px; }
-        .name-area { font-size: 35px; font-weight: 900; color: #fff; text-transform: uppercase; width: 250px; text-align: center; }
+        #logo-container { position: absolute; top: 30px; left: 40px; z-index: 9999; opacity: 1; transition: all 0.7s ease; }
+        #logo-container.hidden { opacity: 0; transform: scale(0); }
+        #main-logo { height: 100px; width: auto; max-width: 450px; object-fit: contain; filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.3)); }
 
-        /* ਟਿੱਕਰ ਡਿਜ਼ਾਈਨ (Bottom) */
-        #ticker-wrap { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 1800px; height: 120px; display: flex; align-items: center; background: #000; border: 3px solid #ffcc00; z-index: 9998; }
-        .live-box { width: 250px; background: #e60000; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; height: 100%; }
-        .center-wrap { flex: 1; display: flex; flex-direction: column; padding: 5px; }
-        .row-text { height: 35px; color: #ffcc00; font-size: 28px; font-weight: bold; display: flex; align-items: center; padding-left: 15px; white-space: nowrap; overflow: hidden; }
-        .contact-box { width: 350px; background: #ffcc00; color: #000; font-size: 30px; font-weight: 900; display: flex; align-items: center; justify-content: center; height: 100%; }
-        .scroller { display: inline-block; animation: scroll 15s linear infinite; }
-        @keyframes scroll { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+        #single-wm { position: absolute; color: rgba(255, 255, 255, 0.7); font-size: 35px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 5px #000; white-space: nowrap; z-index: 1; opacity: 1; }
+
+        #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 150px; display: flex; z-index: 9998; opacity: 1; transition: all 0.7s ease; background: transparent; }
+        #ticker-wrap.hidden { opacity: 0; transform: translateY(160px); }
+
+        #ticker-wrap{
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:1920px;
+    height:100px;
+    display:flex;
+    z-index:9998;
+    transition:.5s;
+}
+
+#ticker-wrap.hidden{
+    opacity:0;
+    transform:translateY(120px);
+}
+
+/* LEFT */
+.live-box{
+    width:180px;
+    background:#111;
+    color:#fff;
+    border-top:4px solid #f3c300;
+    border-bottom:4px solid #f3c300;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    font-weight:900;
+    line-height:1;
+}
+
+.live-top{
+    font-size:34px;
+}
+
+.live-bottom{
+    font-size:28px;
+}
+
+/* CENTER */
+.ticker-center{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+}
+
+/* TOP */
+.top-strip{
+    height:25px;
+    background:#f3c300;
+    color:#000;
+    font-size:18px;
+    font-weight:900;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+/* BLACK */
+.main-strip{
+    height:42px;
+    background:#000;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    overflow:hidden;
+}
+
+/* BOTTOM */
+.bottom-strip{
+    height:33px;
+    background:#f3c300;
+    color:#000;
+    font-size:18px;
+    font-weight:bold;
+    display:flex;
+    align-items:center;
+    padding-left:20px;
+}
+
+.phone-box{
+    width:250px;
+    background:#f3c300;
+    color:#000;
+    font-size:28px;
+    font-weight:900;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-left:3px solid #000;
+}
+
+/* TEXT */
+.row-text{
+    flex:1;
+    white-space:nowrap;
+    overflow:hidden;
+    font-size:26px;
+    font-weight:800;
+}
+
+/* DOT */
+.dot{
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:#f3c300;
+    margin:0 12px;
+    flex-shrink:0;
+}
+
+.scroller{
+    display:inline-block;
+    white-space:nowrap;
+    position:relative;
+    will-change:transform;
+}
+@keyframes scrollSlow{
+    from{
+        transform:translateX(0);
+    }
+    to{
+        transform:translateX(-100%);
+    }
+}
+
+@keyframes scrollFast{
+    from{
+        transform:translateX(0);
+    }
+    to{
+        transform:translateX(-100%);
+    }
+}
+        #scoreboard { position: absolute; top: 40px; right: 80px; display: flex; flex-direction: column; align-items: center; z-index: 9999; opacity: 1; transition: all 0.7s ease; }
+        #scoreboard.hidden { opacity: 0; transform: translateY(-100px); }
+        .main-bar { display: flex; align-items: center; height: 65px; background: rgba(20, 20, 20, 0.95); border-radius: 6px; border: 2px solid rgba(255,255,255,0.2); padding: 0 5px; position: relative; overflow: hidden; }
+        .s-box { background: linear-gradient(145deg, #e60000, #990000); color: #ffffff; font-size: 42px; font-weight: 900; width: 120px; height: 100%; display: flex; align-items: center; justify-content: center; transform: skewX(-15deg); text-shadow: 2px 2px 4px #000; box-shadow: inset 2px 2px 6px rgba(255,255,255,0.4); position: relative; z-index: 11; }
+        .s-left { margin-left: -17px; border-radius: 4px 0 0 4px; }
+        .s-right { margin-right: -17px; border-radius: 0 4px 4px 0; }
+        .inner-val { transform: skewX(15deg); }
+        .name-area { width: 220px; height: 100%; display: flex; align-items: center; overflow: hidden; white-space: nowrap; color: #ffffff; font-size: 28px; font-weight: bold; text-align: center; padding: 0 10px; text-shadow: 2px 2px 4px #000; box-sizing: border-box; text-transform: uppercase; position: relative; z-index: 11; }
+        .team-scroller { display: inline-block; padding-left: 100%; animation: team-scroll 8s linear infinite; }
+        @keyframes team-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        .vs-text { color: #ffffff; font-size: 20px; font-weight: 900; margin: 0 10px; text-shadow: 1px 1px 3px #000; background: #333; display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; border-radius: 50%; border: 2px solid #e60000; position: relative; z-index: 11; }
+        .round-display { color: white; font-size: 22px; font-weight: bold; text-transform: uppercase; margin-top: 15px; text-shadow: 2px 2px 6px #000; letter-spacing: 2px; display: block; background: rgba(0,0,0,0.6); padding: 4px 15px; border-radius: 4px; }
     </style>
 </head>
 <body>
 
+<div id="logo-container" class="hidden">
+    <img id="main-logo" src="" alt="Logo">
+</div>
+
+<div id="single-wm">M LIVE</div>
+
 <div id="scoreboard">
     <div class="main-bar">
-        <div class="name-area" id="nA">TEAM A</div>
-        <div class="s-box" id="sA">0</div>
-        <div class="s-box" id="sB">0</div>
-        <div class="name-area" id="nB">TEAM B</div>
+        <div class="s-box s-left"><div class="inner-val" id="sA">0</div></div>
+        <div class="name-area" id="nA-container"><div id="nA" style="width:100%; text-align:center;">TEAM 1</div></div>
+        <div class="vs-text">VS</div>
+        <div class="name-area" id="nB-container"><div id="nB" style="width:100%; text-align:center;">TEAM 2</div></div>
+        <div class="s-box s-right"><div class="inner-val" id="sB">0</div></div>
     </div>
+    <div class="round-display" id="round-display">LIVE MATCH</div>
 </div>
 
 <div id="ticker-wrap">
-    <div class="live-box">LIVE STREAM</div>
-    <div class="center-wrap">
-        <div class="row-text"><div class="scroller" id="c1">WELCOME TO LIVE KABADDI MATCH</div></div>
-        <div class="row-text"><div class="scroller" id="c2">MATCH DETAILS WILL BE UPDATED HERE</div></div>
-        <div class="row-text"><div class="scroller" id="c3">NK SPORTS LIVE - SUBSCRIBE NOW</div></div>
-    </div>
-    <div class="contact-box" id="c4">7355300784</div>
-</div>
 
+    <!-- LEFT LIVE -->
+    <div class="live-box">
+        <div class="live-top">LIVE</div>
+        <div class="live-bottom">STREAM</div>
+    </div>
+
+    <!-- CENTER -->
+    <div class="ticker-center">
+
+        <!-- TOP SMALL YELLOW -->
+        <div class="top-strip" id="round-strip">
+            LIVE TOURNAMENT
+        </div>
+
+        <!-- BLACK MAIN -->
+        <div class="main-strip">
+            <div class="dot"></div>
+            <div class="row-text" id="c1">WELCOME TO LIVE KABADDI</div>
+
+            <div class="dot"></div>
+            <div class="row-text" id="c2">SUBSCRIBE OUR CHANNEL</div>
+
+            <div class="dot"></div>
+            <div class="row-text" id="c3">LIKE & SHARE</div>
+        </div>
+
+        <!-- BOTTOM YELLOW -->
+        <div class="bottom-strip">
+            <span id="bottom-info">CONTACT FOR LIVE STREAM</span>
+        </div>
+
+    </div>
+
+    <!-- RIGHT PHONE -->
+    <div class="phone-box">
+        ☎ <span id="phone-number">74007 35730</span>
+    </div>
+
+</div>
 <script>
     const firebaseConfig = { databaseURL: "https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
-    const db = firebase.database().ref("matchData/defaultMatch");
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const matchId = urlParams.get('id') || 'defaultMatch';
+    const db = firebase.database().ref("matchData/" + matchId);
+
+    const clientLogos = {
+        "test": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Kabaddi%20101%20logo.png"
+    };
+
+    // ਟਿੱਕਰ ਨੂੰ ਇੱਕ ਵਾਰ ਸ਼ੁਰੂ ਕਰਨ ਲਈ variables
+    let tickerInitialized = false;
 
     db.on("value", (snap) => {
-        const data = snap.val() || {};
+        const data = snap.val() || {}; 
+        const logoCont = document.getElementById('logo-container');
+        const currentId = matchId.trim().toLowerCase();
+
+        // Logo visibility
+        if (clientLogos[currentId] && data.logoVisible !== false) {
+            document.getElementById('main-logo').src = clientLogos[currentId];
+            logoCont.classList.remove('hidden');
+        } else {
+            logoCont.classList.add('hidden');
+        }
+
+        // Scoreboard & Ticker Wrapper visibility
+        document.getElementById('scoreboard').classList.toggle('hidden', data.scoreVisible === false);
+        const tickerWrap = document.getElementById('ticker-wrap');
+        const whatsappBar = document.querySelector('.whatsapp-bar');
+        tickerWrap.classList.toggle('hidden', data.tickerVisible === false);
+        whatsappBar.style.display = (data.tickerVisible === false) ? 'none' : 'flex';
+        
+        // Update basic data
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
-        document.getElementById('nA').innerText = data.nameA ?? "TEAM A";
-        document.getElementById('nB').innerText = data.nameB ?? "TEAM B";
+        setTeamName('nA-container', data.nameA || "TEAM 1");
+        setTeamName('nB-container', data.nameB || "TEAM 2");
+        document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
         
-        // ਟਿੱਕਰ ਦੀਆਂ ਲਾਈਨਾਂ ਅਪਡੇਟ ਕਰਨ ਲਈ
-        if(data.row1) document.getElementById('c1').innerText = data.row1;
-        if(data.row2) document.getElementById('c2').innerText = data.row2;
-        if(data.row3) document.getElementById('c3').innerText = data.row3;
+        const roundEl = document.getElementById('round-display');
+        roundEl.innerText = data.round || "";
+        roundEl.style.display = (data.round || "").trim() === "" ? "none" : "block";
+        
+        // ਟਿੱਕਰ ਟੈਕਸਟ ਅਪਡੇਟ (ਐਨੀਮੇਸ਼ਨ ਨੂੰ ਛੇੜੇ ਬਿਨਾਂ)
+        updateTickerContent('c1', data.row1Txt || "WELCOME TO LIVE KABADDI");
+        updateTickerContent('c2', data.row2Txt || "SUBSCRIBE OUR CHANNEL");
+        updateTickerContent('c3', data.row3Txt || "LIKE & SHARE");
+
+        if (!tickerInitialized) {
+            startTicker('c1', 1.4);
+            startTicker('c2', 2.0);
+            startTicker('c3', 1.7);
+            tickerInitialized = true;
+        }
     });
+
+    function setTeamName(containerId, txt) {
+        const el = document.getElementById(containerId);
+        el.innerHTML = txt.length > 12 ? `<div class="team-scroller">${txt}</div>` : `<div style="width:100%; text-align:center;">${txt}</div>`;
+    }
+
+    // ਇਹ ਫੰਕਸ਼ਨ ਸਿਰਫ ਟੈਕਸਟ ਬਦਲਦਾ ਹੈ, ਐਨੀਮੇਸ਼ਨ ਨਹੀਂ
+    function updateTickerContent(id, txt) {
+        const el = document.getElementById(id);
+        const scroller = el.querySelector('.scroller');
+        if (scroller) {
+            scroller.innerHTML = `${txt}&nbsp;&nbsp; • &nbsp;&nbsp; ${txt}`;
+        } else {
+            el.innerHTML = `<div class="scroller">${txt}&nbsp;&nbsp; • &nbsp;&nbsp; ${txt}</div>`;
+        }
+    }
+
+    // ਟਿੱਕਰ ਨੂੰ ਇੱਕ ਵਾਰ ਚਲਾਉਣ ਵਾਲਾ ਫੰਕਸ਼ਨ
+    function startTicker(id, speed) {
+        const el = document.getElementById(id);
+        const scroller = el.querySelector('.scroller');
+        let x = el.offsetWidth;
+
+        function animate() {
+            x -= speed;
+            if (x < -scroller.offsetWidth) x = el.offsetWidth;
+            scroller.style.transform = `translateX(${x}px)`;
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
+
+    // Clock functions
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('live-time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('live-date').innerText = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+    }
+    setInterval(updateClock, 1000); updateClock();
+
+    let isTime = true;
+    setInterval(() => { isTime = !isTime; document.getElementById('t-wrap').style.opacity = isTime ? "1" : "0"; document.getElementById('d-wrap').style.opacity = isTime ? "0" : "1"; }, 5000);
+
+    const wmEl = document.getElementById('single-wm');
+    function moveWM() { wmEl.style.left = (Math.random() * 1400 + 100) + 'px'; wmEl.style.top = (Math.random() * 600 + 150) + 'px'; }
+    moveWM(); setInterval(moveWM, 6000);
 </script>
-</body>
-</html>
