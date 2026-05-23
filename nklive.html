@@ -7,22 +7,19 @@
     <style>
         body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Arial', sans-serif; overflow: hidden; }
 
-        /* Left Corner Scoreboard */
+        /* ਸਕੋਰਬੋਰਡ (Left Corner) */
         #scoreboard { position: absolute; top: 40px; left: 40px; z-index: 9999; }
         .main-bar { display: flex; align-items: center; background: linear-gradient(145deg, #d4af37, #8b6914); border: 4px solid #000; border-radius: 10px; padding: 5px 15px; height: 90px; }
         .s-box { background: #000; color: #fff; font-size: 55px; font-weight: 900; width: 110px; height: 75px; display: flex; align-items: center; justify-content: center; border: 2px solid #ffcc00; border-radius: 5px; margin: 0 10px; }
         .name-area { font-size: 35px; font-weight: 900; color: #fff; text-transform: uppercase; width: 250px; text-align: center; }
-        .vs-text { font-size: 25px; font-weight: 900; color: #fff; background: #000; padding: 10px; border-radius: 50%; }
 
-        /* 3-Line Ticker (Bottom) */
-        #ticker-wrap { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 1800px; display: flex; z-index: 9998; border: 3px solid #000; background: #fff; }
-        .live-box { width: 250px; background: #e60000; color: white; display: flex; align-items: center; justify-content: center; font-size: 60px; font-weight: 900; clip-path: polygon(0 0, 90% 0, 100% 100%, 0 100%); }
-        .center-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .row-text { height: 50px; display: flex; align-items: center; font-size: 32px; font-weight: bold; padding-left: 20px; white-space: nowrap; overflow: hidden; }
-        .row-1 { background: #333; color: white; }
-        .row-2 { background: #ccc; color: black; }
-        .row-3 { background: #333; color: white; }
-        .scroller { display: inline-block; animation: scroll 20s linear infinite; }
+        /* ਟਿੱਕਰ ਡਿਜ਼ਾਈਨ (Bottom) */
+        #ticker-wrap { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 1800px; height: 120px; display: flex; align-items: center; background: #000; border: 3px solid #ffcc00; z-index: 9998; }
+        .live-box { width: 250px; background: #e60000; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; height: 100%; }
+        .center-wrap { flex: 1; display: flex; flex-direction: column; padding: 5px; }
+        .row-text { height: 35px; color: #ffcc00; font-size: 28px; font-weight: bold; display: flex; align-items: center; padding-left: 15px; white-space: nowrap; overflow: hidden; }
+        .contact-box { width: 350px; background: #ffcc00; color: #000; font-size: 30px; font-weight: 900; display: flex; align-items: center; justify-content: center; height: 100%; }
+        .scroller { display: inline-block; animation: scroll 15s linear infinite; }
         @keyframes scroll { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
     </style>
 </head>
@@ -32,19 +29,19 @@
     <div class="main-bar">
         <div class="name-area" id="nA">TEAM A</div>
         <div class="s-box" id="sA">0</div>
-        <div class="vs-text">VS</div>
         <div class="s-box" id="sB">0</div>
         <div class="name-area" id="nB">TEAM B</div>
     </div>
 </div>
 
 <div id="ticker-wrap">
-    <div class="live-box">LIVE</div>
+    <div class="live-box">LIVE STREAM</div>
     <div class="center-wrap">
-        <div class="row-text row-1"><div class="scroller" id="c1">WELCOME TO LIVE KABADDI - GET READY!</div></div>
-        <div class="row-text row-2"><div class="scroller" id="c2">MATCH UPDATES WILL APPEAR HERE...</div></div>
-        <div class="row-text row-3"><div class="scroller" id="c3">CONTACT FOR LIVE: 7355300784</div></div>
+        <div class="row-text"><div class="scroller" id="c1">WELCOME TO LIVE KABADDI MATCH</div></div>
+        <div class="row-text"><div class="scroller" id="c2">MATCH DETAILS WILL BE UPDATED HERE</div></div>
+        <div class="row-text"><div class="scroller" id="c3">NK SPORTS LIVE - SUBSCRIBE NOW</div></div>
     </div>
+    <div class="contact-box" id="c4">7355300784</div>
 </div>
 
 <script>
@@ -59,10 +56,10 @@
         document.getElementById('nA').innerText = data.nameA ?? "TEAM A";
         document.getElementById('nB').innerText = data.nameB ?? "TEAM B";
         
-        // 3 Line Update
-        document.getElementById('c1').innerText = data.row1 || "WELCOME TO LIVE KABADDI";
-        document.getElementById('c2').innerText = data.row2 || "MATCH UPDATES HERE";
-        document.getElementById('c3').innerText = data.row3 || "CONTACT: 7355300784";
+        // ਟਿੱਕਰ ਦੀਆਂ ਲਾਈਨਾਂ ਅਪਡੇਟ ਕਰਨ ਲਈ
+        if(data.row1) document.getElementById('c1').innerText = data.row1;
+        if(data.row2) document.getElementById('c2').innerText = data.row2;
+        if(data.row3) document.getElementById('c3').innerText = data.row3;
     });
 </script>
 </body>
