@@ -130,18 +130,24 @@
         .time-str { color: #ffffff; font-size: 45px; letter-spacing: 1px; }
         .date-str { font-size: 32px; color: #ffffff; }
 
-        #scoreboard { position: absolute; top: 40px; right: 80px; display: flex; flex-direction: column; align-items: center; z-index: 9999; opacity: 1; transition: all 0.7s ease; }
-        #scoreboard.hidden { opacity: 0; transform: translateY(-100px); }
-        .main-bar { display: flex; align-items: center; height: 65px; background: rgba(20, 20, 20, 0.95); border-radius: 6px; border: 2px solid rgba(255,255,255,0.2); padding: 0 5px; position: relative; overflow: hidden; }
-        .s-box { background: linear-gradient(145deg, #e60000, #990000); color: #ffffff; font-size: 42px; font-weight: 900; width: 120px; height: 100%; display: flex; align-items: center; justify-content: center; transform: skewX(-15deg); text-shadow: 2px 2px 4px #000; box-shadow: inset 2px 2px 6px rgba(255,255,255,0.4); position: relative; z-index: 11; }
-        .s-left { margin-left: -17px; border-radius: 4px 0 0 4px; }
-        .s-right { margin-right: -17px; border-radius: 0 4px 4px 0; }
+       /* ਸਕੋਰਬੋਰਡ ਦਾ ਨਵਾਂ ਡਿਜ਼ਾਈਨ */
+#scoreboard { position: absolute; top: 40px; right: 80px; display: flex; flex-direction: column; align-items: center; z-index: 9999; opacity: 1; transition: all 0.7s ease; }
+#scoreboard.hidden { opacity: 0; transform: translateY(-100px); }
+
+.main-bar { display: flex; align-items: center; height: 65px; background: rgba(255, 255, 255, 1); /* White background */ border-radius: 6px; border: 3px solid #000080; /* Navy Blue Border */ padding: 0; position: relative; overflow: hidden; }
+
+/* ਸਕੋਰ ਬਾਕਸ - Navy Blue background, White text */
+.s-box { background: #000080; color: #ffffff; font-size: 42px; font-weight: 900; width: 120px; height: 100%; display: flex; align-items: center; justify-content: center; text-shadow: 1px 1px 2px #000; position: relative; z-index: 11; }
+.s-left { border-right: 2px solid #ffffff; } /* White border divider */
+.s-right { border-left: 2px solid #ffffff; }
         .inner-val { transform: skewX(15deg); }
-        .name-area { width: 220px; height: 100%; display: flex; align-items: center; overflow: hidden; white-space: nowrap; color: #ffffff; font-size: 28px; font-weight: bold; text-align: center; padding: 0 10px; text-shadow: 2px 2px 4px #000; box-sizing: border-box; text-transform: uppercase; position: relative; z-index: 11; }
+        /* ਟੀਮ ਨਾਮ ਖੇਤਰ - White background, Navy Blue text */
+.name-area { width: 220px; height: 100%; display: flex; align-items: center; overflow: hidden; white-space: nowrap; color: #000080; font-size: 28px; font-weight: bold; text-align: center; padding: 0 10px; box-sizing: border-box; text-transform: uppercase; background: #ffffff; } 
         .team-scroller { display: inline-block; padding-left: 100%; animation: team-scroll 8s linear infinite; }
         @keyframes team-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-        .vs-text { color: #ffffff; font-size: 20px; font-weight: 900; margin: 0 10px; text-shadow: 1px 1px 3px #000; background: #333; display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; border-radius: 50%; border: 2px solid #e60000; position: relative; z-index: 11; }
-        .round-display { color: white; font-size: 22px; font-weight: bold; text-transform: uppercase; margin-top: 15px; text-shadow: 2px 2px 6px #000; letter-spacing: 2px; display: block; background: rgba(0,0,0,0.6); padding: 4px 15px; border-radius: 4px; }
+        .vs-text { color: #ffffff; font-size: 20px; font-weight: 900; margin: 0 5px; background: #000080; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; z-index: 11; }
+
+.round-display { color: white; font-size: 22px; font-weight: bold; text-transform: uppercase; margin-top: 15px; text-shadow: 2px 2px 6px #000; letter-spacing: 2px; display: block; background: rgba(0,0,0,0.6); padding: 4px 15px; border-radius: 4px; }
     </style>
 </head>
 <body>
