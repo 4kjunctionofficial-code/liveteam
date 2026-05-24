@@ -137,7 +137,21 @@
 .main-bar { display: flex; align-items: center; height: 65px; background: rgba(255, 255, 255, 1); /* White background */ border-radius: 6px; border: 3px solid #000080; /* Navy Blue Border */ padding: 0; position: relative; overflow: hidden; }
 
 /* ਸਕੋਰ ਬਾਕਸ - Navy Blue background, White text */
-.s-box { background: #000080; color: #ffffff; font-size: 42px; font-weight: 900; width: 120px; height: 100%; display: flex; align-items: center; justify-content: center; text-shadow: 1px 1px 2px #000; position: relative; z-index: 11; }
+/* ਸਕੋਰ ਬਾਕਸ - Navy Blue background, White bold simple text */
+.s-box { 
+    background: #000080; 
+    color: #ffffff; 
+    font-size: 42px; 
+    font-weight: 900; 
+    font-family: Arial, sans-serif; /* ਸਿੰਪਲ ਫੌਂਟ */
+    width: 120px; 
+    height: 100%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    position: relative; 
+    z-index: 11; 
+}
 .s-left { border-right: 2px solid #ffffff; } /* White border divider */
 .s-right { border-left: 2px solid #ffffff; }
         .inner-val { transform: skewX(15deg); }
