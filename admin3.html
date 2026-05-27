@@ -292,6 +292,7 @@ SWAP
 </button>
 
 <button class="btn-full btn-dark"
+id="camBtn"
 onclick="toggleCameraView()">
 Camera View
 </button>
@@ -521,13 +522,13 @@ allTeams.join("\n");
 document.getElementById("resultText").innerText =
 data.resultText || "No Result Yet";
 
-     camOpposite=data.cameraOpposite||false;
+camOpposite=data.cameraOpposite||false;
 
-        document.querySelector(".teams-container").style.flexDirection =
-            camOpposite ? "row-reverse" : "row";
+document.querySelector(".teams-container").style.flexDirection =
+camOpposite ? "row-reverse" : "row";
 
-        document.getElementById("camBtn").innerText =
-            camOpposite ? "Camera Oppo View" : "Camera View";
+document.getElementById("camBtn").innerText =
+camOpposite ? "Camera Oppo View" : "Camera View";
     }
 });
 
