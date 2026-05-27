@@ -62,7 +62,7 @@ body{
 }
 
 .team-input{
-    width:100%;
+    flex:1;
     min-height:55px;
     padding:12px;
     border:2px solid #ddd;
@@ -70,7 +70,6 @@ body{
     font-size:24px;
     font-weight:bold;
     text-align:center;
-    margin-bottom:10px;
     box-sizing:border-box;
 }
 
@@ -173,7 +172,7 @@ textarea{
 
 <div id="main-panel">
 
-<!-- SCOREBOARD -->
+<!-- LIVE SCOREBOARD -->
 <div class="card">
 
 <div class="header">
@@ -182,6 +181,7 @@ LIVE SCORE BOARD
 
 <div class="teams-container" id="teamWrap">
 
+<!-- TEAM A -->
 <div class="team-box">
 
 <select id="teamSelectA"
@@ -189,10 +189,20 @@ onchange="selectTeamA(this.value)">
 <option value="">Select Team A</option>
 </select>
 
+<div style="display:flex;width:100%;gap:8px;">
+
 <input type="text"
 id="nameA"
 class="team-input"
 placeholder="TEAM 1">
+
+<button class="btn-full btn-blue"
+style="width:110px;margin:0;"
+onclick="updateTeamA()">
+SET
+</button>
+
+</div>
 
 <div class="score-val" id="dispA">0</div>
 
@@ -205,12 +215,15 @@ onclick="changeScore('scoreA',-1)">-</button>
 onclick="changeScore('scoreA',1)">+</button>
 
 </div>
+
 </div>
 
+<!-- VS -->
 <div style="display:flex;align-items:center;font-weight:bold;font-size:28px;color:#999;">
 VS
 </div>
 
+<!-- TEAM B -->
 <div class="team-box">
 
 <select id="teamSelectB"
@@ -218,10 +231,20 @@ onchange="selectTeamB(this.value)">
 <option value="">Select Team B</option>
 </select>
 
+<div style="display:flex;width:100%;gap:8px;">
+
 <input type="text"
 id="nameB"
 class="team-input"
 placeholder="TEAM 2">
+
+<button class="btn-full btn-blue"
+style="width:110px;margin:0;"
+onclick="updateTeamB()">
+SET
+</button>
+
+</div>
 
 <div class="score-val" id="dispB">0</div>
 
@@ -234,21 +257,46 @@ onclick="changeScore('scoreB',-1)">-</button>
 onclick="changeScore('scoreB',1)">+</button>
 
 </div>
-</div>
 
 </div>
 
-<div class="controls">
+</div>
 
-<button class="btn-full btn-blue"
-onclick="updateTeamNames()">
-Update Team Names
-</button>
+<!-- NEXT MATCH -->
+<div class="settings-section">
+
+<div class="header"
+style="margin:-15px -15px 15px -15px;">
+NEXT MATCH SETUP
+</div>
+
+<select id="nextTeamA">
+<option value="">Select Next Match Team 1</option>
+</select>
+
+<select id="nextTeamB">
+<option value="">Select Next Match Team 2</option>
+</select>
 
 <button class="btn-full btn-green"
-onclick="setMatchTeams()">
-Set Match Teams
+onclick="addNextMatch()">
+ADD NEXT MATCH
 </button>
+
+<textarea id="nextMatchList"
+rows="5"
+placeholder="Next Match Teams"
+oninput="autoGrow(this)"></textarea>
+
+<button class="btn-full btn-blue"
+onclick="saveNextMatches()">
+SAVE NEXT MATCHES
+</button>
+
+</div>
+
+<!-- CONTROLS -->
+<div class="controls">
 
 <button class="btn-full btn-green"
 onclick="showResultLayer()">
@@ -283,6 +331,7 @@ class="std-input"
 placeholder="ROUND">
 
 </div>
+
 </div>
 
 <!-- TEAM MANAGER -->
@@ -323,41 +372,6 @@ oninput="autoGrow(this)"></textarea>
 rows="5"
 placeholder="Eliminated Teams"
 oninput="autoGrow(this)"></textarea>
-
-</div>
-</div>
-
-<!-- NEXT MATCH -->
-<div class="card">
-
-<div class="header">
-NEXT MATCH SETUP
-</div>
-
-<div class="settings-section">
-
-<select id="nextTeamA">
-<option value="">Select Next Match Team 1</option>
-</select>
-
-<select id="nextTeamB">
-<option value="">Select Next Match Team 2</option>
-</select>
-
-<button class="btn-full btn-green"
-onclick="addNextMatch()">
-ADD NEXT MATCH
-</button>
-
-<textarea id="nextMatchList"
-rows="6"
-placeholder="Next Match Teams"
-oninput="autoGrow(this)"></textarea>
-
-<button class="btn-full btn-blue"
-onclick="saveNextMatches()">
-SAVE NEXT MATCHES
-</button>
 
 </div>
 </div>
@@ -616,27 +630,26 @@ function updateNextMatchDropdowns(){
 }
 
 function selectTeamA(team){
-
     document.getElementById("nameA").value=team;
 }
 
 function selectTeamB(team){
-
     document.getElementById("nameB").value=team;
 }
 
-function setMatchTeams(){
+function updateTeamA(){
 
     db.update({
-
         nameA:
-        document.getElementById("nameA").value,
+        document.getElementById("nameA").value
+    });
+}
 
+function updateTeamB(){
+
+    db.update({
         nameB:
-        document.getElementById("nameB").value,
-
-        scoreA:0,
-        scoreB:0
+        document.getElementById("nameB").value
     });
 }
 
@@ -666,18 +679,6 @@ function changeScore(team,val){
 
     db.update({
         [team]:newVal
-    });
-}
-
-function updateTeamNames(){
-
-    db.update({
-
-        nameA:
-        document.getElementById("nameA").value,
-
-        nameB:
-        document.getElementById("nameB").value
     });
 }
 
