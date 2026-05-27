@@ -821,10 +821,10 @@ cameraOpposite: !camOpposite
 
 function showResultLayer(){
 
-const teamA=
+const teamA =
 document.getElementById("nameA").value;
 
-const teamB=
+const teamB =
 document.getElementById("nameB").value;
 
 let winner="";
@@ -842,39 +842,91 @@ loser=teamA;
 
 }
 
-let winners=
-document.getElementById("winnerTeamsInp").value;
+/* WINNER LIST */
 
-winners += (winners ? "\n":"") + winner;
+let winners =
+document.getElementById("winnerTeamsInp").value
+.split("\n")
+.filter(t=>t.trim()!=='');
 
-let losers=
-document.getElementById("loserTeamsInp").value;
+winners.push(winner + " (WIN)");
 
-losers += (losers ? "\n":"") + loser;
+/* LOSER LIST */
 
-document.getElementById("winnerTeamsInp").value=winners;
-document.getElementById("loserTeamsInp").value=losers;
+let losers =
+document.getElementById("loserTeamsInp").value
+.split("\n")
+.filter(t=>t.trim()!=='');
 
-const resultText=
-winner + " defeated " + loser;
+losers.push(loser);
 
-document.getElementById("resultText").innerText=resultText;
+/* SHOW */
 
-/* REMOVE LOSER */
+document.getElementById("winnerTeamsInp").value =
+winners.join("\n");
 
-allTeams=allTeams.filter(t=>t!==loser);
+document.getElementById("loserTeamsInp").value =
+losers.join("\n");
+
+/* RESULT TEXT */
+
+const resultText =
+winner +
+" defeated " +
+loser +
+" (" + curA + " - " + curB + ")";
+
+document.getElementById("resultText").innerText =
+resultText;
+
+/* REMOVE LOSER FROM ALL TEAMS */
+
+allTeams =
+allTeams.filter(t=>t!==loser);
+
+/* REMOVE PLAYED MATCH FROM NEXT MATCH */
+
+nextMatches =
+nextMatches.filter(match=>{
+
+const m = match.toLowerCase();
+
+const t1 = teamA.toLowerCase();
+const t2 = teamB.toLowerCase();
+
+return !(
+
+m.includes(t1) &&
+m.includes(t2)
+
+);
+
+});
+
+/* UPDATE NEXT MATCH BOX */
+
+document.getElementById("nextMatchList").value =
+nextMatches.join("\n");
+
+/* SAVE */
 
 db.update({
 
 resultText:resultText,
 
-qualifiedTeams:winners,
+qualifiedTeams:winners.join("\n"),
 
-eliminatedTeams:losers,
+eliminatedTeams:losers.join("\n"),
 
-allTeams:allTeams
+allTeams:allTeams,
+
+nextMatches:nextMatches
 
 });
+
+/* UPDATE DROPDOWNS */
+
+updateDropdowns();
 
 }
 
