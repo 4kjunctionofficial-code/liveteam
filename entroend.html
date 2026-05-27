@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Live Overlay</title>
+
+<style>
+body{
+    margin:0;
+    overflow:hidden;
+    font-family:Arial;
+    background:transparent;
+}
+
+/* ===== INTRO ===== */
+#intro{
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:black;
+    color:white;
+    display:none;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+}
+
+#intro h1{
+    font-size:70px;
+    color:red;
+}
+
+/* ===== OVERLAY ===== */
+#bar{
+    position:fixed;
+    top:20px;
+    left:20px;
+    right:20px;
+    background:rgba(0,0,0,0.6);
+    color:white;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 20px;
+    border-radius:10px;
+}
+
+.team{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.team img{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    background:white;
+}
+
+.score{
+    font-size:28px;
+    color:yellow;
+}
+
+/* ===== END ===== */
+#end{
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:black;
+    color:white;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- INTRO -->
+<div id="intro">
+    <h1 id="introText">KABADDI LIVE</h1>
+</div>
+
+<!-- OVERLAY -->
+<div id="bar">
+    <div class="team">
+        <img id="logoA">
+        <span id="teamA">A</span>
+    </div>
+
+    <div class="score" id="score">0 - 0</div>
+
+    <div class="team">
+        <span id="teamB">B</span>
+        <img id="logoB">
+    </div>
+</div>
+
+<!-- END -->
+<div id="end">
+    <h1>THANK YOU FOR WATCHING 🔥</h1>
+</div>
+
+<script>
+
+function loadData(){
+    let data = JSON.parse(localStorage.getItem("live_data"));
+    if(!data) return;
+
+    teamA.innerText = data.teamA;
+    teamB.innerText = data.teamB;
+    score.innerText = data.scoreA + " - " + data.scoreB;
+
+    logoA.src = data.logoA;
+    logoB.src = data.logoB;
+
+    introText.innerText = data.title || "LIVE";
+
+    /* INTRO CONTROL */
+    document.getElementById("intro").style.display =
+        data.intro ? "flex" : "none";
+
+    /* END CONTROL */
+    document.getElementById("end").style.display =
+        data.end ? "flex" : "none";
+}
+
+/* AUTO UPDATE */
+setInterval(loadData,1000);
+loadData();
+
+</script>
+
+</body>
+</html>
