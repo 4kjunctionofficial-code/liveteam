@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Admin Control</title>
+<style>
+body{font-family:Arial;background:#111;color:white;padding:20px}
+input,button{width:100%;padding:10px;margin:5px 0}
+button{background:red;color:white;border:none;cursor:pointer}
+</style>
+</head>
+<body>
+
+<h2>🎛️ LIVE ADMIN PANEL</h2>
+
+<input id="teamA" placeholder="Team A">
+<input id="teamB" placeholder="Team B">
+
+<input id="scoreA" placeholder="Score A">
+<input id="scoreB" placeholder="Score B">
+
+<input id="logoA" placeholder="Logo A URL">
+<input id="logoB" placeholder="Logo B URL">
+
+<input id="title" placeholder="Live Title">
+
+<hr>
+
+<button onclick="updateData()">📊 UPDATE OVERLAY</button>
+<button onclick="startIntro()">🎬 START INTRO</button>
+<button onclick="showEnd()">🏁 END STREAM</button>
+
+<script>
+
+function updateData(){
+    let data = {
+        teamA:teamA.value,
+        teamB:teamB.value,
+        scoreA:scoreA.value,
+        scoreB:scoreB.value,
+        logoA:logoA.value,
+        logoB:logoB.value,
+        title:title.value,
+        intro:false,
+        end:false
+    };
+
+    localStorage.setItem("live_data", JSON.stringify(data));
+    alert("Updated 🔥");
+}
+
+function startIntro(){
+    let data = JSON.parse(localStorage.getItem("live_data")) || {};
+    data.intro = true;
+    data.end = false;
+
+    localStorage.setItem("live_data", JSON.stringify(data));
+}
+
+function showEnd(){
+    let data = JSON.parse(localStorage.getItem("live_data")) || {};
+    data.end = true;
+    data.intro = false;
+
+    localStorage.setItem("live_data", JSON.stringify(data));
+}
+
+</script>
+
+</body>
+</html>
