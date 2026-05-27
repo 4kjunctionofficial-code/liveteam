@@ -110,136 +110,7 @@
         transform:translateX(-100%);
     }
 }
-
-        @keyframes zoomIn{
-
-0%{
-transform:scale(0.2);
-opacity:0;
-}
-
-100%{
-transform:scale(1);
-opacity:1;
-}
-
-}
-
-@keyframes fadeIn{
-
-0%{
-opacity:0;
-}
-
-100%{
-opacity:1;
-}
-
-}
-
-/* RESULT FULL SCREEN */
-
-.result-animation-layer{
-
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.88);
-
-display:flex;
-align-items:center;
-justify-content:center;
-
-z-index:999999;
-
-animation:fadeIn 0.5s ease;
-
-}
-
-/* CENTER BOX */
-
-.result-animation-box{
-
-text-align:center;
-
-animation:zoomIn 0.7s ease;
-
-}
-
-/* WINNER TITLE */
-
-.result-winner-title{
-
-font-size:120px;
-font-weight:900;
-
-color:#fbbc05;
-
-margin-bottom:30px;
-
-text-shadow:
-0 0 15px #000,
-0 0 25px #000,
-0 0 35px #000;
-
-font-family:
-'Impact',
-'Arial Black',
-sans-serif;
-
-text-transform:uppercase;
-
-}
-
-/* TEAM NAME */
-
-.result-team-name{
-
-font-size:150px;
-
-font-weight:900;
-
-color:white;
-
-line-height:1.1;
-
-text-transform:uppercase;
-
-font-family:
-'Impact',
-'Arial Black',
-sans-serif;
-
-text-shadow:
-0 0 15px #000,
-0 0 25px #000,
-0 0 40px #000;
-
-letter-spacing:4px;
-
-}
-
-/* MOBILE */
-
-@media(max-width:900px){
-
-.result-winner-title{
-
-font-size:60px;
-
-}
-
-.result-team-name{
-
-font-size:80px;
-
-}
-
-}
-        
-        .box-time{
+       .box-time{
     width:340px;
     background:#0a2a66;
     color:white;
@@ -378,7 +249,37 @@ font-size:80px;
         
         // ਟਿੱਕਰ ਟੈਕਸਟ ਅਪਡੇਟ (ਐਨੀਮੇਸ਼ਨ ਨੂੰ ਛੇੜੇ ਬਿਨਾਂ)
         updateTickerContent('c1', data.row1Txt || "WELCOME TO LIVE KABADDI");
-        updateTickerContent('c2', data.row2Txt || "SUBSCRIBE OUR CHANNEL");
+        /* ROW 2 AUTO DATA */
+
+let row2Text = "";
+
+/* NEXT MATCH */
+
+if(data.nextMatches && data.nextMatches.length > 0){
+
+row2Text += "NEXT MATCH : " + data.nextMatches[0];
+
+}
+
+/* WINNER */
+
+if(data.resultText){
+
+if(row2Text!=="") row2Text += "   ★★★   ";
+
+row2Text += "WIN MATCH : " + data.resultText;
+
+}
+
+/* DEFAULT */
+
+if(row2Text===""){
+
+row2Text = "SUBSCRIBE OUR CHANNEL";
+
+}
+
+updateTickerContent('c2', row2Text);
         updateTickerContent('c3', data.row3Txt || "LIKE & SHARE");
 
         if (!tickerInitialized) {
@@ -388,7 +289,106 @@ font-size:80px;
             tickerInitialized = true;
         }
     });
+function showResultLayer(){
 
+const scoreA =
+parseFloat(document.getElementById("sA").innerText) || 0;
+
+const scoreB =
+parseFloat(document.getElementById("sB").innerText) || 0;
+
+const teamA =
+document.getElementById("nA").innerText.trim();
+
+const teamB =
+document.getElementById("nB").innerText.trim();
+
+let winner="";
+
+if(scoreA > scoreB){
+
+winner = teamA;
+
+}else if(scoreB > scoreA){
+
+winner = teamB;
+
+}else{
+
+winner = "MATCH DRAW";
+
+}
+
+/* RESULT TEXT */
+
+const resultText =
+winner==="MATCH DRAW"
+? "MATCH DRAW"
+: winner + " WIN";
+
+/* SAVE FIREBASE */
+
+db.update({
+resultText: resultText
+});
+
+/* REMOVE OLD RESULT */
+
+const oldLayer =
+document.querySelector(".result-animation-layer");
+
+if(oldLayer){
+
+oldLayer.remove();
+
+}
+
+/* CREATE RESULT LAYER */
+
+const resultLayer =
+document.createElement("div");
+
+resultLayer.className =
+"result-animation-layer";
+
+resultLayer.innerHTML = `
+
+<div class="result-animation-box">
+
+<div class="result-winner-title">
+
+🏆 WINNER 🏆
+
+</div>
+
+<div class="result-team-name">
+
+${resultText}
+
+</div>
+
+</div>
+
+`;
+
+document.body.appendChild(resultLayer);
+
+/* AUTO REMOVE AFTER 10 SEC */
+
+setTimeout(()=>{
+
+resultLayer.style.transition = "0.5s";
+resultLayer.style.opacity = "0";
+
+setTimeout(()=>{
+
+resultLayer.remove();
+
+},500);
+
+},10000);
+
+}
     function setTeamName(containerId, txt) {
         const el = document.getElementById(containerId);
         el.innerHTML = txt.length > 12 ? `<div class="team-scroller">${txt}</div>` : `<div style="width:100%; text-align:center;">${txt}</div>`;
@@ -434,172 +434,4 @@ font-size:80px;
     const wmEl = document.getElementById('single-wm');
     function moveWM() { wmEl.style.left = (Math.random() * 1400 + 100) + 'px'; wmEl.style.top = (Math.random() * 600 + 150) + 'px'; }
     moveWM(); setInterval(moveWM, 6000);
-
-    function showResultLayer(){
-
-const teamA =
-document.getElementById("nameA").value.trim();
-
-const teamB =
-document.getElementById("nameB").value.trim();
-
-/* NO TEAM */
-
-if(teamA==="" || teamB==="") return;
-
-/* WINNER */
-
-let winner="";
-let loser="";
-
-if(curA>curB){
-
-winner=teamA;
-loser=teamB;
-
-}else if(curB>curA){
-
-winner=teamB;
-loser=teamA;
-
-}else{
-
-winner="MATCH DRAW";
-loser="";
-
-}
-
-/* QUALIFIED */
-
-let winners =
-document.getElementById("winnerTeamsInp").value;
-
-if(winner!=="MATCH DRAW"){
-
-winners +=
-(winners ? "\n":"") +
-winner +
-" WIN";
-
-}
-
-/* ELIMINATED */
-
-let losers =
-document.getElementById("loserTeamsInp").value;
-
-if(loser!==""){
-
-losers +=
-(losers ? "\n":"") +
-loser;
-
-}
-
-/* UPDATE BOXES */
-
-document.getElementById("winnerTeamsInp").value =
-winners;
-
-document.getElementById("loserTeamsInp").value =
-losers;
-
-/* RESULT TEXT */
-
-const resultText =
-winner==="MATCH DRAW"
-? "MATCH DRAW"
-: winner + " WIN";
-
-/* FULL SCREEN RESULT */
-
-const resultLayer =
-document.createElement("div");
-
-resultLayer.className =
-"result-animation-layer";
-
-resultLayer.innerHTML = `
-
-<div class="result-animation-box">
-
-<div class="result-winner-title">
-
-🏆 WINNER 🏆
-
-</div>
-
-<div class="result-team-name">
-
-${resultText}
-
-</div>
-
-</div>
-
-`;
-
-document.body.appendChild(resultLayer);
-
-/* AUTO HIDE */
-
-setTimeout(()=>{
-
-resultLayer.remove();
-
-},5000);
-
-/* RESULT BOX */
-
-document.getElementById("resultText").innerText =
-resultText;
-
-/* REMOVE LOSER */
-
-if(loser!==""){
-
-allTeams =
-allTeams.filter(t=>t!==loser);
-
-}
-
-/* REMOVE PLAYED MATCH */
-
-nextMatches =
-nextMatches.filter(match=>{
-
-const m =
-match.toLowerCase();
-
-return !(
-
-m.includes(teamA.toLowerCase()) &&
-m.includes(teamB.toLowerCase())
-
-);
-
-});
-
-/* UPDATE NEXT MATCH BOX */
-
-document.getElementById("nextMatchList").value =
-nextMatches.join("\n");
-
-/* FIREBASE SAVE */
-
-db.update({
-
-resultText:resultText,
-
-qualifiedTeams:winners,
-
-eliminatedTeams:losers,
-
-allTeams:allTeams,
-
-nextMatches:nextMatches
-
-});
-
-}
 </script>
