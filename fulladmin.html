@@ -280,12 +280,9 @@ onclick="showResultLayer()">
 RESULT
 </button>
 
-<button id="visBtn"
-class="btn-full btn-red"
-onclick="toggleVis('scoreVisible')">
-HIDE
-</button>
-
+<button id="visBtn" class="btn-full btn-red" onclick="toggleVis('scoreVisible')">
+        Hide Scoreboard
+    </button>
 <button class="btn-full btn-yellow"
 onclick="swapTeams()">
 SWAP
@@ -566,6 +563,10 @@ allTeams.join("\n");
 
 document.getElementById("resultText").innerText =
 data.resultText || "No Result Yet";
+
+// Button text auto update
+document.getElementById("visBtn").innerText =
+ sVis ? "Hide Scoreboard" : "Show Scoreboard";
 
 /* CAMERA VIEW */
 
