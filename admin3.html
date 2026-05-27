@@ -13,90 +13,111 @@ body{
     font-family:'Segoe UI',sans-serif;
     background:#f0f2f5;
     margin:0;
-    padding:10px;
+    padding:8px;
     display:flex;
-    flex-direction:column;
-    align-items:center;
-    min-height:100vh;
+    justify-content:center;
 }
 
 #main-panel{
     width:100%;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
+    max-width:760px;
 }
 
 .card{
     background:white;
-    width:100%;
-    max-width:750px;
-    border-radius:15px;
-    box-shadow:0 8px 20px rgba(0,0,0,.15);
+    border-radius:14px;
+    box-shadow:0 5px 15px rgba(0,0,0,.15);
     overflow:hidden;
-    margin-bottom:20px;
+    margin-bottom:16px;
 }
 
 .header{
     background:#1a73e8;
     color:white;
-    padding:14px;
+    padding:10px;
     text-align:center;
     font-weight:bold;
-    font-size:18px;
-    text-transform:uppercase;
+    font-size:16px;
 }
 
 .teams-container{
     display:flex;
-    padding:20px;
-    gap:20px;
-    border-bottom:2px solid #eee;
+    gap:12px;
+    padding:12px;
+    align-items:center;
 }
 
 .team-box{
     flex:1;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
 }
 
-.team-input{
-    flex:1;
-    min-height:55px;
-    padding:12px;
+select,
+.team-input,
+.std-input,
+textarea{
+    width:100%;
+    padding:10px;
     border:2px solid #ddd;
     border-radius:8px;
-    font-size:24px;
+    font-size:18px;
     font-weight:bold;
-    text-align:center;
+    margin-bottom:8px;
     box-sizing:border-box;
 }
 
+textarea{
+    resize:none;
+}
+
+.team-top{
+    display:flex;
+    gap:6px;
+}
+
+.set-btn{
+    width:70px;
+    border:none;
+    background:#1a73e8;
+    color:white;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
 .score-val{
-    font-size:70px;
+    text-align:center;
+    font-size:52px;
     font-weight:900;
-    color:#333;
-    margin:10px 0;
+    margin:6px 0;
+    color:#222;
+}
+
+.pm-wrap{
+    display:flex;
+    gap:6px;
 }
 
 .btn-pm{
+    flex:1;
     border:none;
     color:white;
-    padding:16px;
+    padding:12px;
     border-radius:8px;
-    font-size:28px;
+    font-size:24px;
     font-weight:bold;
     cursor:pointer;
-    flex:1;
-    margin:0 5px;
 }
 
-.btn-plus{background:#28a745;}
-.btn-minus{background:#dc3545;}
+.btn-plus{
+    background:#28a745;
+}
+
+.btn-minus{
+    background:#dc3545;
+}
 
 .controls{
-    padding:15px;
+    padding:12px;
     display:flex;
     flex-direction:column;
     gap:8px;
@@ -105,64 +126,47 @@ body{
 .btn-full{
     border:none;
     color:white;
-    padding:14px;
+    padding:12px;
     border-radius:8px;
-    font-size:15px;
+    font-size:14px;
     font-weight:bold;
     cursor:pointer;
-    text-transform:uppercase;
-    width:100%;
 }
 
 .btn-blue{background:#1a73e8;}
-.btn-yellow{background:#fbbc05;color:black;}
 .btn-red{background:#ea4335;}
+.btn-yellow{background:#fbbc05;color:black;}
 .btn-dark{background:#333;}
 .btn-green{background:#28a745;}
 
 .settings-section{
-    padding:15px;
-    background:#fafafa;
-}
-
-textarea,
-.std-input,
-select{
-    width:100%;
-    min-height:55px;
     padding:12px;
-    border:2px solid #ccc;
-    border-radius:8px;
-    font-size:22px;
-    font-weight:bold;
-    margin-bottom:12px;
-    box-sizing:border-box;
-}
-
-textarea{
-    resize:none;
-    line-height:1.4;
-    overflow:hidden;
 }
 
 .result-box{
     background:#111;
     color:white;
-    padding:20px;
     border-radius:10px;
+    padding:18px;
     text-align:center;
 }
 
 .result-title{
-    font-size:32px;
-    font-weight:900;
     color:#fbbc05;
-    margin-bottom:10px;
+    font-size:28px;
+    font-weight:900;
 }
 
 .result-text{
+    font-size:20px;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+.vs-text{
     font-size:24px;
     font-weight:bold;
+    color:#999;
 }
 
 </style>
@@ -172,7 +176,7 @@ textarea{
 
 <div id="main-panel">
 
-<!-- LIVE SCOREBOARD -->
+<!-- SCOREBOARD -->
 <div class="card">
 
 <div class="header">
@@ -189,15 +193,14 @@ onchange="selectTeamA(this.value)">
 <option value="">Select Team A</option>
 </select>
 
-<div style="display:flex;width:100%;gap:8px;">
+<div class="team-top">
 
 <input type="text"
 id="nameA"
 class="team-input"
 placeholder="TEAM 1">
 
-<button class="btn-full btn-blue"
-style="width:110px;margin:0;"
+<button class="set-btn"
 onclick="updateTeamA()">
 SET
 </button>
@@ -206,20 +209,23 @@ SET
 
 <div class="score-val" id="dispA">0</div>
 
-<div style="display:flex;width:100%;">
+<div class="pm-wrap">
 
 <button class="btn-pm btn-minus"
-onclick="changeScore('scoreA',-1)">-</button>
+onclick="changeScore('scoreA',-1)">
+-
+</button>
 
 <button class="btn-pm btn-plus"
-onclick="changeScore('scoreA',1)">+</button>
+onclick="changeScore('scoreA',1)">
++
+</button>
 
 </div>
 
 </div>
 
-<!-- VS -->
-<div style="display:flex;align-items:center;font-weight:bold;font-size:28px;color:#999;">
+<div class="vs-text">
 VS
 </div>
 
@@ -231,15 +237,14 @@ onchange="selectTeamB(this.value)">
 <option value="">Select Team B</option>
 </select>
 
-<div style="display:flex;width:100%;gap:8px;">
+<div class="team-top">
 
 <input type="text"
 id="nameB"
 class="team-input"
 placeholder="TEAM 2">
 
-<button class="btn-full btn-blue"
-style="width:110px;margin:0;"
+<button class="set-btn"
 onclick="updateTeamB()">
 SET
 </button>
@@ -248,25 +253,37 @@ SET
 
 <div class="score-val" id="dispB">0</div>
 
-<div style="display:flex;width:100%;">
+<div class="pm-wrap">
 
 <button class="btn-pm btn-minus"
-onclick="changeScore('scoreB',-1)">-</button>
+onclick="changeScore('scoreB',-1)">
+-
+</button>
 
 <button class="btn-pm btn-plus"
-onclick="changeScore('scoreB',1)">+</button>
+onclick="changeScore('scoreB',1)">
++
+</button>
 
 </div>
 
 </div>
 
 </div>
+
+<div class="controls">
+
+<input type="text"
+id="roundInp"
+class="std-input"
+placeholder="ROUND">
 
 <!-- NEXT MATCH -->
-<div class="settings-section">
+<div class="settings-section"
+style="padding:0;">
 
 <div class="header"
-style="margin:-15px -15px 15px -15px;">
+style="margin-bottom:10px;">
 NEXT MATCH SETUP
 </div>
 
@@ -284,7 +301,7 @@ ADD NEXT MATCH
 </button>
 
 <textarea id="nextMatchList"
-rows="5"
+rows="4"
 placeholder="Next Match Teams"
 oninput="autoGrow(this)"></textarea>
 
@@ -295,40 +312,32 @@ SAVE NEXT MATCHES
 
 </div>
 
-<!-- CONTROLS -->
-<div class="controls">
-
 <button class="btn-full btn-green"
 onclick="showResultLayer()">
-Show Result Screen
+SHOW RESULT SCREEN
 </button>
 
 <button id="visBtn"
 class="btn-full btn-red"
 onclick="toggleVis('scoreVisible')">
-Hide Scoreboard
+HIDE SCOREBOARD
 </button>
 
 <button class="btn-full btn-yellow"
 onclick="swapTeams()">
-Swap Teams + Score
+SWAP TEAMS + SCORE
 </button>
 
 <button class="btn-full btn-dark"
 onclick="toggleCameraView()">
-Camera View
+CAMERA VIEW
 </button>
 
 <button class="btn-full"
 style="background:#777;"
 onclick="resetScores()">
-Reset Scores
+RESET SCORES
 </button>
-
-<input type="text"
-id="roundInp"
-class="std-input"
-placeholder="ROUND">
 
 </div>
 
@@ -350,30 +359,31 @@ placeholder="Add New Team">
 
 <button class="btn-full btn-green"
 onclick="addTeam()">
-Add Team
+ADD TEAM
 </button>
 
 <textarea id="allTeamsInp"
-rows="8"
+rows="7"
 placeholder="All Participating Teams"
 oninput="autoGrow(this)"></textarea>
 
 <button class="btn-full btn-blue"
 onclick="saveAllTeams()">
-Save Team List
+SAVE TEAM LIST
 </button>
 
 <textarea id="winnerTeamsInp"
-rows="5"
+rows="4"
 placeholder="Qualified Teams"
 oninput="autoGrow(this)"></textarea>
 
 <textarea id="loserTeamsInp"
-rows="5"
+rows="4"
 placeholder="Eliminated Teams"
 oninput="autoGrow(this)"></textarea>
 
 </div>
+
 </div>
 
 <!-- TICKER -->
@@ -407,16 +417,17 @@ placeholder="Channel Name">
 
 <button class="btn-full btn-blue"
 onclick="updateTicker()">
-Update Ticker
+UPDATE TICKER
 </button>
 
 <button id="tickVisBtn"
 class="btn-full btn-red"
 onclick="toggleVis('tickerVisible')">
-Hide Ticker
+HIDE TICKER
 </button>
 
 </div>
+
 </div>
 
 <!-- RESULT -->
@@ -442,6 +453,7 @@ No Result Yet
 </div>
 
 </div>
+
 </div>
 
 </div>
@@ -449,7 +461,7 @@ No Result Yet
 <script>
 
 const firebaseConfig = {
-    databaseURL:"https://manpreetteam-a86e9-default-rtdb.firebaseio.com/"
+databaseURL:"https://manpreetteam-a86e9-default-rtdb.firebaseio.com/"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -475,394 +487,385 @@ let nextMatches=[];
 
 db.on("value",(snap)=>{
 
-    const data=snap.val();
+const data=snap.val();
 
-    if(data){
+if(data){
 
-        curA=parseFloat(data.scoreA)||0;
-        curB=parseFloat(data.scoreB)||0;
+curA=parseFloat(data.scoreA)||0;
+curB=parseFloat(data.scoreB)||0;
 
-        sVis=data.scoreVisible!==false;
-        tVis=data.tickerVisible!==false;
+allTeams=data.allTeams || [];
+nextMatches=data.nextMatches || [];
 
-        allTeams=data.allTeams || [];
-        nextMatches=data.nextMatches || [];
+updateTeamTextarea();
+updateTeamDropdowns();
+updateNextMatchDropdowns();
 
-        updateTeamTextarea();
-        updateTeamDropdowns();
-        updateNextMatchDropdowns();
+document.getElementById("dispA").innerText=curA;
+document.getElementById("dispB").innerText=curB;
 
-        document.getElementById("dispA").innerText=curA;
-        document.getElementById("dispB").innerText=curB;
+document.getElementById("nameA").value=data.nameA||"";
+document.getElementById("nameB").value=data.nameB||"";
 
-        document.getElementById("nameA").value=data.nameA||"";
-        document.getElementById("nameB").value=data.nameB||"";
+document.getElementById("roundInp").value=data.round||"";
 
-        document.getElementById("roundInp").value=data.round||"";
+document.getElementById("row1Inp").value=data.row1Txt||"";
+document.getElementById("row2Inp").value=data.row2Txt||"";
+document.getElementById("row3Inp").value=data.row3Txt||"";
 
-        document.getElementById("row1Inp").value=data.row1Txt||"";
-        document.getElementById("row2Inp").value=data.row2Txt||"";
-        document.getElementById("row3Inp").value=data.row3Txt||"";
+document.getElementById("watermarkInp").value =
+data.watermarkTxt||"";
 
-        document.getElementById("watermarkInp").value =
-        data.watermarkTxt||"";
+document.getElementById("winnerTeamsInp").value =
+data.qualifiedTeams || "";
 
-        document.getElementById("winnerTeamsInp").value =
-        data.qualifiedTeams || "";
+document.getElementById("loserTeamsInp").value =
+data.eliminatedTeams || "";
 
-        document.getElementById("loserTeamsInp").value =
-        data.eliminatedTeams || "";
+document.getElementById("nextMatchList").value =
+nextMatches.join("\n");
 
-        document.getElementById("nextMatchList").value =
-        nextMatches.join("\n");
+document.getElementById("resultText").innerText =
+data.resultText || "No Result Yet";
 
-        document.getElementById("resultText").innerText =
-        data.resultText || "No Result Yet";
+camOpposite=data.cameraOpposite||false;
 
-        autoGrow(document.getElementById("allTeamsInp"));
-        autoGrow(document.getElementById("winnerTeamsInp"));
-        autoGrow(document.getElementById("loserTeamsInp"));
-        autoGrow(document.getElementById("nextMatchList"));
+document.getElementById("teamWrap").style.flexDirection =
+camOpposite ? "row-reverse" : "row";
 
-        camOpposite=data.cameraOpposite||false;
-
-        document.getElementById("teamWrap").style.flexDirection =
-        camOpposite ? "row-reverse" : "row";
-    }
+}
 });
 
 function autoGrow(el){
 
-    el.style.height="auto";
-    el.style.height=el.scrollHeight+"px";
+el.style.height="auto";
+el.style.height=el.scrollHeight+"px";
 }
 
 function addTeam(){
 
-    const team =
-    document.getElementById("newTeamInp").value.trim();
+const team =
+document.getElementById("newTeamInp").value.trim();
 
-    if(team==="") return;
+if(team==="") return;
 
-    allTeams.push(team);
+allTeams.push(team);
 
-    updateTeamTextarea();
-    updateTeamDropdowns();
-    updateNextMatchDropdowns();
+updateTeamTextarea();
+updateTeamDropdowns();
+updateNextMatchDropdowns();
 
-    db.update({
-        allTeams:allTeams
-    });
+db.update({
+allTeams:allTeams
+});
 
-    document.getElementById("newTeamInp").value="";
+document.getElementById("newTeamInp").value="";
 }
 
 function saveAllTeams(){
 
-    const txt =
-    document.getElementById("allTeamsInp").value;
+const txt =
+document.getElementById("allTeamsInp").value;
 
-    allTeams =
-    txt.split("\n")
-    .map(t=>t.trim())
-    .filter(t=>t!=='');
+allTeams =
+txt.split("\n")
+.map(t=>t.trim())
+.filter(t=>t!=='');
 
-    updateTeamDropdowns();
-    updateNextMatchDropdowns();
+updateTeamDropdowns();
+updateNextMatchDropdowns();
 
-    db.update({
-        allTeams:allTeams
-    });
+db.update({
+allTeams:allTeams
+});
 }
 
 function updateTeamTextarea(){
 
-    document.getElementById("allTeamsInp").value =
-    allTeams.join("\n");
+document.getElementById("allTeamsInp").value =
+allTeams.join("\n");
 }
 
 function updateTeamDropdowns(){
 
-    const selectA =
-    document.getElementById("teamSelectA");
+const selectA =
+document.getElementById("teamSelectA");
 
-    const selectB =
-    document.getElementById("teamSelectB");
+const selectB =
+document.getElementById("teamSelectB");
 
-    selectA.innerHTML =
-    '<option value="">Select Team A</option>';
+selectA.innerHTML =
+'<option value="">Select Team A</option>';
 
-    selectB.innerHTML =
-    '<option value="">Select Team B</option>';
+selectB.innerHTML =
+'<option value="">Select Team B</option>';
 
-    allTeams.forEach(team=>{
+allTeams.forEach(team=>{
 
-        selectA.innerHTML +=
-        `<option value="${team}">${team}</option>`;
+selectA.innerHTML +=
+`<option value="${team}">${team}</option>`;
 
-        selectB.innerHTML +=
-        `<option value="${team}">${team}</option>`;
-    });
+selectB.innerHTML +=
+`<option value="${team}">${team}</option>`;
+});
 }
 
 function updateNextMatchDropdowns(){
 
-    const selA =
-    document.getElementById("nextTeamA");
+const selA =
+document.getElementById("nextTeamA");
 
-    const selB =
-    document.getElementById("nextTeamB");
+const selB =
+document.getElementById("nextTeamB");
 
-    selA.innerHTML =
-    '<option value="">Select Next Match Team 1</option>';
+selA.innerHTML =
+'<option value="">Select Next Match Team 1</option>';
 
-    selB.innerHTML =
-    '<option value="">Select Next Match Team 2</option>';
+selB.innerHTML =
+'<option value="">Select Next Match Team 2</option>';
 
-    allTeams.forEach(team=>{
+allTeams.forEach(team=>{
 
-        selA.innerHTML +=
-        `<option value="${team}">${team}</option>`;
+selA.innerHTML +=
+`<option value="${team}">${team}</option>`;
 
-        selB.innerHTML +=
-        `<option value="${team}">${team}</option>`;
-    });
+selB.innerHTML +=
+`<option value="${team}">${team}</option>`;
+});
 }
 
 function selectTeamA(team){
-    document.getElementById("nameA").value=team;
+document.getElementById("nameA").value=team;
 }
 
 function selectTeamB(team){
-    document.getElementById("nameB").value=team;
+document.getElementById("nameB").value=team;
 }
 
 function updateTeamA(){
 
-    db.update({
-        nameA:
-        document.getElementById("nameA").value
-    });
+db.update({
+nameA:
+document.getElementById("nameA").value
+});
 }
 
 function updateTeamB(){
 
-    db.update({
-        nameB:
-        document.getElementById("nameB").value
-    });
+db.update({
+nameB:
+document.getElementById("nameB").value
+});
 }
 
 function changeScore(team,val){
 
-    let current=(team==="scoreA") ? curA : curB;
+let current=(team==="scoreA") ? curA : curB;
 
-    let newVal;
+let newVal;
 
-    if(val>0){
+if(val>0){
 
-        if(curA===0 && curB===0)
-            newVal=1.5;
-        else
-            newVal=current+1;
+if(curA===0 && curB===0)
+newVal=1.5;
+else
+newVal=current+1;
 
-    }else{
+}else{
 
-        if(current===1.5)
-            newVal=0;
-        else
-            newVal=current-1;
+if(current===1.5)
+newVal=0;
+else
+newVal=current-1;
 
-        if(newVal<0)
-            newVal=0;
-    }
+if(newVal<0)
+newVal=0;
+}
 
-    db.update({
-        [team]:newVal
-    });
+db.update({
+[team]:newVal
+});
 }
 
 function updateTicker(){
 
-    db.update({
+db.update({
 
-        round:
-        document.getElementById("roundInp").value,
+round:
+document.getElementById("roundInp").value,
 
-        row1Txt:
-        document.getElementById("row1Inp").value,
+row1Txt:
+document.getElementById("row1Inp").value,
 
-        row2Txt:
-        document.getElementById("row2Inp").value,
+row2Txt:
+document.getElementById("row2Inp").value,
 
-        row3Txt:
-        document.getElementById("row3Inp").value,
+row3Txt:
+document.getElementById("row3Inp").value,
 
-        watermarkTxt:
-        document.getElementById("watermarkInp").value
-    });
+watermarkTxt:
+document.getElementById("watermarkInp").value
+});
 }
 
 function toggleVis(field){
 
-    let val =
-    field==="scoreVisible" ? sVis : tVis;
+let val =
+field==="scoreVisible" ? sVis : tVis;
 
-    db.child(field).set(!val);
+db.child(field).set(!val);
 }
 
 function swapTeams(){
 
-    db.update({
+db.update({
 
-        nameA:
-        document.getElementById("nameB").value,
+nameA:
+document.getElementById("nameB").value,
 
-        nameB:
-        document.getElementById("nameA").value,
+nameB:
+document.getElementById("nameA").value,
 
-        scoreA:curB,
-        scoreB:curA
-    });
+scoreA:curB,
+scoreB:curA
+});
 }
 
 function resetScores(){
 
-    if(confirm("Reset Match Scores?")){
+if(confirm("Reset Match Scores?")){
 
-        db.update({
-            scoreA:0,
-            scoreB:0
-        });
-    }
+db.update({
+scoreA:0,
+scoreB:0
+});
+}
 }
 
 function toggleCameraView(){
 
-    db.update({
-        cameraOpposite: !camOpposite
-    });
+db.update({
+cameraOpposite: !camOpposite
+});
 }
 
 function showResultLayer(){
 
-    const teamA =
-    document.getElementById("nameA").value;
+const teamA =
+document.getElementById("nameA").value;
 
-    const teamB =
-    document.getElementById("nameB").value;
+const teamB =
+document.getElementById("nameB").value;
 
-    let winner="";
-    let loser="";
+let winner="";
+let loser="";
 
-    if(curA>curB){
+if(curA>curB){
 
-        winner=teamA;
-        loser=teamB;
+winner=teamA;
+loser=teamB;
 
-    }else{
+}else{
 
-        winner=teamB;
-        loser=teamA;
-    }
+winner=teamB;
+loser=teamA;
+}
 
-    let winners =
-    document.getElementById("winnerTeamsInp").value;
+let winners =
+document.getElementById("winnerTeamsInp").value;
 
-    if(winners.trim()==="")
-        winners=winner;
-    else
-        winners += "\n"+winner;
+if(winners.trim()==="")
+winners=winner;
+else
+winners += "\n"+winner;
 
-    let losers =
-    document.getElementById("loserTeamsInp").value;
+let losers =
+document.getElementById("loserTeamsInp").value;
 
-    if(losers.trim()==="")
-        losers=loser;
-    else
-        losers += "\n"+loser;
+if(losers.trim()==="")
+losers=loser;
+else
+losers += "\n"+loser;
 
-    document.getElementById("winnerTeamsInp").value =
-    winners;
+document.getElementById("winnerTeamsInp").value =
+winners;
 
-    document.getElementById("loserTeamsInp").value =
-    losers;
+document.getElementById("loserTeamsInp").value =
+losers;
 
-    const resultText =
-    winner +
-    " defeated " +
-    loser +
-    " by " +
-    curA +
-    " - " +
-    curB;
+const resultText =
+winner +
+" defeated " +
+loser +
+" by " +
+curA +
+" - " +
+curB;
 
-    document.getElementById("resultText").innerText =
-    resultText;
+document.getElementById("resultText").innerText =
+resultText;
 
-    db.update({
+db.update({
 
-        resultText:resultText,
+resultText:resultText,
 
-        winnerTeam:winner,
+winnerTeam:winner,
 
-        loserTeam:loser,
+loserTeam:loser,
 
-        qualifiedTeams:winners,
+qualifiedTeams:winners,
 
-        eliminatedTeams:losers
-    });
+eliminatedTeams:losers
+});
 
-    allTeams =
-    allTeams.filter(t=>t!==loser);
+allTeams =
+allTeams.filter(t=>t!==loser);
 
-    updateTeamTextarea();
-    updateTeamDropdowns();
-    updateNextMatchDropdowns();
+updateTeamTextarea();
+updateTeamDropdowns();
+updateNextMatchDropdowns();
 
-    db.update({
-        allTeams:allTeams
-    });
+db.update({
+allTeams:allTeams
+});
 }
 
 function addNextMatch(){
 
-    const a =
-    document.getElementById("nextTeamA").value;
+const a =
+document.getElementById("nextTeamA").value;
 
-    const b =
-    document.getElementById("nextTeamB").value;
+const b =
+document.getElementById("nextTeamB").value;
 
-    if(a==="" || b==="") return;
+if(a==="" || b==="") return;
 
-    const match =
-    a + " VS " + b;
+const match =
+a + " VS " + b;
 
-    nextMatches.push(match);
+nextMatches.push(match);
 
-    document.getElementById("nextMatchList").value =
-    nextMatches.join("\n");
+document.getElementById("nextMatchList").value =
+nextMatches.join("\n");
 
-    autoGrow(document.getElementById("nextMatchList"));
-
-    db.update({
-        nextMatches:nextMatches
-    });
+db.update({
+nextMatches:nextMatches
+});
 }
 
 function saveNextMatches(){
 
-    const txt =
-    document.getElementById("nextMatchList").value;
+const txt =
+document.getElementById("nextMatchList").value;
 
-    nextMatches =
-    txt.split("\n")
-    .map(t=>t.trim())
-    .filter(t=>t!=='');
+nextMatches =
+txt.split("\n")
+.map(t=>t.trim())
+.filter(t=>t!=='');
 
-    db.update({
-        nextMatches:nextMatches
-    });
+db.update({
+nextMatches:nextMatches
+});
 }
 
 </script>
