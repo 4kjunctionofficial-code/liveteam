@@ -8,86 +8,56 @@
 
 <style>
 body{ font-family:'Segoe UI',sans-serif; background:#f0f2f5; margin:0; padding:10px; display:flex; flex-direction:column; align-items:center; min-height:100vh; }
-#main-panel{ width:100%; display:flex; flex-direction:column; align-items:center; }
 .card{ background:white; width:100%; max-width:650px; border-radius:15px; box-shadow:0 8px 20px rgba(0,0,0,.15); overflow:hidden; margin-bottom:20px; }
 .header{ background:#1a73e8; color:white; padding:14px; text-align:center; font-weight:bold; font-size:18px; text-transform:uppercase; }
+.settings-section{ padding:15px; }
+.std-input{ width:100%; min-height:55px; padding:12px; border:2px solid #ccc; border-radius:8px; font-size:22px; font-weight:bold; margin-bottom:12px; box-sizing:border-box; }
+.btn-full{ border:none; color:white; padding:14px; border-radius:8px; font-size:15px; font-weight:bold; cursor:pointer; width:100%; margin-bottom:8px; }
+.btn-blue{background:#1a73e8;}
 .teams-container{ display:flex; padding:20px; gap:20px; border-bottom:2px solid #eee; }
 .team-box{ flex:1; display:flex; flex-direction:column; align-items:center; }
-.team-input{ width:100%; min-height:55px; padding:12px; border:2px solid #ddd; border-radius:8px; font-size:24px; font-weight:bold; text-align:center; margin-bottom:10px; box-sizing:border-box; }
-.score-val{ font-size:70px; font-weight:900; color:#333; margin:10px 0; }
-.btn-pm{ border:none; color:white; padding:16px; border-radius:8px; font-size:28px; font-weight:bold; cursor:pointer; flex:1; margin:0 5px; }
-.btn-plus{background:#28a745;} .btn-minus{background:#dc3545;}
-.controls, .settings-section{ padding:15px; display:flex; flex-direction:column; gap:8px; }
-.btn-full{ border:none; color:white; padding:14px; border-radius:8px; font-size:15px; font-weight:bold; cursor:pointer; text-transform:uppercase; width:100%; }
-.btn-blue{background:#1a73e8;} .btn-yellow{background:#fbbc05;color:black;} .btn-red{background:#ea4335;} .btn-dark{background:#333;}
-textarea{ width:100%; min-height:90px; padding:16px; border:2px solid #ccc; border-radius:8px; font-size:24px; font-weight:bold; margin-bottom:12px; box-sizing:border-box; resize:none; }
-.std-input{ width:100%; min-height:55px; padding:12px; border:2px solid #ccc; border-radius:8px; font-size:22px; font-weight:bold; margin-bottom:12px; box-sizing:border-box; }
+.team-input{ width:100%; min-height:55px; padding:12px; border:2px solid #ddd; border-radius:8px; font-size:20px; font-weight:bold; text-align:center; }
+.score-val{ font-size:60px; font-weight:900; margin:10px 0; }
+.btn-pm{ border:none; color:white; padding:10px; border-radius:8px; font-size:24px; cursor:pointer; flex:1; margin:0 5px; }
 </style>
 </head>
 <body>
 
-<div id="main-panel">
-
-<!-- ਟੀਮ ਮੈਨੇਜਮੈਂਟ -->
 <div class="card">
-    <div class="header">Team Library</div>
+    <div class="header">Team Library (ਇੱਥੇ ਟੀਮਾਂ ਲਿਖੋ)</div>
     <div class="settings-section">
-        <input type="text" id="newTeamName" class="std-input" placeholder="ਨਵੀਂ ਟੀਮ ਦਾ ਨਾਮ">
-        <button class="btn-full btn-blue" onclick="addTeam()">ਟੀਮ ਸ਼ਾਮਲ ਕਰੋ</button>
-        <div style="display:flex; gap:10px; margin-top:10px;">
+        <textarea id="allTeamsInp" class="std-input" placeholder="ਟੀਮਾਂ ਇੱਥੇ ਲਿਖੋ (ਕੌਮੇ ਨਾਲ ਵੱਖ ਕਰੋ: mudki, gill, fzr, fdk)" rows="3"></textarea>
+        <button class="btn-full btn-blue" onclick="saveTeamsList()">ਸਾਰੀਆਂ ਟੀਮਾਂ ਸੇਵ ਕਰੋ</button>
+    </div>
+</div>
+
+<div class="card">
+    <div class="header">Match Setup</div>
+    <div class="settings-section">
+        <div style="display:flex; gap:10px;">
             <select id="selectA" class="std-input" onchange="document.getElementById('nameA').value=this.value">
-                <option value="">Team A ਚੁਣੋ</option>
+                <option value="">ਟੀਮ A ਚੁਣੋ</option>
             </select>
             <select id="selectB" class="std-input" onchange="document.getElementById('nameB').value=this.value">
-                <option value="">Team B ਚੁਣੋ</option>
+                <option value="">ਟੀਮ B ਚੁਣੋ</option>
             </select>
         </div>
     </div>
 </div>
 
-<!-- SCOREBOARD -->
 <div class="card">
-    <div class="header">Live Score Board</div>
     <div class="teams-container">
         <div class="team-box">
-            <input type="text" id="nameA" class="team-input" placeholder="TEAM 1">
+            <input type="text" id="nameA" class="team-input">
             <div class="score-val" id="dispA">0</div>
-            <div style="display:flex;width:100%;">
-                <button class="btn-pm btn-minus" onclick="changeScore('scoreA',-1)">-</button>
-                <button class="btn-pm btn-plus" onclick="changeScore('scoreA',1)">+</button>
-            </div>
+            <button class="btn-pm" style="background:#28a745;" onclick="changeScore('scoreA', 1)">+</button>
         </div>
-        <div style="display:flex;align-items:center;font-weight:bold;font-size:26px;color:#aaa;">VS</div>
         <div class="team-box">
-            <input type="text" id="nameB" class="team-input" placeholder="TEAM 2">
+            <input type="text" id="nameB" class="team-input">
             <div class="score-val" id="dispB">0</div>
-            <div style="display:flex;width:100%;">
-                <button class="btn-pm btn-minus" onclick="changeScore('scoreB',-1)">-</button>
-                <button class="btn-pm btn-plus" onclick="changeScore('scoreB',1)">+</button>
-            </div>
+            <button class="btn-pm" style="background:#28a745;" onclick="changeScore('scoreB', 1)">+</button>
         </div>
     </div>
-    <div class="controls">
-        <button class="btn-full btn-blue" onclick="updateTeamNames()">Update Team Names</button>
-        <button id="visBtn" class="btn-full btn-red" onclick="toggleVis('scoreVisible')">Hide Scoreboard</button>
-        <button class="btn-full" style="background:#777;" onclick="resetScores()">Reset Scores</button>
-        <button class="btn-full btn-yellow" onclick="swapTeams()">Swap Teams + Score</button>
-        <button id="camBtn" class="btn-full btn-dark" onclick="toggleCameraView()">Camera View</button>
-        <input type="text" id="roundInp" class="std-input" placeholder="ROUND">
-    </div>
-</div>
-
-<!-- TICKER -->
-<div class="card">
-    <div class="header">Ticker & Branding</div>
-    <div class="settings-section">
-        <textarea id="row1Inp" placeholder="Title Line 1"></textarea>
-        <textarea id="row2Inp" placeholder="Title Line 2"></textarea>
-        <textarea id="row3Inp" placeholder="Title Line 3"></textarea>
-        <input type="text" id="watermarkInp" class="std-input" placeholder="Channel Name">
-        <button class="btn-full btn-blue" onclick="updateTicker()">Update Ticker</button>
-    </div>
-</div>
 </div>
 
 <script>
@@ -95,9 +65,12 @@ const firebaseConfig = { databaseURL:"https://manpreetteam-a86e9-default-rtdb.fi
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database().ref("matchData/defaultMatch");
 
-// ਟੀਮਾਂ ਦੀ ਲਿਸਟ ਲੋਡ ਕਰਨਾ
+// ਟੀਮਾਂ ਲੋਡ ਕਰਨਾ
 db.child("teamsList").on("value", (snap) => {
-    const teams = snap.val() || [];
+    const val = snap.val() || "";
+    document.getElementById("allTeamsInp").value = val;
+    const teams = val.split(',').map(t => t.trim()).filter(t => t !== "");
+    
     const selects = [document.getElementById("selectA"), document.getElementById("selectB")];
     selects.forEach(sel => {
         sel.innerHTML = '<option value="">ਟੀਮ ਚੁਣੋ</option>';
@@ -105,62 +78,25 @@ db.child("teamsList").on("value", (snap) => {
     });
 });
 
-function addTeam() {
-    const name = document.getElementById("newTeamName").value;
-    if (!name) return;
-    db.child("teamsList").once("value").then(snap => {
-        let teams = snap.val() || [];
-        if (!teams.includes(name)) {
-            teams.push(name);
-            db.child("teamsList").set(teams);
-            document.getElementById("newTeamName").value = "";
-        }
-    });
+function saveTeamsList() {
+    const list = document.getElementById("allTeamsInp").value;
+    db.child("teamsList").set(list);
+    alert("ਟੀਮਾਂ ਸੇਵ ਹੋ ਗਈਆਂ ਹਨ!");
 }
-
-// ਮੈਚ ਡਾਟਾ ਲੋਡ ਕਰਨਾ
-db.on("value", (snap) => {
-    const data = snap.val();
-    if (!data) return;
-    document.getElementById("dispA").innerText = data.scoreA || 0;
-    document.getElementById("dispB").innerText = data.scoreB || 0;
-    document.getElementById("nameA").value = data.nameA || "";
-    document.getElementById("nameB").value = data.nameB || "";
-    document.getElementById("roundInp").value = data.round || "";
-    // ... ਬਾਕੀ ਕੋਡ ਉਹੀ ਹੈ ...
-});
 
 function changeScore(team, val) {
     db.once("value").then(snap => {
-        let data = snap.val() || {};
-        let current = parseFloat(data[team]) || 0;
-        let newScore = Math.max(0, current + val);
-        db.update({ [team]: newScore });
+        let cur = parseFloat(snap.val()[team] || 0);
+        db.update({ [team]: cur + val });
     });
 }
 
-function updateTeamNames() {
-    db.update({ nameA: document.getElementById("nameA").value, nameB: document.getElementById("nameB").value });
-}
-
-function swapTeams() {
-    db.once("value").then(snap => {
-        let d = snap.val();
-        db.update({ nameA: d.nameB, nameB: d.nameA, scoreA: d.scoreB, scoreB: d.scoreA });
-    });
-}
-
-function resetScores() { if(confirm("Reset Scores?")) db.update({scoreA:0, scoreB:0}); }
-function updateTicker() {
-    db.update({
-        round: document.getElementById("roundInp").value,
-        row1Txt: document.getElementById("row1Inp").value,
-        row2Txt: document.getElementById("row2Inp").value,
-        row3Txt: document.getElementById("row3Inp").value
-    });
-}
-function toggleVis(f) { db.child(f).once("value").then(s => db.child(f).set(!s.val())); }
-function toggleCameraView() { db.child("cameraOpposite").once("value").then(s => db.child("cameraOpposite").set(!s.val())); }
+db.on("value", (snap) => {
+    const d = snap.val();
+    if(!d) return;
+    document.getElementById("dispA").innerText = d.scoreA || 0;
+    document.getElementById("dispB").innerText = d.scoreB || 0;
+});
 </script>
 </body>
 </html>
