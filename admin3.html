@@ -14,13 +14,12 @@ body{
     background:#f0f2f5;
     margin:0;
     padding:8px;
-    display:flex;
-    justify-content:center;
 }
 
 #main-panel{
     width:100%;
     max-width:760px;
+    margin:auto;
 }
 
 .card{
@@ -28,7 +27,7 @@ body{
     border-radius:14px;
     box-shadow:0 5px 15px rgba(0,0,0,.15);
     overflow:hidden;
-    margin-bottom:16px;
+    margin-bottom:15px;
 }
 
 .header{
@@ -36,13 +35,13 @@ body{
     color:white;
     padding:10px;
     text-align:center;
-    font-weight:bold;
     font-size:16px;
+    font-weight:bold;
 }
 
 .teams-container{
     display:flex;
-    gap:12px;
+    gap:10px;
     padding:12px;
     align-items:center;
 }
@@ -51,9 +50,14 @@ body{
     flex:1;
 }
 
+.vs-text{
+    font-size:24px;
+    font-weight:bold;
+    color:#999;
+}
+
 select,
-.team-input,
-.std-input,
+input,
 textarea{
     width:100%;
     padding:10px;
@@ -61,8 +65,8 @@ textarea{
     border-radius:8px;
     font-size:18px;
     font-weight:bold;
-    margin-bottom:8px;
     box-sizing:border-box;
+    margin-bottom:8px;
 }
 
 textarea{
@@ -72,6 +76,10 @@ textarea{
 .team-top{
     display:flex;
     gap:6px;
+}
+
+.team-input{
+    flex:1;
 }
 
 .set-btn{
@@ -89,7 +97,6 @@ textarea{
     font-size:52px;
     font-weight:900;
     margin:6px 0;
-    color:#222;
 }
 
 .pm-wrap{
@@ -118,8 +125,8 @@ textarea{
 
 .controls{
     padding:12px;
-    display:flex;
-    flex-direction:column;
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
     gap:8px;
 }
 
@@ -128,16 +135,16 @@ textarea{
     color:white;
     padding:12px;
     border-radius:8px;
-    font-size:14px;
+    font-size:13px;
     font-weight:bold;
     cursor:pointer;
 }
 
-.btn-blue{background:#1a73e8;}
+.btn-green{background:#28a745;}
 .btn-red{background:#ea4335;}
 .btn-yellow{background:#fbbc05;color:black;}
 .btn-dark{background:#333;}
-.btn-green{background:#28a745;}
+.btn-blue{background:#1a73e8;}
 
 .settings-section{
     padding:12px;
@@ -152,21 +159,15 @@ textarea{
 }
 
 .result-title{
-    color:#fbbc05;
     font-size:28px;
     font-weight:900;
+    color:#fbbc05;
 }
 
 .result-text{
     font-size:20px;
     font-weight:bold;
     margin-top:10px;
-}
-
-.vs-text{
-    font-size:24px;
-    font-weight:bold;
-    color:#999;
 }
 
 </style>
@@ -271,17 +272,45 @@ onclick="changeScore('scoreB',1)">
 
 </div>
 
+<!-- BUTTONS -->
 <div class="controls">
+
+<button class="btn-full btn-green"
+onclick="showResultLayer()">
+RESULT
+</button>
+
+<button id="visBtn"
+class="btn-full btn-red"
+onclick="toggleVis('scoreVisible')">
+HIDE
+</button>
+
+<button class="btn-full btn-yellow"
+onclick="swapTeams()">
+SWAP
+</button>
+
+<button class="btn-full btn-dark"
+onclick="toggleCameraView()">
+CAM
+</button>
+
+<button class="btn-full"
+style="background:#777;"
+onclick="resetScores()">
+RESET
+</button>
+
+</div>
+
+<div class="settings-section">
 
 <input type="text"
 id="roundInp"
-class="std-input"
 placeholder="ROUND">
 
 <!-- NEXT MATCH -->
-<div class="settings-section"
-style="padding:0;">
-
 <div class="header"
 style="margin-bottom:10px;">
 NEXT MATCH SETUP
@@ -296,47 +325,19 @@ NEXT MATCH SETUP
 </select>
 
 <button class="btn-full btn-green"
-onclick="addNextMatch()">
+onclick="addNextMatch()"
+style="width:100%;margin-bottom:8px;">
 ADD NEXT MATCH
 </button>
 
 <textarea id="nextMatchList"
 rows="4"
-placeholder="Next Match Teams"
-oninput="autoGrow(this)"></textarea>
+placeholder="Next Match Teams"></textarea>
 
 <button class="btn-full btn-blue"
-onclick="saveNextMatches()">
+onclick="saveNextMatches()"
+style="width:100%;">
 SAVE NEXT MATCHES
-</button>
-
-</div>
-
-<button class="btn-full btn-green"
-onclick="showResultLayer()">
-SHOW RESULT SCREEN
-</button>
-
-<button id="visBtn"
-class="btn-full btn-red"
-onclick="toggleVis('scoreVisible')">
-HIDE SCOREBOARD
-</button>
-
-<button class="btn-full btn-yellow"
-onclick="swapTeams()">
-SWAP TEAMS + SCORE
-</button>
-
-<button class="btn-full btn-dark"
-onclick="toggleCameraView()">
-CAMERA VIEW
-</button>
-
-<button class="btn-full"
-style="background:#777;"
-onclick="resetScores()">
-RESET SCORES
 </button>
 
 </div>
@@ -354,33 +355,31 @@ TOURNAMENT TEAM MANAGER
 
 <input type="text"
 id="newTeamInp"
-class="std-input"
 placeholder="Add New Team">
 
 <button class="btn-full btn-green"
-onclick="addTeam()">
+onclick="addTeam()"
+style="width:100%;margin-bottom:8px;">
 ADD TEAM
 </button>
 
 <textarea id="allTeamsInp"
-rows="7"
-placeholder="All Participating Teams"
-oninput="autoGrow(this)"></textarea>
+rows="6"
+placeholder="All Participating Teams"></textarea>
 
 <button class="btn-full btn-blue"
-onclick="saveAllTeams()">
+onclick="saveAllTeams()"
+style="width:100%;margin-bottom:8px;">
 SAVE TEAM LIST
 </button>
 
 <textarea id="winnerTeamsInp"
 rows="4"
-placeholder="Qualified Teams"
-oninput="autoGrow(this)"></textarea>
+placeholder="Qualified Teams"></textarea>
 
 <textarea id="loserTeamsInp"
 rows="4"
-placeholder="Eliminated Teams"
-oninput="autoGrow(this)"></textarea>
+placeholder="Eliminated Teams"></textarea>
 
 </div>
 
@@ -397,32 +396,30 @@ TICKER & BRANDING
 
 <textarea id="row1Inp"
 rows="2"
-placeholder="Title Line 1"
-oninput="autoGrow(this)"></textarea>
+placeholder="Title Line 1"></textarea>
 
 <textarea id="row2Inp"
 rows="2"
-placeholder="Title Line 2"
-oninput="autoGrow(this)"></textarea>
+placeholder="Title Line 2"></textarea>
 
 <textarea id="row3Inp"
 rows="2"
-placeholder="Title Line 3"
-oninput="autoGrow(this)"></textarea>
+placeholder="Title Line 3"></textarea>
 
 <input type="text"
 id="watermarkInp"
-class="std-input"
 placeholder="Channel Name">
 
 <button class="btn-full btn-blue"
-onclick="updateTicker()">
+onclick="updateTicker()"
+style="width:100%;margin-bottom:8px;">
 UPDATE TICKER
 </button>
 
 <button id="tickVisBtn"
 class="btn-full btn-red"
-onclick="toggleVis('tickerVisible')">
+onclick="toggleVis('tickerVisible')"
+style="width:100%;">
 HIDE TICKER
 </button>
 
@@ -477,9 +474,6 @@ firebase.database().ref("matchData/" + matchId);
 let curA=0;
 let curB=0;
 
-let sVis=true;
-let tVis=true;
-
 let camOpposite=false;
 
 let allTeams=[];
@@ -496,10 +490,6 @@ curB=parseFloat(data.scoreB)||0;
 
 allTeams=data.allTeams || [];
 nextMatches=data.nextMatches || [];
-
-updateTeamTextarea();
-updateTeamDropdowns();
-updateNextMatchDropdowns();
 
 document.getElementById("dispA").innerText=curA;
 document.getElementById("dispB").innerText=curB;
@@ -525,6 +515,9 @@ data.eliminatedTeams || "";
 document.getElementById("nextMatchList").value =
 nextMatches.join("\n");
 
+document.getElementById("allTeamsInp").value =
+allTeams.join("\n");
+
 document.getElementById("resultText").innerText =
 data.resultText || "No Result Yet";
 
@@ -533,27 +526,44 @@ camOpposite=data.cameraOpposite||false;
 document.getElementById("teamWrap").style.flexDirection =
 camOpposite ? "row-reverse" : "row";
 
+updateDropdowns();
+
 }
 });
 
-function autoGrow(el){
+function updateDropdowns(){
 
-el.style.height="auto";
-el.style.height=el.scrollHeight+"px";
+const a=document.getElementById("teamSelectA");
+const b=document.getElementById("teamSelectB");
+
+const na=document.getElementById("nextTeamA");
+const nb=document.getElementById("nextTeamB");
+
+a.innerHTML='<option value="">Select Team A</option>';
+b.innerHTML='<option value="">Select Team B</option>';
+
+na.innerHTML='<option value="">Select Next Match Team 1</option>';
+nb.innerHTML='<option value="">Select Next Match Team 2</option>';
+
+allTeams.forEach(team=>{
+
+a.innerHTML += `<option value="${team}">${team}</option>`;
+b.innerHTML += `<option value="${team}">${team}</option>`;
+
+na.innerHTML += `<option value="${team}">${team}</option>`;
+nb.innerHTML += `<option value="${team}">${team}</option>`;
+
+});
 }
 
 function addTeam(){
 
-const team =
+const team=
 document.getElementById("newTeamInp").value.trim();
 
 if(team==="") return;
 
 allTeams.push(team);
-
-updateTeamTextarea();
-updateTeamDropdowns();
-updateNextMatchDropdowns();
 
 db.update({
 allTeams:allTeams
@@ -564,73 +574,14 @@ document.getElementById("newTeamInp").value="";
 
 function saveAllTeams(){
 
-const txt =
-document.getElementById("allTeamsInp").value;
-
-allTeams =
-txt.split("\n")
+allTeams=
+document.getElementById("allTeamsInp").value
+.split("\n")
 .map(t=>t.trim())
 .filter(t=>t!=='');
 
-updateTeamDropdowns();
-updateNextMatchDropdowns();
-
 db.update({
 allTeams:allTeams
-});
-}
-
-function updateTeamTextarea(){
-
-document.getElementById("allTeamsInp").value =
-allTeams.join("\n");
-}
-
-function updateTeamDropdowns(){
-
-const selectA =
-document.getElementById("teamSelectA");
-
-const selectB =
-document.getElementById("teamSelectB");
-
-selectA.innerHTML =
-'<option value="">Select Team A</option>';
-
-selectB.innerHTML =
-'<option value="">Select Team B</option>';
-
-allTeams.forEach(team=>{
-
-selectA.innerHTML +=
-`<option value="${team}">${team}</option>`;
-
-selectB.innerHTML +=
-`<option value="${team}">${team}</option>`;
-});
-}
-
-function updateNextMatchDropdowns(){
-
-const selA =
-document.getElementById("nextTeamA");
-
-const selB =
-document.getElementById("nextTeamB");
-
-selA.innerHTML =
-'<option value="">Select Next Match Team 1</option>';
-
-selB.innerHTML =
-'<option value="">Select Next Match Team 2</option>';
-
-allTeams.forEach(team=>{
-
-selA.innerHTML +=
-`<option value="${team}">${team}</option>`;
-
-selB.innerHTML +=
-`<option value="${team}">${team}</option>`;
 });
 }
 
@@ -645,22 +596,20 @@ document.getElementById("nameB").value=team;
 function updateTeamA(){
 
 db.update({
-nameA:
-document.getElementById("nameA").value
+nameA:document.getElementById("nameA").value
 });
 }
 
 function updateTeamB(){
 
 db.update({
-nameB:
-document.getElementById("nameB").value
+nameB:document.getElementById("nameB").value
 });
 }
 
 function changeScore(team,val){
 
-let current=(team==="scoreA") ? curA : curB;
+let current=(team==="scoreA")?curA:curB;
 
 let newVal;
 
@@ -710,10 +659,7 @@ document.getElementById("watermarkInp").value
 
 function toggleVis(field){
 
-let val =
-field==="scoreVisible" ? sVis : tVis;
-
-db.child(field).set(!val);
+db.child(field).set(true);
 }
 
 function swapTeams(){
@@ -733,7 +679,7 @@ scoreB:curA
 
 function resetScores(){
 
-if(confirm("Reset Match Scores?")){
+if(confirm("Reset Scores?")){
 
 db.update({
 scoreA:0,
@@ -751,10 +697,10 @@ cameraOpposite: !camOpposite
 
 function showResultLayer(){
 
-const teamA =
+const teamA=
 document.getElementById("nameA").value;
 
-const teamB =
+const teamB=
 document.getElementById("nameB").value;
 
 let winner="";
@@ -771,81 +717,51 @@ winner=teamB;
 loser=teamA;
 }
 
-let winners =
+let winners=
 document.getElementById("winnerTeamsInp").value;
 
-if(winners.trim()==="")
-winners=winner;
-else
-winners += "\n"+winner;
+winners += (winners ? "\n":"") + winner;
 
-let losers =
+let losers=
 document.getElementById("loserTeamsInp").value;
 
-if(losers.trim()==="")
-losers=loser;
-else
-losers += "\n"+loser;
+losers += (losers ? "\n":"") + loser;
 
-document.getElementById("winnerTeamsInp").value =
-winners;
+document.getElementById("winnerTeamsInp").value=winners;
+document.getElementById("loserTeamsInp").value=losers;
 
-document.getElementById("loserTeamsInp").value =
-losers;
+const resultText=
+winner + " defeated " + loser;
 
-const resultText =
-winner +
-" defeated " +
-loser +
-" by " +
-curA +
-" - " +
-curB;
+document.getElementById("resultText").innerText=resultText;
 
-document.getElementById("resultText").innerText =
-resultText;
+allTeams=allTeams.filter(t=>t!==loser);
 
 db.update({
 
 resultText:resultText,
 
-winnerTeam:winner,
-
-loserTeam:loser,
-
 qualifiedTeams:winners,
 
-eliminatedTeams:losers
-});
+eliminatedTeams:losers,
 
-allTeams =
-allTeams.filter(t=>t!==loser);
-
-updateTeamTextarea();
-updateTeamDropdowns();
-updateNextMatchDropdowns();
-
-db.update({
 allTeams:allTeams
 });
 }
 
 function addNextMatch(){
 
-const a =
+const a=
 document.getElementById("nextTeamA").value;
 
-const b =
+const b=
 document.getElementById("nextTeamB").value;
 
 if(a==="" || b==="") return;
 
-const match =
-a + " VS " + b;
+nextMatches.push(a + " VS " + b);
 
-nextMatches.push(match);
-
-document.getElementById("nextMatchList").value =
+document.getElementById("nextMatchList").value=
 nextMatches.join("\n");
 
 db.update({
@@ -855,11 +771,9 @@ nextMatches:nextMatches
 
 function saveNextMatches(){
 
-const txt =
-document.getElementById("nextMatchList").value;
-
-nextMatches =
-txt.split("\n")
+nextMatches=
+document.getElementById("nextMatchList").value
+.split("\n")
 .map(t=>t.trim())
 .filter(t=>t!=='');
 
