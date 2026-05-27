@@ -293,7 +293,7 @@ SWAP
 
 <button class="btn-full btn-dark"
 onclick="toggleCameraView()">
-CAM
+Camera View
 </button>
 
 <button class="btn-full"
@@ -521,14 +521,14 @@ allTeams.join("\n");
 document.getElementById("resultText").innerText =
 data.resultText || "No Result Yet";
 
-camOpposite=data.cameraOpposite||false;
+     camOpposite=data.cameraOpposite||false;
 
-document.getElementById("teamWrap").style.flexDirection =
-camOpposite ? "row-reverse" : "row";
+        document.querySelector(".teams-container").style.flexDirection =
+            camOpposite ? "row-reverse" : "row";
 
-updateDropdowns();
-
-}
+        document.getElementById("camBtn").innerText =
+            camOpposite ? "Camera Oppo View" : "Camera View";
+    }
 });
 
 function updateDropdowns(){
