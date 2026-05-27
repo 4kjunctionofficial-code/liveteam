@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pa">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,7 +35,7 @@ body{
     color:white;
     padding:12px;
     text-align:center;
-    font-size:16px;
+    font-size:18px;
     font-weight:bold;
 }
 
@@ -51,7 +51,7 @@ body{
 }
 
 .vs-text{
-    font-size:30px;
+    font-size:24px;
     font-weight:bold;
     color:#999;
 }
@@ -83,35 +83,34 @@ textarea{
 }
 
 .set-btn{
-    width:90px;
+    width:80px;
     border:none;
     background:#1a73e8;
     color:white;
     border-radius:10px;
     font-weight:bold;
     cursor:pointer;
-    font-size:18px;
 }
 
 .score-val{
     text-align:center;
-    font-size:70px;
+    font-size:60px;
     font-weight:900;
-    margin:8px 0;
+    margin:6px 0;
 }
 
 .pm-wrap{
     display:flex;
-    gap:8px;
+    gap:6px;
 }
 
 .btn-pm{
     flex:1;
     border:none;
     color:white;
-    padding:16px;
+    padding:15px;
     border-radius:10px;
-    font-size:32px;
+    font-size:30px;
     font-weight:bold;
     cursor:pointer;
 }
@@ -127,19 +126,18 @@ textarea{
 .controls{
     padding:12px;
     display:grid;
-    grid-template-columns:repeat(2,1fr);
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
     gap:10px;
 }
 
 .btn-full{
     border:none;
     color:white;
-    padding:16px;
-    border-radius:10px;
+    height:72px;
+    border-radius:12px;
     font-size:18px;
-    font-weight:bold;
+    font-weight:900;
     cursor:pointer;
-    height:70px;
     width:100%;
 }
 
@@ -148,6 +146,7 @@ textarea{
 .btn-yellow{background:#fbbc05;color:black;}
 .btn-dark{background:#333;}
 .btn-blue{background:#1a73e8;}
+.btn-gray{background:#777;}
 
 .settings-section{
     padding:12px;
@@ -168,20 +167,24 @@ textarea{
 }
 
 .result-text{
-    font-size:24px;
+    font-size:22px;
     font-weight:bold;
     margin-top:10px;
 }
 
-@media(max-width:700px){
+@media(max-width:768px){
 
 .controls{
 grid-template-columns:repeat(2,1fr);
 }
 
 .btn-full{
-font-size:16px;
+font-size:15px;
 height:65px;
+}
+
+.score-val{
+font-size:50px;
 }
 
 }
@@ -244,9 +247,7 @@ onclick="changeScore('scoreA',1)">
 
 </div>
 
-<div class="vs-text">
-VS
-</div>
+<div class="vs-text">VS</div>
 
 <!-- TEAM B -->
 
@@ -303,7 +304,7 @@ RESULT
 <button id="visBtn"
 class="btn-full btn-red"
 onclick="toggleVis('scoreVisible')">
-Hide Scoreboard
+HIDE SCOREBOARD
 </button>
 
 <button class="btn-full btn-yellow"
@@ -314,19 +315,17 @@ SWAP
 <button class="btn-full btn-dark"
 id="camBtn"
 onclick="toggleCameraView()">
-Camera View
+CAMERA VIEW
 </button>
 
-<button class="btn-full"
-style="background:#777;"
+<button class="btn-full btn-gray"
 onclick="resetScores()">
-RESET
+RESET SCORE
 </button>
 
-<button id="tickVisBtn"
-class="btn-full btn-blue"
-onclick="toggleVis('tickerVisible')">
-Hide Ticker
+<button class="btn-full btn-blue"
+onclick="toggleTickerPanel()">
+TICKER PANEL
 </button>
 
 </div>
@@ -337,32 +336,40 @@ Hide Ticker
 id="roundInp"
 placeholder="ROUND">
 
-<div class="header"
-style="margin-bottom:10px;">
+</div>
+
+</div>
+
+<!-- NEXT MATCH -->
+
+<div class="card">
+
+<div class="header">
 NEXT MATCH SETUP
 </div>
 
+<div class="settings-section">
+
 <select id="nextTeamA">
-<option value="">Select Next Match Team 1</option>
+<option value="">Select Team 1</option>
 </select>
 
 <select id="nextTeamB">
-<option value="">Select Next Match Team 2</option>
+<option value="">Select Team 2</option>
 </select>
 
 <button class="btn-full btn-green"
 onclick="addNextMatch()"
-style="width:100%;margin-bottom:8px;">
+style="margin-bottom:8px;">
 ADD NEXT MATCH
 </button>
 
 <textarea id="nextMatchList"
-rows="4"
+rows="5"
 placeholder="Next Match Teams"></textarea>
 
 <button class="btn-full btn-blue"
-onclick="saveNextMatches()"
-style="width:100%;">
+onclick="saveNextMatches()">
 SAVE NEXT MATCHES
 </button>
 
@@ -386,17 +393,17 @@ placeholder="Mudki, Faridkot, Talwandi"></textarea>
 
 <button class="btn-full btn-green"
 onclick="addTeam()"
-style="width:100%;margin-bottom:8px;">
+style="margin-bottom:8px;">
 ADD TEAM
 </button>
 
 <textarea id="allTeamsInp"
 rows="6"
-placeholder="All Teams"></textarea>
+placeholder="All Participating Teams"></textarea>
 
 <button class="btn-full btn-blue"
 onclick="saveAllTeams()"
-style="width:100%;margin-bottom:8px;">
+style="margin-bottom:8px;">
 SAVE TEAM LIST
 </button>
 
@@ -412,6 +419,61 @@ placeholder="Loser Teams"></textarea>
 
 </div>
 
+<!-- RESET ALL -->
+
+<button class="btn-full btn-red"
+onclick="clearAllTeams()"
+style="margin-bottom:15px;">
+RESET ALL TEAMS
+</button>
+
+<!-- TICKER PANEL -->
+
+<div class="card"
+id="tickerPanel"
+style="display:none;">
+
+<div class="header">
+TICKER & BRANDING
+</div>
+
+<div class="settings-section">
+
+<textarea id="row1Inp"
+rows="2"
+placeholder="Title Line 1"></textarea>
+
+<textarea id="row2Inp"
+rows="2"
+placeholder="Title Line 2"></textarea>
+
+<textarea id="row3Inp"
+rows="2"
+placeholder="Title Line 3"></textarea>
+
+<input type="text"
+id="watermarkInp"
+placeholder="Channel Name">
+
+<div class="controls">
+
+<button class="btn-full btn-blue"
+onclick="updateTicker()">
+UPDATE TICKER
+</button>
+
+<button id="tickVisBtn"
+class="btn-full btn-red"
+onclick="toggleVis('tickerVisible')">
+HIDE TICKER
+</button>
+
+</div>
+
+</div>
+
+</div>
+
 <!-- RESULT -->
 
 <div class="card">
@@ -421,34 +483,6 @@ MATCH RESULT
 </div>
 
 <div class="settings-section">
-
-<div style="
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-margin-bottom:12px;
-">
-
-<button class="btn-full btn-green"
-onclick="showResultLayer()">
-WIN RESULT
-</button>
-
-<button class="btn-full btn-yellow"
-style="color:black;"
-onclick="setPendingResult()">
-RESULT PENDING
-</button>
-
-</div>
-
-<input type="text"
-id="winnerEdit"
-placeholder="Winner Team Name">
-
-<input type="text"
-id="loserEdit"
-placeholder="Loser Team Name">
 
 <div class="result-box">
 
@@ -462,12 +496,6 @@ No Result Yet
 </div>
 
 </div>
-
-<button class="btn-full btn-blue"
-onclick="saveEditedResult()"
-style="margin-top:10px;width:100%;">
-SAVE RESULT EDIT
-</button>
 
 </div>
 
@@ -519,6 +547,13 @@ document.getElementById("nameB").value=data.nameB||"";
 
 document.getElementById("roundInp").value=data.round||"";
 
+document.getElementById("row1Inp").value=data.row1Txt||"";
+document.getElementById("row2Inp").value=data.row2Txt||"";
+document.getElementById("row3Inp").value=data.row3Txt||"";
+
+document.getElementById("watermarkInp").value =
+data.watermarkTxt||"";
+
 document.getElementById("winnerTeamsInp").value =
 data.qualifiedTeams || "";
 
@@ -534,33 +569,16 @@ allTeams.join("\n");
 document.getElementById("resultText").innerText =
 data.resultText || "No Result Yet";
 
-const sVis = data.scoreVisible !== false;
-
-document.getElementById("visBtn").innerText =
-sVis ? "Hide Scoreboard" : "Show Scoreboard";
-
-const tVis = data.tickerVisible !== false;
-
-document.getElementById("tickVisBtn").innerText =
-tVis ? "Hide Ticker" : "Show Ticker";
-
 camOpposite=data.cameraOpposite||false;
 
 document.getElementById("teamWrap").style.flexDirection =
 camOpposite ? "row-reverse" : "row";
-
-document.getElementById("camBtn").innerText =
-camOpposite
-? "Camera Oppo View"
-: "Camera View";
 
 updateDropdowns();
 
 }
 
 });
-
-/* DROPDOWNS */
 
 function updateDropdowns(){
 
@@ -573,8 +591,8 @@ const nb=document.getElementById("nextTeamB");
 a.innerHTML='<option value="">Select Team A</option>';
 b.innerHTML='<option value="">Select Team B</option>';
 
-na.innerHTML='<option value="">Select Next Match Team 1</option>';
-nb.innerHTML='<option value="">Select Next Match Team 2</option>';
+na.innerHTML='<option value="">Select Team 1</option>';
+nb.innerHTML='<option value="">Select Team 2</option>';
 
 allTeams.forEach(team=>{
 
@@ -587,8 +605,6 @@ nb.innerHTML += `<option value="${team}">${team}</option>`;
 });
 
 }
-
-/* TEAM */
 
 function addTeam(){
 
@@ -611,14 +627,9 @@ allTeams.push(team);
 
 });
 
-document.getElementById("allTeamsInp").value =
-allTeams.join("\n");
-
 db.update({
 allTeams:allTeams
 });
-
-updateDropdowns();
 
 document.getElementById("newTeamInp").value="";
 
@@ -636,11 +647,7 @@ db.update({
 allTeams:allTeams
 });
 
-updateDropdowns();
-
 }
-
-/* TEAM SELECT */
 
 function selectTeamA(team){
 document.getElementById("nameA").value=team;
@@ -666,15 +673,14 @@ nameB:document.getElementById("nameB").value
 
 }
 
-/* SCORE */
-
 function changeScore(team,val){
 
 let current=(team==="scoreA")?curA:curB;
 
 let newVal=current+val;
 
-if(newVal<0)newVal=0;
+if(newVal<0)
+newVal=0;
 
 db.update({
 [team]:newVal
@@ -682,23 +688,42 @@ db.update({
 
 }
 
-/* SHOW HIDE */
-
-function toggleVis(field){
-
-db.child(field).once("value",snap=>{
-
-const current = snap.val();
+function updateTicker(){
 
 db.update({
-[field]: current === false ? true : false
-});
+
+round:
+document.getElementById("roundInp").value,
+
+row1Txt:
+document.getElementById("row1Inp").value,
+
+row2Txt:
+document.getElementById("row2Inp").value,
+
+row3Txt:
+document.getElementById("row3Inp").value,
+
+watermarkTxt:
+document.getElementById("watermarkInp").value
 
 });
 
 }
 
-/* SWAP */
+function toggleVis(field){
+
+db.child(field).once("value",snap=>{
+
+const current=snap.val();
+
+db.update({
+[field]: current===false ? true : false
+});
+
+});
+
+}
 
 function swapTeams(){
 
@@ -717,8 +742,6 @@ scoreB:curA
 
 }
 
-/* RESET */
-
 function resetScores(){
 
 if(confirm("Reset Scores?")){
@@ -732,8 +755,6 @@ scoreB:0
 
 }
 
-/* CAMERA */
-
 function toggleCameraView(){
 
 db.update({
@@ -742,7 +763,37 @@ cameraOpposite: !camOpposite
 
 }
 
-/* RESULT */
+function addNextMatch(){
+
+const a=
+document.getElementById("nextTeamA").value;
+
+const b=
+document.getElementById("nextTeamB").value;
+
+if(a==="" || b==="") return;
+
+nextMatches.push(a + " VS " + b);
+
+db.update({
+nextMatches:nextMatches
+});
+
+}
+
+function saveNextMatches(){
+
+nextMatches=
+document.getElementById("nextMatchList").value
+.split("\n")
+.map(t=>t.trim())
+.filter(t=>t!=='');
+
+db.update({
+nextMatches:nextMatches
+});
+
+}
 
 function showResultLayer(){
 
@@ -767,24 +818,12 @@ loser=teamA;
 
 }
 
-document.getElementById("winnerEdit").value =
-winner;
-
-document.getElementById("loserEdit").value =
-loser;
-
-const resultText =
-winner + " WIN";
-
-document.getElementById("resultText").innerText =
-resultText;
-
 let winners =
 document.getElementById("winnerTeamsInp").value
 .split("\n")
 .filter(t=>t.trim()!=='');
 
-winners.push(winner + " WIN");
+winners.push(winner + " (WIN)");
 
 let losers =
 document.getElementById("loserTeamsInp").value
@@ -793,11 +832,11 @@ document.getElementById("loserTeamsInp").value
 
 losers.push(loser);
 
-document.getElementById("winnerTeamsInp").value =
-winners.join("\n");
-
-document.getElementById("loserTeamsInp").value =
-losers.join("\n");
+const resultText =
+winner +
+" WIN vs " +
+loser +
+" (" + curA + " - " + curB + ")";
 
 db.update({
 
@@ -805,120 +844,62 @@ resultText:resultText,
 
 qualifiedTeams:winners.join("\n"),
 
-eliminatedTeams:losers.join("\n")
+eliminatedTeams:losers.join("\n"),
 
-});
+allTeams:allTeams,
 
-alert(resultText);
-
-}
-
-/* RESULT PENDING */
-
-function setPendingResult(){
-
-document.getElementById("resultText").innerText =
-"RESULT PENDING";
-
-document.getElementById("winnerEdit").value = "";
-document.getElementById("loserEdit").value = "";
-
-db.update({
-
-resultText:"RESULT PENDING"
-
-});
-
-}
-
-/* SAVE EDIT RESULT */
-
-function saveEditedResult(){
-
-const winner =
-document.getElementById("winnerEdit").value.trim();
-
-const loser =
-document.getElementById("loserEdit").value.trim();
-
-if(winner==="") return;
-
-const finalResult =
-winner + " WIN";
-
-document.getElementById("resultText").innerText =
-finalResult;
-
-let winners =
-document.getElementById("winnerTeamsInp").value
-.split("\n")
-.filter(t=>t.trim()!=='');
-
-winners.push(winner + " WIN");
-
-let losers =
-document.getElementById("loserTeamsInp").value
-.split("\n")
-.filter(t=>t.trim()!=='');
-
-if(loser!==""){
-
-losers.push(loser);
-
-}
-
-document.getElementById("winnerTeamsInp").value =
-winners.join("\n");
-
-document.getElementById("loserTeamsInp").value =
-losers.join("\n");
-
-db.update({
-
-resultText:finalResult,
-
-qualifiedTeams:winners.join("\n"),
-
-eliminatedTeams:losers.join("\n")
-
-});
-
-}
-
-/* NEXT MATCH */
-
-function addNextMatch(){
-
-const a=
-document.getElementById("nextTeamA").value;
-
-const b=
-document.getElementById("nextTeamB").value;
-
-if(a==="" || b==="") return;
-
-nextMatches.push(a + " VS " + b);
-
-document.getElementById("nextMatchList").value=
-nextMatches.join("\n");
-
-db.update({
 nextMatches:nextMatches
+
 });
 
 }
 
-function saveNextMatches(){
+function clearAllTeams(){
 
-nextMatches=
-document.getElementById("nextMatchList").value
-.split("\n")
-.map(t=>t.trim())
-.filter(t=>t!=='');
+if(confirm("Delete All Teams?")){
+
+allTeams=[];
 
 db.update({
-nextMatches:nextMatches
+
+allTeams:[],
+
+qualifiedTeams:"",
+
+eliminatedTeams:"",
+
+nextMatches:[],
+
+resultText:"No Result Yet",
+
+scoreA:0,
+
+scoreB:0,
+
+nameA:"",
+
+nameB:""
+
 });
+
+}
+
+}
+
+function toggleTickerPanel(){
+
+const panel =
+document.getElementById("tickerPanel");
+
+if(panel.style.display==="none"){
+
+panel.style.display="block";
+
+}else{
+
+panel.style.display="none";
+
+}
 
 }
 
