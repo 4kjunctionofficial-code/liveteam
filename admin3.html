@@ -7,6 +7,8 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
+<title>Kabaddi Score Panel</title>
+
 <style>
 
 body{
@@ -51,19 +53,17 @@ body{
 }
 
 .vs-text{
-    font-size:24px;
+    font-size:26px;
     font-weight:bold;
-    color:#999;
+    color:#777;
 }
 
-select,
-input,
-textarea{
+select,input,textarea{
     width:100%;
     padding:12px;
     border:2px solid #ddd;
     border-radius:10px;
-    font-size:18px;
+    font-size:17px;
     font-weight:bold;
     box-sizing:border-box;
     margin-bottom:8px;
@@ -83,7 +83,7 @@ textarea{
 }
 
 .set-btn{
-    width:80px;
+    width:75px;
     border:none;
     background:#1a73e8;
     color:white;
@@ -96,7 +96,7 @@ textarea{
     text-align:center;
     font-size:60px;
     font-weight:900;
-    margin:6px 0;
+    margin:8px 0;
 }
 
 .pm-wrap{
@@ -108,7 +108,7 @@ textarea{
     flex:1;
     border:none;
     color:white;
-    padding:15px;
+    padding:14px;
     border-radius:10px;
     font-size:30px;
     font-weight:bold;
@@ -133,9 +133,9 @@ textarea{
 .btn-full{
     border:none;
     color:white;
-    height:72px;
+    height:68px;
     border-radius:12px;
-    font-size:18px;
+    font-size:16px;
     font-weight:900;
     cursor:pointer;
     width:100%;
@@ -147,6 +147,7 @@ textarea{
 .btn-dark{background:#333;}
 .btn-blue{background:#1a73e8;}
 .btn-gray{background:#777;}
+.btn-purple{background:#7b1fa2;}
 
 .settings-section{
     padding:12px;
@@ -179,12 +180,12 @@ grid-template-columns:repeat(2,1fr);
 }
 
 .btn-full{
-font-size:15px;
-height:65px;
+font-size:14px;
+height:64px;
 }
 
 .score-val{
-font-size:50px;
+font-size:48px;
 }
 
 }
@@ -301,10 +302,9 @@ onclick="showResultLayer()">
 RESULT
 </button>
 
-<button id="visBtn"
-class="btn-full btn-red"
-onclick="toggleVis('scoreVisible')">
-HIDE SCOREBOARD
+<button class="btn-full btn-red"
+onclick="resetScores()">
+RESET SCORE
 </button>
 
 <button class="btn-full btn-yellow"
@@ -313,19 +313,18 @@ SWAP
 </button>
 
 <button class="btn-full btn-dark"
-id="camBtn"
 onclick="toggleCameraView()">
 CAMERA VIEW
-</button>
-
-<button class="btn-full btn-gray"
-onclick="resetScores()">
-RESET SCORE
 </button>
 
 <button class="btn-full btn-blue"
 onclick="toggleTickerPanel()">
 TICKER PANEL
+</button>
+
+<button class="btn-full btn-purple"
+onclick="toggleByePanel()">
+BYE TEAM
 </button>
 
 </div>
@@ -365,7 +364,7 @@ ADD NEXT MATCH
 </button>
 
 <textarea id="nextMatchList"
-rows="5"
+rows="7"
 placeholder="Next Match Teams"></textarea>
 
 <button class="btn-full btn-blue"
@@ -377,12 +376,37 @@ SAVE NEXT MATCHES
 
 </div>
 
+<!-- BYE TEAM -->
+
+<div class="card"
+id="byePanel"
+style="display:none;">
+
+<div class="header">
+BYE TEAM TO NEXT ROUND
+</div>
+
+<div class="settings-section">
+
+<select id="byeTeamSelect">
+<option value="">Select Bye Team</option>
+</select>
+
+<button class="btn-full btn-purple"
+onclick="addByeTeam()">
+ADD BYE TEAM
+</button>
+
+</div>
+
+</div>
+
 <!-- TEAM MANAGER -->
 
 <div class="card">
 
 <div class="header">
-TOURNAMENT TEAM MANAGER
+TEAM MANAGER
 </div>
 
 <div class="settings-section">
@@ -398,8 +422,8 @@ ADD TEAM
 </button>
 
 <textarea id="allTeamsInp"
-rows="6"
-placeholder="All Participating Teams"></textarea>
+rows="7"
+placeholder="All Teams"></textarea>
 
 <button class="btn-full btn-blue"
 onclick="saveAllTeams()"
@@ -408,18 +432,16 @@ SAVE TEAM LIST
 </button>
 
 <textarea id="winnerTeamsInp"
-rows="4"
-placeholder="Winner Teams"></textarea>
+rows="5"
+placeholder="Qualified Teams"></textarea>
 
 <textarea id="loserTeamsInp"
-rows="4"
-placeholder="Loser Teams"></textarea>
+rows="5"
+placeholder="Eliminated Teams"></textarea>
 
 </div>
 
 </div>
-
-<!-- RESET ALL -->
 
 <button class="btn-full btn-red"
 onclick="clearAllTeams()"
@@ -427,14 +449,14 @@ style="margin-bottom:15px;">
 RESET ALL TEAMS
 </button>
 
-<!-- TICKER PANEL -->
+<!-- TICKER -->
 
 <div class="card"
 id="tickerPanel"
 style="display:none;">
 
 <div class="header">
-TICKER & BRANDING
+TICKER PANEL
 </div>
 
 <div class="settings-section">
@@ -455,20 +477,10 @@ placeholder="Title Line 3"></textarea>
 id="watermarkInp"
 placeholder="Channel Name">
 
-<div class="controls">
-
 <button class="btn-full btn-blue"
 onclick="updateTicker()">
 UPDATE TICKER
 </button>
-
-<button id="tickVisBtn"
-class="btn-full btn-red"
-onclick="toggleVis('tickerVisible')">
-HIDE TICKER
-</button>
-
-</div>
 
 </div>
 
@@ -582,25 +594,26 @@ updateDropdowns();
 
 function updateDropdowns(){
 
-const a=document.getElementById("teamSelectA");
-const b=document.getElementById("teamSelectB");
+const ids=[
+"teamSelectA",
+"teamSelectB",
+"nextTeamA",
+"nextTeamB",
+"byeTeamSelect"
+];
 
-const na=document.getElementById("nextTeamA");
-const nb=document.getElementById("nextTeamB");
+ids.forEach(id=>{
 
-a.innerHTML='<option value="">Select Team A</option>';
-b.innerHTML='<option value="">Select Team B</option>';
+const el=document.getElementById(id);
 
-na.innerHTML='<option value="">Select Team 1</option>';
-nb.innerHTML='<option value="">Select Team 2</option>';
+el.innerHTML='<option value="">Select Team</option>';
 
 allTeams.forEach(team=>{
 
-a.innerHTML += `<option value="${team}">${team}</option>`;
-b.innerHTML += `<option value="${team}">${team}</option>`;
+el.innerHTML +=
+`<option value="${team}">${team}</option>`;
 
-na.innerHTML += `<option value="${team}">${team}</option>`;
-nb.innerHTML += `<option value="${team}">${team}</option>`;
+});
 
 });
 
@@ -679,8 +692,7 @@ let current=(team==="scoreA")?curA:curB;
 
 let newVal=current+val;
 
-if(newVal<0)
-newVal=0;
+if(newVal<0) newVal=0;
 
 db.update({
 [team]:newVal
@@ -706,20 +718,6 @@ document.getElementById("row3Inp").value,
 
 watermarkTxt:
 document.getElementById("watermarkInp").value
-
-});
-
-}
-
-function toggleVis(field){
-
-db.child(field).once("value",snap=>{
-
-const current=snap.val();
-
-db.update({
-[field]: current===false ? true : false
-});
 
 });
 
@@ -775,6 +773,9 @@ if(a==="" || b==="") return;
 
 nextMatches.push(a + " VS " + b);
 
+document.getElementById("nextMatchList").value =
+nextMatches.join("\n");
+
 db.update({
 nextMatches:nextMatches
 });
@@ -791,6 +792,29 @@ document.getElementById("nextMatchList").value
 
 db.update({
 nextMatches:nextMatches
+});
+
+}
+
+function addByeTeam(){
+
+const team=
+document.getElementById("byeTeamSelect").value;
+
+if(team==="") return;
+
+let winners=
+document.getElementById("winnerTeamsInp").value
+.split("\n")
+.filter(t=>t.trim()!=='');
+
+winners.push(team + " (BYE)");
+
+document.getElementById("winnerTeamsInp").value=
+winners.join("\n");
+
+db.update({
+qualifiedTeams:winners.join("\n")
 });
 
 }
@@ -838,17 +862,16 @@ winner +
 loser +
 " (" + curA + " - " + curB + ")";
 
+document.getElementById("resultText").innerText =
+resultText;
+
 db.update({
 
 resultText:resultText,
 
 qualifiedTeams:winners.join("\n"),
 
-eliminatedTeams:losers.join("\n"),
-
-allTeams:allTeams,
-
-nextMatches:nextMatches
+eliminatedTeams:losers.join("\n")
 
 });
 
@@ -888,18 +911,25 @@ nameB:""
 
 function toggleTickerPanel(){
 
-const panel =
+const panel=
 document.getElementById("tickerPanel");
 
-if(panel.style.display==="none"){
-
-panel.style.display="block";
-
-}else{
-
-panel.style.display="none";
+panel.style.display =
+panel.style.display==="none"
+? "block"
+: "none";
 
 }
+
+function toggleByePanel(){
+
+const panel=
+document.getElementById("byePanel");
+
+panel.style.display =
+panel.style.display==="none"
+? "block"
+: "none";
 
 }
 
