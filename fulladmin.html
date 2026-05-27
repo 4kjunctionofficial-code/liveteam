@@ -985,14 +985,40 @@ qualifiedTeams:"",
 
 eliminatedTeams:"",
 
-nextMatches:[]
+nextMatches:[],
+
+resultText:"No Result Yet",
+
+scoreA:0,
+
+scoreB:0,
+
+nameA:"",
+
+nameB:""
 
 });
+
+/* CLEAR BOXES */
 
 document.getElementById("allTeamsInp").value="";
 document.getElementById("winnerTeamsInp").value="";
 document.getElementById("loserTeamsInp").value="";
 document.getElementById("nextMatchList").value="";
+document.getElementById("resultText").innerText="No Result Yet";
+
+document.getElementById("dispA").innerText="0";
+document.getElementById("dispB").innerText="0";
+
+document.getElementById("nameA").value="";
+document.getElementById("nameB").value="";
+
+/* RESET VARIABLES */
+
+curA=0;
+curB=0;
+
+/* UPDATE DROPDOWN */
 
 updateDropdowns();
 
