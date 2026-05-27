@@ -2,99 +2,650 @@
 <html lang="pa">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
 <style>
-    body { font-family: sans-serif; background: #f4f4f9; padding: 20px; }
-    .card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .team-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #ddd; }
-    .btn { padding: 8px 12px; cursor: pointer; border: none; border-radius: 4px; color: white; }
-    .win-btn { background: #28a745; }
-    .lose-btn { background: #dc3545; }
-    input { padding: 10px; width: 80%; }
+
+body{
+    font-family:'Segoe UI',sans-serif;
+    background:#f0f2f5;
+    margin:0;
+    padding:10px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    min-height:100vh;
+}
+
+#main-panel{
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+.card{
+    background:white;
+    width:100%;
+    max-width:650px;
+    border-radius:15px;
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
+    overflow:hidden;
+    margin-bottom:20px;
+}
+
+.header{
+    background:#1a73e8;
+    color:white;
+    padding:14px;
+    text-align:center;
+    font-weight:bold;
+    font-size:18px;
+    text-transform:uppercase;
+}
+
+.teams-container{
+    display:flex;
+    padding:20px;
+    gap:20px;
+    border-bottom:2px solid #eee;
+    transition:0.3s;
+}
+
+.team-box{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+.team-input{
+    width:100%;
+    min-height:55px;
+    padding:12px;
+    border:2px solid #ddd;
+    border-radius:8px;
+    font-size:24px;
+    font-weight:bold;
+    text-align:center;
+    margin-bottom:10px;
+    box-sizing:border-box;
+}
+
+.score-val{
+    font-size:70px;
+    font-weight:900;
+    color:#333;
+    margin:10px 0;
+}
+
+.btn-pm{
+    border:none;
+    color:white;
+    padding:16px;
+    border-radius:8px;
+    font-size:28px;
+    font-weight:bold;
+    cursor:pointer;
+    flex:1;
+    margin:0 5px;
+}
+
+.btn-plus{background:#28a745;}
+.btn-minus{background:#dc3545;}
+
+.controls{
+    padding:15px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.btn-full{
+    border:none;
+    color:white;
+    padding:14px;
+    border-radius:8px;
+    font-size:15px;
+    font-weight:bold;
+    cursor:pointer;
+    text-transform:uppercase;
+    width:100%;
+}
+
+.btn-blue{background:#1a73e8;}
+.btn-yellow{background:#fbbc05;color:black;}
+.btn-red{background:#ea4335;}
+.btn-dark{background:#333;}
+.btn-green{background:#28a745;}
+
+.settings-section{
+    padding:15px;
+    background:#fafafa;
+}
+
+textarea{
+    width:100%;
+    min-height:90px;
+    padding:16px;
+    border:2px solid #ccc;
+    border-radius:8px;
+    font-size:22px;
+    font-weight:bold;
+    margin-bottom:12px;
+    box-sizing:border-box;
+    resize:none;
+    line-height:1.4;
+    overflow:hidden;
+}
+
+.std-input{
+    width:100%;
+    min-height:55px;
+    padding:12px;
+    border:2px solid #ccc;
+    border-radius:8px;
+    font-size:22px;
+    font-weight:bold;
+    margin-bottom:12px;
+    box-sizing:border-box;
+}
+
 </style>
 </head>
+
 <body>
 
+<div id="main-panel">
+
+<!-- SCOREBOARD -->
 <div class="card">
-    <h2>1. ਟੀਮਾਂ ਦਾਖਲ ਕਰੋ</h2>
-    <input type="text" id="teamInput" placeholder="ਟੀਮ ਦਾ ਨਾਮ ਲਿਖੋ (ਜਿਵੇਂ: mudki)">
-    <button onclick="addTeam()">ਐਡ ਕਰੋ</button>
+
+<div class="header">
+Live Score Board
 </div>
 
-<div class="card">
-    <h2>2. ਮੌਜੂਦਾ ਰਾਊਂਡ (ਟੀਮਾਂ ਚੁਣੋ)</h2>
-    <div id="matchSetup">
-        <select id="selectA"></select> VS <select id="selectB"></select>
-        <button onclick="startMatch()">ਮੈਚ ਸ਼ੁਰੂ ਕਰੋ</button>
-    </div>
+<div class="teams-container">
+
+<div class="team-box">
+
+<input type="text" id="nameA" class="team-input" placeholder="TEAM 1">
+
+<div class="score-val" id="dispA">0</div>
+
+<div style="display:flex;width:100%;">
+
+<button class="btn-pm btn-minus"
+onclick="changeScore('scoreA',-1)">-</button>
+
+<button class="btn-pm btn-plus"
+onclick="changeScore('scoreA',1)">+</button>
+
+</div>
 </div>
 
+<div style="display:flex;align-items:center;font-weight:bold;font-size:26px;color:#aaa;">
+VS
+</div>
+
+<div class="team-box">
+
+<input type="text" id="nameB" class="team-input" placeholder="TEAM 2">
+
+<div class="score-val" id="dispB">0</div>
+
+<div style="display:flex;width:100%;">
+
+<button class="btn-pm btn-minus"
+onclick="changeScore('scoreB',-1)">-</button>
+
+<button class="btn-pm btn-plus"
+onclick="changeScore('scoreB',1)">+</button>
+
+</div>
+</div>
+
+</div>
+
+<div class="controls">
+
+<button class="btn-full btn-blue"
+onclick="updateTeamNames()">
+Update Team Names
+</button>
+
+<button id="visBtn"
+class="btn-full btn-red"
+onclick="toggleVis('scoreVisible')">
+Hide Scoreboard
+</button>
+
+<button class="btn-full"
+style="background:#777;"
+onclick="resetScores()">
+Reset Scores
+</button>
+
+<button class="btn-full btn-yellow"
+onclick="swapTeamNames()">
+Only Team Swap
+</button>
+
+<button id="camBtn"
+class="btn-full btn-dark"
+onclick="toggleCameraView()">
+Camera View
+</button>
+
+<button class="btn-full btn-yellow"
+onclick="swapTeams()">
+Swap Teams + Score
+</button>
+
+<input type="text"
+id="roundInp"
+class="std-input"
+placeholder="ROUND">
+
+</div>
+</div>
+
+<!-- TICKER -->
 <div class="card">
-    <h2>3. ਸਕੋਰਬੋਰਡ</h2>
-    <div id="scoreboard">
-        <h3 id="displayNames">... VS ...</h3>
-        <h1 id="scores">0 - 0</h1>
-        <button onclick="updateScore('A', 1)">Team A +1</button>
-        <button onclick="updateScore('B', 1)">Team B +1</button>
-        <hr>
-        <button class="win-btn" onclick="declareWinner('A')">A ਜੇਤੂ (Next Round)</button>
-        <button class="win-btn" onclick="declareWinner('B')">B ਜੇਤੂ (Next Round)</button>
-    </div>
+
+<div class="header">
+Ticker & Branding
+</div>
+
+<div class="settings-section">
+
+<textarea id="row1Inp"
+rows="2"
+placeholder="Title Line 1"
+oninput="autoGrow(this)"></textarea>
+
+<textarea id="row2Inp"
+rows="2"
+placeholder="Title Line 2"
+oninput="autoGrow(this)"></textarea>
+
+<textarea id="row3Inp"
+rows="2"
+placeholder="Title Line 3"
+oninput="autoGrow(this)"></textarea>
+
+<input type="text"
+id="watermarkInp"
+class="std-input"
+placeholder="Channel Name">
+
+<button class="btn-full btn-blue"
+onclick="updateTicker()">
+Update Ticker & Branding
+</button>
+
+<button id="tickVisBtn"
+class="btn-full btn-red"
+onclick="toggleVis('tickerVisible')">
+Hide Ticker
+</button>
+
+</div>
+</div>
+
+<!-- RESULT PANEL -->
+<div class="card">
+
+<div class="header">
+Tournament Result Panel
+</div>
+
+<div class="settings-section">
+
+<input type="text"
+id="winnerInp"
+class="std-input"
+placeholder="Winner Team Name">
+
+<input type="text"
+id="loserInp"
+class="std-input"
+placeholder="Loser Team Name">
+
+<textarea id="nextRoundInp"
+rows="3"
+placeholder="Next Round Qualified Teams"
+oninput="autoGrow(this)"></textarea>
+
+<textarea id="outTeamsInp"
+rows="3"
+placeholder="Eliminated Teams"
+oninput="autoGrow(this)"></textarea>
+
+<textarea id="resultTxtInp"
+rows="4"
+placeholder="Match Result"
+oninput="autoGrow(this)"></textarea>
+
+<button class="btn-full btn-blue"
+onclick="declareResult()">
+Declare Result
+</button>
+
+<button class="btn-full btn-green"
+onclick="sendWinnerNextRound()">
+Winner → Next Round
+</button>
+
+<button class="btn-full btn-red"
+onclick="removeLoserTeam()">
+Remove Losing Team
+</button>
+
+</div>
+</div>
+
 </div>
 
 <script>
-const firebaseConfig = { databaseURL:"https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
+
+const firebaseConfig = {
+    databaseURL:"https://manpreetteam-a86e9-default-rtdb.firebaseio.com/"
+};
+
 firebase.initializeApp(firebaseConfig);
-const db = firebase.database().ref("tournament");
 
-function addTeam() {
-    const name = document.getElementById("teamInput").value;
-    db.child("teams").push(name);
-    document.getElementById("teamInput").value = "";
-}
+const urlParams = new URLSearchParams(window.location.search);
 
-// ਟੀਮਾਂ ਲੋਡ ਕਰਨਾ
-db.child("teams").on("value", snap => {
-    const teams = snap.val();
-    let html = '<option>ਚੁਣੋ</option>';
-    for(let key in teams) html += `<option value="${teams[key]}">${teams[key]}</option>`;
-    document.getElementById("selectA").innerHTML = html;
-    document.getElementById("selectB").innerHTML = html;
-});
+const matchId =
+urlParams.get('id') || 'defaultMatch';
 
-function startMatch() {
-    const a = document.getElementById("selectA").value;
-    const b = document.getElementById("selectB").value;
-    db.update({ match: { teamA: a, teamB: b, scoreA: 0, scoreB: 0 } });
-}
+const db =
+firebase.database().ref("matchData/" + matchId);
 
-db.child("match").on("value", snap => {
-    const d = snap.val();
-    if(d) {
-        document.getElementById("displayNames").innerText = d.teamA + " VS " + d.teamB;
-        document.getElementById("scores").innerText = d.scoreA + " - " + d.scoreB;
+let curA=0;
+let curB=0;
+
+let sVis=true;
+let tVis=true;
+
+let camOpposite=false;
+
+db.on("value",(snap)=>{
+
+    const data=snap.val();
+
+    if(data){
+
+        curA=parseFloat(data.scoreA)||0;
+        curB=parseFloat(data.scoreB)||0;
+
+        sVis=data.scoreVisible!==false;
+        tVis=data.tickerVisible!==false;
+
+        document.getElementById("visBtn").innerText =
+        sVis ? "Hide Scoreboard" : "Show Scoreboard";
+
+        document.getElementById("tickVisBtn").innerText =
+        tVis ? "Hide Ticker" : "Show Ticker";
+
+        document.getElementById("dispA").innerText=curA;
+        document.getElementById("dispB").innerText=curB;
+
+        document.getElementById("nameA").value=data.nameA||"";
+        document.getElementById("nameB").value=data.nameB||"";
+
+        document.getElementById("roundInp").value=data.round||"";
+
+        document.getElementById("row1Inp").value=data.row1Txt||"";
+        document.getElementById("row2Inp").value=data.row2Txt||"";
+        document.getElementById("row3Inp").value=data.row3Txt||"";
+
+        document.getElementById("watermarkInp").value =
+        data.watermarkTxt||"";
+
+        document.getElementById("winnerInp").value =
+        data.winnerTeam || "";
+
+        document.getElementById("loserInp").value =
+        data.loserTeam || "";
+
+        document.getElementById("nextRoundInp").value =
+        data.nextRoundTeams || "";
+
+        document.getElementById("outTeamsInp").value =
+        data.outTeams || "";
+
+        document.getElementById("resultTxtInp").value =
+        data.resultText || "";
+
+        autoGrow(document.getElementById("row1Inp"));
+        autoGrow(document.getElementById("row2Inp"));
+        autoGrow(document.getElementById("row3Inp"));
+
+        autoGrow(document.getElementById("nextRoundInp"));
+        autoGrow(document.getElementById("outTeamsInp"));
+        autoGrow(document.getElementById("resultTxtInp"));
+
+        camOpposite=data.cameraOpposite||false;
+
+        document.querySelector(".teams-container").style.flexDirection =
+        camOpposite ? "row-reverse" : "row";
+
+        document.getElementById("camBtn").innerText =
+        camOpposite ? "Camera View" : "Camera Oppo View";
     }
 });
 
-function updateScore(t, val) {
-    db.child("match").once("value").then(snap => {
-        let d = snap.val();
-        let s = (t === 'A') ? d.scoreA + val : d.scoreB + val;
-        db.child("match").update(t === 'A' ? {scoreA: s} : {scoreB: s});
+function autoGrow(el){
+
+    el.style.height="auto";
+    el.style.height=el.scrollHeight+"px";
+}
+
+function changeScore(team,val){
+
+    let current=(team==="scoreA") ? curA : curB;
+
+    let newVal;
+
+    if(val>0){
+
+        if(curA===0 && curB===0)
+            newVal=1.5;
+
+        else
+            newVal=current+1;
+
+    }else{
+
+        if(current===1.5)
+            newVal=0;
+
+        else
+            newVal=current-1;
+
+        if(newVal<0)
+            newVal=0;
+    }
+
+    db.update({
+        [team]:newVal
     });
 }
 
-function declareWinner(winnerSide) {
-    db.child("match").once("value").then(snap => {
-        const d = snap.val();
-        const winner = (winnerSide === 'A') ? d.teamA : d.teamB;
-        // ਜੇਤੂ ਨੂੰ ਅਗਲੇ ਰਾਊਂਡ (next_round) ਲਿਸਟ ਵਿੱਚ ਪਾਓ
-        db.child("next_round").push(winner);
-        alert(winner + " ਅਗਲੇ ਰਾਊਂਡ ਵਿੱਚ ਪਹੁੰਚ ਗਈ!");
-        db.child("match").remove(); // ਮੈਚ ਖਤਮ
+function updateTeamNames(){
+
+    db.update({
+
+        nameA:
+        document.getElementById("nameA").value,
+
+        nameB:
+        document.getElementById("nameB").value
     });
 }
+
+function updateTicker(){
+
+    db.update({
+
+        round:
+        document.getElementById("roundInp").value,
+
+        row1Txt:
+        document.getElementById("row1Inp").value,
+
+        row2Txt:
+        document.getElementById("row2Inp").value,
+
+        row3Txt:
+        document.getElementById("row3Inp").value,
+
+        watermarkTxt:
+        document.getElementById("watermarkInp").value
+    });
+}
+
+function toggleVis(field){
+
+    let val =
+    field==="scoreVisible" ? sVis : tVis;
+
+    db.child(field).set(!val);
+}
+
+function swapTeamNames(){
+
+    db.update({
+
+        nameA:
+        document.getElementById("nameB").value,
+
+        nameB:
+        document.getElementById("nameA").value
+    });
+}
+
+function swapTeams(){
+
+    db.update({
+
+        nameA:
+        document.getElementById("nameB").value,
+
+        nameB:
+        document.getElementById("nameA").value,
+
+        scoreA:curB,
+        scoreB:curA
+    });
+}
+
+function resetScores(){
+
+    if(confirm("Reset Match Scores?")){
+
+        db.update({
+            scoreA:0,
+            scoreB:0
+        });
+    }
+}
+
+function toggleCameraView(){
+
+    db.update({
+        cameraOpposite: !camOpposite
+    });
+}
+
+function declareResult(){
+
+    const winner =
+    document.getElementById("winnerInp").value;
+
+    const loser =
+    document.getElementById("loserInp").value;
+
+    const resultText =
+    winner + " defeated " +
+    loser + " by " +
+    curA + " - " + curB;
+
+    document.getElementById("resultTxtInp").value =
+    resultText;
+
+    db.update({
+
+        winnerTeam:winner,
+
+        loserTeam:loser,
+
+        resultText:resultText,
+
+        nextRoundTeams:
+        document.getElementById("nextRoundInp").value,
+
+        outTeams:
+        document.getElementById("outTeamsInp").value
+    });
+}
+
+function sendWinnerNextRound(){
+
+    let current =
+    document.getElementById("nextRoundInp").value;
+
+    let winner =
+    document.getElementById("winnerInp").value;
+
+    if(current.trim()===""){
+
+        current=winner;
+
+    }else{
+
+        current += "\n" + winner;
+    }
+
+    document.getElementById("nextRoundInp").value =
+    current;
+
+    db.update({
+        nextRoundTeams:current
+    });
+}
+
+function removeLoserTeam(){
+
+    let current =
+    document.getElementById("outTeamsInp").value;
+
+    let loser =
+    document.getElementById("loserInp").value;
+
+    if(current.trim()===""){
+
+        current=loser;
+
+    }else{
+
+        current += "\n" + loser;
+    }
+
+    document.getElementById("outTeamsInp").value =
+    current;
+
+    db.update({
+        outTeams:current
+    });
+}
+
 </script>
+
 </body>
 </html>
