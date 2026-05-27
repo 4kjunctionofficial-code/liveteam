@@ -30,7 +30,7 @@ body{
 .card{
     background:white;
     width:100%;
-    max-width:650px;
+    max-width:700px;
     border-radius:15px;
     box-shadow:0 8px 20px rgba(0,0,0,.15);
     overflow:hidden;
@@ -142,7 +142,8 @@ textarea{
     overflow:hidden;
 }
 
-.std-input{
+.std-input,
+select{
     width:100%;
     min-height:55px;
     padding:12px;
@@ -152,6 +153,27 @@ textarea{
     font-weight:bold;
     margin-bottom:12px;
     box-sizing:border-box;
+}
+
+.result-box{
+    background:#111;
+    color:white;
+    padding:20px;
+    border-radius:10px;
+    text-align:center;
+    margin-top:10px;
+}
+
+.result-title{
+    font-size:32px;
+    font-weight:900;
+    color:#fbbc05;
+    margin-bottom:10px;
+}
+
+.result-text{
+    font-size:24px;
+    font-weight:bold;
 }
 
 </style>
@@ -165,14 +187,22 @@ textarea{
 <div class="card">
 
 <div class="header">
-Live Score Board
+LIVE SCORE BOARD
 </div>
 
-<div class="teams-container">
+<div class="teams-container" id="teamWrap">
 
 <div class="team-box">
 
-<input type="text" id="nameA" class="team-input" placeholder="TEAM 1">
+<select id="teamSelectA"
+onchange="selectTeamA(this.value)">
+<option value="">Select Team A</option>
+</select>
+
+<input type="text"
+id="nameA"
+class="team-input"
+placeholder="TEAM 1">
 
 <div class="score-val" id="dispA">0</div>
 
@@ -193,7 +223,15 @@ VS
 
 <div class="team-box">
 
-<input type="text" id="nameB" class="team-input" placeholder="TEAM 2">
+<select id="teamSelectB"
+onchange="selectTeamB(this.value)">
+<option value="">Select Team B</option>
+</select>
+
+<input type="text"
+id="nameB"
+class="team-input"
+placeholder="TEAM 2">
 
 <div class="score-val" id="dispB">0</div>
 
@@ -215,6 +253,11 @@ onclick="changeScore('scoreB',1)">+</button>
 <button class="btn-full btn-blue"
 onclick="updateTeamNames()">
 Update Team Names
+</button>
+
+<button class="btn-full btn-green"
+onclick="setMatchTeams()">
+Set Match Teams
 </button>
 
 <button id="visBtn"
@@ -245,6 +288,11 @@ onclick="swapTeams()">
 Swap Teams + Score
 </button>
 
+<button class="btn-full btn-green"
+onclick="showResultLayer()">
+Show Result Screen
+</button>
+
 <input type="text"
 id="roundInp"
 class="std-input"
@@ -253,11 +301,53 @@ placeholder="ROUND">
 </div>
 </div>
 
+<!-- TEAM MANAGER -->
+<div class="card">
+
+<div class="header">
+TOURNAMENT TEAM MANAGER
+</div>
+
+<div class="settings-section">
+
+<input type="text"
+id="newTeamInp"
+class="std-input"
+placeholder="Add New Team">
+
+<button class="btn-full btn-green"
+onclick="addTeam()">
+Add Team
+</button>
+
+<textarea id="allTeamsInp"
+rows="8"
+placeholder="All Participating Teams"
+oninput="autoGrow(this)"></textarea>
+
+<button class="btn-full btn-blue"
+onclick="saveAllTeams()">
+Save Team List
+</button>
+
+<textarea id="winnerTeamsInp"
+rows="5"
+placeholder="Qualified Teams"
+oninput="autoGrow(this)"></textarea>
+
+<textarea id="loserTeamsInp"
+rows="5"
+placeholder="Eliminated Teams"
+oninput="autoGrow(this)"></textarea>
+
+</div>
+</div>
+
 <!-- TICKER -->
 <div class="card">
 
 <div class="header">
-Ticker & Branding
+TICKER & BRANDING
 </div>
 
 <div class="settings-section">
@@ -296,54 +386,27 @@ Hide Ticker
 </div>
 </div>
 
-<!-- RESULT PANEL -->
+<!-- RESULT -->
 <div class="card">
 
 <div class="header">
-Tournament Result Panel
+MATCH RESULT
 </div>
 
 <div class="settings-section">
 
-<input type="text"
-id="winnerInp"
-class="std-input"
-placeholder="Winner Team Name">
+<div class="result-box">
 
-<input type="text"
-id="loserInp"
-class="std-input"
-placeholder="Loser Team Name">
+<div class="result-title">
+RESULT
+</div>
 
-<textarea id="nextRoundInp"
-rows="3"
-placeholder="Next Round Qualified Teams"
-oninput="autoGrow(this)"></textarea>
+<div class="result-text"
+id="resultText">
+No Result Yet
+</div>
 
-<textarea id="outTeamsInp"
-rows="3"
-placeholder="Eliminated Teams"
-oninput="autoGrow(this)"></textarea>
-
-<textarea id="resultTxtInp"
-rows="4"
-placeholder="Match Result"
-oninput="autoGrow(this)"></textarea>
-
-<button class="btn-full btn-blue"
-onclick="declareResult()">
-Declare Result
-</button>
-
-<button class="btn-full btn-green"
-onclick="sendWinnerNextRound()">
-Winner → Next Round
-</button>
-
-<button class="btn-full btn-red"
-onclick="removeLoserTeam()">
-Remove Losing Team
-</button>
+</div>
 
 </div>
 </div>
@@ -374,6 +437,8 @@ let tVis=true;
 
 let camOpposite=false;
 
+let allTeams=[];
+
 db.on("value",(snap)=>{
 
     const data=snap.val();
@@ -385,6 +450,11 @@ db.on("value",(snap)=>{
 
         sVis=data.scoreVisible!==false;
         tVis=data.tickerVisible!==false;
+
+        allTeams=data.allTeams || [];
+
+        updateTeamTextarea();
+        updateTeamDropdowns();
 
         document.getElementById("visBtn").innerText =
         sVis ? "Hide Scoreboard" : "Show Scoreboard";
@@ -407,32 +477,26 @@ db.on("value",(snap)=>{
         document.getElementById("watermarkInp").value =
         data.watermarkTxt||"";
 
-        document.getElementById("winnerInp").value =
-        data.winnerTeam || "";
+        document.getElementById("winnerTeamsInp").value =
+        data.qualifiedTeams || "";
 
-        document.getElementById("loserInp").value =
-        data.loserTeam || "";
+        document.getElementById("loserTeamsInp").value =
+        data.eliminatedTeams || "";
 
-        document.getElementById("nextRoundInp").value =
-        data.nextRoundTeams || "";
+        document.getElementById("resultText").innerText =
+        data.resultText || "No Result Yet";
 
-        document.getElementById("outTeamsInp").value =
-        data.outTeams || "";
-
-        document.getElementById("resultTxtInp").value =
-        data.resultText || "";
+        autoGrow(document.getElementById("allTeamsInp"));
+        autoGrow(document.getElementById("winnerTeamsInp"));
+        autoGrow(document.getElementById("loserTeamsInp"));
 
         autoGrow(document.getElementById("row1Inp"));
         autoGrow(document.getElementById("row2Inp"));
         autoGrow(document.getElementById("row3Inp"));
 
-        autoGrow(document.getElementById("nextRoundInp"));
-        autoGrow(document.getElementById("outTeamsInp"));
-        autoGrow(document.getElementById("resultTxtInp"));
-
         camOpposite=data.cameraOpposite||false;
 
-        document.querySelector(".teams-container").style.flexDirection =
+        document.getElementById("teamWrap").style.flexDirection =
         camOpposite ? "row-reverse" : "row";
 
         document.getElementById("camBtn").innerText =
@@ -444,6 +508,98 @@ function autoGrow(el){
 
     el.style.height="auto";
     el.style.height=el.scrollHeight+"px";
+}
+
+function addTeam(){
+
+    const team =
+    document.getElementById("newTeamInp").value.trim();
+
+    if(team==="") return;
+
+    allTeams.push(team);
+
+    updateTeamTextarea();
+
+    updateTeamDropdowns();
+
+    db.update({
+        allTeams:allTeams
+    });
+
+    document.getElementById("newTeamInp").value="";
+}
+
+function saveAllTeams(){
+
+    const txt =
+    document.getElementById("allTeamsInp").value;
+
+    allTeams =
+    txt.split("\n")
+    .map(t=>t.trim())
+    .filter(t=>t!=="");
+
+    updateTeamDropdowns();
+
+    db.update({
+        allTeams:allTeams
+    });
+}
+
+function updateTeamTextarea(){
+
+    document.getElementById("allTeamsInp").value =
+    allTeams.join("\n");
+}
+
+function updateTeamDropdowns(){
+
+    const selectA =
+    document.getElementById("teamSelectA");
+
+    const selectB =
+    document.getElementById("teamSelectB");
+
+    selectA.innerHTML =
+    '<option value="">Select Team A</option>';
+
+    selectB.innerHTML =
+    '<option value="">Select Team B</option>';
+
+    allTeams.forEach(team=>{
+
+        selectA.innerHTML +=
+        `<option value="${team}">${team}</option>`;
+
+        selectB.innerHTML +=
+        `<option value="${team}">${team}</option>`;
+    });
+}
+
+function selectTeamA(team){
+
+    document.getElementById("nameA").value=team;
+}
+
+function selectTeamB(team){
+
+    document.getElementById("nameB").value=team;
+}
+
+function setMatchTeams(){
+
+    db.update({
+
+        nameA:
+        document.getElementById("nameA").value,
+
+        nameB:
+        document.getElementById("nameB").value,
+
+        scoreA:0,
+        scoreB:0
+    });
 }
 
 function changeScore(team,val){
@@ -563,85 +719,97 @@ function toggleCameraView(){
     });
 }
 
-function declareResult(){
+function showResultLayer(){
 
-    const winner =
-    document.getElementById("winnerInp").value;
+    const teamA =
+    document.getElementById("nameA").value;
 
-    const loser =
-    document.getElementById("loserInp").value;
+    const teamB =
+    document.getElementById("nameB").value;
+
+    let winner="";
+    let loser="";
+
+    if(curA>curB){
+
+        winner=teamA;
+        loser=teamB;
+
+    }else{
+
+        winner=teamB;
+        loser=teamA;
+    }
+
+    let winners =
+    document.getElementById("winnerTeamsInp").value;
+
+    if(winners.trim()===""){
+
+        winners=winner;
+
+    }else{
+
+        winners += "\n"+winner;
+    }
+
+    let losers =
+    document.getElementById("loserTeamsInp").value;
+
+    if(losers.trim()===""){
+
+        losers=loser;
+
+    }else{
+
+        losers += "\n"+loser;
+    }
+
+    document.getElementById("winnerTeamsInp").value =
+    winners;
+
+    document.getElementById("loserTeamsInp").value =
+    losers;
+
+    autoGrow(document.getElementById("winnerTeamsInp"));
+    autoGrow(document.getElementById("loserTeamsInp"));
 
     const resultText =
-    winner + " defeated " +
-    loser + " by " +
-    curA + " - " + curB;
+    winner +
+    " defeated " +
+    loser +
+    " by " +
+    curA +
+    " - " +
+    curB;
 
-    document.getElementById("resultTxtInp").value =
+    document.getElementById("resultText").innerText =
     resultText;
 
     db.update({
+
+        resultVisible:true,
+
+        resultText:resultText,
 
         winnerTeam:winner,
 
         loserTeam:loser,
 
-        resultText:resultText,
+        qualifiedTeams:winners,
 
-        nextRoundTeams:
-        document.getElementById("nextRoundInp").value,
-
-        outTeams:
-        document.getElementById("outTeamsInp").value
+        eliminatedTeams:losers
     });
-}
 
-function sendWinnerNextRound(){
+    allTeams =
+    allTeams.filter(t=>t!==loser);
 
-    let current =
-    document.getElementById("nextRoundInp").value;
+    updateTeamTextarea();
 
-    let winner =
-    document.getElementById("winnerInp").value;
-
-    if(current.trim()===""){
-
-        current=winner;
-
-    }else{
-
-        current += "\n" + winner;
-    }
-
-    document.getElementById("nextRoundInp").value =
-    current;
+    updateTeamDropdowns();
 
     db.update({
-        nextRoundTeams:current
-    });
-}
-
-function removeLoserTeam(){
-
-    let current =
-    document.getElementById("outTeamsInp").value;
-
-    let loser =
-    document.getElementById("loserInp").value;
-
-    if(current.trim()===""){
-
-        current=loser;
-
-    }else{
-
-        current += "\n" + loser;
-    }
-
-    document.getElementById("outTeamsInp").value =
-    current;
-
-    db.update({
-        outTeams:current
+        allTeams:allTeams
     });
 }
 
