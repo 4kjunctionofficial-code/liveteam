@@ -30,7 +30,7 @@ body{
 .card{
     background:white;
     width:100%;
-    max-width:700px;
+    max-width:750px;
     border-radius:15px;
     box-shadow:0 8px 20px rgba(0,0,0,.15);
     overflow:hidden;
@@ -52,7 +52,6 @@ body{
     padding:20px;
     gap:20px;
     border-bottom:2px solid #eee;
-    transition:0.3s;
 }
 
 .team-box{
@@ -127,21 +126,7 @@ body{
     background:#fafafa;
 }
 
-textarea{
-    width:100%;
-    min-height:90px;
-    padding:16px;
-    border:2px solid #ccc;
-    border-radius:8px;
-    font-size:22px;
-    font-weight:bold;
-    margin-bottom:12px;
-    box-sizing:border-box;
-    resize:none;
-    line-height:1.4;
-    overflow:hidden;
-}
-
+textarea,
 .std-input,
 select{
     width:100%;
@@ -155,13 +140,18 @@ select{
     box-sizing:border-box;
 }
 
+textarea{
+    resize:none;
+    line-height:1.4;
+    overflow:hidden;
+}
+
 .result-box{
     background:#111;
     color:white;
     padding:20px;
     border-radius:10px;
     text-align:center;
-    margin-top:10px;
 }
 
 .result-title{
@@ -217,7 +207,7 @@ onclick="changeScore('scoreA',1)">+</button>
 </div>
 </div>
 
-<div style="display:flex;align-items:center;font-weight:bold;font-size:26px;color:#aaa;">
+<div style="display:flex;align-items:center;font-weight:bold;font-size:28px;color:#999;">
 VS
 </div>
 
@@ -260,27 +250,15 @@ onclick="setMatchTeams()">
 Set Match Teams
 </button>
 
+<button class="btn-full btn-green"
+onclick="showResultLayer()">
+Show Result Screen
+</button>
+
 <button id="visBtn"
 class="btn-full btn-red"
 onclick="toggleVis('scoreVisible')">
 Hide Scoreboard
-</button>
-
-<button class="btn-full"
-style="background:#777;"
-onclick="resetScores()">
-Reset Scores
-</button>
-
-<button class="btn-full btn-yellow"
-onclick="swapTeamNames()">
-Only Team Swap
-</button>
-
-<button id="camBtn"
-class="btn-full btn-dark"
-onclick="toggleCameraView()">
-Camera View
 </button>
 
 <button class="btn-full btn-yellow"
@@ -288,9 +266,15 @@ onclick="swapTeams()">
 Swap Teams + Score
 </button>
 
-<button class="btn-full btn-green"
-onclick="showResultLayer()">
-Show Result Screen
+<button class="btn-full btn-dark"
+onclick="toggleCameraView()">
+Camera View
+</button>
+
+<button class="btn-full"
+style="background:#777;"
+onclick="resetScores()">
+Reset Scores
 </button>
 
 <input type="text"
@@ -343,6 +327,41 @@ oninput="autoGrow(this)"></textarea>
 </div>
 </div>
 
+<!-- NEXT MATCH -->
+<div class="card">
+
+<div class="header">
+NEXT MATCH SETUP
+</div>
+
+<div class="settings-section">
+
+<select id="nextTeamA">
+<option value="">Select Next Match Team 1</option>
+</select>
+
+<select id="nextTeamB">
+<option value="">Select Next Match Team 2</option>
+</select>
+
+<button class="btn-full btn-green"
+onclick="addNextMatch()">
+ADD NEXT MATCH
+</button>
+
+<textarea id="nextMatchList"
+rows="6"
+placeholder="Next Match Teams"
+oninput="autoGrow(this)"></textarea>
+
+<button class="btn-full btn-blue"
+onclick="saveNextMatches()">
+SAVE NEXT MATCHES
+</button>
+
+</div>
+</div>
+
 <!-- TICKER -->
 <div class="card">
 
@@ -374,7 +393,7 @@ placeholder="Channel Name">
 
 <button class="btn-full btn-blue"
 onclick="updateTicker()">
-Update Ticker & Branding
+Update Ticker
 </button>
 
 <button id="tickVisBtn"
@@ -438,6 +457,7 @@ let tVis=true;
 let camOpposite=false;
 
 let allTeams=[];
+let nextMatches=[];
 
 db.on("value",(snap)=>{
 
@@ -452,15 +472,11 @@ db.on("value",(snap)=>{
         tVis=data.tickerVisible!==false;
 
         allTeams=data.allTeams || [];
+        nextMatches=data.nextMatches || [];
 
         updateTeamTextarea();
         updateTeamDropdowns();
-
-        document.getElementById("visBtn").innerText =
-        sVis ? "Hide Scoreboard" : "Show Scoreboard";
-
-        document.getElementById("tickVisBtn").innerText =
-        tVis ? "Hide Ticker" : "Show Ticker";
+        updateNextMatchDropdowns();
 
         document.getElementById("dispA").innerText=curA;
         document.getElementById("dispB").innerText=curB;
@@ -483,24 +499,21 @@ db.on("value",(snap)=>{
         document.getElementById("loserTeamsInp").value =
         data.eliminatedTeams || "";
 
+        document.getElementById("nextMatchList").value =
+        nextMatches.join("\n");
+
         document.getElementById("resultText").innerText =
         data.resultText || "No Result Yet";
 
         autoGrow(document.getElementById("allTeamsInp"));
         autoGrow(document.getElementById("winnerTeamsInp"));
         autoGrow(document.getElementById("loserTeamsInp"));
-
-        autoGrow(document.getElementById("row1Inp"));
-        autoGrow(document.getElementById("row2Inp"));
-        autoGrow(document.getElementById("row3Inp"));
+        autoGrow(document.getElementById("nextMatchList"));
 
         camOpposite=data.cameraOpposite||false;
 
         document.getElementById("teamWrap").style.flexDirection =
         camOpposite ? "row-reverse" : "row";
-
-        document.getElementById("camBtn").innerText =
-        camOpposite ? "Camera View" : "Camera Oppo View";
     }
 });
 
@@ -520,8 +533,8 @@ function addTeam(){
     allTeams.push(team);
 
     updateTeamTextarea();
-
     updateTeamDropdowns();
+    updateNextMatchDropdowns();
 
     db.update({
         allTeams:allTeams
@@ -538,9 +551,10 @@ function saveAllTeams(){
     allTeams =
     txt.split("\n")
     .map(t=>t.trim())
-    .filter(t=>t!=="");
+    .filter(t=>t!=='');
 
     updateTeamDropdowns();
+    updateNextMatchDropdowns();
 
     db.update({
         allTeams:allTeams
@@ -573,6 +587,30 @@ function updateTeamDropdowns(){
         `<option value="${team}">${team}</option>`;
 
         selectB.innerHTML +=
+        `<option value="${team}">${team}</option>`;
+    });
+}
+
+function updateNextMatchDropdowns(){
+
+    const selA =
+    document.getElementById("nextTeamA");
+
+    const selB =
+    document.getElementById("nextTeamB");
+
+    selA.innerHTML =
+    '<option value="">Select Next Match Team 1</option>';
+
+    selB.innerHTML =
+    '<option value="">Select Next Match Team 2</option>';
+
+    allTeams.forEach(team=>{
+
+        selA.innerHTML +=
+        `<option value="${team}">${team}</option>`;
+
+        selB.innerHTML +=
         `<option value="${team}">${team}</option>`;
     });
 }
@@ -612,7 +650,6 @@ function changeScore(team,val){
 
         if(curA===0 && curB===0)
             newVal=1.5;
-
         else
             newVal=current+1;
 
@@ -620,7 +657,6 @@ function changeScore(team,val){
 
         if(current===1.5)
             newVal=0;
-
         else
             newVal=current-1;
 
@@ -672,18 +708,6 @@ function toggleVis(field){
     field==="scoreVisible" ? sVis : tVis;
 
     db.child(field).set(!val);
-}
-
-function swapTeamNames(){
-
-    db.update({
-
-        nameA:
-        document.getElementById("nameB").value,
-
-        nameB:
-        document.getElementById("nameA").value
-    });
 }
 
 function swapTeams(){
@@ -744,35 +768,24 @@ function showResultLayer(){
     let winners =
     document.getElementById("winnerTeamsInp").value;
 
-    if(winners.trim()===""){
-
+    if(winners.trim()==="")
         winners=winner;
-
-    }else{
-
+    else
         winners += "\n"+winner;
-    }
 
     let losers =
     document.getElementById("loserTeamsInp").value;
 
-    if(losers.trim()===""){
-
+    if(losers.trim()==="")
         losers=loser;
-
-    }else{
-
+    else
         losers += "\n"+loser;
-    }
 
     document.getElementById("winnerTeamsInp").value =
     winners;
 
     document.getElementById("loserTeamsInp").value =
     losers;
-
-    autoGrow(document.getElementById("winnerTeamsInp"));
-    autoGrow(document.getElementById("loserTeamsInp"));
 
     const resultText =
     winner +
@@ -787,8 +800,6 @@ function showResultLayer(){
     resultText;
 
     db.update({
-
-        resultVisible:true,
 
         resultText:resultText,
 
@@ -805,11 +816,51 @@ function showResultLayer(){
     allTeams.filter(t=>t!==loser);
 
     updateTeamTextarea();
-
     updateTeamDropdowns();
+    updateNextMatchDropdowns();
 
     db.update({
         allTeams:allTeams
+    });
+}
+
+function addNextMatch(){
+
+    const a =
+    document.getElementById("nextTeamA").value;
+
+    const b =
+    document.getElementById("nextTeamB").value;
+
+    if(a==="" || b==="") return;
+
+    const match =
+    a + " VS " + b;
+
+    nextMatches.push(match);
+
+    document.getElementById("nextMatchList").value =
+    nextMatches.join("\n");
+
+    autoGrow(document.getElementById("nextMatchList"));
+
+    db.update({
+        nextMatches:nextMatches
+    });
+}
+
+function saveNextMatches(){
+
+    const txt =
+    document.getElementById("nextMatchList").value;
+
+    nextMatches =
+    txt.split("\n")
+    .map(t=>t.trim())
+    .filter(t=>t!=='');
+
+    db.update({
+        nextMatches:nextMatches
     });
 }
 
