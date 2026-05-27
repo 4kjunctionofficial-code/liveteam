@@ -801,8 +801,36 @@ document.getElementById("nextMatchList").value
 db.update({
 nextMatches:nextMatches
 });
+} 
+    
+function clearAllTeams(){
+
+if(confirm("Delete All Teams?")){
+
+allTeams=[];
+
+db.update({
+
+allTeams:[],
+
+qualifiedTeams:"",
+
+eliminatedTeams:"",
+
+nextMatches:[]
+
+});
+
+document.getElementById("allTeamsInp").value="";
+document.getElementById("winnerTeamsInp").value="";
+document.getElementById("loserTeamsInp").value="";
+document.getElementById("nextMatchList").value="";
+
+updateDropdowns();
+
 }
 
+}
 </script>
 
 </body>
