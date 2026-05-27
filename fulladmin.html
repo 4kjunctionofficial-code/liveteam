@@ -564,9 +564,23 @@ allTeams.join("\n");
 document.getElementById("resultText").innerText =
 data.resultText || "No Result Yet";
 
-// Button text auto update
+/* SCOREBOARD BUTTON TEXT */
+
+const sVis = data.scoreVisible !== false;
+
 document.getElementById("visBtn").innerText =
- sVis ? "Hide Scoreboard" : "Show Scoreboard";
+sVis
+? "Hide Scoreboard"
+: "Show Scoreboard";
+
+/* TICKER BUTTON TEXT */
+
+const tVis = data.tickerVisible !== false;
+
+document.getElementById("tickVisBtn").innerText =
+tVis
+? "Hide Ticker"
+: "Show Ticker";
 
 /* CAMERA VIEW */
 
@@ -641,22 +655,14 @@ allTeams.push(team);
 
 });
 
-/* SHOW LINE BY LINE */
-
 document.getElementById("allTeamsInp").value =
 allTeams.join("\n");
-
-/* SAVE */
 
 db.update({
 allTeams:allTeams
 });
 
-/* UPDATE DROPDOWNS */
-
 updateDropdowns();
-
-/* CLEAR */
 
 document.getElementById("newTeamInp").value="";
 
@@ -770,7 +776,33 @@ document.getElementById("watermarkInp").value
 
 function toggleVis(field){
 
-db.child(field).set(true);
+db.child(field).once("value",snap=>{
+
+const current = snap.val();
+
+db.update({
+[field]: current === false ? true : false
+});
+
+if(field==="scoreVisible"){
+
+document.getElementById("visBtn").innerText =
+current === false
+? "Hide Scoreboard"
+: "Show Scoreboard";
+
+}
+
+if(field==="tickerVisible"){
+
+document.getElementById("tickVisBtn").innerText =
+current === false
+? "Hide Ticker"
+: "Show Ticker";
+
+}
+
+});
 
 }
 
@@ -873,7 +905,7 @@ losers.join("\n");
 
 const resultText =
 winner +
-" defeated " +
+" WIN vs " +
 loser +
 " (" + curA + " - " + curB + ")";
 
@@ -924,8 +956,6 @@ allTeams:allTeams,
 nextMatches:nextMatches
 
 });
-
-/* UPDATE DROPDOWNS */
 
 updateDropdowns();
 
@@ -1000,8 +1030,6 @@ nameB:""
 
 });
 
-/* CLEAR BOXES */
-
 document.getElementById("allTeamsInp").value="";
 document.getElementById("winnerTeamsInp").value="";
 document.getElementById("loserTeamsInp").value="";
@@ -1014,12 +1042,8 @@ document.getElementById("dispB").innerText="0";
 document.getElementById("nameA").value="";
 document.getElementById("nameB").value="";
 
-/* RESET VARIABLES */
-
 curA=0;
 curB=0;
-
-/* UPDATE DROPDOWN */
 
 updateDropdowns();
 
