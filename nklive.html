@@ -7,23 +7,35 @@
     <style>
         body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Arial', sans-serif; overflow: hidden; position: relative; }
         
-        .whatsapp-bar { position: absolute; bottom: 185px; left: 10px; display: flex; align-items: center; background: #000000; color: #ffffff; padding: 6px 18px 6px 45px; border-radius: 25px; font-size: 35px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .whatsapp-icon { position: absolute; left: -2px; width: 67px; height: 67px; background: #0a2a66; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        /* Updated WhatsApp bar to match new scheme */
+        .whatsapp-bar { position: absolute; bottom: 185px; left: 10px; display: flex; align-items: center; background: #FFD22F; color: #000000; padding: 6px 18px 6px 45px; border-radius: 25px; font-size: 35px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3); border: 2px solid #000000; }
+        .whatsapp-icon { position: absolute; left: -2px; width: 67px; height: 67px; background: #000000; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .whatsapp-icon svg { width: 24px; height: 24px; fill: white; }
 
         #logo-container { position: absolute; top: 30px; left: 40px; z-index: 9999; opacity: 1; transition: all 0.7s ease; }
         #logo-container.hidden { opacity: 0; transform: scale(0); }
-        #main-logo { height: 100px; width: auto; max-width: 450px; object-fit: contain; filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.3)); }
+        #main-logo { height: 100px; width: auto; max-width: 450px; object-fit: contain; filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.3)); } 
 
-        #single-wm { position: absolute; color: rgba(255, 255, 255, 0.7); font-size: 35px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 5px #000; white-space: nowrap; z-index: 1; opacity: 1; }
+        #single-wm{
+    position:absolute;
+    color:#ffffff;
+    opacity:1;
+    font-size:35px;
+    font-weight:900;
+    text-shadow:2px 2px 5px #000;
+    white-space:nowrap;
+    z-index:500;
+    pointer-events:none;
+    transition:all 1s linear;
+}
 
         #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 150px; display: flex; z-index: 9998; opacity: 1; transition: all 0.7s ease; background: transparent; }
         #ticker-wrap.hidden { opacity: 0; transform: translateY(160px); }
 
         .box-live{
     width:300px;
-    background:#0a2a66;
-    color:white;
+    background:#000000; /* New Primary Black */
+    color:#FFD22F; /* Accent Gold */
     display:flex;
     align-items:center;
     justify-content:center;
@@ -34,6 +46,7 @@
     letter-spacing:4px;
     z-index:12;
     position:relative;
+    border-right: 4px solid #FFD22F;
 
     /* right side / */
     clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%);
@@ -43,49 +56,49 @@
     text-shadow:3px 3px 5px rgba(0,0,0,0.4);
 }
 
-/* ਟਿੱਕਰ ਪੱਟੀ ਦੀ ਲੰਬਾਈ ਵਧਾਉਣ ਲਈ */
+/* Updated center wrap background to match new scheme */
 .center-wrap { 
-    flex: 1; /* ਇਹ ਸਾਰੀ ਖਾਲੀ ਜਗ੍ਹਾ ਲੈ ਲਵੇਗਾ */
+    flex: 1; 
     display: flex; 
     flex-direction: column; 
     overflow: hidden; 
-    background: white; 
+    background: #FFD22F; /* Golden yellow from logo */
     z-index: 5; 
     
-    /* ਲਾਲ ਬਕਸਿਆਂ ਦੇ ਹੇਠਾਂ ਜਾਣ ਲਈ ਮਾਰਜਿਨ ਸੈੱਟ ਕਰੋ */
-    margin-left: -115px;  /* ਖੱਬੇ ਪਾਸੇ ਥੋੜਾ ਹੋਰ ਅੰਦਰ ਕਰਨ ਲਈ */
-    margin-right: -115px; /* ਸੱਜੇ ਪਾਸੇ ਥੋੜਾ ਹੋਰ ਅੰਦਰ ਕਰਨ ਲਈ */
+    margin-left: -115px;  
+    margin-right: -115px; 
     
-    padding-left: 60px;  /* ਟੈਕਸਟ ਨੂੰ ਲਾਲ ਬਕਸੇ ਦੇ ਅੰਦਰੋਂ ਸ਼ੁਰੂ ਕਰਨ ਲਈ */
+    padding-left: 60px; 
     padding-right: 60px;
 }
         .row-text { display: flex; align-items: center; font-weight: bold; text-transform: uppercase; width: 100%; overflow: hidden; box-sizing: border-box; white-space: nowrap; padding-left: 60px; }
-        /* upper line now bigger */
+        
+        /* Updated upper line colors */
 .row-1{
-    background:#333333;
-    color:white;
+    background:#111111;
+    color:#FFD22F; /* Accent Gold */
     height:54px;
     font-size:38px;
     font-weight:900;
-    border-bottom:1px solid #444;
+    border-bottom:1px solid #FFD22F;
 }
 
-/* center line now smaller */
+/* Updated center line colors */
 .row-2{
-    background:white;
+    background:#FFD22F; /* Golden yellow */
     color:#111111;
     height:48px;
     font-size:28px;
     font-weight:bold;
 }
 
-/* bottom line white text */
+/* Updated bottom line colors */
 .row-3{
-    background:#333333;
-    color:white;
+    background:#111111;
+    color:#ffffff;
     height:48px;
     font-size:28px;
-    border-top:1px solid #444;
+    border-top:1px solid #FFD22F;
 }
         .scroller{
     display:inline-block;
@@ -110,15 +123,17 @@
         transform:translateX(-100%);
     }
 }
+        /* Updated box-time colors and borders */
        .box-time{
     width:340px;
-    background:#0a2a66;
+    background:#000000; /* New Primary Black */
     color:white;
     display:flex;
     align-items:center;
     justify-content:center;
     z-index:12;
     position:relative;
+    border-left: 4px solid #FFD22F;
 
     /* left side \ */
     clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%);
@@ -128,22 +143,21 @@
 }
         .time-wrap, .date-wrap { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: 0.8s; font-weight: bold; padding-left: 40px; box-sizing: border-box;}
         .time-str { color: #ffffff; font-size: 45px; letter-spacing: 1px; }
-        .date-str { font-size: 32px; color: #ffffff; }
+        .date-str { font-size: 32px; color: #FFD22F; } /* Date in gold */
 
-              /* ਸਕੋਰਬੋਰਡ ਦਾ ਨਵਾਂ ਡਿਜ਼ਾਈਨ */
+              /* Updated scoreboard colors and border */
 #scoreboard { position: absolute; top: 40px; right: 80px; display: flex; flex-direction: column; align-items: center; z-index: 9999; opacity: 1; transition: all 0.7s ease; }
 #scoreboard.hidden { opacity: 0; transform: translateY(-100px); }
 
-.main-bar { display: flex; align-items: center; height: 65px; background: rgba(255, 255, 255, 1); /* White background */ border-radius: 6px; border: 3px solid #000080; /* Navy Blue Border */ padding: 0; position: relative; overflow: hidden; }
+.main-bar { display: flex; align-items: center; height: 65px; background: #FFD22F; /* White changed to Golden yellow */ border-radius: 6px; border: 3px solid #000000; /* Navy changed to Black */ padding: 0; position: relative; overflow: hidden; }
 
-/* ਸਕੋਰ ਬਾਕਸ - Navy Blue background, White text */
-/* ਸਕੋਰ ਬਾਕਸ - Navy Blue background, White bold simple text */
+/* Score boxes - Black background, White bold simple text */
 .s-box { 
-    background: #000080; 
+    background: #000000; 
     color: #ffffff; 
     font-size: 42px; 
     font-weight: 900; 
-    font-family: Arial, sans-serif; /* ਸਿੰਪਲ ਫੌਂਟ */
+    font-family: Arial, sans-serif; /* Simple font */
     width: 120px; 
     height: 100%; 
     display: flex; 
@@ -152,16 +166,17 @@
     position: relative; 
     z-index: 11; 
 }
-.s-left { border-right: 2px solid #ffffff; } /* White border divider */
-.s-right { border-left: 2px solid #ffffff; }
+.s-left { border-right: 2px solid #FFD22F; } /* Golden border divider */
+.s-right { border-left: 2px solid #FFD22F; }
         .inner-val { transform: skewX(15deg); }
-        /* ਟੀਮ ਨਾਮ ਖੇਤਰ - White background, Navy Blue text */
-.name-area { width: 220px; height: 100%; display: flex; align-items: center; overflow: hidden; white-space: nowrap; color: #000080; font-size: 28px; font-weight: bold; text-align: center; padding: 0 10px; box-sizing: border-box; text-transform: uppercase; background: #ffffff; } 
+        /* Team name area - Golden background, Black text */
+.name-area { width: 220px; height: 100%; display: flex; align-items: center; overflow: hidden; white-space: nowrap; color: #000000; font-size: 28px; font-weight: bold; text-align: center; padding: 0 10px; box-sizing: border-box; text-transform: uppercase; background: #FFD22F; } 
         .team-scroller { display: inline-block; padding-left: 100%; animation: team-scroll 8s linear infinite; }
         @keyframes team-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-        .vs-text { color: #ffffff; font-size: 20px; font-weight: 900; margin: 0 5px; background: #000080; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; z-index: 11; }
+        /* VS text updated colors */
+        .vs-text { color: #FFD22F; font-size: 20px; font-weight: 900; margin: 0 5px; background: #000000; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; z-index: 11; border: 2px solid #FFD22F;}
 
-.round-display { color: white; font-size: 22px; font-weight: bold; text-transform: uppercase; margin-top: 15px; text-shadow: 2px 2px 6px #000; letter-spacing: 2px; display: block; background: rgba(0,0,0,0.6); padding: 4px 15px; border-radius: 4px; }  
+.round-display { color: #FFD22F; font-size: 22px; font-weight: bold; text-transform: uppercase; margin-top: 15px; text-shadow: 2px 2px 6px #000; letter-spacing: 2px; display: block; background: rgba(0,0,0,0.8); padding: 4px 15px; border-radius: 4px; border: 1px solid #FFD22F; }  
     </style>
 </head>
 <body>
@@ -209,11 +224,11 @@
     const matchId = urlParams.get('id') || 'defaultMatch';
     const db = firebase.database().ref("matchData/" + matchId);
 
+    // Updated with referenced logo filename
     const clientLogos = {
-        "mudki1": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/image-Photoroom%20(4).png"
+        "mudki1": "nk sports live logo.png"
     };
 
-    // ਟਿੱਕਰ ਨੂੰ ਇੱਕ ਵਾਰ ਸ਼ੁਰੂ ਕਰਨ ਲਈ variables
     let tickerInitialized = false;
 
     db.on("value", (snap) => {
@@ -247,39 +262,9 @@
         roundEl.innerText = data.round || "";
         roundEl.style.display = (data.round || "").trim() === "" ? "none" : "block";
         
-        // ਟਿੱਕਰ ਟੈਕਸਟ ਅਪਡੇਟ (ਐਨੀਮੇਸ਼ਨ ਨੂੰ ਛੇੜੇ ਬਿਨਾਂ)
+        // Ticker Content update
         updateTickerContent('c1', data.row1Txt || "WELCOME TO LIVE KABADDI");
-        /* ROW 2 AUTO DATA */
-
-let row2Text = "";
-
-/* NEXT MATCH */
-
-if(data.nextMatches && data.nextMatches.length > 0){
-
-row2Text += "NEXT MATCH : " + data.nextMatches[0];
-
-}
-
-/* WINNER */
-
-if(data.resultText){
-
-if(row2Text!=="") row2Text += "   ★★★   ";
-
-row2Text += "WIN MATCH : " + data.resultText;
-
-}
-
-/* DEFAULT */
-
-if(row2Text===""){
-
-row2Text = "SUBSCRIBE OUR CHANNEL";
-
-}
-
-updateTickerContent('c2', row2Text);
+        updateTickerContent('c2', data.row2Txt || "SUBSCRIBE OUR CHANNEL");
         updateTickerContent('c3', data.row3Txt || "LIKE & SHARE");
 
         if (!tickerInitialized) {
@@ -289,112 +274,12 @@ updateTickerContent('c2', row2Text);
             tickerInitialized = true;
         }
     });
-function showResultLayer(){
 
-const scoreA =
-parseFloat(document.getElementById("sA").innerText) || 0;
-
-const scoreB =
-parseFloat(document.getElementById("sB").innerText) || 0;
-
-const teamA =
-document.getElementById("nA").innerText.trim();
-
-const teamB =
-document.getElementById("nB").innerText.trim();
-
-let winner="";
-
-if(scoreA > scoreB){
-
-winner = teamA;
-
-}else if(scoreB > scoreA){
-
-winner = teamB;
-
-}else{
-
-winner = "MATCH DRAW";
-
-}
-
-/* RESULT TEXT */
-
-const resultText =
-winner==="MATCH DRAW"
-? "MATCH DRAW"
-: winner + " WIN";
-
-/* SAVE FIREBASE */
-
-db.update({
-resultText: resultText
-});
-
-/* REMOVE OLD RESULT */
-
-const oldLayer =
-document.querySelector(".result-animation-layer");
-
-if(oldLayer){
-
-oldLayer.remove();
-
-}
-
-/* CREATE RESULT LAYER */
-
-const resultLayer =
-document.createElement("div");
-
-resultLayer.className =
-"result-animation-layer";
-
-resultLayer.innerHTML = `
-
-<div class="result-animation-box">
-
-<div class="result-winner-title">
-
-🏆 WINNER 🏆
-
-</div>
-
-<div class="result-team-name">
-
-${resultText}
-
-</div>
-
-</div>
-
-`;
-
-document.body.appendChild(resultLayer);
-
-/* AUTO REMOVE AFTER 10 SEC */
-
-setTimeout(()=>{
-
-resultLayer.style.transition = "0.5s";
-resultLayer.style.opacity = "0";
-
-setTimeout(()=>{
-
-resultLayer.remove();
-
-},500);
-
-},10000);
-
-}
     function setTeamName(containerId, txt) {
         const el = document.getElementById(containerId);
         el.innerHTML = txt.length > 12 ? `<div class="team-scroller">${txt}</div>` : `<div style="width:100%; text-align:center;">${txt}</div>`;
     }
 
-    // ਇਹ ਫੰਕਸ਼ਨ ਸਿਰਫ ਟੈਕਸਟ ਬਦਲਦਾ ਹੈ, ਐਨੀਮੇਸ਼ਨ ਨਹੀਂ
     function updateTickerContent(id, txt) {
         const el = document.getElementById(id);
         const scroller = el.querySelector('.scroller');
@@ -405,10 +290,10 @@ resultLayer.remove();
         }
     }
 
-    // ਟਿੱਕਰ ਨੂੰ ਇੱਕ ਵਾਰ ਚਲਾਉਣ ਵਾਲਾ ਫੰਕਸ਼ਨ
     function startTicker(id, speed) {
         const el = document.getElementById(id);
         const scroller = el.querySelector('.scroller');
+        if(!el || !scroller) return;
         let x = el.offsetWidth;
 
         function animate() {
@@ -435,3 +320,5 @@ resultLayer.remove();
     function moveWM() { wmEl.style.left = (Math.random() * 1400 + 100) + 'px'; wmEl.style.top = (Math.random() * 600 + 150) + 'px'; }
     moveWM(); setInterval(moveWM, 6000);
 </script>
+</body>
+</html>
