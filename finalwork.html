@@ -46,7 +46,7 @@
 
         #single-wm { position: absolute; color: rgba(255, 255, 255, 0.7); font-size: 35px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 5px #000; white-space: nowrap; z-index: 1; opacity: 1; }
 
-        /* SCOREBOARD BACKGROUND - 101 score png */
+        /* SCOREBOARD BACKGROUND - 101 score png_2.png */
         #scoreboard { 
             position: absolute; 
             top: var(--sb-top); 
@@ -56,8 +56,8 @@
             transform: scale(var(--sb-width-scale), var(--sb-scale)); 
             transform-origin: top left; 
             z-index: 9999; opacity: 1; transition: opacity 0.7s ease;
-            /* ਇੱਥੇ ਆਪਣੀ ਨਵੀਂ 101 score png ਫਾਈਲ ਦਾ ਲਿੰਕ ਪਾਓ */
-            background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/101%20score%20png.png'); 
+            /* ਇੱਥੇ ਆਪਣੀ ਨਵੀਂ 101 score png_2.png ਫਾਈਲ ਦਾ ਲਿੰਕ ਪਾਓ */
+            background-image: url('YOUR_GITHUB_LINK_HERE/101%20score%20png_2.png'); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -266,7 +266,6 @@
     }
 
     function loadSettings() {
-        // Updated Default values for 101 score png.png
         document.getElementById('sb-scale-slider').value = localStorage.getItem('sb-scale') || '1';
         document.getElementById('sb-width-slider').value = localStorage.getItem('sb-width-scale') || '1';
         document.getElementById('sb-y-slider').value = localStorage.getItem('sb-top') || '0';
