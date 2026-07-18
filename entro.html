@@ -62,32 +62,14 @@
 </div>
 
 <script>
+
     const firebaseConfig = { databaseURL: "https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
 
     const urlParams = new URLSearchParams(window.location.search);
     const matchId = urlParams.get('id') || 'defaultMatch';
-    
-    // --- EXPIRY & PLAN STATUS CHECK ---
-    // ਇਹ ਯਕੀਨੀ ਬਣਾਓ ਕਿ ਤੁਸੀਂ 'users' ਟਰੀ ਤੋਂ ਸਟੇਟਸ ਚੈੱਕ ਕਰ ਰਹੇ ਹੋ
-    firebase.database().ref('users/' + matchId).on('value', snap => {
-        const userData = snap.val();
-        // ਜੇ ਯੂਜ਼ਰ ਨਹੀਂ ਹੈ ਜਾਂ planStatus 'true' ਹੈ (ਲੌਕ ਹੈ), ਤਾਂ Lock Screen ਦਿਖਾਓ
-        if (!userData || userData.planStatus === true) {
-            document.getElementById('expiry-lock').style.display = 'flex';
-            document.getElementById('scoreboard').style.display = 'none';
-            document.getElementById('ticker-wrap').style.display = 'none';
-        } else {
-            document.getElementById('expiry-lock').style.display = 'none';
-            document.getElementById('scoreboard').style.display = 'block';
-            document.getElementById('ticker-wrap').style.display = 'block';
-        }
-    });
-
-    // --- MATCH DATA LOAD ---
     const db = firebase.database().ref("matchData/" + matchId);
-    
-    // ਬਾਕੀ ਤੁਹਾਡਾ ਪੁਰਾਣਾ ਕੋਡ ਇੱਥੇ ਜਾਰੀ ਰਹੇਗਾ...
+
     const clientLogos = {
         "test": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Kabaddi%20101%20logo.png"
     };
@@ -106,6 +88,9 @@
             logoCont.classList.add('hidden');
         }
 
+        document.getElementById('scoreboard').classList.toggle('hidden', data.scoreVisible === false);
+        document.getElementById('ticker-wrap').classList.toggle('hidden', data.tickerVisible === false);
+        
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
         setTeamName('nA-container', data.nameA || "TEAM 1");
@@ -129,7 +114,7 @@
         }
     });
 
-     function setTeamName(containerId, txt) {
+    function setTeamName(containerId, txt) {
         const el = document.getElementById(containerId);
         let alignment = containerId === 'nA-container' ? 'right' : 'left';
         el.innerHTML = txt.length > 15 ? `<div class="team-scroller">${txt}</div>` : `<div style="width:100%; text-align:${alignment};">${txt}</div>`;
@@ -173,4 +158,3 @@
     }, 3000);
 </script>
 </body>
-</html>
