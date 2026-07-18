@@ -5,6 +5,14 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
+        :root {
+            /* Default Settings for Top Right Corner */
+            --sb-scale: 0.65;
+            --sb-top: -300px;
+            --sb-left: 450px;
+            --tk-scale: 1;
+        }
+
         body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Arial', sans-serif; overflow: hidden; position: relative; }
         
         .whatsapp-bar { position: absolute; bottom: 165px; left: 10px; display: flex; align-items: center; background: #000000; color: #ffffff; padding: 6px 18px 6px 45px; border-radius: 25px; font-size: 22px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
@@ -17,62 +25,96 @@
 
         #single-wm { position: absolute; color: rgba(255, 255, 255, 0.7); font-size: 35px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 5px #000; white-space: nowrap; z-index: 1; opacity: 1; }
 
-        /* SCOREBOARD BACKGROUND (Copy of Copy of Star Kabaddi _20260712_102146_0000.png) */
+        /* SCOREBOARD BACKGROUND - Scalable and Moveable */
         #scoreboard { 
-            position: absolute; top: 0; left: 0; width: 1920px; height: 1080px; 
-            z-index: 9999; opacity: 1; transition: all 0.7s ease;
-            background-image: url("https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Copy%20of%20Copy%20of%20Star%20Kabaddi%20_20260712_102146_0000.png"); /* <-- ਇੱਥੇ ਸਕੋਰਬੋਰਡ ਵਾਲਾ ਲਿੰਕ ਪਾਓ */
+            position: absolute; 
+            top: var(--sb-top); 
+            left: var(--sb-left); 
+            width: 1920px; 
+            height: 1080px; 
+            transform: scale(var(--sb-scale));
+            transform-origin: center;
+            z-index: 9999; opacity: 1; transition: opacity 0.7s ease;
+            background-image: url('YOUR_GITHUB_LINK_HERE'); /* <-- ਇੱਥੇ ਸਕੋਰਬੋਰਡ ਵਾਲਾ ਲਿੰਕ ਪਾਓ */
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
         }
-        #scoreboard.hidden { opacity: 0; transform: translateY(-100px); }
+        #scoreboard.hidden { opacity: 0; }
 
-        /* SCOREBOARD TEXT POSITIONING (Adjust left/top pixels as needed to match the PNG) */
+        /* TEXT POSITIONING INSIDE SCOREBOARD */
         .name-area { position: absolute; top: 480px; height: 60px; display: flex; align-items: center; color: #ffffff; font-size: 38px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 4px #000; overflow: hidden; white-space: nowrap; z-index: 11; }
-        #nA-container { left: 450px; width: 350px; justify-content: flex-end; } /* TEAM 1 */
-        #nB-container { left: 1120px; width: 350px; justify-content: flex-start; } /* TEAM 2 */
+        #nA-container { left: 450px; width: 350px; justify-content: flex-end; }
+        #nB-container { left: 1120px; width: 350px; justify-content: flex-start; }
         
         .score-box { position: absolute; top: 480px; height: 60px; width: 80px; display: flex; align-items: center; justify-content: center; font-size: 55px; font-weight: 900; color: #e60000; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); z-index: 12; }
-        #sA { left: 860px; } /* TEAM 1 SCORE */
-        #sB { left: 980px; } /* TEAM 2 SCORE */
+        #sA { left: 860px; } 
+        #sB { left: 980px; } 
 
         .round-display { position: absolute; top: 560px; left: 50%; transform: translateX(-50%); color: white; font-size: 26px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 6px #000; letter-spacing: 2px; }
 
         .team-scroller { display: inline-block; padding-left: 100%; animation: team-scroll 8s linear infinite; }
         @keyframes team-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        /* TICKER BACKGROUND (Copy of Star Kabaddi _20260711_110521_0000.png) */
+        /* TICKER BACKGROUND */
         #ticker-wrap { 
             position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 1080px; 
-            z-index: 9998; opacity: 1; transition: all 0.7s ease;
-            background-image: url("https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Copy%20of%20Star%20Kabaddi%20_20260711_110521_0000.png"); /* <-- ਇੱਥੇ ਹੇਠਲੇ ਟਿੱਕਰ ਵਾਲਾ ਲਿੰਕ ਪਾਓ */
+            z-index: 9998; opacity: 1; transition: opacity 0.7s ease;
+            background-image: url('YOUR_GITHUB_LINK_HERE'); /* <-- ਇੱਥੇ ਹੇਠਲੇ ਟਿੱਕਰ ਵਾਲਾ ਲਿੰਕ ਪਾਓ */
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            pointer-events: none; /* Allows clicking through the transparent areas */
+            pointer-events: none;
+            transform-origin: bottom center;
+            transform: scale(var(--tk-scale));
         }
-        #ticker-wrap.hidden { opacity: 0; transform: translateY(160px); }
+        #ticker-wrap.hidden { opacity: 0; }
 
-        /* TICKER 4 ROWS POSITIONING */
         .row-text { position: absolute; display: flex; align-items: center; font-weight: bold; text-transform: uppercase; width: 1400px; left: 250px; overflow: hidden; box-sizing: border-box; white-space: nowrap; padding-left: 20px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
-        
-        /* PNG ਦੇ ਲਾਲ ਅਤੇ ਕਾਲੇ ਹਿੱਸੇ ਮੁਤਾਬਕ bottom ਪਿਕਸਲ ਸੈੱਟ ਕਰੋ */
         .row-1 { bottom: 105px; height: 35px; font-size: 28px; color: #ffffff; }
         .row-2 { bottom: 70px;  height: 30px; font-size: 24px; color: #ffff00; }
         .row-3 { bottom: 40px;  height: 25px; font-size: 22px; color: #ffffff; }
-        .row-4 { bottom: 12px;  height: 25px; font-size: 22px; color: #00ffcc; } /* ਨਵੀਂ 4th Row */
+        .row-4 { bottom: 12px;  height: 25px; font-size: 22px; color: #00ffcc; } 
 
         .scroller{ display:inline-block; white-space:nowrap; position:relative; will-change:transform; }
 
-        /* TIME & DATE SETTINGS */
         .box-time { position: absolute; bottom: 15px; right: 40px; width: 300px; height: 100px; display: flex; align-items: center; justify-content: center; z-index: 12; }
         .time-wrap, .date-wrap { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: 0.8s; font-weight: bold; }
         .time-str { color: #ffffff; font-size: 40px; letter-spacing: 1px; text-shadow: 2px 2px 5px #000; }
         .date-str { font-size: 28px; color: #ffffff; text-shadow: 2px 2px 5px #000; }
+
+        /* OBS INTERACTIVE CONTROLS */
+        #obs-controls-wrap { position: absolute; top: 15px; left: 15px; z-index: 100000; pointer-events: auto; }
+        #gear-icon { font-size: 28px; cursor: pointer; opacity: 0.1; transition: 0.3s; background: rgba(0,0,0,0.6); padding: 5px; border-radius: 5px; }
+        #obs-controls-wrap:hover #gear-icon { opacity: 1; }
+        #obs-controls { display: none; background: rgba(0, 0, 0, 0.9); padding: 15px; border-radius: 8px; color: white; border: 1px solid #444; width: 220px; margin-top: 5px; }
+        #obs-controls input[type="range"] { width: 100%; margin: 5px 0 15px 0; }
+        .reset-btn { background: #da3633; color: white; padding: 6px; border: none; border-radius: 4px; width: 100%; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
+
+<!-- ADJUSTMENT CONTROLS (Only visible on hover in OBS Interact) -->
+<div id="obs-controls-wrap">
+    <div id="gear-icon" onclick="toggleMenu()">⚙️</div>
+    <div id="obs-controls">
+        <b style="color:#f39c12;">Scale Settings</b><hr style="border:0; border-top:1px solid #444;">
+        
+        <small>Scoreboard Size:</small><br>
+        <input type="range" id="scale-slider" min="0.3" max="1.5" step="0.01" oninput="updateCSS()"><br>
+        
+        <small>Up / Down:</small><br>
+        <input type="range" id="y-slider" min="-800" max="800" step="5" oninput="updateCSS()"><br>
+        
+        <small>Left / Right:</small><br>
+        <input type="range" id="x-slider" min="-800" max="1000" step="5" oninput="updateCSS()"><br>
+        
+        <small>Ticker Size (Bottom):</small><br>
+        <input type="range" id="tk-scale-slider" min="0.5" max="1.5" step="0.01" oninput="updateCSS()"><br>
+        
+        <button class="reset-btn" onclick="resetCSS()">Reset to Default</button>
+    </div>
+</div>
 
 <div class="whatsapp-bar">
     <div class="whatsapp-icon"><svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.405.003 12.022.003c3.201.001 6.212 1.244 8.477 3.513 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.35 12.002-11.97 12.002-2.012-.002-3.992-.501-5.756-1.451L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.742.002-2.602-1.01-5.05-2.85-6.893-1.839-1.84-4.287-2.853-6.89-2.854-5.441 0-9.865 4.37-9.869 9.745-.001 1.706.469 3.374 1.359 4.848l-.993 3.626 3.754-.981zM17.48 14.86c-.29-.145-1.714-.846-1.98-.942-.264-.096-.457-.145-.648.145-.19.29-.738.942-.905 1.134-.167.19-.334.212-.623.067-.29-.145-1.223-.45-2.33-1.44-.863-.77-1.445-1.72-1.614-2.012-.17-.29-.018-.447.127-.592.13-.13.29-.335.434-.503.144-.167.192-.28.29-.466.096-.186.047-.35-.024-.495-.072-.145-.648-1.56-.888-2.137-.233-.56-.47-.483-.648-.492-.167-.008-.36-.01-.553-.01-.193 0-.507.073-.77.361-.264.288-1.01.987-1.01 2.407s1.033 2.795 1.178 2.99c.145.19 2.032 3.102 4.922 4.35.688.298 1.224.475 1.643.607.692.22 1.323.19 1.82.115.553-.083 1.714-.7 1.958-1.376.244-.677.244-1.255.172-1.376-.073-.12-.265-.193-.554-.338z"/></svg></div>
@@ -100,7 +142,7 @@
     <div class="row-text row-1" id="c1">WELCOME TO LIVE KABADDI</div>
     <div class="row-text row-2" id="c2">SUBSCRIBE OUR CHANNEL</div>
     <div class="row-text row-3" id="c3">LIKE & SHARE</div>
-    <div class="row-text row-4" id="c4">KEEP WATCHING</div> <!-- 4th Row -->
+    <div class="row-text row-4" id="c4">KEEP WATCHING</div> 
 
     <div class="box-time">
         <div class="time-wrap" id="t-wrap"><div class="time-str" id="live-time"></div></div>
@@ -109,6 +151,57 @@
 </div>
 
 <script>
+    // --- SETTINGS / SCALING SCRIPT ---
+    function toggleMenu() {
+        const menu = document.getElementById('obs-controls');
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function updateCSS() {
+        const scale = document.getElementById('scale-slider').value;
+        const top = document.getElementById('y-slider').value;
+        const left = document.getElementById('x-slider').value;
+        const tkScale = document.getElementById('tk-scale-slider').value;
+        
+        document.documentElement.style.setProperty('--sb-scale', scale);
+        document.documentElement.style.setProperty('--sb-top', top + 'px');
+        document.documentElement.style.setProperty('--sb-left', left + 'px');
+        document.documentElement.style.setProperty('--tk-scale', tkScale);
+
+        // Save to PC
+        localStorage.setItem('sb-scale', scale);
+        localStorage.setItem('sb-top', top);
+        localStorage.setItem('sb-left', left);
+        localStorage.setItem('tk-scale', tkScale);
+    }
+
+    function loadSettings() {
+        const scale = localStorage.getItem('sb-scale') || '0.65';
+        const top = localStorage.getItem('sb-top') || '-300';
+        const left = localStorage.getItem('sb-left') || '450';
+        const tkScale = localStorage.getItem('tk-scale') || '1';
+
+        document.getElementById('scale-slider').value = scale;
+        document.getElementById('y-slider').value = top;
+        document.getElementById('x-slider').value = left;
+        document.getElementById('tk-scale-slider').value = tkScale;
+
+        updateCSS();
+    }
+    
+    function resetCSS() {
+        localStorage.removeItem('sb-scale');
+        localStorage.removeItem('sb-top');
+        localStorage.removeItem('sb-left');
+        localStorage.removeItem('tk-scale');
+        loadSettings();
+    }
+    
+    // Load saved settings when page starts
+    window.onload = loadSettings;
+
+
+    // --- FIREBASE SCRIPT ---
     const firebaseConfig = { databaseURL: "https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
 
@@ -135,14 +228,12 @@
             logoCont.classList.add('hidden');
         }
 
-        // Scoreboard & Ticker Wrapper visibility
         document.getElementById('scoreboard').classList.toggle('hidden', data.scoreVisible === false);
         const tickerWrap = document.getElementById('ticker-wrap');
         const whatsappBar = document.querySelector('.whatsapp-bar');
         tickerWrap.classList.toggle('hidden', data.tickerVisible === false);
         whatsappBar.style.display = (data.tickerVisible === false) ? 'none' : 'flex';
         
-        // Update basic data
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
         setTeamName('nA-container', data.nameA || "TEAM 1");
@@ -153,7 +244,6 @@
         roundEl.innerText = data.round || "";
         roundEl.style.display = (data.round || "").trim() === "" ? "none" : "block";
         
-        // Update all 4 Ticker rows
         updateTickerContent('c1', data.row1Txt || "WELCOME TO LIVE KABADDI");
         updateTickerContent('c2', data.row2Txt || "SUBSCRIBE OUR CHANNEL");
         updateTickerContent('c3', data.row3Txt || "LIKE & SHARE");
@@ -163,14 +253,13 @@
             startTicker('c1', 1.4);
             startTicker('c2', 2.0);
             startTicker('c3', 1.7);
-            startTicker('c4', 1.9); // Start animation for 4th row
+            startTicker('c4', 1.9);
             tickerInitialized = true;
         }
     });
 
     function setTeamName(containerId, txt) {
         const el = document.getElementById(containerId);
-        // Team 1 starts from right to left, Team 2 starts from left to right based on original alignment
         let alignment = containerId === 'nA-container' ? 'right' : 'left';
         el.innerHTML = txt.length > 15 ? `<div class="team-scroller">${txt}</div>` : `<div style="width:100%; text-align:${alignment};">${txt}</div>`;
     }
