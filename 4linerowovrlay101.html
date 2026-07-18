@@ -37,21 +37,21 @@
             z-index: 9999; opacity: 1; transition: opacity 0.7s ease;
             background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/101%20score%20png.png'); 
             background-size: cover;
-            background-position: center;
+            background-position: right;
             background-repeat: no-repeat;
         }
         #scoreboard.hidden { opacity: 0; }
 
         /* TEXT POSITIONING INSIDE SCOREBOARD */
-        .name-area { position: absolute; top: 10px; height: 60px; display: flex; align-items: center; color: #ffffff; font-size: 38px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 4px #000; overflow: hidden; white-space: nowrap; z-index: 11; }
+        .name-area { position: absolute; top: 10px; height: 60px; display: flex; align-items: right; color: #ffffff; font-size: 38px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 4px #000; overflow: hidden; white-space: nowrap; z-index: 11; }
         #nA-container { left: 450px; width: 350px; justify-content: flex-end; }
         #nB-container { left: 1120px; width: 350px; justify-content: flex-start; }
         
-        .score-box { position: absolute; top: 10px; height: 60px; width: 80px; display: flex; align-items: center; justify-content: center; font-size: 55px; font-weight: 900; color: #e60000; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); z-index: 12; }
+        .score-box { position: absolute; top: 10px; height: 60px; width: 80px; display: flex; align-items: center; justify-content: right; font-size: 55px; font-weight: 900; color: #e60000; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); z-index: 12; }
         #sA { left: 860px; } 
         #sB { left: 980px; } 
 
-        .round-display { position: absolute; top: 560px; left: 50%; transform: translateX(-50%); color: white; font-size: 26px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 6px #000; letter-spacing: 2px; }
+        .round-display { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); color: white; font-size: 26px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 6px #000; letter-spacing: 2px; }
 
         .team-scroller { display: inline-block; padding-left: 100%; animation: team-scroll 8s linear infinite; }
         @keyframes team-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
