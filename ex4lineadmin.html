@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        
+        /* MAIN PANEL STYLES */
+        #main-panel { display: flex; width: 100%; flex-direction: column; align-items: center; }
+        .card { background: white; width: 100%; max-width: 500px; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); overflow: hidden; margin-bottom: 20px; box-sizing: border-box;}
+        .header { background: #1a73e8; color: white; padding: 12px; text-align: center; font-size: 16px; font-weight: bold; text-transform: uppercase; }
+        .teams-container { display: flex; padding: 15px; gap: 10px; border-bottom: 2px solid #eee; }
+        .team-box { flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .team-input { width: 95%; padding: 8px; border: 2px solid #ddd; border-radius: 6px; font-size: 15px; font-weight: bold; margin-bottom: 8px; text-align: center; }
+        .score-val { font-size: 50px; font-weight: 900; color: #333; margin: 5px 0; }
+        .btn-pm { border: none; color: white; padding: 12px; border-radius: 6px; font-size: 24px; font-weight: bold; cursor: pointer; flex: 1; margin: 0 4px; }
+        .btn-plus { background: #28a745; } .btn-minus { background: #dc3545; }
+        .settings-section { padding: 15px; background: #fafafa; box-sizing: border-box; }
+        
+        /* Textarea Auto-resize Styles */
+        textarea, .std-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; margin-bottom: 12px; resize: none; box-sizing: border-box; font-family: inherit; overflow: hidden; min-height: 42px; }
+        
+        .controls { padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+        .btn-full { border: none; color: white; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-bottom: 5px; width: 100%; box-sizing: border-box;}
+        .btn-blue { background: #1a73e8; } .btn-yellow { background: #fbbc05; color: #000; } .btn-red { background: #ea4335; } .btn-dark { background: #333; }
+        button:active { transform: scale(0.98); }
+
+        /* EXPIRED PANEL STYLES */
+        #expired-panel { display: none; width: 100%; flex-direction: column; align-items: center; margin-top: 50px; }
+        .expired-card { background: white; padding: 40px 20px; border-radius: 15px; box-shadow: 0 8px 30px rgba(218, 54, 51, 0.3); text-align: center; border-top: 6px solid #da3633; max-width: 400px; width: 90%; }
+        .expired-card h2 { color: #da3633; margin-top: 0; }
+        .expired-card p { color: #555; font-size: 16px; margin-bottom: 20px; }
+        .helpline-no { font-size: 22px; font-weight: bold; color: #333; margin: 15px 0; }
+        .btn-whatsapp { display: inline-flex; align-items: center; justify-content: center; background: #25D366; color: white; padding: 12px 20px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px; transition: 0.3s; }
+        .btn-whatsapp:hover { background: #1ebc5a; transform: scale(1.02); }
+    </style>
+</head>
+<body>
+
+<!-- MAIN PANEL (ਚਾਲੂ ਹੋਣ ਤੇ ਦਿਖੇਗਾ) -->
+<div id="main-panel">
+    <div class="card">
+        <div class="header">Live Score Board</div>
+        <div class="teams-container">
+            <div class="team-box">
+                <input type="text" id="nameA" class="team-input" placeholder="TEAM 1" oninput="updateDB()">
+                <div class="score-val" id="dispA">0</div>
+                <div style="display:flex; width:100%;">
+                    <button class="btn-pm btn-minus" onclick="changeScore('scoreA', -1)">-</button>
+                    <button class="btn-pm btn-plus" onclick="changeScore('scoreA', 1)">+</button>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; font-weight:bold; color:#aaa;">VS</div>
+            <div class="team-box">
+                <input type="text" id="nameB" class="team-input" placeholder="TEAM 2" oninput="updateDB()">
+                <div class="score-val" id="dispB">0</div>
+                <div style="display:flex; width:100%;">
+                    <button class="btn-pm btn-minus" onclick="changeScore('scoreB', -1)">-</button>
+                    <button class="btn-pm btn-plus" onclick="changeScore('scoreB', 1)">+</button>
+                </div>
+            </div>
+        </div>
+        <div class="controls">
+            <button id="visBtn" class="btn-full btn-red" onclick="toggleVis('scoreVisible')">Show/Hide Scoreboard</button>
+            <button class="btn-full btn-yellow" onclick="swapTeams()">Swap Teams</button>
+            <button class="btn-full btn-red" style="background:#777;" onclick="resetScores()">Reset Scores</button>
+            <input type="text" id="roundInp" class="std-input" style="text-align:center; margin-bottom:0;" placeholder="ROUND" oninput="updateDB()">
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="header">Ticker & Branding</div>
+        <div class="settings-section">
+            <textarea id="row1Inp" rows="1" placeholder="Title Line 1" oninput="updateDB(); autoResize(this)"></textarea>
+            <textarea id="row2Inp" rows="1" placeholder="Title Line 2" oninput="updateDB(); autoResize(this)"></textarea>
+            <textarea id="row3Inp" rows="1" placeholder="Title Line 3" oninput="updateDB(); autoResize(this)"></textarea>
+            <textarea id="row4Inp" rows="1" placeholder="Title Line 4" oninput="updateDB(); autoResize(this)"></textarea>
+            
+            <button id="tickVisBtn" class="btn-full btn-blue" onclick="toggleVis('tickerVisible')">Show/Hide Ticker</button>
+            <input type="text" id="watermarkInp" class="std-input" placeholder="Channel Name" oninput="updateDB()">
+            <button id="logoBtn" class="btn-full btn-dark" onclick="toggleVis('logoVisible')">Show/Hide Logo</button>
+        </div>
+    </div>
+</div>
+
+<!-- EXPIRED PANEL (ਪਲਾਨ ਖਤਮ ਹੋਣ ਤੇ ਦਿਖੇਗਾ) -->
+<div id="expired-panel">
+    <div class="expired-card">
+        <h2>🛑 PLAN EXPIRED</h2>
+        <p>Your panel subscription has expired. Please renew your plan to continue using the services.</p>
+        <div class="helpline-no">Helpline: 9115426711</div>
+        <a href="https://wa.me/919115426711?text=Hello,%20I%20want%20to%20renew%20my%20Live%20Panel." target="_blank" class="btn-whatsapp">
+            💬 WhatsApp Us
+        </a>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = { databaseURL: "https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
+    firebase.initializeApp(firebaseConfig);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const matchId = urlParams.get('id') || 'defaultMatch';
+    
+    const db = firebase.database().ref("matchData/" + matchId);
+    const userDb = firebase.database().ref("users/" + matchId); // ਮਾਸਟਰ ਪੈਨਲ ਦੇ ਡਾਟਾ ਲਈ
+
+    let curA = 0, curB = 0, sVis = true, tVis = true, lVis = true;
+    let isPanelActive = true; // Security Check
+
+    // 1. Check Plan Status from Master Panel
+    userDb.on("value", (snap) => {
+        const userData = snap.val();
+        if (userData && userData.planStatus === true) {
+            // Plan is Expired
+            isPanelActive = false;
+            document.getElementById('main-panel').style.display = 'none';
+            document.getElementById('expired-panel').style.display = 'flex';
+        } else {
+            // Plan is Active
+            isPanelActive = true;
+            document.getElementById('main-panel').style.display = 'flex';
+            document.getElementById('expired-panel').style.display = 'none';
+        }
+    });
+
+    // Textarea Auto-resize Function
+    function autoResize(el) {
+        if (!el) return;
+        el.style.height = 'auto';
+        el.style.height = (el.scrollHeight) + 'px';
+    }
+
+    // 2. Load Match Data
+    db.on("value", (snap) => {
+        const data = snap.val();
+        if(data) {
+            curA = parseFloat(data.scoreA) || 0; 
+            curB = parseFloat(data.scoreB) || 0;
+            sVis = data.scoreVisible !== false; 
+            tVis = data.tickerVisible !== false; 
+            lVis = data.logoVisible !== false;
+            
+            document.getElementById('dispA').innerText = curA;
+            document.getElementById('dispB').innerText = curB;
+            document.getElementById('nameA').value = data.nameA || "";
+            document.getElementById('nameB').value = data.nameB || "";
+            document.getElementById('roundInp').value = data.round || "";
+            
+            const r1 = document.getElementById('row1Inp');
+            const r2 = document.getElementById('row2Inp');
+            const r3 = document.getElementById('row3Inp');
+            const r4 = document.getElementById('row4Inp');
+            
+            r1.value = data.row1Txt || ""; autoResize(r1);
+            r2.value = data.row2Txt || ""; autoResize(r2);
+            r3.value = data.row3Txt || ""; autoResize(r3);
+            r4.value = data.row4Txt || ""; autoResize(r4);
+
+            document.getElementById('watermarkInp').value = data.watermarkTxt || "";
+            
+            updateBtnUI('visBtn', sVis, "Scoreboard");
+            updateBtnUI('tickVisBtn', tVis, "Ticker");
+            updateBtnUI('logoBtn', lVis, "Logo");
+        }
+    });
+
+    function updateBtnUI(id, val, text) {
+        const btn = document.getElementById(id);
+        if(btn) {
+            btn.innerText = val ? "Hide " + text : "Show " + text;
+            btn.style.background = val ? (id==='logoBtn'?'#333':'#dc3545') : "#28a745";
+        }
+    }
+
+    function changeScore(team, val) {
+        if(!isPanelActive) return alert("Panel is locked!"); // Block access if expired
+        let current = (team === 'scoreA' ? curA : curB);
+        let newVal;
+        if (val > 0) {
+            if (curA === 0 && curB === 0) newVal = 1.5;
+            else newVal = current + 1;
+        } else {
+            if (current === 1.5) newVal = 0;
+            else newVal = current - 1;
+            if (newVal < 0) newVal = 0;
+        }
+        db.update({ [team]: newVal });
+    }
+
+    function updateDB() {
+        if(!isPanelActive) return; // Block typing updates if expired
+        db.update({
+            nameA: document.getElementById('nameA').value,
+            nameB: document.getElementById('nameB').value,
+            round: document.getElementById('roundInp').value,
+            row1Txt: document.getElementById('row1Inp').value,
+            row2Txt: document.getElementById('row2Inp').value,
+            row3Txt: document.getElementById('row3Inp').value,
+            row4Txt: document.getElementById('row4Inp').value,
+            watermarkTxt: document.getElementById('watermarkInp').value
+        });
+    }
+
+    function toggleVis(field) {
+        if(!isPanelActive) return alert("Panel is locked!"); // Block button clicks
+        let val = (field === 'scoreVisible') ? sVis : (field === 'tickerVisible' ? tVis : lVis);
+        db.child(field).set(!val);
+    }
+
+    function swapTeams() {
+        if(!isPanelActive) return alert("Panel is locked!");
+        db.update({ nameA: document.getElementById('nameB').value, nameB: document.getElementById('nameA').value, scoreA: curB, scoreB: curA });
+    }
+
+    function resetScores() {
+        if(!isPanelActive) return alert("Panel is locked!");
+        if(confirm("Reset Match Scores?")) db.update({ scoreA: 0, scoreB: 0 });
+    }
+</script>
+</body>
+</html>
