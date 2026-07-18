@@ -1,49 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="pa">
 <head>
     <meta charset="UTF-8">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        :root {
-            /* Default Settings for Top Right Corner */
-            --sb-scale: 1;
-            --sb-top: 0px;
-            --sb-left: 0px;
-            --tk-scale: 1;
-        }
-
         body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Arial', sans-serif; overflow: hidden; position: relative; }
         
+        /* WhatsApp Bar */
         .whatsapp-bar { position: absolute; bottom: 165px; left: 10px; display: flex; align-items: center; background: #000000; color: #ffffff; padding: 6px 18px 6px 45px; border-radius: 25px; font-size: 22px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         .whatsapp-icon { position: absolute; left: -2px; width: 44px; height: 44px; background: #e60000; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .whatsapp-icon svg { width: 24px; height: 24px; fill: white; }
 
+        /* Logo */
         #logo-container { position: absolute; top: 30px; left: 40px; z-index: 9999; opacity: 1; transition: all 0.7s ease; }
         #logo-container.hidden { opacity: 0; transform: scale(0); }
         #main-logo { height: 100px; width: auto; max-width: 450px; object-fit: contain; filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.3)); }
 
+        /* Floating Watermark */
         #single-wm { position: absolute; color: rgba(255, 255, 255, 0.7); font-size: 35px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 5px #000; white-space: nowrap; z-index: 1; opacity: 1; }
 
-        /* SCOREBOARD BACKGROUND - Scalable and Moveable */
+        /* SCOREBOARD BACKGROUND (Locked to 1920x1080) */
         #scoreboard { 
             position: absolute; 
-            top: var(--sb-top); 
-            left: var(--sb-left); 
+            top: 0px; 
+            left: 0px; 
             width: 1920px; 
             height: 1080px; 
-            transform: scale(var(--sb-scale));
-            transform-origin: top left;
             z-index: 9999; opacity: 1; transition: opacity 0.7s ease;
-            /* Updated to use 101 png_2.png */
-            background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/101%20score%20png.png'); 
+            background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/101%20png_2.png'); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
         }
         #scoreboard.hidden { opacity: 0; }
 
-        /* TEXT POSITIONING INSIDE SCOREBOARD (Updated for 101 png_2.png) */
+        /* TEXT POSITIONING INSIDE SCOREBOARD */
         .name-area { position: absolute; top: 32px; height: 50px; display: flex; align-items: center; color: #ffffff; font-size: 32px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 4px #000; overflow: hidden; white-space: nowrap; z-index: 11; }
         #nA-container { left: 1030px; width: 310px; justify-content: flex-end; }
         #nB-container { left: 1560px; width: 310px; justify-content: flex-start; }
@@ -52,12 +44,12 @@
         #sA { left: 1355px; } 
         #sB { left: 1485px; } 
 
-        .round-display { position: absolute; top: 88px; left: 1450px; transform: translateX(-50%); color: white; font-size: 20px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 6px #000; letter-spacing: 2px; }
+        .round-display { position: absolute; top: 88px; left: 1450px; transform: translateX(-50%); color: white; font-size: 20px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 6px #000; letter-spacing: 2px; z-index: 11; }
 
         .team-scroller { display: inline-block; padding-left: 100%; animation: team-scroll 8s linear infinite; }
         @keyframes team-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        /* TICKER BACKGROUND */
+        /* TICKER BACKGROUND (Locked to 1920x1080) */
         #ticker-wrap { 
             position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 1080px; 
             z-index: 9998; opacity: 1; transition: opacity 0.7s ease;
@@ -66,65 +58,24 @@
             background-position: center;
             background-repeat: no-repeat;
             pointer-events: none;
-            transform-origin: bottom center;
-            transform: scale(var(--tk-scale));
         }
         #ticker-wrap.hidden { opacity: 0; }
 
-        /* NEW TICKER 4 ROWS POSITIONING (Matched to specific boxes) */
+        /* TICKER 4 ROWS POSITIONING */
         .row-text { position: absolute; display: flex; align-items: center; font-weight: bold; text-transform: uppercase; overflow: hidden; box-sizing: border-box; white-space: nowrap; padding-left: 10px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
-        
-        /* 1. Main Red Box (next to LIVE) */
         .row-1 { bottom: 67px; left: 210px; width: 350px; height: 35px; font-size: 40px; color: #ffffff; }
-        
-        /* 2. White Gap (Black Text, No Shadow) */
         .row-2 { bottom: 64px; left: 587px; width: 815px; height: 35px; font-size: 40px; color: #000000; text-shadow: none; }
-        
-        /* 3. Thin Red Line */
         .row-3 { bottom: 60px; left: 1425px; width: 550px; height: 35px; font-size: 40px; color: #ffffff; }
-        
-        /* 4. Bottom Black Bar (Full Width) */
         .row-4 { bottom: 6px; left: 200px; width: 1730px; height: 28px; font-size: 40px; color: #ffffff; }
-
         .scroller{ display:inline-block; white-space:nowrap; position:relative; will-change:transform; }
 
-        /* DATE & TIME (Flashing on Bottom Right Red Box) */
+        /* DATE & TIME */
         .box-time { position: absolute; bottom: 1px; left: 3px; width: 190px; height: 40px; display: flex; align-items: center; justify-content: center; z-index: 12; overflow: hidden; }
         .time-wrap, .date-wrap { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: opacity 0.3s ease-in-out; font-weight: bold; }
         .time-str, .date-str { color: #ffffff; font-size: 26px; letter-spacing: 1px; text-shadow: 2px 2px 5px #000; }
-
-        /* OBS INTERACTIVE CONTROLS */
-        #obs-controls-wrap { position: absolute; top: 15px; left: 15px; z-index: 100000; pointer-events: auto; }
-        #gear-icon { font-size: 28px; cursor: pointer; opacity: 0.1; transition: 0.3s; background: rgba(0,0,0,0.6); padding: 5px; border-radius: 5px; }
-        #obs-controls-wrap:hover #gear-icon { opacity: 1; }
-        #obs-controls { display: none; background: rgba(0, 0, 0, 0.9); padding: 15px; border-radius: 8px; color: white; border: 1px solid #444; width: 220px; margin-top: 5px; }
-        #obs-controls input[type="range"] { width: 100%; margin: 5px 0 15px 0; }
-        .reset-btn { background: #da3633; color: white; padding: 6px; border: none; border-radius: 4px; width: 100%; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
-
-<!-- ADJUSTMENT CONTROLS (Only visible on hover in OBS Interact) -->
-<div id="obs-controls-wrap">
-    <div id="gear-icon" onclick="toggleMenu()">⚙️</div>
-    <div id="obs-controls">
-        <b style="color:#f39c12;">Scale Settings</b><hr style="border:0; border-top:1px solid #444;">
-        
-        <small>Scoreboard Size:</small><br>
-        <input type="range" id="scale-slider" min="0.3" max="1.5" step="0.01" oninput="updateCSS()"><br>
-        
-        <small>Up / Down:</small><br>
-        <input type="range" id="y-slider" min="-800" max="800" step="5" oninput="updateCSS()"><br>
-        
-        <small>Left / Right:</small><br>
-        <input type="range" id="x-slider" min="-800" max="1000" step="5" oninput="updateCSS()"><br>
-        
-        <small>Ticker Size (Bottom):</small><br>
-        <input type="range" id="tk-scale-slider" min="0.5" max="1.5" step="0.01" oninput="updateCSS()"><br>
-        
-        <button class="reset-btn" onclick="resetCSS()">Reset to Default</button>
-    </div>
-</div>
 
 <div class="whatsapp-bar">
     <div class="whatsapp-icon"><svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.405.003 12.022.003c3.201.001 6.212 1.244 8.477 3.513 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.35 12.002-11.97 12.002-2.012-.002-3.992-.501-5.756-1.451L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.742.002-2.602-1.01-5.05-2.85-6.893-1.839-1.84-4.287-2.853-6.89-2.854-5.441 0-9.865 4.37-9.869 9.745-.001 1.706.469 3.374 1.359 4.848l-.993 3.626 3.754-.981zM17.48 14.86c-.29-.145-1.714-.846-1.98-.942-.264-.096-.457-.145-.648.145-.19.29-.738.942-.905 1.134-.167.19-.334.212-.623.067-.29-.145-1.223-.45-2.33-1.44-.863-.77-1.445-1.72-1.614-2.012-.17-.29-.018-.447.127-.592.13-.13.29-.335.434-.503.144-.167.192-.28.29-.466.096-.186.047-.35-.024-.495-.072-.145-.648-1.56-.888-2.137-.233-.56-.47-.483-.648-.492-.167-.008-.36-.01-.553-.01-.193 0-.507.073-.77.361-.264.288-1.01.987-1.01 2.407s1.033 2.795 1.178 2.99c.145.19 2.032 3.102 4.922 4.35.688.298 1.224.475 1.643.607.692.22 1.323.19 1.82.115.553-.083 1.714-.7 1.958-1.376.244-.677.244-1.255.172-1.376-.073-.12-.265-.193-.554-.338z"/></svg></div>
@@ -148,13 +99,13 @@
 
 <!-- Ticker with Background Image -->
 <div id="ticker-wrap">
-    <!-- 4 Ticker Rows customized for the new PNG layout -->
+    <!-- 4 Ticker Rows -->
     <div class="row-text row-1" id="c1">WELCOME TO LIVE KABADDI</div>
     <div class="row-text row-2" id="c2">SUBSCRIBE OUR CHANNEL</div>
     <div class="row-text row-3" id="c3">LIKE & SHARE</div>
     <div class="row-text row-4" id="c4">KEEP WATCHING</div> 
 
-    <!-- Date & Time Flashing over the Right Red Box -->
+    <!-- Date & Time Flashing -->
     <div class="box-time">
         <div class="time-wrap" id="t-wrap"><div class="time-str" id="live-time"></div></div>
         <div class="date-wrap" id="d-wrap" style="opacity:0;"><div class="date-str" id="live-date"></div></div>
@@ -162,54 +113,6 @@
 </div>
 
 <script>
-    // --- SETTINGS / SCALING SCRIPT ---
-    function toggleMenu() {
-        const menu = document.getElementById('obs-controls');
-        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-    }
-
-    function updateCSS() {
-        const scale = document.getElementById('scale-slider').value;
-        const top = document.getElementById('y-slider').value;
-        const left = document.getElementById('x-slider').value;
-        const tkScale = document.getElementById('tk-scale-slider').value;
-        
-        document.documentElement.style.setProperty('--sb-scale', scale);
-        document.documentElement.style.setProperty('--sb-top', top + 'px');
-        document.documentElement.style.setProperty('--sb-left', left + 'px');
-        document.documentElement.style.setProperty('--tk-scale', tkScale);
-
-        localStorage.setItem('sb-scale', scale);
-        localStorage.setItem('sb-top', top);
-        localStorage.setItem('sb-left', left);
-        localStorage.setItem('tk-scale', tkScale);
-    }
-
-    function loadSettings() {
-        // Updated Default values for 101 png_2.png
-        const scale = localStorage.getItem('sb-scale') || '1';
-        const top = localStorage.getItem('sb-top') || '0';
-        const left = localStorage.getItem('sb-left') || '0';
-        const tkScale = localStorage.getItem('tk-scale') || '1';
-
-        document.getElementById('scale-slider').value = scale;
-        document.getElementById('y-slider').value = top;
-        document.getElementById('x-slider').value = left;
-        document.getElementById('tk-scale-slider').value = tkScale;
-
-        updateCSS();
-    }
-    
-    function resetCSS() {
-        localStorage.removeItem('sb-scale');
-        localStorage.removeItem('sb-top');
-        localStorage.removeItem('sb-left');
-        localStorage.removeItem('tk-scale');
-        loadSettings();
-    }
-    
-    window.onload = loadSettings;
-
     // --- FIREBASE SCRIPT ---
     const firebaseConfig = { databaseURL: "https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
@@ -229,6 +132,7 @@
         const logoCont = document.getElementById('logo-container');
         const currentId = matchId.trim().toLowerCase();
 
+        // Logo visibility
         if (clientLogos[currentId] && data.logoVisible !== false) {
             document.getElementById('main-logo').src = clientLogos[currentId];
             logoCont.classList.remove('hidden');
@@ -236,12 +140,14 @@
             logoCont.classList.add('hidden');
         }
 
+        // Display Scoreboard and Ticker based on Database values
         document.getElementById('scoreboard').classList.toggle('hidden', data.scoreVisible === false);
         const tickerWrap = document.getElementById('ticker-wrap');
         const whatsappBar = document.querySelector('.whatsapp-bar');
         tickerWrap.classList.toggle('hidden', data.tickerVisible === false);
         whatsappBar.style.display = (data.tickerVisible === false) ? 'none' : 'flex';
         
+        // Match Data
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
         setTeamName('nA-container', data.nameA || "TEAM 1");
@@ -252,6 +158,7 @@
         roundEl.innerText = data.round || "";
         roundEl.style.display = (data.round || "").trim() === "" ? "none" : "block";
         
+        // Ticker Lines
         updateTickerContent('c1', data.row1Txt || "WELCOME TO LIVE KABADDI");
         updateTickerContent('c2', data.row2Txt || "SUBSCRIBE OUR CHANNEL");
         updateTickerContent('c3', data.row3Txt || "LIKE & SHARE");
@@ -304,7 +211,7 @@
     }
     setInterval(updateClock, 1000); updateClock();
 
-    // Toggle Time & Date every 3 seconds for a snappier flash effect
+    // Toggle Time & Date every 3 seconds
     let isTime = true;
     setInterval(() => { 
         isTime = !isTime; 
@@ -312,6 +219,7 @@
         document.getElementById('d-wrap').style.opacity = isTime ? "0" : "1"; 
     }, 3000);
 
+    // Floating Watermark
     const wmEl = document.getElementById('single-wm');
     function moveWM() { wmEl.style.left = (Math.random() * 1400 + 100) + 'px'; wmEl.style.top = (Math.random() * 600 + 150) + 'px'; }
     moveWM(); setInterval(moveWM, 6000);
