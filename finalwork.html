@@ -6,27 +6,28 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         :root {
-            /* Scoreboard PNG Settings (Top Right Anchor) */
-            --sb-scale: 0.65;
+            /* Scoreboard PNG Settings (Full Screen 1920x1080) */
+            --sb-scale: 1;
             --sb-width-scale: 1;
-            --sb-top: 10px;
-            --sb-right: 10px;
+            --sb-top: 0px;
+            --sb-left: 0px;
             
-            /* Scores Settings */
-            --score-size: 55px;
-            --score-top: 480px;
-            --score1-left: 860px;
-            --score2-left: 980px;
+            /* Scores Settings (Top Right Position) */
+            --score-size: 40px;
+            --score-top: 30px;
+            --score1-left: 1365px; /* White Box 1 */
+            --score2-left: 1495px; /* White Box 2 */
             
-            /* Teams Settings */
-            --team-size: 38px;
-            --team-top: 480px;
-            --team1-left: 450px;
-            --team2-left: 1120px;
+            /* Teams Settings (Top Right Position) */
+            --team-size: 32px;
+            --team-top: 30px;
+            --team1-left: 1050px; /* Red Box 1 */
+            --team2-left: 1565px; /* Red Box 2 */
             
             /* Round Text Settings */
-            --round-size: 26px;
-            --round-top: 560px;
+            --round-size: 20px;
+            --round-top: 90px;
+            --round-left: 1460px; /* Centered under VS */
             
             /* Ticker Settings */
             --tk-scale: 1;
@@ -45,17 +46,18 @@
 
         #single-wm { position: absolute; color: rgba(255, 255, 255, 0.7); font-size: 35px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 5px #000; white-space: nowrap; z-index: 1; opacity: 1; }
 
-        /* SCOREBOARD BACKGROUND - Anchored to Top Right */
+        /* SCOREBOARD BACKGROUND - 101 score png */
         #scoreboard { 
             position: absolute; 
             top: var(--sb-top); 
-            right: var(--sb-right); 
+            left: var(--sb-left); 
             width: 1920px; 
             height: 1080px; 
             transform: scale(var(--sb-width-scale), var(--sb-scale)); 
-            transform-origin: top right; /* Changed to Top Right */
+            transform-origin: top left; 
             z-index: 9999; opacity: 1; transition: opacity 0.7s ease;
-            background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Copy of Copy of Star Kabaddi _20260712_102146_0000.png'); 
+            /* ਇੱਥੇ ਆਪਣੀ ਨਵੀਂ 101 score png ਫਾਈਲ ਦਾ ਲਿੰਕ ਪਾਓ */
+            background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/101%20score%20png.png'); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -63,15 +65,15 @@
         #scoreboard.hidden { opacity: 0; }
 
         /* TEXT POSITIONING INSIDE SCOREBOARD */
-        .name-area { position: absolute; top: var(--team-top); height: 60px; display: flex; align-items: center; color: #ffffff; font-size: var(--team-size); font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 4px #000; overflow: hidden; white-space: nowrap; z-index: 11; }
-        #nA-container { left: var(--team1-left); width: 350px; justify-content: flex-end; }
-        #nB-container { left: var(--team2-left); width: 350px; justify-content: flex-start; }
+        .name-area { position: absolute; top: var(--team-top); height: 55px; display: flex; align-items: center; color: #ffffff; font-size: var(--team-size); font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 4px #000; overflow: hidden; white-space: nowrap; z-index: 11; }
+        #nA-container { left: var(--team1-left); width: 310px; justify-content: flex-end; }
+        #nB-container { left: var(--team2-left); width: 320px; justify-content: flex-start; }
         
-        .score-box { position: absolute; top: var(--score-top); height: 60px; width: 80px; display: flex; align-items: center; justify-content: center; font-size: var(--score-size); font-weight: 900; color: #e60000; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); z-index: 12; }
+        .score-box { position: absolute; top: var(--score-top); height: 55px; width: 65px; display: flex; align-items: center; justify-content: center; font-size: var(--score-size); font-weight: 900; color: #e60000; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); z-index: 12; }
         #sA { left: var(--score1-left); } 
         #sB { left: var(--score2-left); } 
 
-        .round-display { position: absolute; top: var(--round-top); left: 50%; transform: translateX(-50%); color: white; font-size: var(--round-size); font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 6px #000; letter-spacing: 2px; }
+        .round-display { position: absolute; top: var(--round-top); left: var(--round-left); transform: translateX(-50%); color: white; font-size: var(--round-size); font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 6px #000; letter-spacing: 2px; }
 
         .team-scroller { display: inline-block; padding-left: 100%; animation: team-scroll 8s linear infinite; }
         @keyframes team-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
@@ -80,7 +82,7 @@
         #ticker-wrap { 
             position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 1080px; 
             z-index: 9998; opacity: 1; transition: opacity 0.7s ease;
-            background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Copy%20of%20Star%20Kabaddi%20_20260711_110521_0000.png'); 
+            background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Copy%20of%20Star%20Kabaddi%20_20260711_110521_0000_2.png'); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -92,16 +94,16 @@
 
         /* TICKER ROWS */
         .row-text { position: absolute; display: flex; align-items: center; font-weight: bold; text-transform: uppercase; overflow: hidden; box-sizing: border-box; white-space: nowrap; padding-left: 10px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
-        .row-1 { bottom: 67px; left: 210px; width: 350px; height: 35px; font-size: 40px; color: #ffffff; }
-        .row-2 { bottom: 64px; left: 587px; width: 815px; height: 35px; font-size: 40px; color: #000000; text-shadow: none; }
-        .row-3 { bottom: 60px; left: 1425px; width: 550px; height: 35px; font-size: 40px; color: #ffffff; }
-        .row-4 { bottom: 6px; left: 200px; width: 1730px; height: 28px; font-size: 40px; color: #ffffff; }
+        .row-1 { bottom: 65px; left: 210px; width: 400px; height: 35px; font-size: 26px; color: #ffffff; }
+        .row-2 { bottom: 48px; left: 210px; width: 500px; height: 16px; font-size: 13px; color: #000000; text-shadow: none; }
+        .row-3 { bottom: 33px; left: 200px; width: 550px; height: 15px; font-size: 12px; color: #ffffff; }
+        .row-4 { bottom: 4px; left: 160px; width: 1350px; height: 28px; font-size: 22px; color: #ffffff; }
         .scroller{ display:inline-block; white-space:nowrap; position:relative; will-change:transform; }
 
         /* DATE & TIME */
-        .box-time { position: absolute; bottom: 1px; left: 3px; width: 190px; height: 40px; display: flex; align-items: center; justify-content: center; z-index: 12; overflow: hidden; }
+        .box-time { position: absolute; bottom: 2px; right: 20px; width: 320px; height: 40px; display: flex; align-items: center; justify-content: center; z-index: 12; overflow: hidden; }
         .time-wrap, .date-wrap { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: opacity 0.3s ease-in-out; font-weight: bold; }
-        .time-str, .date-str { color: #ffffff; font-size: 26px; letter-spacing: 1px; text-shadow: 2px 2px 5px #000; }
+        .time-str, .date-str { color: #ffffff; font-size: 24px; letter-spacing: 1px; text-shadow: 2px 2px 5px #000; }
 
         /* OBS INTERACTIVE CONTROLS */
         #obs-controls-wrap { position: absolute; top: 15px; left: 15px; z-index: 100000; pointer-events: auto; }
@@ -129,23 +131,24 @@
         <div class="flex-row"><small>Size (Overall):</small><input type="range" id="sb-scale-slider" min="0.3" max="1.5" step="0.01" oninput="updateCSS()"></div>
         <div class="flex-row"><small style="color:#28a745; font-weight:bold;">Width (ਚੌੜਾਈ):</small><input type="range" id="sb-width-slider" min="0.3" max="2.0" step="0.01" oninput="updateCSS()"></div>
         <div class="flex-row"><small>Up / Down:</small><input type="range" id="sb-y-slider" min="-200" max="1000" step="2" oninput="updateCSS()"></div>
-        <div class="flex-row"><small>Left / Right:</small><input type="range" id="sb-x-slider" min="-200" max="1000" step="2" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Left / Right:</small><input type="range" id="sb-x-slider" min="-500" max="1500" step="5" oninput="updateCSS()"></div>
 
         <span class="section-title">🔢 Score Text (0 - 0)</span>
-        <div class="flex-row"><small>Text Size:</small><input type="range" id="score-size-slider" min="20" max="120" step="1" oninput="updateCSS()"></div>
-        <div class="flex-row"><small>Up / Down:</small><input type="range" id="score-y-slider" min="0" max="1080" step="2" oninput="updateCSS()"></div>
-        <div class="flex-row"><small>Score 1 Left:</small><input type="range" id="score1-x-slider" min="0" max="1920" step="2" oninput="updateCSS()"></div>
-        <div class="flex-row"><small>Score 2 Left:</small><input type="range" id="score2-x-slider" min="0" max="1920" step="2" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Text Size:</small><input type="range" id="score-size-slider" min="20" max="80" step="1" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Up / Down:</small><input type="range" id="score-y-slider" min="0" max="500" step="2" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Score 1 Left:</small><input type="range" id="score1-x-slider" min="1000" max="1920" step="2" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Score 2 Left:</small><input type="range" id="score2-x-slider" min="1000" max="1920" step="2" oninput="updateCSS()"></div>
 
         <span class="section-title">🅰️ Team Names</span>
         <div class="flex-row"><small>Text Size:</small><input type="range" id="team-size-slider" min="20" max="80" step="1" oninput="updateCSS()"></div>
-        <div class="flex-row"><small>Up / Down:</small><input type="range" id="team-y-slider" min="0" max="1080" step="2" oninput="updateCSS()"></div>
-        <div class="flex-row"><small>Team 1 Left:</small><input type="range" id="team1-x-slider" min="0" max="1920" step="2" oninput="updateCSS()"></div>
-        <div class="flex-row"><small>Team 2 Left:</small><input type="range" id="team2-x-slider" min="0" max="1920" step="2" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Up / Down:</small><input type="range" id="team-y-slider" min="0" max="500" step="2" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Team 1 Left:</small><input type="range" id="team1-x-slider" min="500" max="1920" step="2" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Team 2 Left:</small><input type="range" id="team2-x-slider" min="1000" max="1920" step="2" oninput="updateCSS()"></div>
 
         <span class="section-title">🏷️ Round (Live Match)</span>
-        <div class="flex-row"><small>Text Size:</small><input type="range" id="round-size-slider" min="15" max="60" step="1" oninput="updateCSS()"></div>
-        <div class="flex-row"><small>Up / Down:</small><input type="range" id="round-y-slider" min="0" max="1080" step="2" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Text Size:</small><input type="range" id="round-size-slider" min="10" max="60" step="1" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Up / Down:</small><input type="range" id="round-y-slider" min="0" max="500" step="2" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Left / Right:</small><input type="range" id="round-x-slider" min="1000" max="1920" step="2" oninput="updateCSS()"></div>
 
         <span class="section-title">📰 Ticker Panel</span>
         <div class="flex-row"><small>Size (Overall):</small><input type="range" id="tk-scale-slider" min="0.5" max="1.5" step="0.01" oninput="updateCSS()"></div>
@@ -189,44 +192,38 @@
 </div>
 
 <script>
-    // --- SETTINGS / SCALING SCRIPT ---
     function toggleMenu() {
         const menu = document.getElementById('obs-controls');
         menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
     }
 
     function updateCSS() {
-        // Score PNG Settings
         const sbScale = document.getElementById('sb-scale-slider').value;
         const sbWidthScale = document.getElementById('sb-width-slider').value;
         const sbTop = document.getElementById('sb-y-slider').value;
-        const sbRight = document.getElementById('sb-x-slider').value; // Working as Right Margin now
+        const sbLeft = document.getElementById('sb-x-slider').value;
         
-        // Score Text Settings
         const scoreSize = document.getElementById('score-size-slider').value;
         const scoreTop = document.getElementById('score-y-slider').value;
         const score1Left = document.getElementById('score1-x-slider').value;
         const score2Left = document.getElementById('score2-x-slider').value;
         
-        // Team Text Settings
         const teamSize = document.getElementById('team-size-slider').value;
         const teamTop = document.getElementById('team-y-slider').value;
         const team1Left = document.getElementById('team1-x-slider').value;
         const team2Left = document.getElementById('team2-x-slider').value;
         
-        // Round Text Settings
         const roundSize = document.getElementById('round-size-slider').value;
         const roundTop = document.getElementById('round-y-slider').value;
+        const roundLeft = document.getElementById('round-x-slider').value;
         
-        // Ticker Settings
         const tkScale = document.getElementById('tk-scale-slider').value;
         const tkWidthScale = document.getElementById('tk-width-slider').value;
         
-        // Set CSS Variables
         document.documentElement.style.setProperty('--sb-scale', sbScale);
         document.documentElement.style.setProperty('--sb-width-scale', sbWidthScale);
         document.documentElement.style.setProperty('--sb-top', sbTop + 'px');
-        document.documentElement.style.setProperty('--sb-right', sbRight + 'px');
+        document.documentElement.style.setProperty('--sb-left', sbLeft + 'px');
         
         document.documentElement.style.setProperty('--score-size', scoreSize + 'px');
         document.documentElement.style.setProperty('--score-top', scoreTop + 'px');
@@ -240,15 +237,15 @@
         
         document.documentElement.style.setProperty('--round-size', roundSize + 'px');
         document.documentElement.style.setProperty('--round-top', roundTop + 'px');
+        document.documentElement.style.setProperty('--round-left', roundLeft + 'px');
         
         document.documentElement.style.setProperty('--tk-scale', tkScale);
         document.documentElement.style.setProperty('--tk-width-scale', tkWidthScale);
 
-        // Save to LocalStorage
         localStorage.setItem('sb-scale', sbScale);
         localStorage.setItem('sb-width-scale', sbWidthScale);
         localStorage.setItem('sb-top', sbTop);
-        localStorage.setItem('sb-right', sbRight);
+        localStorage.setItem('sb-left', sbLeft);
         
         localStorage.setItem('score-size', scoreSize);
         localStorage.setItem('score-top', scoreTop);
@@ -262,35 +259,37 @@
         
         localStorage.setItem('round-size', roundSize);
         localStorage.setItem('round-top', roundTop);
+        localStorage.setItem('round-left', roundLeft);
         
         localStorage.setItem('tk-scale', tkScale);
         localStorage.setItem('tk-width-scale', tkWidthScale);
     }
 
     function loadSettings() {
-        // Updated Default values for Top Right Corner layout
-        document.getElementById('sb-scale-slider').value = localStorage.getItem('sb-scale') || '0.65';
+        // Updated Default values for 101 score png.png
+        document.getElementById('sb-scale-slider').value = localStorage.getItem('sb-scale') || '1';
         document.getElementById('sb-width-slider').value = localStorage.getItem('sb-width-scale') || '1';
-        document.getElementById('sb-y-slider').value = localStorage.getItem('sb-top') || '10';
-        document.getElementById('sb-x-slider').value = localStorage.getItem('sb-right') || '10';
+        document.getElementById('sb-y-slider').value = localStorage.getItem('sb-top') || '0';
+        document.getElementById('sb-x-slider').value = localStorage.getItem('sb-left') || '0';
         
-        document.getElementById('score-size-slider').value = localStorage.getItem('score-size') || '55';
-        document.getElementById('score-y-slider').value = localStorage.getItem('score-top') || '480';
-        document.getElementById('score1-x-slider').value = localStorage.getItem('score1-left') || '860';
-        document.getElementById('score2-x-slider').value = localStorage.getItem('score2-left') || '980';
+        document.getElementById('score-size-slider').value = localStorage.getItem('score-size') || '40';
+        document.getElementById('score-y-slider').value = localStorage.getItem('score-top') || '30';
+        document.getElementById('score1-x-slider').value = localStorage.getItem('score1-left') || '1365';
+        document.getElementById('score2-x-slider').value = localStorage.getItem('score2-left') || '1495';
         
-        document.getElementById('team-size-slider').value = localStorage.getItem('team-size') || '38';
-        document.getElementById('team-y-slider').value = localStorage.getItem('team-top') || '480';
-        document.getElementById('team1-x-slider').value = localStorage.getItem('team1-left') || '450';
-        document.getElementById('team2-x-slider').value = localStorage.getItem('team2-left') || '1120';
+        document.getElementById('team-size-slider').value = localStorage.getItem('team-size') || '32';
+        document.getElementById('team-y-slider').value = localStorage.getItem('team-top') || '30';
+        document.getElementById('team1-x-slider').value = localStorage.getItem('team1-left') || '1050';
+        document.getElementById('team2-x-slider').value = localStorage.getItem('team2-left') || '1565';
         
-        document.getElementById('round-size-slider').value = localStorage.getItem('round-size') || '26';
-        document.getElementById('round-y-slider').value = localStorage.getItem('round-top') || '560';
+        document.getElementById('round-size-slider').value = localStorage.getItem('round-size') || '20';
+        document.getElementById('round-y-slider').value = localStorage.getItem('round-top') || '90';
+        document.getElementById('round-x-slider').value = localStorage.getItem('round-left') || '1460';
         
         document.getElementById('tk-scale-slider').value = localStorage.getItem('tk-scale') || '1';
         document.getElementById('tk-width-slider').value = localStorage.getItem('tk-width-scale') || '1';
 
-        updateCSS(); // Apply immediately on load
+        updateCSS();
     }
     
     function resetCSS() {
