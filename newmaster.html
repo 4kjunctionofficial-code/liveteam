@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Admin - Manage Kabaddi Clients</title>
+    <!-- Firebase v8 SDK (ਕਬੂਤਰ ਬਾਜ਼ੀ ਵਾਂਗ ਆਸਾਨ ਸੈੱਟਅੱਪ) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0b0d0f; color: white; padding: 20px; margin: 0; }
+        .container { max-width: 1050px; margin: auto; background: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #30363d; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h2 { color: #f39c12; text-align: center; text-transform: uppercase; margin-bottom: 25px; }
+        
+        .add-card { background: #0d1117; padding: 20px; border-radius: 10px; margin-bottom: 30px; border-left: 5px solid #f39c12; }
+        .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        label { display: block; margin-bottom: 5px; color: #8b949e; font-size: 13px; font-weight: bold; }
+        input, select { padding: 12px; background: #161b22; border: 1px solid #30363d; color: white; border-radius: 8px; width: 100%; box-sizing: border-box; }
+        input:focus { border-color: #f39c12; outline: none; }
+        button { padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; }
+        .btn-add { background: #f39c12; color: black; margin-top: 15px; width: 100%; }
+        .btn-add:hover { background: #dd850e; }
+        
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #0d1117; }
+        th { background: #30363d; color: #f39c12; padding: 15px; text-align: left; font-size: 14px; }
+        td { padding: 15px; border-bottom: 1px solid #30363d; font-size: 14px; vertical-align: middle; }
+        
+        .btn-save { background: #238636; color: white; margin-right: 5px; font-size: 12px; padding: 8px 12px; }
+        .btn-del { background: #da3633; color: white; font-size: 12px; padding: 8px 12px; }
+        .link-group { display: flex; flex-direction: column; gap: 5px; }
+        .link-btn { color: #58a6ff; text-decoration: none; font-size: 12px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🔑 ਕਬੱਡੀ ਲਾਈਵ - ਮਾਸਟਰ ਕੰਟਰੋਲ ਪੈਨਲ</h2>
+    
+    <div class="add-card">
+        <h4 style="margin-top:0; color:#f39c12; text-transform:uppercase;">ਨਵਾਂ ਕਬੱਡੀ ਕਲਾਇੰਟ ਐਡ ਕਰੋ</h4>
+        <div class="grid-inputs">
+            <div>
+                <label>ਕਲਾਇੰਟ ID (User ID)</label>
+                <input type="text" id="cID" placeholder="e.g. mudki">
+            </div>
+            <div>
+                <label>ਪਾਸਵਰਡ (Chabi)</label>
+                <input type="text" id="cPass" placeholder="Password">
+            </div>
+            <div>
+                <label>ਵੈਲਡਿਟੀ (Date & Time)</label>
+                <input type="datetime-local" id="cExpiry">
+            </div>
+        </div>
+        <button class="btn-add" onclick="createClient()">ਕਬੱਡੀ ਕਲਾਇੰਟ ਸੇਵ ਕਰੋ</button>
+    </div>
+
+    <h3>ਐਕਟਿਵ ਕਲਾਇੰਟ ਲਿਸਟ</h3>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>ਕਲਾਇੰਟ ID / ਚਾਬੀ</th>
+                    <th>ਵੈਲਡਿਟੀ (Update Expiry)</th>
+                    <th>ਲਾਈਵ ਪੈਨਲ ਲਿੰਕਸ</th>
+                    <th>ਐਕਸ਼ਨ</th>
+                </tr>
+            </thead>
+            <tbody id="clientTable"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // ਕਬੱਡੀ ਲਾਈਵ ਦਾ ਫਾਇਰਬੇਸ ਲਿੰਕ
+    const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // 1. ਨਵਾਂ ਕਲਾਇੰਟ ਬਣਾਉਣਾ (Kabaddi Default Data ਨਾਲ)
+    function createClient() {
+        const id = document.getElementById('cID').value.trim().toLowerCase();
+        const pass = document.getElementById('cPass').value.trim();
+        const expiry = document.getElementById('cExpiry').value;
+
+        if(!id || !pass || !expiry) return alert("ਕਿਰਪਾ ਕਰਕੇ ਸਾਰੀ ਜਾਣਕਾਰੀ ਭਰੋ!");
+
+        db.ref('users/' + id).set({
+            password: pass,
+            expiryDate: expiry,
+            planStatus: false,
+            matchData: {
+                nameA: "TEAM 1",
+                nameB: "TEAM 2",
+                scoreA: 0,
+                scoreB: 0,
+                round: "LIVE MATCH",
+                row1Txt: "WELCOME TO LIVE KABADDI",
+                row2Txt: "SUBSCRIBE OUR CHANNEL",
+                row3Txt: "LIKE & SHARE",
+                watermarkTxt: "M LIVE",
+                scoreVisible: true,
+                tickerVisible: true,
+                logoVisible: true
+            }
+        }).then(() => {
+            alert("🎯 ਨਵਾਂ ਕਬੱਡੀ ਕਲਾਇੰਟ ਸਫ਼ਲਤਾਪੂਰਵਕ ਬਣ ਗਿਆ ਹੈ!");
+            document.getElementById('cID').value = "";
+            document.getElementById('cPass').value = "";
+            document.getElementById('cExpiry').value = "";
+        }).catch(err => alert("Error: " + err.message));
+    }
+
+    // 2. ਲਿਸਟ ਲੋਡ ਕਰਨਾ
+    function loadList() {
+        db.ref('users').on('value', (snapshot) => {
+            const data = snapshot.val();
+            const tbody = document.getElementById('clientTable');
+            tbody.innerHTML = "";
+
+            if (!data) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#8b949e;">ਕੋਈ ਕਲਾਇੰਟ ਨਹੀਂ ਮਿਲਿਆ।</td></tr>`;
+                return;
+            }
+
+            let currentUrl = window.location.href;
+            let baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/')) + '/';
+
+            for (let id in data) {
+                const adminL = baseUrl + "admin.html?id=" + id;
+                const overL = baseUrl + "overlay.html?id=" + id;
+
+                // ਤਾਰੀਖ ਨੂੰ ਸਹੀ ਫਾਰਮੈਟ ਵਿੱਚ ਦਿਖਾਉਣ ਲਈ
+                let dbExpiry = data[id].expiryDate || "";
+                let formattedDate = "Not Set";
+                
+                if(dbExpiry) {
+                    const d = new Date(dbExpiry);
+                    formattedDate = d.getDate().toString().padStart(2, '0') + "-" + 
+                                    (d.getMonth() + 1).toString().padStart(2, '0') + "-" + 
+                                    d.getFullYear() + " " + 
+                                    d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                }
+
+                const safePass = data[id].password || 'No Pass';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>
+                            <b style="color: #58a6ff; font-size: 16px;">${id.toUpperCase()}</b>
+                            <div style="font-size:12px; color:#8b949e; margin-top:4px;">Chabi: <b>${safePass}</b></div>
+                        </td>
+                        <td>
+                            <input type="datetime-local" id="newExp-${id}" value="${dbExpiry}" style="padding:8px; font-size:13px; width:100%; max-width:200px; margin-bottom:5px;">
+                            <div style="font-size:11px; color:#f39c12;">Current: ${formattedDate}</div>
+                        </td>
+                        <td>
+                            <div class="link-group">
+                                <a class="link-btn" href="${adminL}" target="_blank">💻 ADMIN PANEL</a>
+                                <a class="link-btn" href="${overL}" target="_blank">📺 OVERLAY LINK</a>
+                            </div>
+                        </td>
+                        <td>
+                            <button class="btn-save" onclick="updateClient('${id}')">UPDATE EXPIRY</button>
+                            <button class="btn-del" onclick="deleteClient('${id}')">DEL</button>
+                        </td>
+                    </tr>
+                `;
+            }
+        });
+    }
+
+    // 3. ਵੈਲਡਿਟੀ (Expiry) ਅਪਡੇਟ ਕਰੋ (ਸਿੱਧਾ ਟੇਬਲ ਤੋਂ)
+    function updateClient(id) {
+        const newTime = document.getElementById('newExp-' + id).value;
+        if(!newTime) return alert("ਕਿਰਪਾ ਕਰਕੇ ਸਮਾਂ ਚੁਣੋ!");
+        
+        // ਪਲਾਨ ਸਟੇਟਸ ਨੂੰ false (ਐਕਟਿਵ) ਕਰ ਦਿਓ ਤਾਂ ਜੋ ਲਾਕ ਖੁੱਲ੍ਹ ਜਾਵੇ
+        db.ref('users/' + id).update({ 
+            expiryDate: newTime,
+            planStatus: false 
+        }).then(() => alert(id.toUpperCase() + " ਦੀ ਵੈਲਡਿਟੀ ਵਧਾ ਦਿੱਤੀ ਗਈ ਹੈ!"));
+    }
+
+    // 4. ਕਲਾਇੰਟ ਡਲੀਟ ਕਰੋ
+    function deleteClient(id) {
+        if(confirm("ਕੀ ਤੁਸੀਂ ਕਲਾਇੰਟ '" + id.toUpperCase() + "' ਨੂੰ ਡਲੀਟ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ? ਸਾਰਾ ਡਾਟਾ ਖਤਮ ਹੋ ਜਾਵੇਗਾ।")) {
+            db.ref('users/' + id).remove()
+              .then(() => alert("ਕਲਾਇੰਟ ਡਲੀਟ ਕਰ ਦਿੱਤਾ ਗਿਆ।"));
+        }
+    }
+
+    loadList();
+</script>
+</body>
+</html>
