@@ -65,29 +65,112 @@
     const firebaseConfig = { databaseURL: "https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
 
-    const matchId = new URLSearchParams(window.location.search).get('id') || 'defaultMatch';
+    const urlParams = new URLSearchParams(window.location.search);
+    const matchId = urlParams.get('id') || 'defaultMatch';
     
-    // 1. ਐਕਸਪਾਇਰੀ ਚੈੱਕ (users/ ਵਾਲੇ ਡਾਟਾਬੇਸ ਤੋਂ)
+    // --- EXPIRY & PLAN STATUS CHECK ---
+    // ਇਹ ਯਕੀਨੀ ਬਣਾਓ ਕਿ ਤੁਸੀਂ 'users' ਟਰੀ ਤੋਂ ਸਟੇਟਸ ਚੈੱਕ ਕਰ ਰਹੇ ਹੋ
     firebase.database().ref('users/' + matchId).on('value', snap => {
-        const data = snap.val();
-        if(!data || new Date().getTime() > new Date(data.expiryDate).getTime()) {
+        const userData = snap.val();
+        // ਜੇ ਯੂਜ਼ਰ ਨਹੀਂ ਹੈ ਜਾਂ planStatus 'true' ਹੈ (ਲੌਕ ਹੈ), ਤਾਂ Lock Screen ਦਿਖਾਓ
+        if (!userData || userData.planStatus === true) {
             document.getElementById('expiry-lock').style.display = 'flex';
-            document.getElementById('main-overlay').style.display = 'none';
+            document.getElementById('scoreboard').style.display = 'none';
+            document.getElementById('ticker-wrap').style.display = 'none';
         } else {
             document.getElementById('expiry-lock').style.display = 'none';
-            document.getElementById('main-overlay').style.display = 'block';
+            document.getElementById('scoreboard').style.display = 'block';
+            document.getElementById('ticker-wrap').style.display = 'block';
         }
     });
 
-    // 2. ਮੈਚ ਡਾਟਾ ਲੋਡ
-    firebase.database().ref("matchData/" + matchId).on("value", (snap) => {
-        const data = snap.val() || {};
+    // --- MATCH DATA LOAD ---
+    const db = firebase.database().ref("matchData/" + matchId);
+    
+    // ਬਾਕੀ ਤੁਹਾਡਾ ਪੁਰਾਣਾ ਕੋਡ ਇੱਥੇ ਜਾਰੀ ਰਹੇਗਾ...
+    const clientLogos = {
+        "test": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Kabaddi%20101%20logo.png"
+    };
+
+    let tickerInitialized = false;
+
+    db.on("value", (snap) => {
+        const data = snap.val() || {}; 
+        const logoCont = document.getElementById('logo-container');
+        const currentId = matchId.trim().toLowerCase();
+
+        if (clientLogos[currentId] && data.logoVisible !== false) {
+            document.getElementById('main-logo').src = clientLogos[currentId];
+            logoCont.classList.remove('hidden');
+        } else {
+            logoCont.classList.add('hidden');
+        }
+
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
-        document.getElementById('nA').innerText = data.nameA || "TEAM 1";
-        document.getElementById('nB').innerText = data.nameB || "TEAM 2";
-        // ਬਾਕੀ ਫੰਕਸ਼ਨ ਉਵੇਂ ਹੀ ਰੱਖੋ...
+        setTeamName('nA-container', data.nameA || "TEAM 1");
+        setTeamName('nB-container', data.nameB || "TEAM 2");
+        document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
+        
+        const roundEl = document.getElementById('round-display');
+        roundEl.innerText = data.round || "";
+        
+        updateTickerContent('c1', data.row1Txt || "WELCOME TO LIVE KABADDI");
+        updateTickerContent('c2', data.row2Txt || "SUBSCRIBE OUR CHANNEL");
+        updateTickerContent('c3', data.row3Txt || "LIKE & SHARE");
+        updateTickerContent('c4', data.row4Txt || "THANKS FOR WATCHING");
+
+        if (!tickerInitialized) {
+            startTicker('c1', 1.4);
+            startTicker('c2', 2.0);
+            startTicker('c3', 1.7);
+            startTicker('c4', 1.9);
+            tickerInitialized = true;
+        }
     });
+
+     function setTeamName(containerId, txt) {
+        const el = document.getElementById(containerId);
+        let alignment = containerId === 'nA-container' ? 'right' : 'left';
+        el.innerHTML = txt.length > 15 ? `<div class="team-scroller">${txt}</div>` : `<div style="width:100%; text-align:${alignment};">${txt}</div>`;
+    }
+
+    function updateTickerContent(id, txt) {
+        const el = document.getElementById(id);
+        const scroller = el.querySelector('.scroller');
+        if (scroller) {
+            scroller.innerHTML = `${txt}&nbsp;&nbsp; • &nbsp;&nbsp; ${txt}`;
+        } else {
+            el.innerHTML = `<div class="scroller">${txt}&nbsp;&nbsp; • &nbsp;&nbsp; ${txt}</div>`;
+        }
+    }
+
+    function startTicker(id, speed) {
+        const el = document.getElementById(id);
+        const scroller = el.querySelector('.scroller');
+        let x = el.offsetWidth;
+        function animate() {
+            x -= speed;
+            if (x < -scroller.offsetWidth) x = el.offsetWidth;
+            scroller.style.transform = `translateX(${x}px)`;
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
+
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('live-time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('live-date').innerText = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+    }
+    setInterval(updateClock, 1000); updateClock();
+
+    let isTime = true;
+    setInterval(() => { 
+        isTime = !isTime; 
+        document.getElementById('t-wrap').style.opacity = isTime ? "1" : "0"; 
+        document.getElementById('d-wrap').style.opacity = isTime ? "0" : "1"; 
+    }, 3000);
 </script>
 </body>
 </html>
