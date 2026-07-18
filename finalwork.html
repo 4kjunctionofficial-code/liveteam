@@ -6,18 +6,25 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         :root {
-            /* Default Settings for Scoreboard PNG */
-            --sb-scale: 0.65;
-            --sb-top: 50px;
-            --sb-left: 250px;
+            /* Scoreboard PNG Settings */
+            --sb-scale: 1;
+            --sb-top: 0px;
+            --sb-left: 0px;
             
-            /* Default Settings for Texts inside Scoreboard */
+            /* Scores Settings */
             --score-size: 55px;
-            --score-top: 250px;
+            --score-top: 480px;
+            --score1-left: 860px;
+            --score2-left: 980px;
             
-            --team-size: 40px;
-            --team-top: 250px;
+            /* Teams Settings */
+            --team-size: 38px;
+            --team-top: 480px;
+            --team1-left: 450px;
+            --team2-left: 1120px;
             
+            /* Round Text Settings */
+            --round-size: 26px;
             --round-top: 560px;
             
             /* Ticker Settings */
@@ -36,7 +43,7 @@
 
         #single-wm { position: absolute; color: rgba(255, 255, 255, 0.7); font-size: 35px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 5px #000; white-space: nowrap; z-index: 1; opacity: 1; }
 
-        /* SCOREBOARD BACKGROUND - Scalable and Moveable */
+        /* SCOREBOARD BACKGROUND */
         #scoreboard { 
             position: absolute; 
             top: var(--sb-top); 
@@ -44,7 +51,7 @@
             width: 1920px; 
             height: 1080px; 
             transform: scale(var(--sb-scale));
-            transform-origin: center;
+            transform-origin: top left;
             z-index: 9999; opacity: 1; transition: opacity 0.7s ease;
             background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Copy of Copy of Star Kabaddi _20260712_102146_0000.png'); 
             background-size: cover;
@@ -53,16 +60,16 @@
         }
         #scoreboard.hidden { opacity: 0; }
 
-        /* TEXT POSITIONING INSIDE SCOREBOARD (Using Variables) */
+        /* TEXT POSITIONING INSIDE SCOREBOARD */
         .name-area { position: absolute; top: var(--team-top); height: 60px; display: flex; align-items: center; color: #ffffff; font-size: var(--team-size); font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 4px #000; overflow: hidden; white-space: nowrap; z-index: 11; }
-        #nA-container { left: 450px; width: 350px; justify-content: flex-end; }
-        #nB-container { left: 1120px; width: 350px; justify-content: flex-start; }
+        #nA-container { left: var(--team1-left); width: 350px; justify-content: flex-end; }
+        #nB-container { left: var(--team2-left); width: 350px; justify-content: flex-start; }
         
         .score-box { position: absolute; top: var(--score-top); height: 60px; width: 80px; display: flex; align-items: center; justify-content: center; font-size: var(--score-size); font-weight: 900; color: #e60000; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); z-index: 12; }
-        #sA { left: 860px; } 
-        #sB { left: 980px; } 
+        #sA { left: var(--score1-left); } 
+        #sB { left: var(--score2-left); } 
 
-        .round-display { position: absolute; top: var(--round-top); left: 50%; transform: translateX(-50%); color: white; font-size: 26px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 6px #000; letter-spacing: 2px; }
+        .round-display { position: absolute; top: var(--round-top); left: 50%; transform: translateX(-50%); color: white; font-size: var(--round-size); font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 6px #000; letter-spacing: 2px; }
 
         .team-scroller { display: inline-block; padding-left: 100%; animation: team-scroll 8s linear infinite; }
         @keyframes team-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
@@ -98,11 +105,12 @@
         #obs-controls-wrap { position: absolute; top: 15px; left: 15px; z-index: 100000; pointer-events: auto; }
         #gear-icon { font-size: 32px; cursor: pointer; opacity: 0.1; transition: 0.3s; background: rgba(0,0,0,0.6); padding: 5px; border-radius: 5px; display: inline-block; }
         #obs-controls-wrap:hover #gear-icon { opacity: 1; }
-        #obs-controls { display: none; background: rgba(10, 10, 10, 0.95); padding: 15px; border-radius: 8px; color: white; border: 1px solid #555; width: 250px; margin-top: 5px; max-height: 80vh; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        #obs-controls { display: none; background: rgba(10, 10, 10, 0.95); padding: 15px; border-radius: 8px; color: white; border: 1px solid #555; width: 320px; margin-top: 5px; max-height: 80vh; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         #obs-controls hr { border: 0; border-top: 1px solid #444; margin: 8px 0; }
-        #obs-controls small { display: inline-block; width: 80px; font-size: 11px; color: #ccc; }
-        #obs-controls input[type="range"] { width: 130px; vertical-align: middle; cursor: pointer; }
-        .section-title { color: #58a6ff; font-size: 13px; font-weight: bold; display: block; margin-top: 5px; }
+        .flex-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .flex-row small { font-size: 11px; color: #ccc; width: 40%; }
+        .flex-row input[type="range"] { width: 55%; cursor: pointer; }
+        .section-title { color: #f39c12; font-size: 14px; font-weight: bold; display: block; margin-top: 10px; margin-bottom: 5px; text-transform: uppercase; background: #222; padding: 4px; border-radius: 4px; text-align: center; border: 1px solid #444;}
         .reset-btn { background: #da3633; color: white; padding: 8px; border: none; border-radius: 4px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; text-transform: uppercase; }
         .reset-btn:hover { background: #b02a28; }
     </style>
@@ -113,30 +121,31 @@
 <div id="obs-controls-wrap">
     <div id="gear-icon" onclick="toggleMenu()">⚙️</div>
     <div id="obs-controls">
-        <b style="color:#f39c12; font-size:16px;">🛠️ OVERLAY SETTINGS</b><hr>
+        <b style="color:#58a6ff; font-size:16px; display:block; text-align:center;">🛠️ FULL OVERLAY SETUP</b>
         
-        <span class="section-title">🖼️ Score PNG Panel</span>
-        <small>Size:</small><input type="range" id="sb-scale-slider" min="0.3" max="1.5" step="0.01" oninput="updateCSS()"><br>
-        <small>Up / Down:</small><input type="range" id="sb-y-slider" min="-800" max="800" step="5" oninput="updateCSS()"><br>
-        <small>Left / Right:</small><input type="range" id="sb-x-slider" min="-800" max="1000" step="5" oninput="updateCSS()"><br>
-        <hr>
+        <span class="section-title">🖼️ Score PNG Setup</span>
+        <div class="flex-row"><small>Size (Scale):</small><input type="range" id="sb-scale-slider" min="0.3" max="1.5" step="0.01" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Up / Down:</small><input type="range" id="sb-y-slider" min="-1000" max="1000" step="5" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Left / Right:</small><input type="range" id="sb-x-slider" min="-1000" max="1000" step="5" oninput="updateCSS()"></div>
 
         <span class="section-title">🔢 Score Text (0 - 0)</span>
-        <small>Text Size:</small><input type="range" id="score-size-slider" min="20" max="120" step="1" oninput="updateCSS()"><br>
-        <small>Up / Down:</small><input type="range" id="score-y-slider" min="300" max="700" step="2" oninput="updateCSS()"><br>
-        <hr>
+        <div class="flex-row"><small>Text Size:</small><input type="range" id="score-size-slider" min="20" max="120" step="1" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Up / Down:</small><input type="range" id="score-y-slider" min="0" max="1080" step="2" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Score 1 Left:</small><input type="range" id="score1-x-slider" min="0" max="1920" step="2" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Score 2 Left:</small><input type="range" id="score2-x-slider" min="0" max="1920" step="2" oninput="updateCSS()"></div>
 
         <span class="section-title">🅰️ Team Names</span>
-        <small>Text Size:</small><input type="range" id="team-size-slider" min="20" max="80" step="1" oninput="updateCSS()"><br>
-        <small>Up / Down:</small><input type="range" id="team-y-slider" min="300" max="700" step="2" oninput="updateCSS()"><br>
-        <hr>
+        <div class="flex-row"><small>Text Size:</small><input type="range" id="team-size-slider" min="20" max="80" step="1" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Up / Down:</small><input type="range" id="team-y-slider" min="0" max="1080" step="2" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Team 1 Left:</small><input type="range" id="team1-x-slider" min="0" max="1920" step="2" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Team 2 Left:</small><input type="range" id="team2-x-slider" min="0" max="1920" step="2" oninput="updateCSS()"></div>
 
-        <span class="section-title">🏷️ Round Text (Live Match)</span>
-        <small>Up / Down:</small><input type="range" id="round-y-slider" min="300" max="800" step="2" oninput="updateCSS()"><br>
-        <hr>
+        <span class="section-title">🏷️ Round (Live Match)</span>
+        <div class="flex-row"><small>Text Size:</small><input type="range" id="round-size-slider" min="15" max="60" step="1" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Up / Down:</small><input type="range" id="round-y-slider" min="0" max="1080" step="2" oninput="updateCSS()"></div>
 
-        <span class="section-title">📰 Ticker Panel (Bottom)</span>
-        <small>Size:</small><input type="range" id="tk-scale-slider" min="0.5" max="1.5" step="0.01" oninput="updateCSS()"><br>
+        <span class="section-title">📰 Ticker Panel</span>
+        <div class="flex-row"><small>Ticker Size:</small><input type="range" id="tk-scale-slider" min="0.5" max="1.5" step="0.01" oninput="updateCSS()"></div>
         
         <button class="reset-btn" onclick="resetCSS()">Reset to Default</button>
     </div>
@@ -183,76 +192,93 @@
     }
 
     function updateCSS() {
-        // Get values from all sliders
+        // Score PNG Settings
         const sbScale = document.getElementById('sb-scale-slider').value;
         const sbTop = document.getElementById('sb-y-slider').value;
         const sbLeft = document.getElementById('sb-x-slider').value;
         
+        // Score Text Settings
         const scoreSize = document.getElementById('score-size-slider').value;
         const scoreTop = document.getElementById('score-y-slider').value;
+        const score1Left = document.getElementById('score1-x-slider').value;
+        const score2Left = document.getElementById('score2-x-slider').value;
         
+        // Team Text Settings
         const teamSize = document.getElementById('team-size-slider').value;
         const teamTop = document.getElementById('team-y-slider').value;
+        const team1Left = document.getElementById('team1-x-slider').value;
+        const team2Left = document.getElementById('team2-x-slider').value;
         
+        // Round Text Settings
+        const roundSize = document.getElementById('round-size-slider').value;
         const roundTop = document.getElementById('round-y-slider').value;
+        
+        // Ticker Settings
         const tkScale = document.getElementById('tk-scale-slider').value;
         
-        // Apply to CSS variables
+        // Set CSS Variables
         document.documentElement.style.setProperty('--sb-scale', sbScale);
         document.documentElement.style.setProperty('--sb-top', sbTop + 'px');
         document.documentElement.style.setProperty('--sb-left', sbLeft + 'px');
         
         document.documentElement.style.setProperty('--score-size', scoreSize + 'px');
         document.documentElement.style.setProperty('--score-top', scoreTop + 'px');
+        document.documentElement.style.setProperty('--score1-left', score1Left + 'px');
+        document.documentElement.style.setProperty('--score2-left', score2Left + 'px');
         
         document.documentElement.style.setProperty('--team-size', teamSize + 'px');
         document.documentElement.style.setProperty('--team-top', teamTop + 'px');
+        document.documentElement.style.setProperty('--team1-left', team1Left + 'px');
+        document.documentElement.style.setProperty('--team2-left', team2Left + 'px');
         
+        document.documentElement.style.setProperty('--round-size', roundSize + 'px');
         document.documentElement.style.setProperty('--round-top', roundTop + 'px');
+        
         document.documentElement.style.setProperty('--tk-scale', tkScale);
 
         // Save to LocalStorage
         localStorage.setItem('sb-scale', sbScale);
         localStorage.setItem('sb-top', sbTop);
         localStorage.setItem('sb-left', sbLeft);
+        
         localStorage.setItem('score-size', scoreSize);
         localStorage.setItem('score-top', scoreTop);
+        localStorage.setItem('score1-left', score1Left);
+        localStorage.setItem('score2-left', score2Left);
+        
         localStorage.setItem('team-size', teamSize);
         localStorage.setItem('team-top', teamTop);
+        localStorage.setItem('team1-left', team1Left);
+        localStorage.setItem('team2-left', team2Left);
+        
+        localStorage.setItem('round-size', roundSize);
         localStorage.setItem('round-top', roundTop);
+        
         localStorage.setItem('tk-scale', tkScale);
     }
 
     function loadSettings() {
-        // Load from LocalStorage or set Defaults
-        const sbScale = localStorage.getItem('sb-scale') || '0.65';
-        const sbTop = localStorage.getItem('sb-top') || '-300';
-        const sbLeft = localStorage.getItem('sb-left') || '450';
+        // Load settings or apply default values
+        document.getElementById('sb-scale-slider').value = localStorage.getItem('sb-scale') || '1';
+        document.getElementById('sb-y-slider').value = localStorage.getItem('sb-top') || '0';
+        document.getElementById('sb-x-slider').value = localStorage.getItem('sb-left') || '0';
         
-        const scoreSize = localStorage.getItem('score-size') || '55';
-        const scoreTop = localStorage.getItem('score-top') || '480';
+        document.getElementById('score-size-slider').value = localStorage.getItem('score-size') || '55';
+        document.getElementById('score-y-slider').value = localStorage.getItem('score-top') || '480';
+        document.getElementById('score1-x-slider').value = localStorage.getItem('score1-left') || '860';
+        document.getElementById('score2-x-slider').value = localStorage.getItem('score2-left') || '980';
         
-        const teamSize = localStorage.getItem('team-size') || '40';
-        const teamTop = localStorage.getItem('team-top') || '480';
+        document.getElementById('team-size-slider').value = localStorage.getItem('team-size') || '38';
+        document.getElementById('team-y-slider').value = localStorage.getItem('team-top') || '480';
+        document.getElementById('team1-x-slider').value = localStorage.getItem('team1-left') || '450';
+        document.getElementById('team2-x-slider').value = localStorage.getItem('team2-left') || '1120';
         
-        const roundTop = localStorage.getItem('round-top') || '560';
-        const tkScale = localStorage.getItem('tk-scale') || '1';
+        document.getElementById('round-size-slider').value = localStorage.getItem('round-size') || '26';
+        document.getElementById('round-y-slider').value = localStorage.getItem('round-top') || '560';
+        
+        document.getElementById('tk-scale-slider').value = localStorage.getItem('tk-scale') || '1';
 
-        // Update Sliders
-        document.getElementById('sb-scale-slider').value = sbScale;
-        document.getElementById('sb-y-slider').value = sbTop;
-        document.getElementById('sb-x-slider').value = sbLeft;
-        
-        document.getElementById('score-size-slider').value = scoreSize;
-        document.getElementById('score-y-slider').value = scoreTop;
-        
-        document.getElementById('team-size-slider').value = teamSize;
-        document.getElementById('team-y-slider').value = teamTop;
-        
-        document.getElementById('round-y-slider').value = roundTop;
-        document.getElementById('tk-scale-slider').value = tkScale;
-
-        updateCSS(); // Apply on load
+        updateCSS(); // Apply immediately on load
     }
     
     function resetCSS() {
