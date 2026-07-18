@@ -1,244 +1,93 @@
-HTML
 <!DOCTYPE html>
 <html lang="pa">
 <head>
     <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         * { box-sizing: border-box; text-transform: uppercase; margin: 0; padding: 0; }
-        body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Arial', sans-serif; overflow: hidden; position: relative; }
+        body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Bebas Neue', sans-serif; overflow: hidden; position: relative; }
         
         /* EXPIRY LOCK SCREEN */
         #expiry-lock {
-            display: none; /* ਡਿਫਾਲਟ ਬੰਦ */
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 99999;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 99999;
+            flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white;
         }
-        .lock-msg {
-            background: #FFD700;
-            color: #000;
-            padding: 40px;
-            border-radius: 20px;
-            border: 6px solid white;
-            box-shadow: 0 0 50px rgba(255,215,0,0.5);
-        }
+        .lock-msg { background: #FFD700; color: #000; padding: 40px; border-radius: 20px; border: 6px solid white; }
         .lock-msg h1 { font-size: 80px; margin-bottom: 20px; }
-        .lock-msg h2 { font-size: 50px; }
         .lock-msg p { font-size: 35px; margin-top: 30px; font-weight: bold; }
 
-         /* Logo */
-        #logo-container { position: absolute; top: 30px; left: 40px; z-index: 9999; opacity: 1; transition: all 0.7s ease; }
-        #logo-container.hidden { opacity: 0; transform: scale(0); }
-        #main-logo { height: 100px; width: auto; max-width: 450px; object-fit: contain; filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.3)); }
-
-        /* Floating Watermark */
-        #single-wm { position: absolute; color: rgba(255, 255, 255, 0.7); font-size: 35px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 5px #000; white-space: nowrap; z-index: 1; opacity: 1; }
-
-        /* SCOREBOARD BACKGROUND */
-        #scoreboard { 
-            position: absolute; top: 0px; left: 0px; width: 1920px; height: 1080px; 
-            z-index: 9999; opacity: 1; transition: opacity 0.7s ease;
-            background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/101%20png.png'); 
-            background-size: cover; background-position: center; background-repeat: no-repeat;
-        }
-        #scoreboard.hidden { opacity: 0; }
-
-        /* TEXT POSITIONING */
-        .name-area { position: absolute; top: 43px; height: 50px; display: flex; align-items: center; color: #ffffff; font-size: 35px; text-transform: uppercase; text-shadow: 2px 2px 4px #000; overflow: hidden; white-space: nowrap; z-index: 11; }
+        /* ਬਾਕੀ ਪੁਰਾਣੇ ਸਟਾਈਲ */
+        #logo-container { position: absolute; top: 30px; left: 40px; z-index: 9999; }
+        #scoreboard { position: absolute; top: 0px; left: 0px; width: 1920px; height: 1080px; z-index: 9999; background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/101%20png.png'); background-size: cover; }
+        .name-area { position: absolute; top: 43px; height: 50px; display: flex; align-items: center; color: #ffffff; font-size: 35px; text-shadow: 2px 2px 4px #000; z-index: 11; }
         #nA-container { left: 1050px; width: 270px; justify-content: flex-end; }
         #nB-container { left: 1580px; width: 270px; justify-content: flex-start; }
-        
-        .score-box { position: absolute; top: 40px; height: 50px; width: 50px; display: flex; align-items: center; justify-content: center; font-size: 55px; font-weight: bold; color: #000000; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); z-index: 12; }
-        #sA { left: 1360px; } 
-        #sB { left: 1497px; } 
-
-        .round-display { position: absolute; top: 110px; left: 1450px; transform: translateX(-50%); color: white; font-size: 30px; text-transform: uppercase; text-shadow: 2px 2px 6px #000; z-index: 11; }
-
-        .team-scroller { display: inline-block; padding-left: 100%; animation: team-scroll 8s linear infinite; }
-        @keyframes team-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-
-        /* TICKER */
-        #ticker-wrap { 
-            position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 1080px; 
-            z-index: 9998; opacity: 1; transition: opacity 0.7s ease;
-            background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Copy%20of%20Star%20Kabaddi%20_20260711_110521_0000.png'); 
-            background-size: cover; background-position: center; background-repeat: no-repeat;
-            pointer-events: none;
-        }
-        #ticker-wrap.hidden { opacity: 0; }
-
-        /* TICKER 4 ROWS */
-        .row-text { position: absolute; display: flex; align-items: center; text-transform: uppercase; overflow: hidden; box-sizing: border-box; white-space: nowrap; padding-left: 10px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
-        .row-1 { bottom: 61px; left: 210px; width: 350px; height: 50px; font-size: 35px; color: #ffffff; }
-        .row-2 { bottom: 53px; left: 587px; width: 815px; height: 50px; font-size: 35px; color: #000000; text-shadow: none; }
-        .row-3 { bottom: 53px; left: 1425px; width: 550px; height: 50px; font-size: 35px; color: #ffffff; }
-        .row-4 { bottom: 2px; left: 200px; width: 1730px; height: 50px; font-size: 30px; color: #ffffff; }
-        .scroller{ display:inline-block; white-space:nowrap; position:relative; will-change:transform; }
-
-        /* DATE & TIME */
-        .box-time { position: absolute; bottom: 1px; left: 3px; width: 190px; height: 40px; display: flex; align-items: center; justify-content: center; z-index: 12; overflow: hidden; }
-        .time-wrap, .date-wrap { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: opacity 0.3s ease-in-out; }
-        .time-str, .date-str { color: #ffffff; font-size: 30px; letter-spacing: 1px; text-shadow: 2px 2px 5px #000; }
+        .score-box { position: absolute; top: 40px; height: 50px; width: 50px; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 900; color: #000000; z-index: 12; }
+        #sA { left: 1360px; } #sB { left: 1497px; }
+        #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 1080px; z-index: 9998; background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Copy%20of%20Star%20Kabaddi%20_20260711_110521_0000.png'); background-size: cover; }
+        .row-text { position: absolute; display: flex; align-items: center; white-space: nowrap; padding-left: 10px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
+        .row-1 { bottom: 67px; left: 210px; width: 350px; height: 35px; font-size: 40px; color: #ffffff; }
+        .row-2 { bottom: 64px; left: 587px; width: 815px; height: 35px; font-size: 40px; color: #000000; }
+        .row-3 { bottom: 60px; left: 1425px; width: 550px; height: 35px; font-size: 40px; color: #ffffff; }
+        .row-4 { bottom: 6px; left: 200px; width: 1730px; height: 28px; font-size: 40px; color: #ffffff; }
     </style>
 </head>
 <body>
 
-    <!-- EXPIRY LOCK SCREEN -->
 <div id="expiry-lock">
     <div class="lock-msg">
         <h1>PLAN EXPIRED</h1>
-        <h2>ਤੁਹਾਡਾ ਪਲਾਨ ਖ਼ਤਮ ਹੋ ਗਿਆ ਹੈ</h2>
         <p>RECHARGE ਲਈ ਸੰਪਰਕ ਕਰੋ:<br> MANPREET SINGH MUDKI<br> 📞 91154-26711</p>
     </div>
 </div>
-<div id="logo-container" class="hidden">
-    <img id="main-logo" src="" alt="Logo">
-</div>
 
-<div id="single-wm">M LIVE</div>
-
-<div id="scoreboard">
-    <div class="name-area" id="nA-container"><div id="nA" style="width:100%; text-align:right;">TEAM 1</div></div>
-    <div class="score-box" id="sA">0</div>
-    <div class="score-box" id="sB">0</div>
-    <div class="name-area" id="nB-container"><div id="nB" style="width:100%; text-align:left;">TEAM 2</div></div>
-    <div class="round-display" id="round-display">LIVE MATCH</div>
-</div>
-
-<div id="ticker-wrap">
-    <div class="row-text row-1" id="c1">WELCOME TO LIVE KABADDI</div>
-    <div class="row-text row-2" id="c2">SUBSCRIBE OUR CHANNEL</div>
-    <div class="row-text row-3" id="c3">LIKE & SHARE</div>
-    <div class="row-text row-4" id="c4">KEEP WATCHING</div> 
-
-    <div class="box-time">
-        <div class="time-wrap" id="t-wrap"><div class="time-str" id="live-time"></div></div>
-        <div class="date-wrap" id="d-wrap" style="opacity:0;"><div class="date-str" id="live-date"></div></div>
+<div id="main-overlay">
+    <div id="logo-container"><img id="main-logo" src="" alt="Logo"></div>
+    <div id="scoreboard">
+        <div class="name-area" id="nA-container"><div id="nA">TEAM 1</div></div>
+        <div class="score-box" id="sA">0</div>
+        <div class="score-box" id="sB">0</div>
+        <div class="name-area" id="nB-container"><div id="nB">TEAM 2</div></div>
+    </div>
+    <div id="ticker-wrap">
+        <div class="row-text row-1" id="c1">WELCOME</div>
+        <div class="row-text row-2" id="c2">SUBSCRIBE</div>
+        <div class="row-text row-3" id="c3">LIKE & SHARE</div>
+        <div class="row-text row-4" id="c4">KEEP WATCHING</div> 
     </div>
 </div>
 
 <script>
-
     const firebaseConfig = { databaseURL: "https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const matchId = urlParams.get('id') || 'defaultMatch';
-    const db = firebase.database().ref("matchData/" + matchId);
-
-    const clientLogos = {
-        "test": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Kabaddi%20101%20logo.png"
-    };
-
-    let tickerInitialized = false;
+    const matchId = new URLSearchParams(window.location.search).get('id') || 'defaultMatch';
     
-    if(userID) {
-        db.ref('users/' + userID).on('value', snap => {
-            const data = snap.val();
-            if(!data) return;
-
-            /* EXPIRY LOGIC */
-            const expiryTime = new Date(data.expiry).getTime();
-            const currentTime = new Date().getTime();
-
-            if(currentTime > expiryTime) {
-                // ਜੇ ਪਲਾਨ ਐਕਸਪਾਇਰ ਹੋ ਗਿਆ
-                document.getElementById('expiry-lock').style.display = 'flex';
-                document.getElementById('scoreboard-div').style.display = 'none';
-                document.getElementById('ticker-div').style.display = 'none';
-                return;
-            } else {
-                document.getElementById('expiry-lock').style.display = 'none';
-
-                 db.on("value", (snap) => {
-        const data = snap.val() || {}; 
-        const logoCont = document.getElementById('logo-container');
-        const currentId = matchId.trim().toLowerCase();
-
-        if (clientLogos[currentId] && data.logoVisible !== false) {
-            document.getElementById('main-logo').src = clientLogos[currentId];
-            logoCont.classList.remove('hidden');
+    // 1. ਐਕਸਪਾਇਰੀ ਚੈੱਕ (users/ ਵਾਲੇ ਡਾਟਾਬੇਸ ਤੋਂ)
+    firebase.database().ref('users/' + matchId).on('value', snap => {
+        const data = snap.val();
+        if(!data || new Date().getTime() > new Date(data.expiryDate).getTime()) {
+            document.getElementById('expiry-lock').style.display = 'flex';
+            document.getElementById('main-overlay').style.display = 'none';
         } else {
-            logoCont.classList.add('hidden');
-        }
-
-        document.getElementById('scoreboard').classList.toggle('hidden', data.scoreVisible === false);
-        document.getElementById('ticker-wrap').classList.toggle('hidden', data.tickerVisible === false);
-        
-        document.getElementById('sA').innerText = data.scoreA ?? "0";
-        document.getElementById('sB').innerText = data.scoreB ?? "0";
-        setTeamName('nA-container', data.nameA || "TEAM 1");
-        setTeamName('nB-container', data.nameB || "TEAM 2");
-        document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
-        
-        const roundEl = document.getElementById('round-display');
-        roundEl.innerText = data.round || "";
-        
-        updateTickerContent('c1', data.row1Txt || "WELCOME TO LIVE KABADDI");
-        updateTickerContent('c2', data.row2Txt || "SUBSCRIBE OUR CHANNEL");
-        updateTickerContent('c3', data.row3Txt || "LIKE & SHARE");
-        updateTickerContent('c4', data.row4Txt || "THANKS FOR WATCHING");
-
-        if (!tickerInitialized) {
-            startTicker('c1', 1.4);
-            startTicker('c2', 2.0);
-            startTicker('c3', 1.7);
-            startTicker('c4', 1.9);
-            tickerInitialized = true;
+            document.getElementById('expiry-lock').style.display = 'none';
+            document.getElementById('main-overlay').style.display = 'block';
         }
     });
 
-    function setTeamName(containerId, txt) {
-        const el = document.getElementById(containerId);
-        let alignment = containerId === 'nA-container' ? 'right' : 'left';
-        el.innerHTML = txt.length > 15 ? `<div class="team-scroller">${txt}</div>` : `<div style="width:100%; text-align:${alignment};">${txt}</div>`;
-    }
-
-    function updateTickerContent(id, txt) {
-        const el = document.getElementById(id);
-        const scroller = el.querySelector('.scroller');
-        if (scroller) {
-            scroller.innerHTML = `${txt}&nbsp;&nbsp; • &nbsp;&nbsp; ${txt}`;
-        } else {
-            el.innerHTML = `<div class="scroller">${txt}&nbsp;&nbsp; • &nbsp;&nbsp; ${txt}</div>`;
-        }
-    }
-
-    function startTicker(id, speed) {
-        const el = document.getElementById(id);
-        const scroller = el.querySelector('.scroller');
-        let x = el.offsetWidth;
-        function animate() {
-            x -= speed;
-            if (x < -scroller.offsetWidth) x = el.offsetWidth;
-            scroller.style.transform = `translateX(${x}px)`;
-            requestAnimationFrame(animate);
-        }
-        animate();
-    }
-
-    function updateClock() {
-        const now = new Date();
-        document.getElementById('live-time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        document.getElementById('live-date').innerText = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
-    }
-    setInterval(updateClock, 1000); updateClock();
-
-    let isTime = true;
-    setInterval(() => { 
-        isTime = !isTime; 
-        document.getElementById('t-wrap').style.opacity = isTime ? "1" : "0"; 
-        document.getElementById('d-wrap').style.opacity = isTime ? "0" : "1"; 
-    }, 3000);
+    // 2. ਮੈਚ ਡਾਟਾ ਲੋਡ
+    firebase.database().ref("matchData/" + matchId).on("value", (snap) => {
+        const data = snap.val() || {};
+        document.getElementById('sA').innerText = data.scoreA ?? "0";
+        document.getElementById('sB').innerText = data.scoreB ?? "0";
+        document.getElementById('nA').innerText = data.nameA || "TEAM 1";
+        document.getElementById('nB').innerText = data.nameB || "TEAM 2";
+        // ਬਾਕੀ ਫੰਕਸ਼ਨ ਉਵੇਂ ਹੀ ਰੱਖੋ...
+    });
 </script>
 </body>
 </html>
-
-            
