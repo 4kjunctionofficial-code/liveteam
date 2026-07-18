@@ -6,10 +6,11 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         :root {
-            /* Scoreboard PNG Settings */
-            --sb-scale: 0.5;
-            --sb-top: 5px;
-            --sb-left: 10px;
+            /* Scoreboard PNG Settings (Top Right Anchor) */
+            --sb-scale: 0.65;
+            --sb-width-scale: 1;
+            --sb-top: 10px;
+            --sb-right: 10px;
             
             /* Scores Settings */
             --score-size: 55px;
@@ -29,6 +30,7 @@
             
             /* Ticker Settings */
             --tk-scale: 1;
+            --tk-width-scale: 1;
         }
 
         body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Arial', sans-serif; overflow: hidden; position: relative; }
@@ -43,19 +45,19 @@
 
         #single-wm { position: absolute; color: rgba(255, 255, 255, 0.7); font-size: 35px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 5px #000; white-space: nowrap; z-index: 1; opacity: 1; }
 
-        /* SCOREBOARD BACKGROUND */
+        /* SCOREBOARD BACKGROUND - Anchored to Top Right */
         #scoreboard { 
             position: absolute; 
             top: var(--sb-top); 
-            left: var(--sb-left); 
+            right: var(--sb-right); 
             width: 1920px; 
             height: 1080px; 
-            transform: scale(var(--sb-scale));
-            transform-origin: top left;
+            transform: scale(var(--sb-width-scale), var(--sb-scale)); 
+            transform-origin: top right; /* Changed to Top Right */
             z-index: 9999; opacity: 1; transition: opacity 0.7s ease;
             background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Copy of Copy of Star Kabaddi _20260712_102146_0000.png'); 
             background-size: cover;
-            background-position: right;
+            background-position: center;
             background-repeat: no-repeat;
         }
         #scoreboard.hidden { opacity: 0; }
@@ -84,7 +86,7 @@
             background-repeat: no-repeat;
             pointer-events: none;
             transform-origin: bottom center;
-            transform: scale(var(--tk-scale));
+            transform: scale(var(--tk-width-scale), var(--tk-scale)); 
         }
         #ticker-wrap.hidden { opacity: 0; }
 
@@ -117,16 +119,17 @@
 </head>
 <body>
 
-<!-- ADJUSTMENT CONTROLS (Only visible on hover in OBS Interact) -->
+<!-- ADJUSTMENT CONTROLS -->
 <div id="obs-controls-wrap">
     <div id="gear-icon" onclick="toggleMenu()">⚙️</div>
     <div id="obs-controls">
         <b style="color:#58a6ff; font-size:16px; display:block; text-align:center;">🛠️ FULL OVERLAY SETUP</b>
         
         <span class="section-title">🖼️ Score PNG Setup</span>
-        <div class="flex-row"><small>Size (Scale):</small><input type="range" id="sb-scale-slider" min="0.3" max="1.5" step="0.01" oninput="updateCSS()"></div>
-        <div class="flex-row"><small>Up / Down:</small><input type="range" id="sb-y-slider" min="-1000" max="1000" step="5" oninput="updateCSS()"></div>
-        <div class="flex-row"><small>Left / Right:</small><input type="range" id="sb-x-slider" min="-1000" max="1000" step="5" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Size (Overall):</small><input type="range" id="sb-scale-slider" min="0.3" max="1.5" step="0.01" oninput="updateCSS()"></div>
+        <div class="flex-row"><small style="color:#28a745; font-weight:bold;">Width (ਚੌੜਾਈ):</small><input type="range" id="sb-width-slider" min="0.3" max="2.0" step="0.01" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Up / Down:</small><input type="range" id="sb-y-slider" min="-200" max="1000" step="2" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Left / Right:</small><input type="range" id="sb-x-slider" min="-200" max="1000" step="2" oninput="updateCSS()"></div>
 
         <span class="section-title">🔢 Score Text (0 - 0)</span>
         <div class="flex-row"><small>Text Size:</small><input type="range" id="score-size-slider" min="20" max="120" step="1" oninput="updateCSS()"></div>
@@ -145,7 +148,8 @@
         <div class="flex-row"><small>Up / Down:</small><input type="range" id="round-y-slider" min="0" max="1080" step="2" oninput="updateCSS()"></div>
 
         <span class="section-title">📰 Ticker Panel</span>
-        <div class="flex-row"><small>Ticker Size:</small><input type="range" id="tk-scale-slider" min="0.5" max="1.5" step="0.01" oninput="updateCSS()"></div>
+        <div class="flex-row"><small>Size (Overall):</small><input type="range" id="tk-scale-slider" min="0.5" max="1.5" step="0.01" oninput="updateCSS()"></div>
+        <div class="flex-row"><small style="color:#28a745; font-weight:bold;">Width (ਚੌੜਾਈ):</small><input type="range" id="tk-width-slider" min="0.5" max="2.0" step="0.01" oninput="updateCSS()"></div>
         
         <button class="reset-btn" onclick="resetCSS()">Reset to Default</button>
     </div>
@@ -194,8 +198,9 @@
     function updateCSS() {
         // Score PNG Settings
         const sbScale = document.getElementById('sb-scale-slider').value;
+        const sbWidthScale = document.getElementById('sb-width-slider').value;
         const sbTop = document.getElementById('sb-y-slider').value;
-        const sbLeft = document.getElementById('sb-x-slider').value;
+        const sbRight = document.getElementById('sb-x-slider').value; // Working as Right Margin now
         
         // Score Text Settings
         const scoreSize = document.getElementById('score-size-slider').value;
@@ -215,11 +220,13 @@
         
         // Ticker Settings
         const tkScale = document.getElementById('tk-scale-slider').value;
+        const tkWidthScale = document.getElementById('tk-width-slider').value;
         
         // Set CSS Variables
         document.documentElement.style.setProperty('--sb-scale', sbScale);
+        document.documentElement.style.setProperty('--sb-width-scale', sbWidthScale);
         document.documentElement.style.setProperty('--sb-top', sbTop + 'px');
-        document.documentElement.style.setProperty('--sb-left', sbLeft + 'px');
+        document.documentElement.style.setProperty('--sb-right', sbRight + 'px');
         
         document.documentElement.style.setProperty('--score-size', scoreSize + 'px');
         document.documentElement.style.setProperty('--score-top', scoreTop + 'px');
@@ -235,11 +242,13 @@
         document.documentElement.style.setProperty('--round-top', roundTop + 'px');
         
         document.documentElement.style.setProperty('--tk-scale', tkScale);
+        document.documentElement.style.setProperty('--tk-width-scale', tkWidthScale);
 
         // Save to LocalStorage
         localStorage.setItem('sb-scale', sbScale);
+        localStorage.setItem('sb-width-scale', sbWidthScale);
         localStorage.setItem('sb-top', sbTop);
-        localStorage.setItem('sb-left', sbLeft);
+        localStorage.setItem('sb-right', sbRight);
         
         localStorage.setItem('score-size', scoreSize);
         localStorage.setItem('score-top', scoreTop);
@@ -255,13 +264,15 @@
         localStorage.setItem('round-top', roundTop);
         
         localStorage.setItem('tk-scale', tkScale);
+        localStorage.setItem('tk-width-scale', tkWidthScale);
     }
 
     function loadSettings() {
-        // Load settings or apply default values
-        document.getElementById('sb-scale-slider').value = localStorage.getItem('sb-scale') || '1';
-        document.getElementById('sb-y-slider').value = localStorage.getItem('sb-top') || '0';
-        document.getElementById('sb-x-slider').value = localStorage.getItem('sb-left') || '0';
+        // Updated Default values for Top Right Corner layout
+        document.getElementById('sb-scale-slider').value = localStorage.getItem('sb-scale') || '0.65';
+        document.getElementById('sb-width-slider').value = localStorage.getItem('sb-width-scale') || '1';
+        document.getElementById('sb-y-slider').value = localStorage.getItem('sb-top') || '10';
+        document.getElementById('sb-x-slider').value = localStorage.getItem('sb-right') || '10';
         
         document.getElementById('score-size-slider').value = localStorage.getItem('score-size') || '55';
         document.getElementById('score-y-slider').value = localStorage.getItem('score-top') || '480';
@@ -277,6 +288,7 @@
         document.getElementById('round-y-slider').value = localStorage.getItem('round-top') || '560';
         
         document.getElementById('tk-scale-slider').value = localStorage.getItem('tk-scale') || '1';
+        document.getElementById('tk-width-slider').value = localStorage.getItem('tk-width-scale') || '1';
 
         updateCSS(); // Apply immediately on load
     }
