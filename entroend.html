@@ -1,140 +1,142 @@
 <!DOCTYPE html>
-<html>
+<html lang="pa">
 <head>
-<meta charset="UTF-8">
-<title>Live Overlay</title>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Bebas Neue', sans-serif; overflow: hidden; position: relative; }
+        
+        /* Result Overlay */
+        #result-overlay { position: absolute; top: 0; left: 0; width: 1920px; height: 1080px; background: rgba(0,0,0,0.9); z-index: 10000; display: none; justify-content: center; align-items: center; color: #ffeb3b; font-size: 120px; text-transform: uppercase; text-shadow: 5px 5px 10px black; text-align: center; }
 
-<style>
-body{
-    margin:0;
-    overflow:hidden;
-    font-family:Arial;
-    background:transparent;
-}
+        #logo-container { position: absolute; top: 30px; left: 40px; z-index: 9999; opacity: 1; transition: all 0.7s ease; }
+        #logo-container.hidden { opacity: 0; transform: scale(0); }
+        #main-logo { height: 100px; width: auto; max-width: 450px; object-fit: contain; filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.3)); }
 
-/* ===== INTRO ===== */
-#intro{
-    position:fixed;
-    width:100%;
-    height:100%;
-    background:black;
-    color:white;
-    display:none;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-}
+        #single-wm { position: absolute; left: 300px; top: 300px; font-family: 'Bebas Neue', sans-serif; font-size: 42px; font-weight: bold; color: #ffffff; opacity: 0.55; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,.8); white-space: nowrap; z-index: 9997; pointer-events: none; user-select: none; }
+        
+        #scoreboard { position: absolute; top: 0px; left: 0px; width: 1920px; height: 1080px; z-index: 9999; opacity: 1; transition: opacity 0.7s ease; background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/101%20png.png'); background-size: cover; background-position: center; background-repeat: no-repeat; }
+        #scoreboard.hidden { opacity: 0; }
 
-#intro h1{
-    font-size:70px;
-    color:red;
-}
+        .name-area { position: absolute; top: 43px; height: 50px; display: flex; align-items: center; color: #ffffff; font-size: 35px; text-transform: uppercase; text-shadow: 2px 2px 4px #000; overflow: hidden; white-space: nowrap; z-index: 11; }
+        #nA-container { left: 1050px; width: 270px; justify-content: flex-end; }
+        #nB-container { left: 1580px; width: 270px; justify-content: flex-start; }
+        
+        .score-box { position: absolute; top: 40px; height: 50px; width: 50px; display: flex; align-items: center; justify-content: center; font-size: 55px; font-weight: bold; color: #000000; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); z-index: 12; }
+        #sA { left: 1360px; } 
+        #sB { left: 1497px; } 
 
-/* ===== OVERLAY ===== */
-#bar{
-    position:fixed;
-    top:20px;
-    left:20px;
-    right:20px;
-    background:rgba(0,0,0,0.6);
-    color:white;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:10px 20px;
-    border-radius:10px;
-}
+        .round-display { position: absolute; top: 110px; left: 1450px; transform: translateX(-50%); color: white; font-size: 30px; text-transform: uppercase; text-shadow: 2px 2px 6px #000; z-index: 11; }
 
-.team{
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
+        #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 1080px; z-index: 9998; opacity: 1; transition: opacity 0.7s ease; background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Copy%20of%20Star%20Kabaddi%20_20260711_110521_0000.png'); background-size: cover; background-position: center; background-repeat: no-repeat; pointer-events: none; }
+        #ticker-wrap.hidden { opacity: 0; }
 
-.team img{
-    width:40px;
-    height:40px;
-    border-radius:50%;
-    background:white;
-}
-
-.score{
-    font-size:28px;
-    color:yellow;
-}
-
-/* ===== END ===== */
-#end{
-    position:fixed;
-    width:100%;
-    height:100%;
-    background:black;
-    color:white;
-    display:none;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-}
-</style>
-
+        .row-text { position: absolute; display: flex; align-items: center; text-transform: uppercase; overflow: hidden; box-sizing: border-box; white-space: nowrap; padding-left: 10px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
+        .row-1 { bottom: 61px; left: 210px; width: 350px; height: 50px; font-size: 35px; color: #ffffff; }
+        .row-2 { bottom: 53px; left: 587px; width: 815px; height: 50px; font-size: 35px; color: #000000; }
+        .row-3 { bottom: 53px; left: 1425px; width: 550px; height: 50px; font-size: 35px; color: #ffffff; }
+        .row-4 { bottom: 2px; left: 200px; width: 1730px; height: 50px; font-size: 30px; color: #ffffff; }
+        .scroller { display: inline-block; white-space: nowrap; position: relative; }
+    </style>
 </head>
-
 <body>
 
-<!-- INTRO -->
-<div id="intro">
-    <h1 id="introText">KABADDI LIVE</h1>
+<div id="result-overlay"></div>
+
+<div id="logo-container" class="hidden">
+    <img id="main-logo" src="" alt="Logo">
 </div>
 
-<!-- OVERLAY -->
-<div id="bar">
-    <div class="team">
-        <img id="logoA">
-        <span id="teamA">A</span>
-    </div>
-
-    <div class="score" id="score">0 - 0</div>
-
-    <div class="team">
-        <span id="teamB">B</span>
-        <img id="logoB">
-    </div>
+<div id="single-wm">M LIVE</div>
+    
+<div id="scoreboard">
+    <div class="name-area" id="nA-container"><div id="nA">TEAM 1</div></div>
+    <div class="score-box" id="sA">0</div>
+    <div class="score-box" id="sB">0</div>
+    <div class="name-area" id="nB-container"><div id="nB">TEAM 2</div></div>
+    <div class="round-display" id="round-display">LIVE MATCH</div>
 </div>
 
-<!-- END -->
-<div id="end">
-    <h1>THANK YOU FOR WATCHING 🔥</h1>
+<div id="ticker-wrap">
+    <div class="row-text row-1" id="c1"></div>
+    <div class="row-text row-2" id="c2"></div>
+    <div class="row-text row-3" id="c3"></div>
+    <div class="row-text row-4" id="c4"></div>
 </div>
 
 <script>
+    const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
+    firebase.initializeApp(firebaseConfig);
 
-function loadData(){
-    let data = JSON.parse(localStorage.getItem("live_data"));
-    if(!data) return;
+    const matchId = new URLSearchParams(window.location.search).get('id') || 'defaultMatch';
+    const db = firebase.database().ref("matchData/" + matchId);
+    
+    let langState = 0; // 0 = English, 1 = Punjabi
+    let globalData = {};
 
-    teamA.innerText = data.teamA;
-    teamB.innerText = data.teamB;
-    score.innerText = data.scoreA + " - " + data.scoreB;
+    // 1. Language Toggle (Every 8 seconds)
+    setInterval(() => {
+        langState = langState === 0 ? 1 : 0;
+        renderUI();
+    }, 8000);
 
-    logoA.src = data.logoA;
-    logoB.src = data.logoB;
+    db.on("value", (snap) => {
+        globalData = snap.val() || {};
+        renderUI();
+    });
 
-    introText.innerText = data.title || "LIVE";
+    function renderUI() {
+        const data = globalData;
 
-    /* INTRO CONTROL */
-    document.getElementById("intro").style.display =
-        data.intro ? "flex" : "none";
+        // Result Screen
+        const resOverlay = document.getElementById('result-overlay');
+        if (data.showResult) {
+            resOverlay.style.display = 'flex';
+            resOverlay.innerText = data.resultText || "RESULT";
+        } else {
+            resOverlay.style.display = 'none';
+        }
 
-    /* END CONTROL */
-    document.getElementById("end").style.display =
-        data.end ? "flex" : "none";
-}
+        // Visibility
+        document.getElementById('scoreboard').classList.toggle('hidden', data.scoreVisible === false);
+        document.getElementById('ticker-wrap').classList.toggle('hidden', data.tickerVisible === false);
 
-/* AUTO UPDATE */
-setInterval(loadData,1000);
-loadData();
+        // Score
+        document.getElementById('sA').innerText = data.scoreA ?? "0";
+        document.getElementById('sB').innerText = data.scoreB ?? "0";
+        
+        // Names (Language Toggle)
+        document.getElementById('nA').innerText = (langState === 1 && data.nameA_pa) ? data.nameA_pa : (data.nameA || "TEAM 1");
+        document.getElementById('nB').innerText = (langState === 1 && data.nameB_pa) ? data.nameB_pa : (data.nameB || "TEAM 2");
+        document.getElementById('round-display').innerText = data.round || "";
 
+        // Tickers
+        updateTicker("c1", data.row1Txt, data.row1Txt_pa);
+        updateTicker("c2", data.row2Txt, data.row2Txt_pa); // List Handler
+        updateTicker("c3", data.row3Txt, data.row3Txt_pa);
+        updateTicker("c4", data.row4Txt, data.row4Txt_pa);
+    }
+
+    function updateTicker(id, en, pa) {
+        const el = document.getElementById(id);
+        
+        // Row 2 List Logic
+        if (id === 'c2' && en && en.includes('|')) {
+            const matches = en.split('|');
+            const pMatches = pa ? pa.split('|') : [];
+            // Cycle every 5 seconds
+            let index = Math.floor((Date.now() / 5000) % matches.length);
+            
+            let txt = (langState === 1 && pMatches[index]) ? pMatches[index].trim() : matches[index].trim();
+            el.innerHTML = `<div class="scroller">${txt}</div>`;
+        } else {
+            // Standard rows
+            let txt = (langState === 1 && pa && pa.trim() !== "") ? pa : (en || "");
+            el.innerHTML = `<div class="scroller">${txt}</div>`;
+        }
+    }
 </script>
-
 </body>
 </html>
