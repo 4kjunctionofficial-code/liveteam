@@ -15,9 +15,40 @@
         #logo-container.hidden { opacity: 0; transform: scale(0); }
         #main-logo { height: 100px; width: auto; max-width: 450px; object-fit: contain; filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.3)); }
 
-        /* Floating Watermark */
-        #single-wm { position: absolute; color: rgba(255, 255, 255, 0.7); font-size: 35px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 5px #000; white-space: nowrap; z-index: 1; opacity: 1; }
+        #wm-layer{
+    position:absolute;
+    top:0;
+    left:0;
+    width:1920px;
+    height:980px;      /* ticker ਤੋਂ ਉੱਪਰ */
+    overflow:hidden;
+    z-index:5;
+    pointer-events:none;
+}
 
+.wm{
+    position:absolute;
+    color:rgba(255,255,255,.18);
+    font-size:34px;
+    font-weight:bold;
+    text-transform:uppercase;
+    white-space:nowrap;
+    text-shadow:2px 2px 4px #000;
+    animation:wmMove 28s linear infinite;
+}
+
+@keyframes wmMove{
+
+    from{
+        transform:translate(-250px,1100px);
+    }
+
+    to{
+        transform:translate(2200px,-200px);
+    }
+
+}
+        
         /* SCOREBOARD BACKGROUND */
         #scoreboard { 
             position: absolute; top: 0px; left: 0px; width: 1920px; height: 1080px; 
@@ -71,8 +102,8 @@
     <img id="main-logo" src="" alt="Logo">
 </div>
 
-<div id="single-wm">M LIVE</div>
-
+<div id="wm-layer"></div>
+    
 <div id="scoreboard">
     <div class="name-area" id="nA-container"><div id="nA" style="width:100%; text-align:right;">TEAM 1</div></div>
     <div class="score-box" id="sA">0</div>
@@ -198,7 +229,33 @@ MANPREET MUDKI<br>
         document.getElementById('sB').innerText = data.scoreB ?? "0";
         setTeamName('nA-container', data.nameA || "TEAM 1");
         setTeamName('nB-container', data.nameB || "TEAM 2");
-        document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
+        const wmLayer=document.getElementById("wm-layer");
+
+if(wmLayer.innerHTML===""){
+
+    for(let i=0;i<18;i++){
+
+        const d=document.createElement("div");
+
+        d.className="wm";
+
+        d.innerText=data.watermarkTxt || "M LIVE";
+
+        d.style.left=(i%3)*650+"px";
+        d.style.top=Math.floor(i/3)*180+"px";
+        d.style.animationDelay=(-i*2)+"s";
+
+        wmLayer.appendChild(d);
+
+    }
+
+}else{
+
+    document.querySelectorAll(".wm").forEach(e=>{
+        e.innerText=data.watermarkTxt || "M LIVE";
+    });
+
+}
         
         const roundEl = document.getElementById('round-display');
         roundEl.innerText = data.round || "";
