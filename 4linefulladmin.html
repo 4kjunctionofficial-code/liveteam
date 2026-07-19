@@ -541,6 +541,8 @@ No Result Yet
 
     <script>
 
+     
+
 const firebaseConfig = {
 databaseURL:"https://my-scorebord-default-rtdb.firebaseio.com/"
 };
@@ -562,13 +564,7 @@ let camOpposite=false;
 
 let allTeams=[];
 let nextMatches=[];
-    
-// Textarea Auto-resize Function
-    function autoResize(el) {
-        if (!el) return;
-        el.style.height = 'auto';
-        el.style.height = (el.scrollHeight) + 'px';
-    }
+
 
 /* LIVE DB */
 
@@ -597,6 +593,14 @@ document.getElementById("nameB").value=data.nameB||"";
 /* ROUND */
 
 document.getElementById("roundInp").value=data.round||"";
+
+       
+// Textarea Auto-resize Function
+    function autoResize(el) {
+        if (!el) return;
+        el.style.height = 'auto';
+        el.style.height = (el.scrollHeight) + 'px';
+    }
 
 /* TICKER */
 
