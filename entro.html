@@ -240,11 +240,32 @@ data.watermarkTxt || "M LIVE";
         }
     });
 
-    function setTeamName(containerId, txt) {
-        const el = document.getElementById(containerId);
-        let alignment = containerId === 'nA-container' ? 'right' : 'left';
-        el.innerHTML = txt.length > 15 ? `<div class="team-scroller">${txt}</div>` : `<div style="width:100%; text-align:${alignment};">${txt}</div>`;
+    function setTeamName(containerId, txt){
+
+    const box = document.getElementById(containerId);
+
+    const align = containerId==="nA-container" ? "right":"left";
+
+    // Short Name
+    if(txt.length<=15){
+
+        if(box.dataset.last==txt) return;
+
+        box.dataset.last=txt;
+
+        box.innerHTML=`<div style="width:100%;text-align:${align};">${txt}</div>`;
+
+        return;
     }
+
+    // Long Name
+    if(box.dataset.last==txt) return;
+
+    box.dataset.last=txt;
+
+    box.innerHTML=`<div class="team-scroller">${txt}</div>`;
+
+}
 
     function updateTickerContent(id, txt) {
         const el = document.getElementById(id);
