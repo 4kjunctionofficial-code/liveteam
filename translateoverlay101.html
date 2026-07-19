@@ -98,7 +98,6 @@
         const logoCont = document.getElementById('logo-container');
         const currentId = matchId.trim().toLowerCase();
 
-        // Logos & Visibility
         if (clientLogos[currentId] && data.logoVisible !== false) {
             document.getElementById('main-logo').src = clientLogos[currentId];
             logoCont.classList.remove('hidden');
@@ -112,7 +111,6 @@
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
         
-        // Update Names
         if (window.lastNameA !== data.nameA || window.lastNameA_pa !== data.nameA_pa) {
             window.lastNameA = data.nameA; window.lastNameA_pa = data.nameA_pa;
             setTeamName("nA-container", data.nameA, data.nameA_pa);
@@ -126,7 +124,7 @@
         document.getElementById('round-display').innerText = data.round || "";
         
         updateTickerContent("c1", data.row1Txt, data.row1Txt_pa);
-        updateTickerContent("c2", data.row2Txt, data.row2Txt_pa);
+        updateTickerContent("c2", data.row2Txt, data.row2Txt_pa); // Row 2 ਨਾਲ List ਵਾਲਾ logic ਚੱਲੇਗਾ
         updateTickerContent("c3", data.row3Txt, data.row3Txt_pa);
         updateTickerContent("c4", data.row4Txt, data.row4Txt_pa);
 
@@ -137,7 +135,6 @@
         }
     });
 
-    // Helper Functions
     function setTeamName(containerId, en, pa) {
         const el = document.getElementById(containerId);
         if (el) {
@@ -146,17 +143,33 @@
         }
     }
 
+    // Updated Ticker Function
     function updateTickerContent(id, en, pa) {
         const el = document.getElementById(id);
         clearInterval(tickerTimers[id]);
-        let showPunjabi = false;
-        function change() {
-            const txt = (showPunjabi && pa && pa.trim() !== "") ? pa : (en || "");
-            el.innerHTML = `<div class="scroller">${txt}&nbsp;&nbsp; • &nbsp;&nbsp; ${txt}</div>`;
-            showPunjabi = !showPunjabi;
+
+        // ਜੇ ID 'c2' ਹੈ, ਤਾਂ List ਵਾਂਗ ਚਲਾਓ (ਵਾਰੀ-ਵਾਰੀ)
+        if (id === 'c2' && en && en.includes('|')) {
+            const matches = en.split('|');
+            let index = 0;
+            function changeMatch() {
+                el.innerHTML = `<div class="scroller">${matches[index].trim()}</div>`;
+                index = (index + 1) % matches.length;
+            }
+            changeMatch();
+            tickerTimers[id] = setInterval(changeMatch, 5000); // 5 ਸਕਿੰਟਾਂ ਬਾਅਦ ਅਗਲਾ ਮੈਚ
+        } else {
+            // ਬਾਕੀ Rows ਲਈ English/Punjabi toggle
+            let showPunjabi = false;
+            function change() {
+                const txt = (showPunjabi && pa && pa.trim() !== "") ? pa : (en || "");
+                // ਇੱਥੋਂ ਡਬਲ ਟੈਕਸਟ ਵਾਲਾ ਹਿੱਸਾ ਹਟਾ ਦਿੱਤਾ ਹੈ
+                el.innerHTML = `<div class="scroller">${txt}</div>`;
+                showPunjabi = !showPunjabi;
+            }
+            change();
+            tickerTimers[id] = setInterval(change, 8000);
         }
-        change();
-        tickerTimers[id] = setInterval(change, 8000);
     }
 
     function startTicker(id, speed) {
@@ -188,7 +201,7 @@
         document.getElementById('d-wrap').style.opacity = isTime ? "0" : "1"; 
     }, 3000);
 
-    // Watermark Animation
+    // Watermark
     const wm = document.getElementById('single-wm');
     let x = 100, y = 250, dx = 2.2, dy = 1.6;
     function animateWatermark() {
@@ -201,5 +214,3 @@
     }
     animateWatermark();
 </script>
-</body>
-</html>
