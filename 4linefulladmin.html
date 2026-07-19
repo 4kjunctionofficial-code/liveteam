@@ -485,10 +485,10 @@ RESET ALL TEAMS
 <div class="card">
         <div class="header">Ticker & Branding</div>
         <div class="settings-section">
-            <textarea id="row1Inp" rows="1" placeholder="Title Line 1" oninput="updateDB(); autoResize(this)"></textarea>
-<textarea id="row2Inp" rows="1" placeholder="Title Line 2" oninput="updateDB(); autoResize(this)"></textarea>
-<textarea id="row3Inp" rows="1" placeholder="Title Line 3" oninput="updateDB(); autoResize(this)"></textarea>
-<textarea id="row4Inp" rows="1" placeholder="Title Line 4" oninput="updateDB(); autoResize(this)"></textarea>
+            <textarea id="row1Inp" rows="1" placeholder="Title Line 1" oninput="autoResize(this); updateTicker();"></textarea>
+<textarea id="row2Inp" rows="1" placeholder="Title Line 2" oninput="autoResize(this); updateTicker();"></textarea>
+<textarea id="row3Inp" rows="1" placeholder="Title Line 3" oninput="autoResize(this); updateTicker();"></textarea>
+<textarea id="row4Inp" rows="1" placeholder="Title Line 4" oninput="autoResize(this); updateTicker();"></textarea>
 <input type="text"
 id="watermarkInp"
 placeholder="Channel Name">
@@ -594,13 +594,7 @@ document.getElementById("nameB").value=data.nameB||"";
 
 document.getElementById("roundInp").value=data.round||"";
 
-       
-// Textarea Auto-resize Function
-    function autoResize(el) {
-        if (!el) return;
-        el.style.height = 'auto';
-        el.style.height = (el.scrollHeight) + 'px';
-    }
+
 
 /* TICKER */
 
@@ -609,6 +603,13 @@ document.getElementById("row2Inp").value = data.row2Txt || "";
 document.getElementById("row3Inp").value = data.row3Txt || "";
 document.getElementById("row4Inp").value = data.row4Txt || "";
 document.getElementById("watermarkInp").value = data.watermarkTxt || "";
+
+    setTimeout(() => {
+    autoResize(document.getElementById("row1Inp"));
+    autoResize(document.getElementById("row2Inp"));
+    autoResize(document.getElementById("row3Inp"));
+    autoResize(document.getElementById("row4Inp"));
+}, 10);
 
 /* QUALIFIED / OUT */
 
@@ -832,6 +833,11 @@ db.update({
 }
 
 /* SHOW HIDE */
+
+    function autoResize(el){
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+}
 
 function toggleVis(field){
 
