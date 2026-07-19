@@ -103,19 +103,9 @@ textarea {
     border-radius:8px;
     font-weight:bold;
     cursor:pointer;
-    padding:0 12px;
-    font-size:16px;
+    padding:0 10px;
+    font-size:15px;
     color:black;
-}
-
-.set-btn{
-    width:60px;
-    border:none;
-    background:#1a73e8;
-    color:white;
-    border-radius:8px;
-    font-weight:bold;
-    cursor:pointer;
 }
 
 .score-val{
@@ -282,6 +272,20 @@ textarea {
 
 <div id="main-panel">
 
+<!-- TRANSLATION SETTINGS -->
+<div class="card">
+    <div class="header" style="background:#fbbc05; color:black;">LANGUAGE TRANSLATION SETTINGS</div>
+    <div class="settings-section" style="display:flex; align-items:center; gap:10px;">
+        <span style="font-weight:bold; font-size:16px;">Translate to:</span>
+        <select id="targetLang" style="margin-bottom:0; border: 2px solid #fbbc05;">
+            <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
+            <option value="hi">Hindi (हिन्दी)</option>
+            <option value="en">English</option>
+            <option value="ur">Urdu (اردو)</option>
+        </select>
+    </div>
+</div>
+
 <!-- SCOREBOARD -->
 <div class="card">
 
@@ -299,12 +303,11 @@ LIVE SCORE BOARD
 <div class="team-top">
     <div class="team-inputs-wrap">
         <div class="team-input-row">
-            <input type="text" id="nameA" class="team-input" placeholder="Team 1 (Eng)">
-            <button class="trans-btn" onclick="translateText('nameA', 'nameA_pa')" title="Translate to Punjabi">A->ਅ</button>
+            <input type="text" id="nameA" class="team-input" placeholder="Team 1 (Input)">
+            <button class="trans-btn" onclick="translateText('nameA', 'nameA_pa')" title="Translate">⇄</button>
         </div>
-        <input type="text" id="nameA_pa" class="team-input" placeholder="Team 1 (ਪੰਜਾਬੀ)">
+        <input type="text" id="nameA_pa" class="team-input" placeholder="Team 1 (Translated)">
     </div>
-    <button class="set-btn" onclick="updateTeamA()">SET</button>
 </div>
 <div class="score-val" id="dispA">0</div>
 <div class="pm-wrap">
@@ -323,12 +326,11 @@ LIVE SCORE BOARD
 <div class="team-top">
     <div class="team-inputs-wrap">
         <div class="team-input-row">
-            <input type="text" id="nameB" class="team-input" placeholder="Team 2 (Eng)">
-            <button class="trans-btn" onclick="translateText('nameB', 'nameB_pa')" title="Translate to Punjabi">A->ਅ</button>
+            <input type="text" id="nameB" class="team-input" placeholder="Team 2 (Input)">
+            <button class="trans-btn" onclick="translateText('nameB', 'nameB_pa')" title="Translate">⇄</button>
         </div>
-        <input type="text" id="nameB_pa" class="team-input" placeholder="Team 2 (ਪੰਜਾਬੀ)">
+        <input type="text" id="nameB_pa" class="team-input" placeholder="Team 2 (Translated)">
     </div>
-    <button class="set-btn" onclick="updateTeamB()">SET</button>
 </div>
 <div class="score-val" id="dispB">0</div>
 <div class="pm-wrap">
@@ -337,6 +339,13 @@ LIVE SCORE BOARD
 </div>
 </div>
 
+</div>
+
+<!-- SINGLE SET BUTTON FOR BOTH TEAMS -->
+<div style="padding: 0 12px 12px 12px;">
+    <button class="btn-full btn-blue" style="height:50px; min-height:50px;" onclick="updateBothTeams()">
+        SET BOTH TEAMS
+    </button>
 </div>
 
 <!-- BUTTONS -->
@@ -394,13 +403,13 @@ ADD TO LIST
 
 <!-- QUICK TRANSLATOR TOOL -->
 <div class="card">
-<div class="header">QUICK TRANSLATOR (Eng to ਪੰਜਾਬੀ)</div>
+<div class="header">QUICK TRANSLATOR TOOL</div>
 <div class="settings-section">
     <div style="display:flex; gap:10px; margin-bottom:10px;">
-        <input type="text" id="quickEng" placeholder="Type English here..." style="margin-bottom:0;">
-        <button class="btn-full btn-yellow" onclick="translateText('quickEng', 'quickPa')" style="height:auto; min-height:42px; width:100px;">A->ਅ</button>
+        <input type="text" id="quickEng" placeholder="Type here in any language..." style="margin-bottom:0;">
+        <button class="btn-full btn-yellow" onclick="translateText('quickEng', 'quickPa')" style="height:auto; min-height:42px; width:100px;">⇄ TRANS</button>
     </div>
-    <input type="text" id="quickPa" placeholder="Punjabi output..." readonly style="background:#eee;">
+    <input type="text" id="quickPa" placeholder="Translated output..." readonly style="background:#eee;">
 </div>
 </div>
 
@@ -429,14 +438,47 @@ RESET ALL TEAMS
 <div class="card">
     <div class="header">Ticker & Branding</div>
     <div class="settings-section">
-        <textarea id="row1Inp" rows="1" placeholder="Title Line 1" oninput="autoResize(this); updateTicker();"></textarea>
-        <textarea id="row2Inp" rows="1" placeholder="Title Line 2" oninput="autoResize(this); updateTicker();"></textarea>
-        <textarea id="row3Inp" rows="1" placeholder="Title Line 3" oninput="autoResize(this); updateTicker();"></textarea>
-        <textarea id="row4Inp" rows="1" placeholder="Title Line 4" oninput="autoResize(this); updateTicker();"></textarea>
-        <input type="text" id="watermarkInp" placeholder="Channel Name">
+        
+        <!-- Ticker Row 1 -->
+        <div class="team-inputs-wrap" style="margin-bottom:12px;">
+            <div class="team-input-row">
+                <textarea id="row1Inp" class="team-input" rows="1" placeholder="Title Line 1 (Input)" oninput="autoResize(this); updateTicker();"></textarea>
+                <button class="trans-btn" onclick="translateText('row1Inp', 'row1Inp_pa').then(() => updateTicker())" title="Translate">⇄</button>
+            </div>
+            <textarea id="row1Inp_pa" class="team-input" rows="1" placeholder="Title Line 1 (Translated)" style="margin-top:5px; width:100%;" oninput="autoResize(this); updateTicker();"></textarea>
+        </div>
+
+        <!-- Ticker Row 2 -->
+        <div class="team-inputs-wrap" style="margin-bottom:12px;">
+            <div class="team-input-row">
+                <textarea id="row2Inp" class="team-input" rows="1" placeholder="Title Line 2 (Input)" oninput="autoResize(this); updateTicker();"></textarea>
+                <button class="trans-btn" onclick="translateText('row2Inp', 'row2Inp_pa').then(() => updateTicker())" title="Translate">⇄</button>
+            </div>
+            <textarea id="row2Inp_pa" class="team-input" rows="1" placeholder="Title Line 2 (Translated)" style="margin-top:5px; width:100%;" oninput="autoResize(this); updateTicker();"></textarea>
+        </div>
+
+        <!-- Ticker Row 3 -->
+        <div class="team-inputs-wrap" style="margin-bottom:12px;">
+            <div class="team-input-row">
+                <textarea id="row3Inp" class="team-input" rows="1" placeholder="Title Line 3 (Input)" oninput="autoResize(this); updateTicker();"></textarea>
+                <button class="trans-btn" onclick="translateText('row3Inp', 'row3Inp_pa').then(() => updateTicker())" title="Translate">⇄</button>
+            </div>
+            <textarea id="row3Inp_pa" class="team-input" rows="1" placeholder="Title Line 3 (Translated)" style="margin-top:5px; width:100%;" oninput="autoResize(this); updateTicker();"></textarea>
+        </div>
+
+        <!-- Ticker Row 4 -->
+        <div class="team-inputs-wrap" style="margin-bottom:12px;">
+            <div class="team-input-row">
+                <textarea id="row4Inp" class="team-input" rows="1" placeholder="Title Line 4 (Input)" oninput="autoResize(this); updateTicker();"></textarea>
+                <button class="trans-btn" onclick="translateText('row4Inp', 'row4Inp_pa').then(() => updateTicker())" title="Translate">⇄</button>
+            </div>
+            <textarea id="row4Inp_pa" class="team-input" rows="1" placeholder="Title Line 4 (Translated)" style="margin-top:5px; width:100%;" oninput="autoResize(this); updateTicker();"></textarea>
+        </div>
+
+        <input type="text" id="watermarkInp" placeholder="Channel Name" oninput="updateTicker();">
 
         <button class="btn-full btn-blue" onclick="updateTicker()" style="width:100%;margin-bottom:8px;">
-        UPDATE TICKER
+        UPDATE TICKER MANUALLY
         </button>
 
         <button id="tickVisBtn" class="btn-full btn-red" onclick="toggleVis('tickerVisible')" style="width:100%;">
@@ -474,14 +516,28 @@ let camOpposite=false;
 let allTeams=[];
 let nextMatches=[];
 
-/* TRANSLATION API FUNCTION */
+function autoResize(el){
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+}
+
+/* MULTI-LANGUAGE TRANSLATION API FUNCTION */
 async function translateText(sourceId, targetId) {
     const text = document.getElementById(sourceId).value;
+    const targetLang = document.getElementById("targetLang").value; 
+    
     if(!text) return;
     try {
-        const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=pa&dt=t&q=${encodeURIComponent(text)}`);
+        const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`);
         const data = await res.json();
-        document.getElementById(targetId).value = data[0][0][0];
+        
+        const targetEl = document.getElementById(targetId);
+        targetEl.value = data[0][0][0];
+        
+        // Auto-resize trigger kardo if it's a textarea
+        if(targetEl.tagName === "TEXTAREA"){
+            autoResize(targetEl);
+        }
     } catch(e) {
         alert("Translation error! Please check internet connection.");
     }
@@ -508,16 +564,29 @@ db.on("value",(snap)=>{
         document.getElementById("roundInp").value=data.round||"";
 
         document.getElementById("row1Inp").value = data.row1Txt || "";
+        document.getElementById("row1Inp_pa").value = data.row1Txt_pa || "";
+        
         document.getElementById("row2Inp").value = data.row2Txt || "";
+        document.getElementById("row2Inp_pa").value = data.row2Txt_pa || "";
+        
         document.getElementById("row3Inp").value = data.row3Txt || "";
+        document.getElementById("row3Inp_pa").value = data.row3Txt_pa || "";
+        
         document.getElementById("row4Inp").value = data.row4Txt || "";
+        document.getElementById("row4Inp_pa").value = data.row4Txt_pa || "";
+        
         document.getElementById("watermarkInp").value = data.watermarkTxt || "";
 
+        // Auto-resize elements when loaded from DB
         setTimeout(() => {
             autoResize(document.getElementById("row1Inp"));
+            autoResize(document.getElementById("row1Inp_pa"));
             autoResize(document.getElementById("row2Inp"));
+            autoResize(document.getElementById("row2Inp_pa"));
             autoResize(document.getElementById("row3Inp"));
+            autoResize(document.getElementById("row3Inp_pa"));
             autoResize(document.getElementById("row4Inp"));
+            autoResize(document.getElementById("row4Inp_pa"));
         }, 10);
 
         document.getElementById("winnerTeamsInp").value = data.qualifiedTeams || "";
@@ -525,7 +594,7 @@ db.on("value",(snap)=>{
         document.getElementById("allTeamsInp").value = allTeams.join("\n");
         document.getElementById("resultText").innerText = data.resultText || "No Result Yet";
 
-        renderNextMatches(); // Update List Box dynamically
+        renderNextMatches(); 
 
         const sVis = data.scoreVisible !== false;
         document.getElementById("visBtn").innerText = sVis ? "Hide Scoreboard" : "Show Scoreboard";
@@ -577,7 +646,7 @@ function startSpecificMatch(index) {
 
     db.update({
         nameA: t1,
-        nameA_pa: "", // Naya match shuru hon te punjabi clear karti, khud kar sakde ho translate
+        nameA_pa: "", 
         nameB: t2,
         nameB_pa: "",
         scoreA: 0,
@@ -638,7 +707,6 @@ function deleteSpecificMatch(index) {
     }
 }
 
-
 /* DROPDOWNS */
 function updateDropdowns(){
     const a=document.getElementById("teamSelectA");
@@ -682,17 +750,13 @@ function saveAllTeams(){
 function selectTeamA(team){ document.getElementById("nameA").value=team; }
 function selectTeamB(team){ document.getElementById("nameB").value=team; }
 
-function updateTeamA(){ 
+/* SINGLE SET BUTTON FUNCTION */
+function updateBothTeams(){ 
     db.update({ 
-        nameA:document.getElementById("nameA").value,
-        nameA_pa:document.getElementById("nameA_pa").value
-    }); 
-}
-
-function updateTeamB(){ 
-    db.update({ 
-        nameB:document.getElementById("nameB").value,
-        nameB_pa:document.getElementById("nameB_pa").value 
+        nameA: document.getElementById("nameA").value,
+        nameA_pa: document.getElementById("nameA_pa").value,
+        nameB: document.getElementById("nameB").value,
+        nameB_pa: document.getElementById("nameB_pa").value 
     }); 
 }
 
@@ -714,16 +778,15 @@ function updateTicker(){
     db.update({
         round: document.getElementById("roundInp").value,
         row1Txt: document.getElementById("row1Inp").value,
+        row1Txt_pa: document.getElementById("row1Inp_pa").value,
         row2Txt: document.getElementById("row2Inp").value,
+        row2Txt_pa: document.getElementById("row2Inp_pa").value,
         row3Txt: document.getElementById("row3Inp").value,
+        row3Txt_pa: document.getElementById("row3Inp_pa").value,
         row4Txt: document.getElementById("row4Inp").value,
+        row4Txt_pa: document.getElementById("row4Inp_pa").value,
         watermarkTxt: document.getElementById("watermarkInp").value
     });
-}
-
-function autoResize(el){
-    el.style.height = "auto";
-    el.style.height = el.scrollHeight + "px";
 }
 
 function toggleVis(field){
@@ -832,7 +895,6 @@ function addNextMatch(){
     
     nextMatches.push(a + " VS " + b);
     
-    // reset dropdown
     document.getElementById("nextTeamA").value = "";
     document.getElementById("nextTeamB").value = "";
     
@@ -853,7 +915,15 @@ function clearAllTeams(){
             nameA:"",
             nameA_pa:"",
             nameB:"",
-            nameB_pa:""
+            nameB_pa:"",
+            row1Txt:"",
+            row1Txt_pa:"",
+            row2Txt:"",
+            row2Txt_pa:"",
+            row3Txt:"",
+            row3Txt_pa:"",
+            row4Txt:"",
+            row4Txt_pa:""
         });
         document.getElementById("allTeamsInp").value="";
         document.getElementById("winnerTeamsInp").value="";
@@ -861,10 +931,21 @@ function clearAllTeams(){
         document.getElementById("resultText").innerText="No Result Yet";
         document.getElementById("dispA").innerText="0";
         document.getElementById("dispB").innerText="0";
+        
         document.getElementById("nameA").value="";
         document.getElementById("nameA_pa").value="";
         document.getElementById("nameB").value="";
         document.getElementById("nameB_pa").value="";
+        
+        document.getElementById("row1Inp").value="";
+        document.getElementById("row1Inp_pa").value="";
+        document.getElementById("row2Inp").value="";
+        document.getElementById("row2Inp_pa").value="";
+        document.getElementById("row3Inp").value="";
+        document.getElementById("row3Inp_pa").value="";
+        document.getElementById("row4Inp").value="";
+        document.getElementById("row4Inp_pa").value="";
+        
         curA=0; curB=0;
         updateDropdowns();
     }
