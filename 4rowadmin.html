@@ -151,42 +151,6 @@ textarea {
     word-break:break-word;
 }
 
-/* MATCH LIST STYLES */
-.match-item {
-    background: #fff;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    padding: 10px;
-    margin-bottom: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-.match-title {
-    font-size: 16px;
-    font-weight: bold;
-    text-align: center;
-    color: #333;
-}
-.match-actions {
-    display: flex;
-    gap: 5px;
-    justify-content: center;
-}
-.btn-sm {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    color: white;
-    cursor: pointer;
-    font-size: 14px;
-}
-.btn-start { background: #1a73e8; }
-.btn-walkover { background: #fd7e14; }
-.btn-delete { background: #dc3545; max-width: 40px; }
-
 /* MOBILE */
 @media(max-width:768px){
 .controls{
@@ -209,10 +173,6 @@ textarea {
     height:64px;
     padding:8px;
 }
-.match-actions {
-    flex-wrap: wrap;
-}
-.btn-sm { font-size: 12px; }
 }
 
 .btn-green{background:#28a745;}
@@ -316,7 +276,7 @@ Camera View
 </button>
 
 <button class="btn-full" style="background:#777;" onclick="resetScores()">
-RESET SCORES
+RESET
 </button>
 
 </div>
@@ -327,7 +287,7 @@ RESET SCORES
 
 <!-- NEXT MATCH -->
 <div class="header" style="margin-bottom:10px;">
-NEXT MATCH LIST
+NEXT MATCH SETUP
 </div>
 
 <select id="nextTeamA">
@@ -338,12 +298,15 @@ NEXT MATCH LIST
 <option value="">Select Next Match Team 2</option>
 </select>
 
-<button class="btn-full btn-green" onclick="addNextMatch()" style="width:100%;margin-bottom:12px;">
-ADD TO LIST
+<button class="btn-full btn-green" onclick="addNextMatch()" style="width:100%;margin-bottom:8px;">
+ADD NEXT MATCH
 </button>
 
-<!-- MATCH LIST CONTAINER -->
-<div id="nextMatchContainer"></div>
+<textarea id="nextMatchList" rows="4" placeholder="Next Match Teams"></textarea>
+
+<button class="btn-full btn-blue" onclick="saveNextMatches()" style="width:100%;">
+SAVE NEXT MATCHES
+</button>
 
 </div>
 
@@ -449,10 +412,9 @@ db.on("value",(snap)=>{
 
         document.getElementById("winnerTeamsInp").value = data.qualifiedTeams || "";
         document.getElementById("loserTeamsInp").value = data.eliminatedTeams || "";
+        document.getElementById("nextMatchList").value = nextMatches.join("\n");
         document.getElementById("allTeamsInp").value = allTeams.join("\n");
         document.getElementById("resultText").innerText = data.resultText || "No Result Yet";
-
-        renderNextMatches(); // Update List Box dynamically
 
         const sVis = data.scoreVisible !== false;
         document.getElementById("visBtn").innerText = sVis ? "Hide Scoreboard" : "Show Scoreboard";
@@ -467,109 +429,6 @@ db.on("value",(snap)=>{
         updateDropdowns();
     }
 });
-
-/* NEXT MATCH RENDERER */
-function renderNextMatches() {
-    const container = document.getElementById("nextMatchContainer");
-    container.innerHTML = ""; // Purana clear kro
-    
-    if(nextMatches.length === 0) {
-        container.innerHTML = `<div style="text-align:center; padding:10px; color:#999; font-weight:bold;">No Upcoming Matches</div>`;
-        return;
-    }
-
-    nextMatches.forEach((matchStr, index) => {
-        let div = document.createElement("div");
-        div.className = "match-item";
-        div.innerHTML = `
-            <div class="match-title">${matchStr}</div>
-            <div class="match-actions">
-                <button class="btn-sm btn-start" onclick="startSpecificMatch(${index})">START</button>
-                <button class="btn-sm btn-walkover" onclick="walkOverSpecificMatch(${index})">WALKOVER</button>
-                <button class="btn-sm btn-delete" onclick="deleteSpecificMatch(${index})">X</button>
-            </div>
-        `;
-        container.appendChild(div);
-    });
-}
-
-/* START SPECIFIC MATCH */
-function startSpecificMatch(index) {
-    let matchStr = nextMatches[index];
-    let teams = matchStr.split(" VS ");
-    let t1 = teams[0] ? teams[0].trim() : "";
-    let t2 = teams[1] ? teams[1].trim() : "";
-
-    // List vicho remove kro
-    nextMatches.splice(index, 1);
-
-    // Database update kro
-    db.update({
-        nameA: t1,
-        nameB: t2,
-        scoreA: 0,
-        scoreB: 0,
-        nextMatches: nextMatches,
-        scoreVisible: true, 
-        resultText: "No Result Yet"
-    });
-}
-
-/* WALKOVER SPECIFIC MATCH */
-function walkOverSpecificMatch(index) {
-    let matchStr = nextMatches[index];
-    let teams = matchStr.split(" VS ");
-    let t1 = teams[0] ? teams[0].trim() : "";
-    let t2 = teams[1] ? teams[1].trim() : "";
-
-    let winnerNum = prompt(`Walkover kisnu ditta jana hai?\n1 = ${t1}\n2 = ${t2}\n\n1 ya 2 likho:`);
-    
-    let winner = "";
-    let loser = "";
-
-    if(winnerNum === "1"){
-        winner = t1;
-        loser = t2;
-    } else if (winnerNum === "2"){
-        winner = t2;
-        loser = t1;
-    } else {
-        return; // Cancel daban te kujh nahi hovega
-    }
-
-    // Win/Loss update kro
-    let winners = document.getElementById("winnerTeamsInp").value.split("\n").filter(t=>t.trim()!=='');
-    winners.push(winner + " (WALKOVER)");
-
-    let losers = document.getElementById("loserTeamsInp").value.split("\n").filter(t=>t.trim()!=='');
-    losers.push(loser);
-    
-    // Result Text
-    let resultText = winner + " WON BY WALKOVER vs " + loser;
-    
-    // Remove loser from allTeams
-    allTeams = allTeams.filter(t=>t!==loser);
-    
-    // Match nu upcoming list cho htao
-    nextMatches.splice(index, 1);
-
-    // Firebase ch update kro
-    db.update({
-        resultText: resultText,
-        qualifiedTeams: winners.join("\n"),
-        eliminatedTeams: losers.join("\n"),
-        allTeams: allTeams,
-        nextMatches: nextMatches
-    });
-}
-
-/* DELETE SPECIFIC MATCH */
-function deleteSpecificMatch(index) {
-    if(confirm("Are you sure you want to delete this match?")) {
-        nextMatches.splice(index, 1);
-        db.update({ nextMatches: nextMatches });
-    }
-}
 
 /* DROPDOWNS */
 function updateDropdowns(){
@@ -663,7 +522,7 @@ function swapTeams(){
 }
 
 function resetScores(){
-    if(confirm("Reset Scores to 0?")){
+    if(confirm("Reset Scores?")){
         db.update({ scoreA:0, scoreB:0 });
     }
 }
@@ -672,12 +531,18 @@ function toggleCameraView(){
     db.update({ cameraOpposite: !camOpposite });
 }
 
-/* RESULT LOGIC */
+/* RESULT LOGIC - UPDATED */
 function showResultLayer(){
     
+    // 1. Agar dono score 0 ne, taan result dobara update nahi hovega
     if(curA === 0 && curB === 0){
-        alert("Score 0-0 hai. Result update nahi hovega.");
+        alert("Score pehlan ton hi 0-0 hai. Result update nahi hovega.");
         return; 
+    }
+
+    // 2. Alert for verification
+    if(!confirm("Ki tuc sach vich result update karna chahunde ho? Result banan ton baad score 0 ho javega.")){
+        return; // User ne cancel kar ditta
     }
 
     const teamA = document.getElementById("nameA").value;
@@ -693,7 +558,7 @@ function showResultLayer(){
         winner=teamB;
         loser=teamA;
     } else {
-        winner="TIE";
+        winner="TIE"; // Agar draw hai
     }
 
     let winners = document.getElementById("winnerTeamsInp").value.split("\n").filter(t=>t.trim()!=='');
@@ -711,8 +576,12 @@ function showResultLayer(){
 
     document.getElementById("resultText").innerText = resultText;
 
-    allTeams = allTeams.filter(t=>t!==loser);
+    // 3. Loser team nu 'All Teams' list vicho uda dao
+    if(loser !== ""){
+        allTeams = allTeams.filter(t=>t!==loser);
+    }
 
+    // Next match list vicho eh match delete kar dao (agar hai)
     nextMatches = nextMatches.filter(match=>{
         const m = match.toLowerCase();
         const t1 = teamA.toLowerCase();
@@ -720,6 +589,9 @@ function showResultLayer(){
         return !(m.includes(t1) && m.includes(t2));
     });
 
+    document.getElementById("nextMatchList").value = nextMatches.join("\n");
+
+    // Result Update kro, Score 0-0 kar deo, ate Team boxes empty kar deo (udd jaan)
     db.update({
         resultText: resultText,
         qualifiedTeams: winners.join("\n"),
@@ -727,7 +599,9 @@ function showResultLayer(){
         allTeams: allTeams,
         nextMatches: nextMatches,
         scoreA: 0, 
-        scoreB: 0
+        scoreB: 0,
+        nameA: "", // Team 1 box clear
+        nameB: ""  // Team 2 box clear
     });
 
     updateDropdowns();
@@ -737,20 +611,19 @@ function addNextMatch(){
     const a= document.getElementById("nextTeamA").value;
     const b= document.getElementById("nextTeamB").value;
     if(a==="" || b==="") return;
-    
     nextMatches.push(a + " VS " + b);
-    
-    // Dropdown reset
-    document.getElementById("nextTeamA").value = "";
-    document.getElementById("nextTeamB").value = "";
-    
+    document.getElementById("nextMatchList").value= nextMatches.join("\n");
+    db.update({ nextMatches:nextMatches });
+}
+
+function saveNextMatches(){
+    nextMatches= document.getElementById("nextMatchList").value.split("\n").map(t=>t.trim()).filter(t=>t!=='');
     db.update({ nextMatches:nextMatches });
 }
 
 function clearAllTeams(){
-    if(confirm("Delete All Teams and Matches?")){
+    if(confirm("Delete All Teams?")){
         allTeams=[];
-        nextMatches=[];
         db.update({
             allTeams:[],
             qualifiedTeams:"",
@@ -765,6 +638,7 @@ function clearAllTeams(){
         document.getElementById("allTeamsInp").value="";
         document.getElementById("winnerTeamsInp").value="";
         document.getElementById("loserTeamsInp").value="";
+        document.getElementById("nextMatchList").value="";
         document.getElementById("resultText").innerText="No Result Yet";
         document.getElementById("dispA").innerText="0";
         document.getElementById("dispB").innerText="0";
