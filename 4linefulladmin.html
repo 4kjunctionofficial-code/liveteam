@@ -574,6 +574,13 @@ let camOpposite=false;
 
 let allTeams=[];
 let nextMatches=[];
+    
+// Textarea Auto-resize Function
+    function autoResize(el) {
+        if (!el) return;
+        el.style.height = 'auto';
+        el.style.height = (el.scrollHeight) + 'px';
+    }
 
 /* LIVE DB */
 
