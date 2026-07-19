@@ -218,8 +218,15 @@ MANPREET MUDKI<br>
         
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
-        setTeamName('nA-container', data.nameA || "TEAM 1");
-        setTeamName('nB-container', data.nameB || "TEAM 2");
+        if(window.lastNameA!==data.nameA){
+    window.lastNameA=data.nameA;
+    setTeamName("nA-container",data.nameA);
+}
+
+if(window.lastNameB!==data.nameB){
+    window.lastNameB=data.nameB;
+    setTeamName("nB-container",data.nameB);
+}
         document.getElementById('single-wm').innerText =
 data.watermarkTxt || "M LIVE";
         
