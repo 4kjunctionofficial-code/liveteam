@@ -287,65 +287,58 @@ updateTickerContent(
         }
     });
 
-   const teamAnim = {};
+ const tickerTimers = {};
 
-function setTeamName(containerId,en,pa){
+function updateTickerContent(id,en,pa){
 
-    const box=document.getElementById(containerId);
+    const el=document.getElementById(id);
+
+    clearInterval(tickerTimers[id]);
 
     let showPunjabi=false;
 
-    function draw(){
+    function change(){
 
-        let txt=showPunjabi && pa ? pa : en;
+        const txt=(showPunjabi && pa)?pa:(en||"");
 
-        box.innerHTML=`<div style="width:100%;text-align:${
-        containerId=="nA-container"?"right":"left"}">${txt}</div>`;
+        el.innerHTML=
+        `<div class="scroller">
+            ${txt}&nbsp;&nbsp; • &nbsp;&nbsp; ${txt}
+        </div>`;
 
         showPunjabi=!showPunjabi;
     }
 
-    draw();
+    change();
 
-    setInterval(draw,2000);
-}
-    function move(){
-
-        x -= 1.5; // Speed
-
-        if(x < -scroller.offsetWidth){
-            x = box.offsetWidth;
-        }
-
-        scroller.style.transform = `translateX(${x}px)`;
-
-        teamAnim[containerId] = requestAnimationFrame(move);
-    }
-
-    move();
+    tickerTimers[id]=setInterval(change,8000);
 }
     
-    function updateTickerContent(id,en,pa){
+ const tickerTimers = {};
+
+function updateTickerContent(id,en,pa){
 
     const el=document.getElementById(id);
 
-    let showPa=false;
+    clearInterval(tickerTimers[id]);
+
+    let showPunjabi=false;
 
     function change(){
 
-        let txt=showPa && pa ? pa : en;
+        const txt=(showPunjabi && pa)?pa:(en||"");
 
         el.innerHTML=
         `<div class="scroller">
-        ${txt}&nbsp;&nbsp;•&nbsp;&nbsp;${txt}
+            ${txt}&nbsp;&nbsp; • &nbsp;&nbsp; ${txt}
         </div>`;
 
-        showPa=!showPa;
+        showPunjabi=!showPunjabi;
     }
 
     change();
 
-    setInterval(change,8000);
+    tickerTimers[id]=setInterval(change,8000);
 }
 
     function startTicker(id, speed) {
