@@ -480,23 +480,13 @@ RESET ALL TEAMS
 
 <div class="card">
 
-<div class="header">
-TICKER & BRANDING
-</div>
-
-<div class="settings-section">
-
-<textarea id="row1Inp"
-rows="2"
-placeholder="Title Line 1"></textarea>
-
-<textarea id="row2Inp"
-rows="2"
-placeholder="Title Line 2"></textarea>
-
-<textarea id="row3Inp"
-rows="2"
-placeholder="Title Line 3"></textarea>
+<div class="card">
+        <div class="header">Ticker & Branding</div>
+        <div class="settings-section">
+            <textarea id="row1Inp" rows="1" placeholder="Title Line 1" oninput="updateDB(); autoResize(this)"></textarea>
+            <textarea id="row2Inp" rows="1" placeholder="Title Line 2" oninput="updateDB(); autoResize(this)"></textarea>
+            <textarea id="row3Inp" rows="1" placeholder="Title Line 3" oninput="updateDB(); autoResize(this)"></textarea>
+            <textarea id="row4Inp" rows="1" placeholder="Title Line 4" oninput="updateDB(); autoResize(this)"></textarea>
 
 <input type="text"
 id="watermarkInp"
