@@ -49,10 +49,34 @@
         }
         #scoreboard.hidden { opacity: 0; }
 
-        /* TEXT POSITIONING */
-        .name-area { position: absolute; top: 43px; height: 50px; display: flex; align-items: center; color: #ffffff; font-size: 35px; text-transform: uppercase; text-shadow: 2px 2px 4px #000; overflow: hidden; white-space: nowrap; z-index: 11; }
-        #nA-container { left: 1050px; width: 270px; justify-content: flex-end; }
-        #nB-container { left: 1580px; width: 270px; justify-content: flex-start; }
+.name-area{
+    position:absolute;
+    top:43px;
+    height:50px;
+    overflow:hidden;
+    white-space:nowrap;
+}
+
+#nA-container{
+    left:1050px;
+    width:270px;
+}
+
+#nB-container{
+    left:1580px;
+    width:270px;
+}
+
+.team-text{
+    position:absolute;
+    top:0;
+    white-space:nowrap;
+    color:#fff;
+    font-size:35px;
+    text-transform:uppercase;
+    text-shadow:2px 2px 4px #000;
+    will-change:transform;
+}
         
         .score-box { position: absolute; top: 40px; height: 50px; width: 50px; display: flex; align-items: center; justify-content: center; font-size: 55px; font-weight: bold; color: #000000; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); z-index: 12; }
         #sA { left: 1360px; } 
@@ -258,43 +282,56 @@ data.watermarkTxt || "M LIVE";
         }
     });
 
-   const teamAnim = {};
+   const teamScrolls = {};
 
 function setTeamName(containerId, txt){
 
     const box = document.getElementById(containerId);
 
-    if(teamAnim[containerId]){
-        cancelAnimationFrame(teamAnim[containerId]);
+    if(teamScrolls[containerId]){
+        cancelAnimationFrame(teamScrolls[containerId]);
     }
 
-    if(txt.length <= 15){
+    box.innerHTML="";
 
-        box.innerHTML = `<div style="width:100%;text-align:${containerId=="nA-container"?"right":"left"}">${txt}</div>`;
+    const d=document.createElement("div");
+
+    d.className="team-text";
+    d.innerText=txt;
+
+    if(txt.length<=15){
+
+        d.style.position="relative";
+        d.style.transform="none";
+        d.style.width="100%";
+        d.style.textAlign=(containerId==="nA-container")?"right":"left";
+
+        box.appendChild(d);
         return;
     }
 
-    box.innerHTML = `<div class="team-scroller">${txt}</div>`;
+    box.appendChild(d);
 
-    const scroller = box.querySelector(".team-scroller");
+    let x=box.offsetWidth;
 
-    let x = box.offsetWidth;
+    function animate(){
 
-    function move(){
+        x-=2;          // Speed
 
-        x -= 1.5; // Speed
-
-        if(x < -scroller.offsetWidth){
-            x = box.offsetWidth;
+        if(x<-d.offsetWidth){
+            x=box.offsetWidth;
         }
 
-        scroller.style.transform = `translateX(${x}px)`;
+        d.style.transform=`translateX(${x}px)`;
 
-        teamAnim[containerId] = requestAnimationFrame(move);
+        teamScrolls[containerId]=requestAnimationFrame(animate);
+
     }
 
-    move();
+    animate();
+
 }
+    
     function updateTickerContent(id, txt) {
         const el = document.getElementById(id);
         const scroller = el.querySelector('.scroller');
