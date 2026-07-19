@@ -107,6 +107,32 @@
     
     const db = firebase.database().ref("matchData/" + matchId);
     const userDb = firebase.database().ref("users/" + matchId); // ਮਾਸਟਰ ਪੈਨਲ ਦੇ ਡਾਟਾ ਲਈ
+    userDb.on("value", (snap)=>{
+
+    const user=snap.val();
+
+    if(!user){
+
+        lockPanel("CLIENT ID DELETED");
+        return;
+
+    }
+
+    const now=Date.now();
+
+    const expiry=new Date(user.expiryDate).getTime();
+
+    if(now>expiry){
+
+        lockPanel("PLAN EXPIRED");
+
+    }else{
+
+        unlockPanel();
+
+    }
+
+});
 
     let curA = 0, curB = 0, sVis = true, tVis = true, lVis = true;
     let isPanelActive = true; // Security Check
@@ -220,6 +246,26 @@
         if(!isPanelActive) return alert("Panel is locked!");
         if(confirm("Reset Match Scores?")) db.update({ scoreA: 0, scoreB: 0 });
     }
+    function lockPanel(msg){
+
+    document.getElementById("main-panel").style.display="none";
+
+    document.getElementById("expired-panel").style.display="flex";
+
+    document.querySelector("#expired-panel h2").innerHTML=msg;
+
+    document.querySelector("#expired-panel p").innerHTML=
+    "HELP LINE<br><br><b>MANPREET MUDKI</b><br>9115426711";
+
+}
+
+function unlockPanel(){
+
+    document.getElementById("main-panel").style.display="flex";
+
+    document.getElementById("expired-panel").style.display="none";
+
+}
 </script>
 </body>
 </html>
