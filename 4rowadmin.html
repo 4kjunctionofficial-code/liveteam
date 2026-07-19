@@ -77,14 +77,39 @@ textarea {
 .team-top{
     display:flex;
     gap:6px;
+    align-items: stretch;
+}
+
+.team-inputs-wrap {
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+    flex:1;
+}
+
+.team-input-row {
+    display:flex;
+    gap:5px;
 }
 
 .team-input{
     flex:1;
+    margin-bottom: 0 !important;
+}
+
+.trans-btn {
+    background:#fbbc05;
+    border:none;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
+    padding:0 12px;
+    font-size:16px;
+    color:black;
 }
 
 .set-btn{
-    width:70px;
+    width:60px;
     border:none;
     background:#1a73e8;
     color:white;
@@ -151,6 +176,42 @@ textarea {
     word-break:break-word;
 }
 
+/* MATCH LIST STYLES */
+.match-item {
+    background: #fff;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.match-title {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    color: #333;
+}
+.match-actions {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+.btn-sm {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+.btn-start { background: #1a73e8; }
+.btn-walkover { background: #fd7e14; }
+.btn-delete { background: #dc3545; max-width: 40px; }
+
 /* MOBILE */
 @media(max-width:768px){
 .controls{
@@ -159,6 +220,12 @@ textarea {
 .btn-full{
     font-size:16px;
     height:68px;
+}
+.teams-container {
+    flex-direction: column;
+}
+.vs-text {
+    padding: 10px 0;
 }
 }
 
@@ -173,6 +240,10 @@ textarea {
     height:64px;
     padding:8px;
 }
+.match-actions {
+    flex-wrap: wrap;
+}
+.btn-sm { font-size: 12px; }
 }
 
 .btn-green{background:#28a745;}
@@ -226,8 +297,14 @@ LIVE SCORE BOARD
 <option value="">Select Team A</option>
 </select>
 <div class="team-top">
-<input type="text" id="nameA" class="team-input" placeholder="TEAM 1">
-<button class="set-btn" onclick="updateTeamA()">SET</button>
+    <div class="team-inputs-wrap">
+        <div class="team-input-row">
+            <input type="text" id="nameA" class="team-input" placeholder="Team 1 (Eng)">
+            <button class="trans-btn" onclick="translateText('nameA', 'nameA_pa')" title="Translate to Punjabi">A->ਅ</button>
+        </div>
+        <input type="text" id="nameA_pa" class="team-input" placeholder="Team 1 (ਪੰਜਾਬੀ)">
+    </div>
+    <button class="set-btn" onclick="updateTeamA()">SET</button>
 </div>
 <div class="score-val" id="dispA">0</div>
 <div class="pm-wrap">
@@ -244,8 +321,14 @@ LIVE SCORE BOARD
 <option value="">Select Team B</option>
 </select>
 <div class="team-top">
-<input type="text" id="nameB" class="team-input" placeholder="TEAM 2">
-<button class="set-btn" onclick="updateTeamB()">SET</button>
+    <div class="team-inputs-wrap">
+        <div class="team-input-row">
+            <input type="text" id="nameB" class="team-input" placeholder="Team 2 (Eng)">
+            <button class="trans-btn" onclick="translateText('nameB', 'nameB_pa')" title="Translate to Punjabi">A->ਅ</button>
+        </div>
+        <input type="text" id="nameB_pa" class="team-input" placeholder="Team 2 (ਪੰਜਾਬੀ)">
+    </div>
+    <button class="set-btn" onclick="updateTeamB()">SET</button>
 </div>
 <div class="score-val" id="dispB">0</div>
 <div class="pm-wrap">
@@ -276,7 +359,7 @@ Camera View
 </button>
 
 <button class="btn-full" style="background:#777;" onclick="resetScores()">
-RESET
+RESET SCORES
 </button>
 
 </div>
@@ -285,9 +368,9 @@ RESET
 
 <input type="text" id="roundInp" placeholder="ROUND">
 
-<!-- NEXT MATCH -->
+<!-- NEXT MATCH SETUP WITH DYNAMIC LIST -->
 <div class="header" style="margin-bottom:10px;">
-NEXT MATCH SETUP
+NEXT MATCH LIST & SETUP
 </div>
 
 <select id="nextTeamA">
@@ -298,18 +381,27 @@ NEXT MATCH SETUP
 <option value="">Select Next Match Team 2</option>
 </select>
 
-<button class="btn-full btn-green" onclick="addNextMatch()" style="width:100%;margin-bottom:8px;">
-ADD NEXT MATCH
+<button class="btn-full btn-green" onclick="addNextMatch()" style="width:100%;margin-bottom:12px;">
+ADD TO LIST
 </button>
 
-<textarea id="nextMatchList" rows="4" placeholder="Next Match Teams"></textarea>
-
-<button class="btn-full btn-blue" onclick="saveNextMatches()" style="width:100%;">
-SAVE NEXT MATCHES
-</button>
+<!-- MATCH LIST CONTAINER -->
+<div id="nextMatchContainer"></div>
 
 </div>
 
+</div>
+
+<!-- QUICK TRANSLATOR TOOL -->
+<div class="card">
+<div class="header">QUICK TRANSLATOR (Eng to ਪੰਜਾਬੀ)</div>
+<div class="settings-section">
+    <div style="display:flex; gap:10px; margin-bottom:10px;">
+        <input type="text" id="quickEng" placeholder="Type English here..." style="margin-bottom:0;">
+        <button class="btn-full btn-yellow" onclick="translateText('quickEng', 'quickPa')" style="height:auto; min-height:42px; width:100px;">A->ਅ</button>
+    </div>
+    <input type="text" id="quickPa" placeholder="Punjabi output..." readonly style="background:#eee;">
+</div>
 </div>
 
 <!-- TEAM MANAGER -->
@@ -382,6 +474,19 @@ let camOpposite=false;
 let allTeams=[];
 let nextMatches=[];
 
+/* TRANSLATION API FUNCTION */
+async function translateText(sourceId, targetId) {
+    const text = document.getElementById(sourceId).value;
+    if(!text) return;
+    try {
+        const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=pa&dt=t&q=${encodeURIComponent(text)}`);
+        const data = await res.json();
+        document.getElementById(targetId).value = data[0][0][0];
+    } catch(e) {
+        alert("Translation error! Please check internet connection.");
+    }
+}
+
 /* LIVE DB */
 db.on("value",(snap)=>{
     const data=snap.val();
@@ -393,8 +498,13 @@ db.on("value",(snap)=>{
 
         document.getElementById("dispA").innerText=curA;
         document.getElementById("dispB").innerText=curB;
+        
         document.getElementById("nameA").value=data.nameA||"";
+        document.getElementById("nameA_pa").value=data.nameA_pa||"";
+        
         document.getElementById("nameB").value=data.nameB||"";
+        document.getElementById("nameB_pa").value=data.nameB_pa||"";
+        
         document.getElementById("roundInp").value=data.round||"";
 
         document.getElementById("row1Inp").value = data.row1Txt || "";
@@ -412,9 +522,10 @@ db.on("value",(snap)=>{
 
         document.getElementById("winnerTeamsInp").value = data.qualifiedTeams || "";
         document.getElementById("loserTeamsInp").value = data.eliminatedTeams || "";
-        document.getElementById("nextMatchList").value = nextMatches.join("\n");
         document.getElementById("allTeamsInp").value = allTeams.join("\n");
         document.getElementById("resultText").innerText = data.resultText || "No Result Yet";
+
+        renderNextMatches(); // Update List Box dynamically
 
         const sVis = data.scoreVisible !== false;
         document.getElementById("visBtn").innerText = sVis ? "Hide Scoreboard" : "Show Scoreboard";
@@ -429,6 +540,104 @@ db.on("value",(snap)=>{
         updateDropdowns();
     }
 });
+
+/* NEXT MATCH RENDERER */
+function renderNextMatches() {
+    const container = document.getElementById("nextMatchContainer");
+    container.innerHTML = ""; 
+    
+    if(nextMatches.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:10px; color:#999; font-weight:bold;">No Upcoming Matches</div>`;
+        return;
+    }
+
+    nextMatches.forEach((matchStr, index) => {
+        let div = document.createElement("div");
+        div.className = "match-item";
+        div.innerHTML = `
+            <div class="match-title">${matchStr}</div>
+            <div class="match-actions">
+                <button class="btn-sm btn-start" onclick="startSpecificMatch(${index})">START</button>
+                <button class="btn-sm btn-walkover" onclick="walkOverSpecificMatch(${index})">WALKOVER</button>
+                <button class="btn-sm btn-delete" onclick="deleteSpecificMatch(${index})">X</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+/* START SPECIFIC MATCH */
+function startSpecificMatch(index) {
+    let matchStr = nextMatches[index];
+    let teams = matchStr.split(" VS ");
+    let t1 = teams[0] ? teams[0].trim() : "";
+    let t2 = teams[1] ? teams[1].trim() : "";
+
+    nextMatches.splice(index, 1);
+
+    db.update({
+        nameA: t1,
+        nameA_pa: "", // Naya match shuru hon te punjabi clear karti, khud kar sakde ho translate
+        nameB: t2,
+        nameB_pa: "",
+        scoreA: 0,
+        scoreB: 0,
+        nextMatches: nextMatches,
+        scoreVisible: true, 
+        resultText: "No Result Yet"
+    });
+}
+
+/* WALKOVER SPECIFIC MATCH */
+function walkOverSpecificMatch(index) {
+    let matchStr = nextMatches[index];
+    let teams = matchStr.split(" VS ");
+    let t1 = teams[0] ? teams[0].trim() : "";
+    let t2 = teams[1] ? teams[1].trim() : "";
+
+    let winnerNum = prompt(`Walkover kisnu ditta jana hai?\n1 = ${t1}\n2 = ${t2}\n\n1 ya 2 likho:`);
+    
+    let winner = "";
+    let loser = "";
+
+    if(winnerNum === "1"){
+        winner = t1;
+        loser = t2;
+    } else if (winnerNum === "2"){
+        winner = t2;
+        loser = t1;
+    } else {
+        return; 
+    }
+
+    let winners = document.getElementById("winnerTeamsInp").value.split("\n").filter(t=>t.trim()!=='');
+    winners.push(winner + " (WALKOVER)");
+
+    let losers = document.getElementById("loserTeamsInp").value.split("\n").filter(t=>t.trim()!=='');
+    losers.push(loser);
+    
+    let resultText = winner + " WON BY WALKOVER vs " + loser;
+    
+    allTeams = allTeams.filter(t=>t!==loser);
+    nextMatches.splice(index, 1);
+
+    db.update({
+        resultText: resultText,
+        qualifiedTeams: winners.join("\n"),
+        eliminatedTeams: losers.join("\n"),
+        allTeams: allTeams,
+        nextMatches: nextMatches
+    });
+}
+
+/* DELETE SPECIFIC MATCH */
+function deleteSpecificMatch(index) {
+    if(confirm("Are you sure you want to delete this match?")) {
+        nextMatches.splice(index, 1);
+        db.update({ nextMatches: nextMatches });
+    }
+}
+
 
 /* DROPDOWNS */
 function updateDropdowns(){
@@ -472,8 +681,20 @@ function saveAllTeams(){
 
 function selectTeamA(team){ document.getElementById("nameA").value=team; }
 function selectTeamB(team){ document.getElementById("nameB").value=team; }
-function updateTeamA(){ db.update({ nameA:document.getElementById("nameA").value }); }
-function updateTeamB(){ db.update({ nameB:document.getElementById("nameB").value }); }
+
+function updateTeamA(){ 
+    db.update({ 
+        nameA:document.getElementById("nameA").value,
+        nameA_pa:document.getElementById("nameA_pa").value
+    }); 
+}
+
+function updateTeamB(){ 
+    db.update({ 
+        nameB:document.getElementById("nameB").value,
+        nameB_pa:document.getElementById("nameB_pa").value 
+    }); 
+}
 
 function changeScore(team,val){
     let current=(team==="scoreA")?curA:curB;
@@ -515,7 +736,9 @@ function toggleVis(field){
 function swapTeams(){
     db.update({
         nameA: document.getElementById("nameB").value,
+        nameA_pa: document.getElementById("nameB_pa").value,
         nameB: document.getElementById("nameA").value,
+        nameB_pa: document.getElementById("nameA_pa").value,
         scoreA: curB,
         scoreB: curA
     });
@@ -531,18 +754,16 @@ function toggleCameraView(){
     db.update({ cameraOpposite: !camOpposite });
 }
 
-/* RESULT LOGIC - UPDATED */
+/* RESULT LOGIC */
 function showResultLayer(){
     
-    // 1. Agar dono score 0 ne, taan result dobara update nahi hovega
     if(curA === 0 && curB === 0){
         alert("Score pehlan ton hi 0-0 hai. Result update nahi hovega.");
         return; 
     }
 
-    // 2. Alert for verification
     if(!confirm("Ki tuc sach vich result update karna chahunde ho? Result banan ton baad score 0 ho javega.")){
-        return; // User ne cancel kar ditta
+        return; 
     }
 
     const teamA = document.getElementById("nameA").value;
@@ -558,7 +779,7 @@ function showResultLayer(){
         winner=teamB;
         loser=teamA;
     } else {
-        winner="TIE"; // Agar draw hai
+        winner="TIE"; 
     }
 
     let winners = document.getElementById("winnerTeamsInp").value.split("\n").filter(t=>t.trim()!=='');
@@ -576,12 +797,10 @@ function showResultLayer(){
 
     document.getElementById("resultText").innerText = resultText;
 
-    // 3. Loser team nu 'All Teams' list vicho uda dao
     if(loser !== ""){
         allTeams = allTeams.filter(t=>t!==loser);
     }
 
-    // Next match list vicho eh match delete kar dao (agar hai)
     nextMatches = nextMatches.filter(match=>{
         const m = match.toLowerCase();
         const t1 = teamA.toLowerCase();
@@ -589,9 +808,6 @@ function showResultLayer(){
         return !(m.includes(t1) && m.includes(t2));
     });
 
-    document.getElementById("nextMatchList").value = nextMatches.join("\n");
-
-    // Result Update kro, Score 0-0 kar deo, ate Team boxes empty kar deo (udd jaan)
     db.update({
         resultText: resultText,
         qualifiedTeams: winners.join("\n"),
@@ -600,8 +816,10 @@ function showResultLayer(){
         nextMatches: nextMatches,
         scoreA: 0, 
         scoreB: 0,
-        nameA: "", // Team 1 box clear
-        nameB: ""  // Team 2 box clear
+        nameA: "", 
+        nameA_pa: "",
+        nameB: "",
+        nameB_pa: ""
     });
 
     updateDropdowns();
@@ -611,13 +829,13 @@ function addNextMatch(){
     const a= document.getElementById("nextTeamA").value;
     const b= document.getElementById("nextTeamB").value;
     if(a==="" || b==="") return;
+    
     nextMatches.push(a + " VS " + b);
-    document.getElementById("nextMatchList").value= nextMatches.join("\n");
-    db.update({ nextMatches:nextMatches });
-}
-
-function saveNextMatches(){
-    nextMatches= document.getElementById("nextMatchList").value.split("\n").map(t=>t.trim()).filter(t=>t!=='');
+    
+    // reset dropdown
+    document.getElementById("nextTeamA").value = "";
+    document.getElementById("nextTeamB").value = "";
+    
     db.update({ nextMatches:nextMatches });
 }
 
@@ -633,17 +851,20 @@ function clearAllTeams(){
             scoreA:0,
             scoreB:0,
             nameA:"",
-            nameB:""
+            nameA_pa:"",
+            nameB:"",
+            nameB_pa:""
         });
         document.getElementById("allTeamsInp").value="";
         document.getElementById("winnerTeamsInp").value="";
         document.getElementById("loserTeamsInp").value="";
-        document.getElementById("nextMatchList").value="";
         document.getElementById("resultText").innerText="No Result Yet";
         document.getElementById("dispA").innerText="0";
         document.getElementById("dispB").innerText="0";
         document.getElementById("nameA").value="";
+        document.getElementById("nameA_pa").value="";
         document.getElementById("nameB").value="";
+        document.getElementById("nameB_pa").value="";
         curA=0; curB=0;
         updateDropdowns();
     }
