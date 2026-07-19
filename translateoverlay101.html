@@ -254,10 +254,29 @@ data.watermarkTxt || "M LIVE";
         const roundEl = document.getElementById('round-display');
         roundEl.innerText = data.round || "";
         
-        updateTickerContent('c1', data.row1Txt || "WELCOME TO LIVE KABADDI");
-        updateTickerContent('c2', data.row2Txt || "SUBSCRIBE OUR CHANNEL");
-        updateTickerContent('c3', data.row3Txt || "LIKE & SHARE");
-        updateTickerContent('c4', data.row4Txt || "THANKS FOR WATCHING");
+        updateTickerContent(
+    "c1",
+    data.row1Txt,
+    data.row1Txt_pa
+);
+
+updateTickerContent(
+    "c2",
+    data.row2Txt,
+    data.row2Txt_pa
+);
+
+updateTickerContent(
+    "c3",
+    data.row3Txt,
+    data.row3Txt_pa
+);
+
+updateTickerContent(
+    "c4",
+    data.row4Txt,
+    data.row4Txt_pa
+);
 
         if (!tickerInitialized) {
             startTicker('c1', 1.4);
@@ -305,15 +324,29 @@ function setTeamName(containerId,en,pa){
 
     move();
 }
-    function updateTickerContent(id, txt) {
-        const el = document.getElementById(id);
-        const scroller = el.querySelector('.scroller');
-        if (scroller) {
-            scroller.innerHTML = `${txt}&nbsp;&nbsp; • &nbsp;&nbsp; ${txt}`;
-        } else {
-            el.innerHTML = `<div class="scroller">${txt}&nbsp;&nbsp; • &nbsp;&nbsp; ${txt}</div>`;
-        }
+    
+    function updateTickerContent(id,en,pa){
+
+    const el=document.getElementById(id);
+
+    let showPa=false;
+
+    function change(){
+
+        let txt=showPa && pa ? pa : en;
+
+        el.innerHTML=
+        `<div class="scroller">
+        ${txt}&nbsp;&nbsp;•&nbsp;&nbsp;${txt}
+        </div>`;
+
+        showPa=!showPa;
     }
+
+    change();
+
+    setInterval(change,8000);
+}
 
     function startTicker(id, speed) {
         const el = document.getElementById(id);
