@@ -1,120 +1,134 @@
 <!DOCTYPE html>
 <html lang="pa">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<style>
-    body{ font-family:'Segoe UI',sans-serif; background:#f0f2f5; margin:0; padding:8px; }
-    #main-panel{ width:100%; max-width:760px; margin:auto; }
-    .card{ background:white; border-radius:14px; box-shadow:0 5px 15px rgba(0,0,0,.15); overflow:hidden; margin-bottom:15px; }
-    .header{ background:#1a73e8; color:white; padding:10px; text-align:center; font-weight:bold; }
-    .teams-container{ display:flex; gap:10px; padding:12px; align-items:center; }
-    .team-box{ flex:1; }
-    .vs-text{ font-size:24px; font-weight:bold; color:#999; }
-    select, input, textarea{ width:100%; padding:10px; border:2px solid #ddd; border-radius:8px; font-size:18px; font-weight:bold; box-sizing:border-box; margin-bottom:8px; }
-    .score-val{ text-align:center; font-size:52px; font-weight:900; margin:6px 0; }
-    .btn-pm{ flex:1; border:none; color:white; padding:12px; border-radius:8px; font-size:24px; font-weight:bold; cursor:pointer; }
-    .btn-plus{ background:#28a745; }
-    .btn-minus{ background:#dc3545; }
-    .controls{ padding:12px; display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; }
-    .btn-full{ border:none; color:white; height:70px; border-radius:12px; font-size:16px; font-weight:900; cursor:pointer; width:100%; }
-    .result-box{ background:#111; color:white; border-radius:10px; padding:10px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        #main-panel { width: 100%; max-width: 500px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: white; width: 100%; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); overflow: hidden; margin-bottom: 20px; box-sizing: border-box; }
+        .header { background: #1a73e8; color: white; padding: 12px; text-align: center; font-size: 16px; font-weight: bold; text-transform: uppercase; }
+        .teams-container { display: flex; padding: 15px; gap: 10px; border-bottom: 2px solid #eee; }
+        .team-box { flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .team-input { width: 95%; padding: 8px; border: 2px solid #ddd; border-radius: 6px; font-size: 15px; font-weight: bold; margin-bottom: 8px; text-align: center; }
+        .score-val { font-size: 50px; font-weight: 900; color: #333; margin: 5px 0; }
+        .btn-pm { border: none; color: white; padding: 12px; border-radius: 6px; font-size: 24px; font-weight: bold; cursor: pointer; flex: 1; margin: 0 4px; }
+        .btn-plus { background: #28a745; } .btn-minus { background: #dc3545; }
+        .settings-section { padding: 15px; background: #fafafa; }
+        textarea, .std-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; margin-bottom: 12px; resize: none; box-sizing: border-box; font-family: inherit; }
+        .controls { padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .btn-full { border: none; color: white; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; text-transform: uppercase; width: 100%; }
+        /* Expired Panel */
+        #expired-panel { display: none; padding-top: 50px; }
+        .expired-card { background: white; padding: 40px; border-radius: 15px; text-align: center; border-top: 6px solid #da3633; }
+    </style>
 </head>
 <body>
 
 <div id="main-panel">
-    <!-- SCOREBOARD -->
     <div class="card">
-        <div class="header">LIVE SCORE BOARD</div>
+        <div class="header">Live Score Board</div>
         <div class="teams-container" id="teamWrap">
             <div class="team-box">
-                <input type="text" id="nameA" class="team-input" placeholder="TEAM 1">
+                <input type="text" id="nameA" class="team-input" placeholder="TEAM 1" oninput="updateDB()">
                 <div class="score-val" id="dispA">0</div>
-                <div style="display:flex; gap:6px;">
-                    <button class="btn-pm btn-minus" onclick="changeScore('scoreA',-1)">-</button>
-                    <button class="btn-pm btn-plus" onclick="changeScore('scoreA',1)">+</button>
+                <div style="display:flex; width:100%;">
+                    <button class="btn-pm btn-minus" onclick="changeScore('scoreA', -1)">-</button>
+                    <button class="btn-pm btn-plus" onclick="changeScore('scoreA', 1)">+</button>
                 </div>
             </div>
-            <div class="vs-text">VS</div>
+            <div style="display:flex; align-items:center; font-weight:bold;">VS</div>
             <div class="team-box">
-                <input type="text" id="nameB" class="team-input" placeholder="TEAM 2">
+                <input type="text" id="nameB" class="team-input" placeholder="TEAM 2" oninput="updateDB()">
                 <div class="score-val" id="dispB">0</div>
-                <div style="display:flex; gap:6px;">
-                    <button class="btn-pm btn-minus" onclick="changeScore('scoreB',-1)">-</button>
-                    <button class="btn-pm btn-plus" onclick="changeScore('scoreB',1)">+</button>
+                <div style="display:flex; width:100%;">
+                    <button class="btn-pm btn-minus" onclick="changeScore('scoreB', -1)">-</button>
+                    <button class="btn-pm btn-plus" onclick="changeScore('scoreB', 1)">+</button>
                 </div>
             </div>
         </div>
         <div class="controls">
-            <button class="btn-full" style="background:#28a745;" onclick="showResultLayer()">RESULT</button>
-            <button id="visBtn" class="btn-full" style="background:#ea4335;" onclick="toggleVis('scoreVisible')">Toggle Score</button>
+            <button class="btn-full" style="background:#28a745;" onclick="showResultLayer()">Result</button>
+            <button id="visBtn" class="btn-full" style="background:#ea4335;" onclick="toggleVis('scoreVisible')">Scoreboard</button>
+            <button class="btn-full" style="background:#fbbc05; color:black;" onclick="swapTeams()">Swap</button>
+            <button class="btn-full" style="background:#333;" onclick="resetScores()">Reset</button>
         </div>
+        <textarea id="resultText" rows="3" placeholder="Match Result" onblur="updateDB()"></textarea>
     </div>
+</div>
 
-    <!-- RESULT SECTION -->
-    <div class="card">
-        <div class="header">MATCH RESULT (Edit Below)</div>
-        <div class="settings-section" style="padding:10px;">
-            <textarea id="resultText" rows="3" onblur="updateResultText()"></textarea>
-        </div>
+<div id="expired-panel">
+    <div class="expired-card">
+        <h2>🛑 PLAN EXPIRED</h2>
+        <a href="https://wa.me/919115426711" class="btn-full" style="background:#25D366; display:inline-block;">WhatsApp Us</a>
     </div>
 </div>
 
 <script>
-    const firebaseConfig = { databaseURL:"https://manpreetteam-a86e9-default-rtdb.firebaseio.com/" };
+    const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
     const urlParams = new URLSearchParams(window.location.search);
     const matchId = urlParams.get('id') || 'defaultMatch';
     const db = firebase.database().ref("matchData/" + matchId);
+    const userDb = firebase.database().ref("users/" + matchId);
 
-    db.on("value",(snap)=>{
+    let curA=0, curB=0, isPanelActive=true;
+
+    userDb.on("value", (snap) => {
+        const userData = snap.val();
+        isPanelActive = !(userData && userData.planStatus === true);
+        document.getElementById('main-panel').style.display = isPanelActive ? 'flex' : 'none';
+        document.getElementById('expired-panel').style.display = isPanelActive ? 'none' : 'block';
+    });
+
+    db.on("value", (snap) => {
         const data = snap.val();
-        if(data){
-            document.getElementById("dispA").innerText = data.scoreA || 0;
-            document.getElementById("dispB").innerText = data.scoreB || 0;
-            document.getElementById("nameA").value = data.nameA || "";
-            document.getElementById("nameB").value = data.nameB || "";
-            document.getElementById("resultText").value = data.resultText || "No Result Yet";
+        if(data) {
+            curA = parseFloat(data.scoreA)||0; curB = parseFloat(data.scoreB)||0;
+            document.getElementById('dispA').innerText = curA;
+            document.getElementById('dispB').innerText = curB;
+            document.getElementById('nameA').value = data.nameA||"";
+            document.getElementById('nameB').value = data.nameB||"";
+            document.getElementById('resultText').value = data.resultText||"";
         }
     });
 
-    function changeScore(team, val){
-        db.once("value", snap => {
-            const data = snap.val();
-            let current = parseFloat(data[team] || 0);
-            let newVal = val > 0 ? (current === 0 && (data.scoreA === 0 && data.scoreB === 0) ? 1.5 : current + 1) : Math.max(0, (current === 1.5 ? 0 : current - 1));
-            db.update({ [team]: newVal });
-        });
+    function changeScore(team, val) {
+        if(!isPanelActive) return;
+        let current = (team === 'scoreA' ? curA : curB);
+        let newVal = (val > 0) ? (current === 0 && curA === 0 && curB === 0 ? 1.5 : current + 1) : Math.max(0, current === 1.5 ? 0 : current - 1);
+        db.update({ [team]: newVal });
     }
 
-    function showResultLayer(){
-        if(confirm("ਕੀ ਤੁਸੀਂ ਰਿਜ਼ਲਟ ਸੇਵ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ? ਸਕੋਰ 0 ਹੋ ਜਾਣਗੇ।")){
-            const teamA = document.getElementById("nameA").value;
-            const teamB = document.getElementById("nameB").value;
-            const sA = document.getElementById("dispA").innerText;
-            const sB = document.getElementById("dispB").innerText;
-            
-            const res = `${teamA} (${sA}) VS ${teamB} (${sB}) - Winner: ${parseFloat(sA) > parseFloat(sB) ? teamA : teamB}`;
-            
-            db.update({
-                resultText: res,
-                scoreA: 0,
-                scoreB: 0
-            });
+    function showResultLayer() {
+        if(!isPanelActive) return;
+        if(confirm("ਕੀ ਤੁਸੀਂ ਰਿਜ਼ਲਟ ਸੇਵ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ? ਸਕੋਰ 0 ਹੋ ਜਾਣਗੇ।")) {
+            const res = `${document.getElementById('nameA').value} (${curA}) VS ${document.getElementById('nameB').value} (${curB}) - Result Saved`;
+            db.update({ resultText: res, scoreA: 0, scoreB: 0 });
         }
     }
 
-    function updateResultText(){
-        db.update({ resultText: document.getElementById("resultText").value });
+    function updateDB() {
+        if(!isPanelActive) return;
+        db.update({
+            nameA: document.getElementById('nameA').value,
+            nameB: document.getElementById('nameB').value,
+            resultText: document.getElementById('resultText').value
+        });
     }
 
-    function toggleVis(field){
-        db.child(field).once("value", snap => {
-            db.update({ [field]: !snap.val() });
-        });
+    function swapTeams() {
+        db.update({ nameA: document.getElementById('nameB').value, nameB: document.getElementById('nameA').value, scoreA: curB, scoreB: curA });
+    }
+
+    function resetScores() {
+        if(confirm("Reset Scores?")) db.update({ scoreA: 0, scoreB: 0 });
+    }
+
+    function toggleVis(field) {
+        db.child(field).once("value", snap => db.update({ [field]: !snap.val() }));
     }
 </script>
 </body>
