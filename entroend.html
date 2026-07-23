@@ -38,7 +38,6 @@
         .row-3 { bottom: 53px; left: 1425px; width: 550px; height: 50px; font-size: 30px; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: clip; }
         .row-4 { bottom: 2px; left: 200px; width: 1730px; height: 50px; font-size: 30px; color: #ffffff; }
         
-        /* Slowed down animation speed (25s instead of 12s) */
         @keyframes scrollText {
             0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
@@ -149,6 +148,7 @@
         const el = document.getElementById(containerId);
         if (el) {
             const txt = (pa && pa.trim() !== "") ? pa : (en || "TEAM");
+            el.style.fontWeight = (pa && pa.trim() !== "") ? "bold" : "normal";
             el.innerHTML = `<div class="team-scroller">${txt}</div>`;
         }
     }
@@ -163,7 +163,6 @@
             let isPa = showPunjabi && pa && pa.trim() !== "";
             let rawTxt = isPa ? pa : (en || "");
             
-            // Apply font-weight: bold only if it's Punjabi
             el.style.fontWeight = isPa ? "bold" : "normal";
             el.innerText = rawTxt.replace(/(\r\n|\n|\r)/gm, " ");
             
@@ -197,7 +196,6 @@
         const isPa = state.showPa && state.pa.trim() !== "";
         const currentTxt = isPa ? state.pa : state.en;
         
-        // Apply font-weight: bold only if it's Punjabi
         scrollerEl.style.fontWeight = isPa ? "bold" : "normal";
         scrollerEl.innerText = currentTxt.replace(/(\r\n|\n|\r)/gm, " ");
 
