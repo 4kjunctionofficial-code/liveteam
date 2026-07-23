@@ -41,13 +41,17 @@
         
         .row-4 { bottom: 2px; left: 200px; width: 1730px; height: 50px; font-size: 30px; color: #ffffff; }
         
+        @keyframes scrollText {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
         .scroller { 
             display: inline-block; 
             white-space: pre; 
             position: absolute;
             will-change: transform;
             left: 100%;
-            /* JS ਨਾਲ ਡਾਇਨੈਮਿਕ ਐਨੀਮੇਸ਼ਨ ਲੱਗੇਗੀ */
         }
 
         .box-time { position: absolute; bottom: 1px; left: 3px; width: 190px; height: 40px; display: flex; align-items: center; justify-content: center; z-index: 12; overflow: hidden; }
@@ -186,7 +190,7 @@
         }
     }
 
-    // Independent Scrolling with Uniform Speed based on text width
+    // Independent Scrolling with Uniform Speed
     function setupIndependentScroller(id) {
         const containerEl = document.getElementById(id);
         const scrollerEl = document.getElementById(`scroller-${id}`);
@@ -199,22 +203,24 @@
         scrollerEl.style.fontWeight = isPa ? "bold" : "normal";
         scrollerEl.innerText = currentTxt.replace(/[\r\n]+/gm, " ");
 
-        // Container ਦੀ ਚੌੜਾਈ ਅਤੇ Text ਦੀ ਚੌੜਾਈ ਮਿਣ ਕੇ ਸਮਾਂ ਤੈਅ ਕਰਨਾ ਤਾਂ ਜੋ ਸਪੀਡ ਇੱਕੋ ਜਿਹੀ ਰਹੇ
-        const containerWidth = containerEl.offsetWidth;
-        const textWidth = scrollerEl.offsetWidth;
-        const totalDistance = containerWidth + textWidth;
-        
-        // Speed pixels per second (ਇੱਥੇ ਤੁਸੀਂ ਸਪੀਡ ਘਟਾ/ਵਧਾ ਸਕਦੇ ਹੋ, ਜਿਵੇਂ 70 ਪਿਕਸਲ ਪ੍ਰਤੀ ਸਕਿੰਟ)
-        const speed = 70; 
-        const duration = totalDistance / speed;
+        // ਸਹੀ ਸਪੀਡ ਅਤੇ ਦੂਰੀ ਦੀ ਕੈਲਕੁਲੇਸ਼ਨ
+        setTimeout(() => {
+            const containerWidth = containerEl.offsetWidth;
+            const textWidth = scrollerEl.offsetWidth;
+            const totalDistance = containerWidth + textWidth;
+            
+            const speed = 100; // ਪਿਕਸਲ ਪ੍ਰਤੀ ਸਕਿੰਟ (ਸਪੀਡ ਕੰਟਰੋਲ ਲਈ)
+            const duration = totalDistance / speed;
 
-        scrollerEl.style.animation = 'none';
-        scrollerEl.offsetHeight; // Trigger reflow
-        scrollerEl.style.animation = `independentScroll ${duration}s linear infinite`;
+            scrollerEl.style.animation = 'none';
+            scrollerEl.offsetHeight; // Trigger reflow
+            scrollerEl.style.animation = `independentScroll ${duration}s linear infinite`;
+        }, 50);
 
-        // ਜਦੋਂ ਇੱਕ ਵਾਰ ਪੂਰਾ ਸਕ੍ਰੋਲ ਖ਼ਤਮ ਹੋਵੇ ਤਾਂ ਭਾਸ਼ਾ ਬਦਲੋ
-        scrollerEl.onanimationiteration = () => {
-            if (state.pa && state.pa.trim() !== "") {
+        scrollerEl.onanimationiteration = null;
+
+        if (state.pa && state.pa.trim() !== "") {
+            scrollerEl.onanimationiteration = () => {
                 state.showPa = !state.showPa;
                 const nextIsPa = state.showPa && state.pa !== "";
                 const nextTxt = nextIsPa ? state.pa : state.en;
@@ -222,26 +228,31 @@
                 scrollerEl.style.fontWeight = nextIsPa ? "bold" : "normal";
                 scrollerEl.innerText = nextTxt.replace(/[\r\n]+/gm, " ");
 
-                // ਨਵੇਂ ਟੈਕਸਟ ਲਈ ਦੁਬਾਰਾ ਡਿਸਟੈਂਸ ਅਤੇ ਡੁਰੇਸ਼ਨ ਕੈਲਕੁਲੇਟ ਕਰੋ
-                const newTextWidth = scrollerEl.offsetWidth;
-                const newTotalDistance = containerWidth + newTextWidth;
-                const newDuration = newTotalDistance / speed;
-                
-                scrollerEl.style.animation = 'none';
-                scrollerEl.offsetHeight;
-                scrollerEl.style.animation = `independentScroll ${newDuration}s linear infinite`;
-            }
-        };
+                setTimeout(() => {
+                    const containerWidth = containerEl.offsetWidth;
+                    const textWidth = scrollerEl.offsetWidth;
+                    const totalDistance = containerWidth + textWidth;
+                    const speed = 100;
+                    const duration = totalDistance / speed;
+                    
+                    scrollerEl.style.animation = 'none';
+                    scrollerEl.offsetHeight;
+                    scrollerEl.style.animation = `independentScroll ${duration}s linear infinite`;
+                }, 50);
+            };
+        }
     }
 
     // Dynamic Keyframes Injector for Smooth Independent Scroll
     const styleSheet = document.styleSheets[0];
-    styleSheet.insertRule(`
-        @keyframes independentScroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(calc(-100% - 100vw)); }
-        }
-    `, styleSheet.cssRules.length);
+    try {
+        styleSheet.insertRule(`
+            @keyframes independentScroll {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(calc(-100% - 100vw)); }
+            }
+        `, styleSheet.cssRules.length);
+    } catch(e) {}
 
     // Clock
     function updateClock() {
