@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Arial', sans-serif; overflow: hidden; position: relative; }
+        
+        #logo-container { position: absolute; top: 30px; left: 40px; z-index: 9999; opacity: 1; transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1); }
+        #logo-container.hidden { opacity: 0; transform: scale(0); pointer-events: none; }
+        #main-logo { height: 100px; width: auto; max-width: 450px; object-fit: contain; filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.3)); } 
+
+        /* Jump & Spin (Firki) Animation Setup */
+        #scoreboard { 
+            position: absolute; 
+            top: 40px; 
+            right: 80px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            z-index: 9999; 
+            opacity: 1; 
+            transform: scale(1) rotate(0deg) translateY(0); 
+            transition: all 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
+        }
+        #scoreboard.hidden { 
+            opacity: 0; 
+            transform: scale(0.2) rotate(360deg) translateY(-150px); 
+            pointer-events: none; 
+        }
+
+        .main-bar { display: flex; align-items: center; height: 65px; background: rgba(255, 255, 255, 1); border-radius: 6px; border: 3px solid #000080; padding: 0; position: relative; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+
+        .s-box { 
+            background: #000080; 
+            color: #ffffff; 
+            font-size: 42px; 
+            font-weight: 900; 
+            font-family: Arial, sans-serif; 
+            width: 120px; 
+            height: 100%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            position: relative; 
+            z-index: 11; 
+        }
+        .s-left { border-right: 2px solid #ffffff; } 
+        .s-right { border-left: 2px solid #ffffff; }
+        .inner-val { transform: skewX(15deg); }
+        
+        .name-area { width: 220px; height: 100%; display: flex; align-items: center; overflow: hidden; white-space: nowrap; color: #000080; font-size: 28px; font-weight: bold; text-align: center; padding: 0 10px; box-sizing: border-box; text-transform: uppercase; background: #ffffff; } 
+        .team-scroller { display: inline-block; padding-left: 100%; animation: team-scroll 8s linear infinite; }
+        @keyframes team-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        
+        .vs-text { color: #ffffff; font-size: 20px; font-weight: 900; margin: 0 5px; background: #000080; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; z-index: 11; }
+
+        .round-display { color: white; font-size: 22px; font-weight: bold; text-transform: uppercase; margin-top: 15px; text-shadow: 2px 2px 6px #000; letter-spacing: 2px; display: block; background: rgba(0,0,0,0.6); padding: 4px 15px; border-radius: 4px; }  
+    </style>
+</head>
+<body>
+
+<div id="logo-container" class="hidden">
+    <img id="main-logo" src="" alt="Logo">
+</div>
+
+<div id="scoreboard">
+    <div class="main-bar">
+        <div class="s-box s-left"><div class="inner-val" id="sA">0</div></div>
+        <div class="name-area" id="nA-container"><div id="nA" style="width:100%; text-align:center;">TEAM 1</div></div>
+        <div class="vs-text" id="vs-label">VS</div>
+        <div class="name-area" id="nB-container"><div id="nB" style="width:100%; text-align:center;">TEAM 2</div></div>
+        <div class="s-box s-right"><div class="inner-val" id="sB">0</div></div>
+    </div>
+    <div class="round-display" id="round-display">LIVE MATCH</div>
+</div>
+
+<script>
+    const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
+    firebase.initializeApp(firebaseConfig);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const matchId = urlParams.get('id') || 'defaultMatch';
+    const db = firebase.database().ref("matchData/" + matchId);
+
+    const clientLogos = {
+        "mudki1": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/image-Photoroom%20(4).png"
+    };
+
+    db.on("value", (snap) => {
+        const data = snap.val() || {}; 
+        const logoCont = document.getElementById('logo-container');
+        const currentId = matchId.trim().toLowerCase();
+
+        // Logo visibility with animation
+        if (clientLogos[currentId] && data.logoVisible !== false) {
+            document.getElementById('main-logo').src = clientLogos[currentId];
+            logoCont.classList.remove('hidden');
+        } else {
+            logoCont.classList.add('hidden');
+        }
+
+        // Scoreboard visibility with jump & spin animation
+        const scoreboard = document.getElementById('scoreboard');
+        if (data.scoreVisible === false) {
+            scoreboard.classList.add('hidden');
+        } else {
+            scoreboard.classList.remove('hidden');
+        }
+        
+        // Update basic data
+        document.getElementById('sA').innerText = data.scoreA ?? "0";
+        document.getElementById('sB').innerText = data.scoreB ?? "0";
+        
+        // Language handling (English/Punjabi check from admin panel)
+        const lang = data.language || 'EN';
+        const teamA = (lang === 'PB' ? (data.nameAPb || data.nameA) : data.nameA) || "TEAM 1";
+        const teamB = (lang === 'PB' ? (data.nameBPb || data.nameB) : data.nameB) || "TEAM 2";
+        const roundText = (lang === 'PB' ? (data.roundPb || data.round) : data.round) || "";
+
+        setTeamName('nA-container', teamA);
+        setTeamName('nB-container', teamB);
+        
+        // VS text update based on language if needed
+        document.getElementById('vs-label').innerText = lang === 'PB' ? 'ਬਨਾਮ' : 'VS';
+
+        const roundEl = document.getElementById('round-display');
+        roundEl.innerText = roundText;
+        roundEl.style.display = roundText.trim() === "" ? "none" : "block";
+    });
+
+    function setTeamName(containerId, txt) {
+        const el = document.getElementById(containerId);
+        el.innerHTML = txt.length > 12 ? `<div class="team-scroller">${txt}</div>` : `<div style="width:100%; text-align:center;">${txt}</div>`;
+    }
+</script>
+</body>
+</html>
