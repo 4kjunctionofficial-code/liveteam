@@ -35,17 +35,9 @@
         .row-text { position: absolute; display: flex; align-items: center; text-transform: uppercase; overflow: hidden; box-sizing: border-box; padding-left: 10px; white-space: pre; }
         .row-1 { bottom: 61px; left: 210px; width: 350px; height: 50px; font-size: 35px; color: #ffffff; }
         .row-2 { bottom: 53px; left: 587px; width: 815px; height: 50px; font-size: 35px; color: #000000; }
-        
-        /* Row 3 - Eko line ch rahen ਲਈ */
         .row-3 { bottom: 53px; left: 1425px; width: 550px; height: 50px; font-size: 30px; color: #ffffff; overflow: hidden; text-overflow: clip; }
-        
         .row-4 { bottom: 2px; left: 200px; width: 1730px; height: 50px; font-size: 30px; color: #ffffff; }
         
-        @keyframes scrollText {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
-
         .scroller { 
             display: inline-block; 
             white-space: pre; 
@@ -129,14 +121,8 @@
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
         
-        if (window.lastNameA !== data.nameA || window.lastNameA_pa !== data.nameA_pa) {
-            window.lastNameA = data.nameA; window.lastNameA_pa = data.nameA_pa;
-            setTeamName("nA-container", data.nameA, data.nameA_pa);
-        }
-        if (window.lastNameB !== data.nameB || window.lastNameB_pa !== data.nameB_pa) {
-            window.lastNameB = data.nameB; window.lastNameB_pa = data.nameB_pa;
-            setTeamName("nB-container", data.nameB, data.nameB_pa);
-        }
+        setTeamName("nA-container", data.nameA, data.nameA_pa);
+        setTeamName("nB-container", data.nameB, data.nameB_pa);
         
         document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
         document.getElementById('round-display').innerText = data.round || "";
@@ -150,8 +136,9 @@
     function setTeamName(containerId, en, pa) {
         const el = document.getElementById(containerId);
         if (el) {
-            const txt = (pa && pa.trim() !== "") ? pa : (en || "TEAM");
-            el.style.fontWeight = (pa && pa.trim() !== "") ? "bold" : "normal";
+            const hasPa = pa && pa.trim() !== "";
+            const txt = hasPa ? pa : (en || "TEAM");
+            el.style.fontWeight = hasPa ? "bold" : "normal";
             el.innerHTML = `<div class="team-scroller">${txt}</div>`;
         }
     }
@@ -163,16 +150,19 @@
 
         let showPunjabi = false;
         function change() {
-            let isPa = showPunjabi && pa && pa !== "";
+            let hasPa = pa && pa.trim() !== "";
+            let isPa = showPunjabi && hasPa;
             let rawTxt = isPa ? pa : (en || "");
             
             el.style.fontWeight = isPa ? "bold" : "normal";
-            el.innerText = rawTxt.replace(/[\r\n]+/gm, " ");
+            el.innerText = rawTxt;
             
-            showPunjabi = !showPunjabi;
+            if (hasPa) {
+                showPunjabi = !showPunjabi;
+            }
         }
         change();
-        if ((pa && pa.trim() !== "")) {
+        if (pa && pa.trim() !== "") {
             tickerTimers[id] = setInterval(change, 8000);
         }
     }
@@ -197,36 +187,36 @@
         const state = tickerState[id];
         if (!scrollerEl || !containerEl) return;
 
-        const isPa = state.showPa && state.pa !== "";
+        const hasPa = state.pa && state.pa.trim() !== "";
+        const isPa = state.showPa && hasPa;
         const currentTxt = isPa ? state.pa : state.en;
 
         scrollerEl.style.fontWeight = isPa ? "bold" : "normal";
-        scrollerEl.innerText = currentTxt.replace(/[\r\n]+/gm, " ");
+        scrollerEl.innerText = currentTxt;
 
-        // ਸਹੀ ਸਪੀਡ ਅਤੇ ਦੂਰੀ ਦੀ ਕੈਲਕੁਲੇਸ਼ਨ
         setTimeout(() => {
             const containerWidth = containerEl.offsetWidth;
             const textWidth = scrollerEl.offsetWidth;
             const totalDistance = containerWidth + textWidth;
             
-            const speed = 100; // ਪਿਕਸਲ ਪ੍ਰਤੀ ਸਕਿੰਟ (ਸਪੀਡ ਕੰਟਰੋਲ ਲਈ)
+            const speed = 100; // ਪਿਕਸਲ ਪ੍ਰਤੀ ਸਕਿੰਟ ਸਪੀਡ
             const duration = totalDistance / speed;
 
             scrollerEl.style.animation = 'none';
-            scrollerEl.offsetHeight; // Trigger reflow
+            scrollerEl.offsetHeight; 
             scrollerEl.style.animation = `independentScroll ${duration}s linear infinite`;
         }, 50);
 
         scrollerEl.onanimationiteration = null;
 
-        if (state.pa && state.pa.trim() !== "") {
+        if (hasPa) {
             scrollerEl.onanimationiteration = () => {
                 state.showPa = !state.showPa;
-                const nextIsPa = state.showPa && state.pa !== "";
+                const nextIsPa = state.showPa;
                 const nextTxt = nextIsPa ? state.pa : state.en;
 
                 scrollerEl.style.fontWeight = nextIsPa ? "bold" : "normal";
-                scrollerEl.innerText = nextTxt.replace(/[\r\n]+/gm, " ");
+                scrollerEl.innerText = nextTxt;
 
                 setTimeout(() => {
                     const containerWidth = containerEl.offsetWidth;
