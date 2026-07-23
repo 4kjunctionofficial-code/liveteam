@@ -11,19 +11,6 @@
         #logo-container.hidden { opacity: 0; transform: scale(0); }
         #main-logo { height: 100px; width: auto; max-width: 450px; object-fit: contain; filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.3)); } 
 
-        #single-wm {
-            position: absolute;
-            color: #ffffff;
-            opacity: 1;
-            font-size: 35px;
-            font-weight: 900;
-            text-shadow: 2px 2px 5px #000;
-            white-space: nowrap;
-            z-index: 500;
-            pointer-events: none;
-            transition: all 1s linear;
-        }
-
         /* Scoreboard styling */
         #scoreboard { position: absolute; top: 40px; right: 80px; display: flex; flex-direction: column; align-items: center; z-index: 9999; opacity: 1; transition: all 0.7s ease; }
         #scoreboard.hidden { opacity: 0; transform: translateY(-100px); }
@@ -62,8 +49,6 @@
 <div id="logo-container" class="hidden">
     <img id="main-logo" src="" alt="Logo">
 </div>
-
-<div id="single-wm">M LIVE</div>
 
 <div id="scoreboard">
     <div class="main-bar">
@@ -109,7 +94,6 @@
         document.getElementById('sB').innerText = data.scoreB ?? "0";
         setTeamName('nA-container', data.nameA || "TEAM 1");
         setTeamName('nB-container', data.nameB || "TEAM 2");
-        document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
         
         const roundEl = document.getElementById('round-display');
         roundEl.innerText = data.round || "";
@@ -120,14 +104,6 @@
         const el = document.getElementById(containerId);
         el.innerHTML = txt.length > 12 ? `<div class="team-scroller">${txt}</div>` : `<div style="width:100%; text-align:center;">${txt}</div>`;
     }
-
-    const wmEl = document.getElementById('single-wm');
-    function moveWM() { 
-        wmEl.style.left = (Math.random() * 1400 + 100) + 'px'; 
-        wmEl.style.top = (Math.random() * 600 + 150) + 'px'; 
-    }
-    moveWM(); 
-    setInterval(moveWM, 6000);
 </script>
 </body>
 </html>
