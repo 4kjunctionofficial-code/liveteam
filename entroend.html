@@ -35,7 +35,10 @@
         .row-text { position: absolute; display: flex; align-items: center; text-transform: uppercase; font-weight: bold; overflow: hidden; box-sizing: border-box; white-space: nowrap; padding-left: 10px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
         .row-1 { bottom: 61px; left: 210px; width: 350px; height: 50px; font-size: 35px; font-weight: bold; color: #ffffff; }
         .row-2 { bottom: 53px; left: 587px; width: 815px; height: 50px; font-size: 35px; font-weight: bold; color: #000000; text-shadow: none; }
-        .row-3 { bottom: 53px; left: 1425px; width: 550px; height: 50px; font-size: 30px; font-weight: bold; color: #ffffff; }
+        
+        /* Row 3 - Eko line ch rahen ਲਈ */
+        .row-3 { bottom: 53px; left: 1425px; width: 550px; height: 50px; font-size: 30px; font-weight: bold; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: clip; }
+        
         .row-4 { bottom: 2px; left: 200px; width: 1730px; height: 50px; font-size: 30px; font-weight: bold; color: #ffffff; }
         .scroller { display: inline-block; white-space: nowrap; font-weight: bold; position: relative; will-change: transform; }
 
@@ -150,7 +153,9 @@
 
         let showPunjabi = false;
         function change() {
-            const txt = (showPunjabi && pa && pa.trim() !== "") ? pa : (en || "");
+            // Newlines ਹਟਾ ਕੇ ਟੈਕਸਟ ਨੂੰ ਇੱਕੋ ਲਾਈਨ ਵਿੱਚ ਰੱਖਣ ਲਈ .replace(/(\r\n|\n|\r)/gm, " ") ਵਰਤਿਆ ਹੈ
+            let rawTxt = (showPunjabi && pa && pa.trim() !== "") ? pa : (en || "");
+            const txt = rawTxt.replace(/(\r\n|\n|\r)/gm, " ");
             el.innerText = txt;
             showPunjabi = !showPunjabi;
         }
@@ -167,7 +172,8 @@
 
         let showPunjabi = false;
         function change() {
-            const txt = (showPunjabi && pa && pa.trim() !== "") ? pa : (en || "");
+            let rawTxt = (showPunjabi && pa && pa.trim() !== "") ? pa : (en || "");
+            const txt = rawTxt.replace(/(\r\n|\n|\r)/gm, " ");
             el.innerHTML = `<div class="scroller">${txt}</div>`;
             showPunjabi = !showPunjabi;
         }
