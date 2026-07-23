@@ -11,7 +11,7 @@
         #logo-container.hidden { opacity: 0; transform: scale(0); pointer-events: none; }
         #main-logo { height: 100px; width: auto; max-width: 450px; object-fit: contain; filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.3)); } 
 
-        /* Ghaint Smooth Zoom & Fade Animation for Scoreboard */
+        /* Jump & Spin (Firki) Animation Setup */
         #scoreboard { 
             position: absolute; 
             top: 40px; 
@@ -21,12 +21,12 @@
             align-items: center; 
             z-index: 9999; 
             opacity: 1; 
-            transform: scale(1) translateY(0); 
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bounce and smooth effect */
+            transform: scale(1) rotate(0deg) translateY(0); 
+            transition: all 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Bounce, jump and spin effect */
         }
         #scoreboard.hidden { 
             opacity: 0; 
-            transform: scale(0.5) translateY(-50px); 
+            transform: scale(0.2) rotate(360deg) translateY(-150px); /* Firki maarda hoya gayab hovega */
             pointer-events: none; 
         }
 
@@ -101,7 +101,7 @@
             logoCont.classList.add('hidden');
         }
 
-        // Scoreboard visibility with ghaint animation
+        // Scoreboard visibility with jump & spin (firki) animation
         const scoreboard = document.getElementById('scoreboard');
         if (data.scoreVisible === false) {
             scoreboard.classList.add('hidden');
