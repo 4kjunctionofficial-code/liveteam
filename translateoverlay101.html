@@ -10,49 +10,51 @@
         
         #logo-container { position: absolute; top: 30px; left: 40px; z-index: 9999; opacity: 1; transition: all 0.7s ease; }
         #logo-container.hidden { opacity: 0; transform: scale(0); }
-        #main-logo { height: 100px; width: auto; max-width: 450px; object-fit: contain; }
+        #main-logo { height: 100px; width: auto; max-width: 450px; object-fit: contain; filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.3)); }
 
-        #single-wm { position: absolute; left: 300px; top: 300px; font-family: 'Bebas Neue', sans-serif; font-size: 42px; font-weight: bold; color: #ffffff; opacity: 0.55; text-transform: uppercase; letter-spacing: 2px; white-space: nowrap; z-index: 9997; pointer-events: none; user-select: none; }
+        #single-wm { position: absolute; left: 300px; top: 300px; font-family: 'Bebas Neue', sans-serif; font-size: 42px; font-weight: bold; color: #ffffff; opacity: 0.55; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,.8); white-space: nowrap; z-index: 9997; pointer-events: none; user-select: none; }
         
         #scoreboard { position: absolute; top: 0px; left: 0px; width: 1920px; height: 1080px; z-index: 9999; opacity: 1; transition: opacity 0.7s ease; background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/101%20png.png'); background-size: cover; background-position: center; background-repeat: no-repeat; }
         #scoreboard.hidden { opacity: 0; }
 
-        .name-area { position: absolute; top: 43px; height: 50px; display: flex; align-items: center; color: #ffffff; font-size: 35px; text-transform: uppercase; overflow: hidden; white-space: nowrap; z-index: 11; }
+        .name-area { position: absolute; top: 43px; height: 50px; display: flex; align-items: center; color: #ffffff; font-size: 35px; text-transform: uppercase; text-shadow: 2px 2px 4px #000; overflow: hidden; white-space: nowrap; z-index: 11; }
         #nA-container { left: 1050px; width: 270px; justify-content: flex-end; }
         #nB-container { left: 1580px; width: 270px; justify-content: flex-start; }
         
-        .score-box { position: absolute; top: 40px; height: 50px; width: 50px; display: flex; align-items: center; justify-content: center; font-size: 55px; font-weight: bold; color: #000000; z-index: 12; }
+        .score-box { position: absolute; top: 40px; height: 50px; width: 50px; display: flex; align-items: center; justify-content: center; font-size: 55px; font-weight: bold; color: #000000; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); z-index: 12; }
         #sA { left: 1360px; } 
         #sB { left: 1497px; } 
 
-        .round-display { position: absolute; top: 110px; left: 1450px; transform: translateX(-50%); color: white; font-size: 30px; text-transform: uppercase; z-index: 11; }
+        .round-display { position: absolute; top: 110px; left: 1450px; transform: translateX(-50%); color: white; font-size: 30px; text-transform: uppercase; text-shadow: 2px 2px 6px #000; z-index: 11; }
 
         .team-scroller { white-space: nowrap; }
 
         #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 1080px; z-index: 9998; opacity: 1; transition: opacity 0.7s ease; background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Copy%20of%20Star%20Kabaddi%20_20260711_110521_0000.png'); background-size: cover; background-position: center; background-repeat: no-repeat; pointer-events: none; }
         #ticker-wrap.hidden { opacity: 0; }
 
-        .row-text { position: absolute; display: flex; align-items: center; text-transform: uppercase; overflow: hidden; box-sizing: border-box; padding-left: 10px; white-space: pre; }
+        .row-text { position: absolute; display: flex; align-items: center; text-transform: uppercase; overflow: hidden; box-sizing: border-box; white-space: nowrap; padding-left: 10px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
         .row-1 { bottom: 61px; left: 210px; width: 350px; height: 50px; font-size: 35px; color: #ffffff; }
-        .row-2 { bottom: 53px; left: 587px; width: 815px; height: 50px; font-size: 35px; color: #000000; }
-        
-        /* Row 3 - Eko line ch rahen ਲਈ */
-        .row-3 { bottom: 53px; left: 1425px; width: 550px; height: 50px; font-size: 30px; color: #ffffff; overflow: hidden; text-overflow: clip; }
-        
+        .row-2 { bottom: 53px; left: 587px; width: 815px; height: 50px; font-size: 35px; color: #000000; text-shadow: none; }
+        .row-3 { bottom: 53px; left: 1425px; width: 550px; height: 50px; font-size: 30px; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: clip; }
         .row-4 { bottom: 2px; left: 200px; width: 1730px; height: 50px; font-size: 30px; color: #ffffff; }
         
+        /* Slowed down animation speed (25s instead of 12s) */
+        @keyframes scrollText {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
         .scroller { 
             display: inline-block; 
-            white-space: pre; 
+            white-space: nowrap; 
             position: absolute;
             will-change: transform;
-            left: 100%;
-            /* JS ਨਾਲ ਡਾਇਨੈਮਿਕ ਐਨੀਮੇਸ਼ਨ ਲੱਗੇਗੀ */
+            animation: scrollText 25s linear infinite;
         }
 
         .box-time { position: absolute; bottom: 1px; left: 3px; width: 190px; height: 40px; display: flex; align-items: center; justify-content: center; z-index: 12; overflow: hidden; }
         .time-wrap, .date-wrap { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: opacity 0.3s ease-in-out; }
-        .time-str, .date-str { color: #ffffff; font-size: 30px; letter-spacing: 1px; }
+        .time-str, .date-str { color: #ffffff; font-size: 30px; letter-spacing: 1px; text-shadow: 2px 2px 5px #000; }
     </style>
 </head>
 <body>
@@ -147,7 +149,6 @@
         const el = document.getElementById(containerId);
         if (el) {
             const txt = (pa && pa.trim() !== "") ? pa : (en || "TEAM");
-            el.style.fontWeight = (pa && pa.trim() !== "") ? "bold" : "normal";
             el.innerHTML = `<div class="team-scroller">${txt}</div>`;
         }
     }
@@ -159,11 +160,12 @@
 
         let showPunjabi = false;
         function change() {
-            let isPa = showPunjabi && pa && pa !== "";
+            let isPa = showPunjabi && pa && pa.trim() !== "";
             let rawTxt = isPa ? pa : (en || "");
             
+            // Apply font-weight: bold only if it's Punjabi
             el.style.fontWeight = isPa ? "bold" : "normal";
-            el.innerText = rawTxt.replace(/[\r\n]+/gm, " ");
+            el.innerText = rawTxt.replace(/(\r\n|\n|\r)/gm, " ");
             
             showPunjabi = !showPunjabi;
         }
@@ -182,66 +184,36 @@
         if (state.en !== newEn || state.pa !== newPa) {
             state.en = newEn;
             state.pa = newPa;
-            setupIndependentScroller(id);
+            renderScrollingText(id);
         }
     }
 
-    // Independent Scrolling with Uniform Speed based on text width
-    function setupIndependentScroller(id) {
-        const containerEl = document.getElementById(id);
+    // Render scrolling text and handle loop change on complete iteration
+    function renderScrollingText(id) {
         const scrollerEl = document.getElementById(`scroller-${id}`);
         const state = tickerState[id];
-        if (!scrollerEl || !containerEl) return;
+        if (!scrollerEl) return;
 
-        const isPa = state.showPa && state.pa !== "";
+        const isPa = state.showPa && state.pa.trim() !== "";
         const currentTxt = isPa ? state.pa : state.en;
-
-        scrollerEl.style.fontWeight = isPa ? "bold" : "normal";
-        scrollerEl.innerText = currentTxt.replace(/[\r\n]+/gm, " ");
-
-        // Container ਦੀ ਚੌੜਾਈ ਅਤੇ Text ਦੀ ਚੌੜਾਈ ਮਿਣ ਕੇ ਸਮਾਂ ਤੈਅ ਕਰਨਾ ਤਾਂ ਜੋ ਸਪੀਡ ਇੱਕੋ ਜਿਹੀ ਰਹੇ
-        const containerWidth = containerEl.offsetWidth;
-        const textWidth = scrollerEl.offsetWidth;
-        const totalDistance = containerWidth + textWidth;
         
-        // Speed pixels per second (ਇੱਥੇ ਤੁਸੀਂ ਸਪੀਡ ਘਟਾ/ਵਧਾ ਸਕਦੇ ਹੋ, ਜਿਵੇਂ 70 ਪਿਕਸਲ ਪ੍ਰਤੀ ਸਕਿੰਟ)
-        const speed = 70; 
-        const duration = totalDistance / speed;
+        // Apply font-weight: bold only if it's Punjabi
+        scrollerEl.style.fontWeight = isPa ? "bold" : "normal";
+        scrollerEl.innerText = currentTxt.replace(/(\r\n|\n|\r)/gm, " ");
 
-        scrollerEl.style.animation = 'none';
-        scrollerEl.offsetHeight; // Trigger reflow
-        scrollerEl.style.animation = `independentScroll ${duration}s linear infinite`;
+        scrollerEl.onanimationiteration = null;
 
-        // ਜਦੋਂ ਇੱਕ ਵਾਰ ਪੂਰਾ ਸਕ੍ਰੋਲ ਖ਼ਤਮ ਹੋਵੇ ਤਾਂ ਭਾਸ਼ਾ ਬਦਲੋ
-        scrollerEl.onanimationiteration = () => {
-            if (state.pa && state.pa.trim() !== "") {
+        if (state.pa && state.pa.trim() !== "") {
+            scrollerEl.onanimationiteration = () => {
                 state.showPa = !state.showPa;
-                const nextIsPa = state.showPa && state.pa !== "";
+                const nextIsPa = state.showPa && state.pa.trim() !== "";
                 const nextTxt = nextIsPa ? state.pa : state.en;
-
-                scrollerEl.style.fontWeight = nextIsPa ? "bold" : "normal";
-                scrollerEl.innerText = nextTxt.replace(/[\r\n]+/gm, " ");
-
-                // ਨਵੇਂ ਟੈਕਸਟ ਲਈ ਦੁਬਾਰਾ ਡਿਸਟੈਂਸ ਅਤੇ ਡੁਰੇਸ਼ਨ ਕੈਲਕੁਲੇਟ ਕਰੋ
-                const newTextWidth = scrollerEl.offsetWidth;
-                const newTotalDistance = containerWidth + newTextWidth;
-                const newDuration = newTotalDistance / speed;
                 
-                scrollerEl.style.animation = 'none';
-                scrollerEl.offsetHeight;
-                scrollerEl.style.animation = `independentScroll ${newDuration}s linear infinite`;
-            }
-        };
-    }
-
-    // Dynamic Keyframes Injector for Smooth Independent Scroll
-    const styleSheet = document.styleSheets[0];
-    styleSheet.insertRule(`
-        @keyframes independentScroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(calc(-100% - 100vw)); }
+                scrollerEl.style.fontWeight = nextIsPa ? "bold" : "normal";
+                scrollerEl.innerText = nextTxt.replace(/(\r\n|\n|\r)/gm, " ");
+            };
         }
-    `, styleSheet.cssRules.length);
+    }
 
     // Clock
     function updateClock() {
