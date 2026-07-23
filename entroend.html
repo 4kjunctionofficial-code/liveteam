@@ -8,9 +8,6 @@
     <style>
         body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Bebas Neue', sans-serif; overflow: hidden; position: relative; }
         
-        /* Result Overlay */
-        #result-overlay { position: absolute; top: 0; left: 0; width: 1920px; height: 1080px; background: rgba(0,0,0,0.9); z-index: 10000; display: none; justify-content: center; align-items: center; color: #ffeb3b; font-size: 120px; text-transform: uppercase; text-shadow: 5px 5px 10px black; text-align: center; }
-
         #logo-container { position: absolute; top: 30px; left: 40px; z-index: 9999; opacity: 1; transition: all 0.7s ease; }
         #logo-container.hidden { opacity: 0; transform: scale(0); }
         #main-logo { height: 100px; width: auto; max-width: 450px; object-fit: contain; filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.3)); }
@@ -30,20 +27,24 @@
 
         .round-display { position: absolute; top: 110px; left: 1450px; transform: translateX(-50%); color: white; font-size: 30px; text-transform: uppercase; text-shadow: 2px 2px 6px #000; z-index: 11; }
 
+        .team-scroller { white-space: nowrap; }
+
         #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 1080px; z-index: 9998; opacity: 1; transition: opacity 0.7s ease; background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Copy%20of%20Star%20Kabaddi%20_20260711_110521_0000.png'); background-size: cover; background-position: center; background-repeat: no-repeat; pointer-events: none; }
         #ticker-wrap.hidden { opacity: 0; }
 
         .row-text { position: absolute; display: flex; align-items: center; text-transform: uppercase; overflow: hidden; box-sizing: border-box; white-space: nowrap; padding-left: 10px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
         .row-1 { bottom: 61px; left: 210px; width: 350px; height: 50px; font-size: 35px; color: #ffffff; }
-        .row-2 { bottom: 53px; left: 587px; width: 815px; height: 50px; font-size: 35px; color: #000000; }
+        .row-2 { bottom: 53px; left: 587px; width: 815px; height: 50px; font-size: 35px; color: #000000; text-shadow: none; }
         .row-3 { bottom: 53px; left: 1425px; width: 550px; height: 50px; font-size: 35px; color: #ffffff; }
         .row-4 { bottom: 2px; left: 200px; width: 1730px; height: 50px; font-size: 30px; color: #ffffff; }
-        .scroller { display: inline-block; white-space: nowrap; position: relative; }
+        .scroller { display: inline-block; white-space: nowrap; position: relative; will-change: transform; }
+
+        .box-time { position: absolute; bottom: 1px; left: 3px; width: 190px; height: 40px; display: flex; align-items: center; justify-content: center; z-index: 12; overflow: hidden; }
+        .time-wrap, .date-wrap { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: opacity 0.3s ease-in-out; }
+        .time-str, .date-str { color: #ffffff; font-size: 30px; letter-spacing: 1px; text-shadow: 2px 2px 5px #000; }
     </style>
 </head>
 <body>
-
-<div id="result-overlay"></div>
 
 <div id="logo-container" class="hidden">
     <img id="main-logo" src="" alt="Logo">
@@ -60,83 +61,157 @@
 </div>
 
 <div id="ticker-wrap">
-    <div class="row-text row-1" id="c1"></div>
-    <div class="row-text row-2" id="c2"></div>
-    <div class="row-text row-3" id="c3"></div>
-    <div class="row-text row-4" id="c4"></div>
+    <div class="row-text row-1" id="c1"><div class="scroller">WELCOME TO LIVE KABADDI</div></div>
+    <div class="row-text row-2" id="c2"><div class="scroller">SUBSCRIBE OUR CHANNEL</div></div>
+    <div class="row-text row-3" id="c3"><div class="scroller">LIKE & SHARE</div></div>
+    <div class="row-text row-4" id="c4"><div class="scroller">KEEP WATCHING</div></div> 
+
+    <div class="box-time">
+        <div class="time-wrap" id="t-wrap"><div class="time-str" id="live-time"></div></div>
+        <div class="date-wrap" id="d-wrap" style="opacity:0;"><div class="date-str" id="live-date"></div></div>
+    </div>
 </div>
 
 <script>
     const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
 
-    const matchId = new URLSearchParams(window.location.search).get('id') || 'defaultMatch';
+    const urlParams = new URLSearchParams(window.location.search);
+    const matchId = urlParams.get('id') || 'defaultMatch';
     const db = firebase.database().ref("matchData/" + matchId);
-    
-    let langState = 0; // 0 = English, 1 = Punjabi
-    let globalData = {};
+    const userDb = firebase.database().ref("users/" + matchId);
 
-    // 1. Language Toggle (Every 8 seconds)
-    setInterval(() => {
-        langState = langState === 0 ? 1 : 0;
-        renderUI();
-    }, 8000);
-
-    db.on("value", (snap) => {
-        globalData = snap.val() || {};
-        renderUI();
+    // Expiry Check
+    userDb.on("value", (snap) => {
+        const user = snap.val();
+        if (!user || Date.now() > new Date(user.expiryDate).getTime()) {
+            document.body.innerHTML = `<div style="width:100vw; height:100vh; display:flex; justify-content:center; align-items:center; background:black; color:white; font-size:60px; text-align:center; font-family:Arial;">🛑 PLAN EXPIRED<br><br>HELP LINE<br>MANPREET MUDKI<br>9115426711</div>`;
+        }
     });
 
-    function renderUI() {
-        const data = globalData;
+    const clientLogos = { "kabaddi101": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Kabaddi%20101%20logo.png" };
+    let tickerInitialized = false;
+    const tickerTimers = {};
 
-        // Result Screen
-        const resOverlay = document.getElementById('result-overlay');
-        if (data.showResult) {
-            resOverlay.style.display = 'flex';
-            resOverlay.innerText = data.resultText || "RESULT";
+    db.on("value", (snap) => {
+        const data = snap.val() || {}; 
+        const logoCont = document.getElementById('logo-container');
+        const currentId = matchId.trim().toLowerCase();
+
+        if (clientLogos[currentId] && data.logoVisible !== false) {
+            document.getElementById('main-logo').src = clientLogos[currentId];
+            logoCont.classList.remove('hidden');
         } else {
-            resOverlay.style.display = 'none';
+            logoCont.classList.add('hidden');
         }
 
-        // Visibility
         document.getElementById('scoreboard').classList.toggle('hidden', data.scoreVisible === false);
         document.getElementById('ticker-wrap').classList.toggle('hidden', data.tickerVisible === false);
-
-        // Score
+        
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
         
-        // Names (Language Toggle)
-        document.getElementById('nA').innerText = (langState === 1 && data.nameA_pa) ? data.nameA_pa : (data.nameA || "TEAM 1");
-        document.getElementById('nB').innerText = (langState === 1 && data.nameB_pa) ? data.nameB_pa : (data.nameB || "TEAM 2");
-        document.getElementById('round-display').innerText = data.round || "";
-
-        // Tickers
-        updateTicker("c1", data.row1Txt, data.row1Txt_pa);
-        updateTicker("c2", data.row2Txt, data.row2Txt_pa); // List Handler
-        updateTicker("c3", data.row3Txt, data.row3Txt_pa);
-        updateTicker("c4", data.row4Txt, data.row4Txt_pa);
-    }
-
-    function updateTicker(id, en, pa) {
-        const el = document.getElementById(id);
+        if (window.lastNameA !== data.nameA || window.lastNameA_pa !== data.nameA_pa) {
+            window.lastNameA = data.nameA; window.lastNameA_pa = data.nameA_pa;
+            setTeamName("nA-container", data.nameA, data.nameA_pa);
+        }
+        if (window.lastNameB !== data.nameB || window.lastNameB_pa !== data.nameB_pa) {
+            window.lastNameB = data.nameB; window.lastNameB_pa = data.nameB_pa;
+            setTeamName("nB-container", data.nameB, data.nameB_pa);
+        }
         
-        // Row 2 List Logic
-        if (id === 'c2' && en && en.includes('|')) {
-            const matches = en.split('|');
-            const pMatches = pa ? pa.split('|') : [];
-            // Cycle every 5 seconds
-            let index = Math.floor((Date.now() / 5000) % matches.length);
-            
-            let txt = (langState === 1 && pMatches[index]) ? pMatches[index].trim() : matches[index].trim();
-            el.innerHTML = `<div class="scroller">${txt}</div>`;
-        } else {
-            // Standard rows
-            let txt = (langState === 1 && pa && pa.trim() !== "") ? pa : (en || "");
-            el.innerHTML = `<div class="scroller">${txt}</div>`;
+        document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
+        document.getElementById('round-display').innerText = data.round || "";
+        
+        updateTickerContent("c1", data.row1Txt, data.row1Txt_pa);
+        updateTickerContent("c2", data.row2Txt, data.row2Txt_pa); 
+        updateTickerContent("c3", data.row3Txt, data.row3Txt_pa);
+        updateTickerContent("c4", data.row4Txt, data.row4Txt_pa);
+
+        if (!tickerInitialized) {
+            startTicker('c1', 1.4); 
+            startTicker('c2', 2.0); // Row 2 ਹੁਣ ਸਕ੍ਰੋਲ ਹੋਵੇਗੀ
+            startTicker('c3', 1.7); 
+            startTicker('c4', 1.9); // Row 4 ਹੁਣ ਸਕ੍ਰੋਲ ਹੋਵੇਗੀ
+            tickerInitialized = true;
+        }
+    });
+
+    function setTeamName(containerId, en, pa) {
+        const el = document.getElementById(containerId);
+        if (el) {
+            const txt = (pa && pa.trim() !== "") ? pa : (en || "TEAM");
+            el.innerHTML = `<div class="team-scroller">${txt}</div>`;
         }
     }
+
+    function updateTickerContent(id, en, pa) {
+        const el = document.getElementById(id);
+        clearInterval(tickerTimers[id]);
+
+        if (id === 'c2' && en && en.includes('|')) {
+            const matches = en.split('|');
+            let index = 0;
+            function changeMatch() {
+                el.innerHTML = `<div class="scroller">${matches[index].trim()}</div>`;
+                index = (index + 1) % matches.length;
+            }
+            changeMatch();
+            tickerTimers[id] = setInterval(changeMatch, 5000); 
+        } else {
+            let showPunjabi = false;
+            function change() {
+                const txt = (showPunjabi && pa && pa.trim() !== "") ? pa : (en || "");
+                el.innerHTML = `<div class="scroller">${txt}</div>`;
+                showPunjabi = !showPunjabi;
+            }
+            change();
+            tickerTimers[id] = setInterval(change, 8000);
+        }
+    }
+
+    function startTicker(id, speed) {
+        const el = document.getElementById(id);
+        let x = el.offsetWidth;
+        function animate() {
+            const scroller = el.querySelector('.scroller');
+            if (scroller) {
+                x -= speed;
+                if (x < -scroller.offsetWidth) x = el.offsetWidth;
+                scroller.style.transform = `translateX(${x}px)`;
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
+
+    // Clock
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('live-time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('live-date').innerText = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+    }
+    setInterval(updateClock, 1000); updateClock();
+
+    let isTime = true;
+    setInterval(() => { 
+        isTime = !isTime; 
+        document.getElementById('t-wrap').style.opacity = isTime ? "1" : "0"; 
+        document.getElementById('d-wrap').style.opacity = isTime ? "0" : "1"; 
+    }, 3000);
+
+    // Watermark
+    const wm = document.getElementById('single-wm');
+    let x = 100, y = 250, dx = 2.2, dy = 1.6;
+    function animateWatermark() {
+        const maxX = 1920 - wm.offsetWidth, maxY = 980 - wm.offsetHeight;
+        x += dx; y += dy;
+        if (x <= 0 || x >= maxX) dx *= -1;
+        if (y <= 170 || y >= maxY) dy *= -1;
+        wm.style.left = x + 'px'; wm.style.top = y + 'px';
+        requestAnimationFrame(animateWatermark);
+    }
+    animateWatermark();
 </script>
 </body>
 </html>
