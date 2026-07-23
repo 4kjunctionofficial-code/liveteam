@@ -61,9 +61,9 @@
 </div>
 
 <div id="ticker-wrap">
-    <div class="row-text row-1" id="c1"><div class="scroller">WELCOME TO LIVE KABADDI</div></div>
+    <div class="row-text row-1" id="c1">WELCOME TO LIVE KABADDI</div>
     <div class="row-text row-2" id="c2"><div class="scroller">SUBSCRIBE OUR CHANNEL</div></div>
-    <div class="row-text row-3" id="c3"><div class="scroller">LIKE & SHARE</div></div>
+    <div class="row-text row-3" id="c3">LIKE & SHARE</div>
     <div class="row-text row-4" id="c4"><div class="scroller">KEEP WATCHING</div></div> 
 
     <div class="box-time">
@@ -123,16 +123,14 @@
         document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
         document.getElementById('round-display').innerText = data.round || "";
         
-        updateTickerContent("c1", data.row1Txt, data.row1Txt_pa);
-        updateTickerContent("c2", data.row2Txt, data.row2Txt_pa); 
-        updateTickerContent("c3", data.row3Txt, data.row3Txt_pa);
-        updateTickerContent("c4", data.row4Txt, data.row4Txt_pa);
+        updateStaticTicker("c1", data.row1Txt, data.row1Txt_pa);
+        updateScrollingTicker("c2", data.row2Txt, data.row2Txt_pa); 
+        updateStaticTicker("c3", data.row3Txt, data.row3Txt_pa);
+        updateScrollingTicker("c4", data.row4Txt, data.row4Txt_pa);
 
         if (!tickerInitialized) {
-            startTicker('c1', 1.4); 
-            startTicker('c2', 2.0); // Row 2 ਹੁਣ ਸਕ੍ਰੋਲ ਹੋਵੇਗੀ
-            startTicker('c3', 1.7); 
-            startTicker('c4', 1.9); // Row 4 ਹੁਣ ਸਕ੍ਰੋਲ ਹੋਵੇਗੀ
+            startTicker('c2', 2.0); // Row 2 ਸਕ੍ਰੋਲ
+            startTicker('c4', 1.9); // Row 4 ਸਕ੍ਰੋਲ
             tickerInitialized = true;
         }
     });
@@ -145,28 +143,37 @@
         }
     }
 
-    function updateTickerContent(id, en, pa) {
+    // Static Rows (Row 1 & Row 3) - English / Punjabi Toggle without scrolling
+    function updateStaticTicker(id, en, pa) {
         const el = document.getElementById(id);
-        clearInterval(tickerTimers[id]);
+        if (tickerTimers[id]) clearInterval(tickerTimers[id]);
 
-        if (id === 'c2' && en && en.includes('|')) {
-            const matches = en.split('|');
-            let index = 0;
-            function changeMatch() {
-                el.innerHTML = `<div class="scroller">${matches[index].trim()}</div>`;
-                index = (index + 1) % matches.length;
-            }
-            changeMatch();
-            tickerTimers[id] = setInterval(changeMatch, 5000); 
-        } else {
-            let showPunjabi = false;
-            function change() {
-                const txt = (showPunjabi && pa && pa.trim() !== "") ? pa : (en || "");
-                el.innerHTML = `<div class="scroller">${txt}</div>`;
-                showPunjabi = !showPunjabi;
-            }
-            change();
+        let showPunjabi = false;
+        function change() {
+            const txt = (showPunjabi && pa && pa.trim() !== "") ? pa : (en || "");
+            el.innerText = txt;
+            showPunjabi = !showPunjabi;
+        }
+        change();
+        if ((pa && pa.trim() !== "")) {
             tickerTimers[id] = setInterval(change, 8000);
+        }
+    }
+
+    // Scrolling Rows (Row 2 & Row 4) - English / Punjabi Toggle with scrolling
+    function updateScrollingTicker(id, en, pa) {
+        const el = document.getElementById(id);
+        if (tickerTimers[id]) clearInterval(tickerTimers[id]);
+
+        let showPunjabi = false;
+        function change() {
+            const txt = (showPunjabi && pa && pa.trim() !== "") ? pa : (en || "");
+            el.innerHTML = `<div class="scroller">${txt}</div>`;
+            showPunjabi = !showPunjabi;
+        }
+        change();
+        if ((pa && pa.trim() !== "")) {
+            tickerTimers[id] = setInterval(change, 16000); // 8 ਸਕਿੰਟ English ਅਤੇ 8 ਸਕਿੰਟ Punjabi
         }
     }
 
