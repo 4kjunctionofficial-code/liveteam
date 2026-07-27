@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Arial', sans-serif; overflow: hidden; position: relative; }
+        
+        #logo-container { position: absolute; top: 30px; left: 40px; z-index: 9999; opacity: 1; transition: all 0.7s ease; }
+        #logo-container.hidden { opacity: 0; transform: scale(0); }
+        #main-logo { height: 100px; width: auto; max-width: 450px; object-fit: contain; filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.3)); } 
+
+        #single-wm {
+            position: absolute;
+            color: #ffffff;
+            opacity: 1;
+            font-size: 35px;
+            font-weight: 900;
+            text-shadow: 2px 2px 5px #000;
+            white-space: nowrap;
+            z-index: 500;
+            pointer-events: none;
+            transition: all 1s linear;
+        }
+
+        #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 150px; display: flex; z-index: 9998; opacity: 1; transition: all 0.7s ease; background: transparent; }
+        #ticker-wrap.hidden { opacity: 0; transform: translateY(160px); }
+
+        .box-live {
+            width: 300px;
+            background: #000000;
+            color: #FFD22F;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 85px;
+            font-weight: 900;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            z-index: 12;
+            position: relative;
+            border-right: 4px solid #FFD22F;
+            clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%);
+            padding-right: 60px;
+            box-sizing: border-box;
+            text-shadow: 3px 3px 5px rgba(0,0,0,0.4);
+        }
+
+        .center-wrap { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+            background: #FFD22F; 
+            z-index: 5; 
+            margin-left: -115px;  
+            margin-right: -115px; 
+            padding-left: 60px; 
+            padding-right: 60px;
+        }
+        
+        .row-text { display: flex; align-items: center; font-weight: bold; text-transform: uppercase; width: 100%; overflow: hidden; box-sizing: border-box; white-space: nowrap; padding-left: 60px; }
+        
+        .row-1 {
+            background: #111111;
+            color: #FFD22F;
+            height: 54px;
+            font-size: 38px;
+            font-weight: 900;
+            border-bottom: 1px solid #FFD22F;
+        }
+
+        .row-2 {
+            background: #FFD22F;
+            color: #111111;
+            height: 48px;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .row-3 {
+            background: #111111;
+            color: #ffffff;
+            height: 48px;
+            font-size: 28px;
+            border-top: 1px solid #FFD22F;
+        }
+
+        .scroller {
+            display: inline-block;
+            white-space: nowrap;
+            position: relative;
+            will-change: transform;
+        }
+
+        .box-time {
+            width: 340px;
+            background: #000000;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 12;
+            position: relative;
+            border-left: 4px solid #FFD22F;
+            clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%);
+            padding-left: 70px;
+            box-sizing: border-box;
+        }
+
+        .time-wrap, .date-wrap { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: 0.8s; font-weight: bold; padding-left: 40px; box-sizing: border-box; }
+        .time-str { color: #ffffff; font-size: 45px; letter-spacing: 1px; }
+        .date-str { font-size: 32px; color: #FFD22F; }
+
+        #scoreboard { position: absolute; top: 40px; right: 80px; display: flex; flex-direction: column; align-items: center; z-index: 9999; opacity: 1; transition: all 0.7s ease; }
+        #scoreboard.hidden { opacity: 0; transform: translateY(-100px); }
+
+        .main-bar { display: flex; align-items: center; height: 65px; background: #FFD22F; border-radius: 6px; border: 3px solid #000000; padding: 0; position: relative; overflow: hidden; }
+
+        .s-box { 
+            background: #000000; 
+            color: #ffffff; 
+            font-size: 42px; 
+            font-weight: 900; 
+            font-family: Arial, sans-serif; 
+            width: 120px; 
+            height: 100%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            position: relative; 
+            z-index: 11; 
+        }
+        .s-left { border-right: 2px solid #FFD22F; }
+        .s-right { border-left: 2px solid #FFD22F; }
+        .inner-val { transform: skewX(15deg); }
+
+        .name-area { width: 220px; height: 100%; display: flex; align-items: center; overflow: hidden; white-space: nowrap; color: #000000; font-size: 28px; font-weight: bold; text-align: center; padding: 0 10px; box-sizing: border-box; text-transform: uppercase; background: #FFD22F; } 
+        .team-scroller { display: inline-block; padding-left: 100%; animation: team-scroll 8s linear infinite; }
+        @keyframes team-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+        .vs-text { color: #FFD22F; font-size: 20px; font-weight: 900; margin: 0 5px; background: #000000; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; z-index: 11; border: 2px solid #FFD22F; }
+        .round-display { color: #FFD22F; font-size: 22px; font-weight: bold; text-transform: uppercase; margin-top: 15px; text-shadow: 2px 2px 6px #000; letter-spacing: 2px; display: block; background: rgba(0,0,0,0.8); padding: 4px 15px; border-radius: 4px; border: 1px solid #FFD22F; }  
+    </style>
+</head>
+<body>
+
+<div id="logo-container" class="hidden">
+    <img id="main-logo" src="" alt="Logo">
+</div>
+
+<div id="single-wm">M LIVE</div>
+
+<div id="scoreboard">
+    <div class="main-bar">
+        <div class="s-box s-left"><div class="inner-val" id="sA">0</div></div>
+        <div class="name-area" id="nA-container"><div id="nA" style="width:100%; text-align:center;">TEAM 1</div></div>
+        <div class="vs-text">VS</div>
+        <div class="name-area" id="nB-container"><div id="nB" style="width:100%; text-align:center;">TEAM 2</div></div>
+        <div class="s-box s-right"><div class="inner-val" id="sB">0</div></div>
+    </div>
+    <div class="round-display" id="round-display">LIVE MATCH</div>
+</div>
+
+<div id="ticker-wrap">
+    <div class="box-live">Live</div>
+    <div class="center-wrap">
+        <div class="row-text row-1" id="c1">WELCOME TO LIVE KABADDI</div>
+        <div class="row-text row-2" id="c2">SUBSCRIBE OUR CHANNEL</div>
+        <div class="row-text row-3" id="c3">LIKE & SHARE</div>
+    </div>
+    <div class="box-time">
+        <div class="time-wrap" id="t-wrap"><div class="time-str" id="live-time"></div></div>
+        <div class="date-wrap" id="d-wrap" style="opacity:0;"><div class="date-str" id="live-date"></div></div>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const matchId = urlParams.get('id') || 'defaultMatch';
+    const db = firebase.database().ref("matchData/" + matchId);
+
+    const clientLogos = {
+        "mudki1": "nk sports live logo.png"
+    };
+
+    let tickerInitialized = false;
+
+    db.on("value", (snap) => {
+        const data = snap.val() || {}; 
+        const logoCont = document.getElementById('logo-container');
+        const currentId = matchId.trim().toLowerCase();
+
+        // Logo visibility
+        if (clientLogos[currentId] && data.logoVisible !== false) {
+            document.getElementById('main-logo').src = clientLogos[currentId];
+            logoCont.classList.remove('hidden');
+        } else {
+            logoCont.classList.add('hidden');
+        }
+
+        // Scoreboard & Ticker Wrapper visibility
+        document.getElementById('scoreboard').classList.toggle('hidden', data.scoreVisible === false);
+        const tickerWrap = document.getElementById('ticker-wrap');
+        tickerWrap.classList.toggle('hidden', data.tickerVisible === false);
+        
+        // Update basic data
+        document.getElementById('sA').innerText = data.scoreA ?? "0";
+        document.getElementById('sB').innerText = data.scoreB ?? "0";
+        setTeamName('nA-container', data.nameA || "TEAM 1");
+        setTeamName('nB-container', data.nameB || "TEAM 2");
+        document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
+        
+        const roundEl = document.getElementById('round-display');
+        roundEl.innerText = data.round || "";
+        roundEl.style.display = (data.round || "").trim() === "" ? "none" : "block";
+        
+        // Ticker Content update
+        updateTickerContent('c1', data.row1Txt || "WELCOME TO LIVE KABADDI");
+        updateTickerContent('c2', data.row2Txt || "SUBSCRIBE OUR CHANNEL");
+        updateTickerContent('c3', data.row3Txt || "LIKE & SHARE");
+
+        if (!tickerInitialized) {
+            startTicker('c1', 1.4);
+            startTicker('c2', 2.0);
+            startTicker('c3', 1.7);
+            tickerInitialized = true;
+        }
+    });
+
+    function setTeamName(containerId, txt) {
+        const el = document.getElementById(containerId);
+        el.innerHTML = txt.length > 12 ? `<div class="team-scroller">${txt}</div>` : `<div style="width:100%; text-align:center;">${txt}</div>`;
+    }
+
+    function updateTickerContent(id, txt) {
+        const el = document.getElementById(id);
+        const scroller = el.querySelector('.scroller');
+        if (scroller) {
+            scroller.innerHTML = `${txt}&nbsp;&nbsp; • &nbsp;&nbsp; ${txt}`;
+        } else {
+            el.innerHTML = `<div class="scroller">${txt}&nbsp;&nbsp; • &nbsp;&nbsp; ${txt}</div>`;
+        }
+    }
+
+    function startTicker(id, speed) {
+        const el = document.getElementById(id);
+        const scroller = el.querySelector('.scroller');
+        if(!el || !scroller) return;
+        let x = el.offsetWidth;
+
+        function animate() {
+            x -= speed;
+            if (x < -scroller.offsetWidth) x = el.offsetWidth;
+            scroller.style.transform = `translateX(${x}px)`;
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
+
+    // Clock functions
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('live-time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('live-date').innerText = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+    }
+    setInterval(updateClock, 1000); 
+    updateClock();
+
+    let isTime = true;
+    setInterval(() => { 
+        isTime = !isTime; 
+        document.getElementById('t-wrap').style.opacity = isTime ? "1" : "0"; 
+        document.getElementById('d-wrap').style.opacity = isTime ? "0" : "1"; 
+    }, 5000);
+
+    const wmEl = document.getElementById('single-wm');
+    function moveWM() { 
+        wmEl.style.left = (Math.random() * 1400 + 100) + 'px'; 
+        wmEl.style.top = (Math.random() * 600 + 150) + 'px'; 
+    }
+    moveWM(); 
+    setInterval(moveWM, 6000);
+</script>
+</body>
+</html>
