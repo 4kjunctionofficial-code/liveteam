@@ -63,8 +63,11 @@
         .row-1 { bottom: 61px; left: 210px; width: 350px; height: 50px; font-size: 30px; color: #ffffff; justify-content: center; text-align: center; padding-left: 0px; }
         .row-3 { bottom: 53px; left: 1395px; width: 550px; height: 50px; font-size: 28px; color: #ffffff; justify-content: center; text-align: center; padding-left: 0px; }
 
-        .row-2 { bottom: 53px; left: 587px; width: 815px; height: 50px; font-size: 30px; color: #000000; text-shadow: none; justify-content: flex-start; text-align: left; padding-left: 0px; }
-        .row-4 { bottom: 2px; left: 200px; width: 1730px; height: 50px; font-size: 30px; color: #ffffff; justify-content: flex-start; text-align: left; padding-left: 0px; }
+        /* Row 2 adjusted to 1395px start */
+        .row-2 { bottom: 53px; left: 1395px; width: 500px; height: 50px; font-size: 30px; color: #000000; text-shadow: none; justify-content: flex-start; text-align: left; padding-left: 0px; }
+        
+        /* Row 4 adjusted to 1920px width/start area */
+        .row-4 { bottom: 2px; left: 1920px; width: 0px; height: 50px; font-size: 30px; color: #ffffff; justify-content: flex-start; text-align: left; padding-left: 0px; }
         
         @keyframes scrollText {
             0% { transform: translateX(100%); }
@@ -85,7 +88,7 @@
             animation-name: scrollText;
             animation-timing-function: linear;
             animation-iteration-count: infinite;
-            animation-duration: 25s; /* Fixed steady speed for smooth scrolling */
+            animation-duration: 25s;
             transition: opacity 0.2s ease-in-out;
         }
 
