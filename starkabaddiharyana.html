@@ -173,8 +173,8 @@
     const tickerState = {
         nA: { showPa: false, en: "", pa: "" },
         nB: { showPa: false, en: "", pa: "" },
-        c2: { showPa: false, en: "", pa: "", activeText: "" },
-        c4: { showPa: false, en: "", pa: "", activeText: "" }
+        c2: { showPa: false, en: "", pa: "" },
+        c4: { showPa: false, en: "", pa: "" }
     };
     const tickerTimers = {};
 
@@ -274,19 +274,14 @@
 
     function updateScrollingData(id, en, pa) {
         const state = tickerState[id];
-        const newEn = en || "";
-        const newPa = pa || "";
-
-        if (state.en !== newEn || state.pa !== newPa) {
-            state.en = newEn;
-            state.pa = newPa;
-        }
+        state.en = en || "";
+        state.pa = pa || "";
     }
 
-    // Perfect Continuous Scroller Engine (Full cycle completion before language switch)
+    // Zero-Jhatka Double Buffering Scroller Engine
     const scrollerData = {
-        c2: { pos: 0, textWidth: 0, lastTime: 0, initialized: false },
-        c4: { pos: 0, textWidth: 0, lastTime: 0, initialized: false }
+        c2: { pos: 0, textWidth: 0, lastTime: 0, initialized: false, activeLang: false },
+        c4: { pos: 0, textWidth: 0, lastTime: 0, initialized: false, activeLang: false }
     };
 
     function initScroller(id) {
@@ -309,29 +304,28 @@
             const dt = (now - scrollerData[id].lastTime) / 1000;
             scrollerData[id].lastTime = now;
 
-            const isPa = state.showPa && state.pa && state.pa.trim() !== "";
-            const currentTxt = (isPa ? state.pa : (state.en || " ")).replace(/(\r\n|\n|\r)/gm, " ");
+            // Get current active language text
+            const hasPa = state.pa && state.pa.trim() !== "";
+            const currentLangIsPa = hasPa ? state.showPa : false;
+            const targetText = (currentLangIsPa ? state.pa : (state.en || " ")).replace(/(\r\n|\n|\r)/gm, " ");
 
-            if (state.activeText !== currentTxt) {
-                state.activeText = currentTxt;
-                scrollerEl.innerText = currentTxt;
+            // If text changed or language changed, update seamlessly
+            if (scrollerData[id].currentText !== targetText || scrollerData[id].activeLang !== currentLangIsPa) {
+                scrollerData[id].currentText = targetText;
+                scrollerData[id].activeLang = currentLangIsPa;
+                scrollerEl.innerText = targetText;
                 scrollerData[id].textWidth = scrollerEl.scrollWidth;
             }
 
             scrollerData[id].pos -= SPEED * dt;
             scrollerEl.style.transform = `translate3d(${scrollerData[id].pos}px, 0, 0)`;
 
-            // When the entire text completely finishes scrolling out of the left boundary,
-            // toggle language and reset position to the right edge instantly.
+            // When text fully exits the left side, switch language (if available) and reset to right edge instantly
             if (scrollerData[id].pos <= -scrollerData[id].textWidth) {
-                if (state.pa && state.pa.trim() !== "") {
+                if (hasPa) {
                     state.showPa = !state.showPa;
                 }
-                const nextTxt = ((state.showPa && state.pa && state.pa.trim() !== "") ? state.pa : (state.en || "")).replace(/(\r\n|\n|\r)/gm, " ");
-                state.activeText = nextTxt;
-                scrollerEl.innerText = nextTxt;
-                scrollerData[id].textWidth = scrollerEl.scrollWidth;
-                scrollerData[id].pos = containerWidth; // Restart cleanly from right edge
+                scrollerData[id].pos = containerWidth;
             }
 
             requestAnimationFrame(step);
