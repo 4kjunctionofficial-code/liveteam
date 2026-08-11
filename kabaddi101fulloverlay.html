@@ -34,11 +34,15 @@
         #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 1080px; z-index: 9998; opacity: 1; transition: opacity 0.7s ease; background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Copy%20of%20Star%20Kabaddi%20_20260711_110521_0000.png'); background-size: cover; background-position: center; background-repeat: no-repeat; pointer-events: none; }
         #ticker-wrap.hidden { opacity: 0; }
 
-        .row-text { position: absolute; display: flex; align-items: center; text-transform: uppercase; overflow: hidden; box-sizing: border-box; white-space: nowrap; padding-left: 10px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); font-family: 'Anmol Unicode', sans-serif; font-weight: bold; }
-        .row-1 { bottom: 61px; left: 210px; width: 350px; height: 50px; font-size: 25px; color: #ffffff; }
-        .row-2 { bottom: 53px; left: 587px; width: 815px; height: 50px; font-size: 25px; color: #000000; text-shadow: none; }
-        .row-3 { bottom: 53px; left: 1425px; width: 550px; height: 50px; font-size: 25px; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: clip; }
-        .row-4 { bottom: 2px; left: 200px; width: 1730px; height: 50px; font-size: 25px; color: #ffffff; }
+        .row-text { position: absolute; display: flex; align-items: center; text-transform: uppercase; overflow: hidden; box-sizing: border-box; white-space: nowrap; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); font-family: 'Anmol Unicode', sans-serif; font-weight: bold; }
+        
+        /* Row 1 & Row 3 centered */
+        .row-1 { bottom: 61px; left: 210px; width: 350px; height: 50px; font-size: 25px; color: #ffffff; justify-content: center; text-align: center; padding-left: 0px; }
+        .row-3 { bottom: 53px; left: 1425px; width: 550px; height: 50px; font-size: 25px; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: clip; justify-content: center; text-align: center; padding-left: 0px; }
+
+        /* Row 2 & Row 4 left-aligned with padding */
+        .row-2 { bottom: 53px; left: 587px; width: 815px; height: 50px; font-size: 25px; color: #000000; text-shadow: none; justify-content: flex-start; text-align: left; padding-left: 10px; }
+        .row-4 { bottom: 2px; left: 200px; width: 1730px; height: 50px; font-size: 25px; color: #ffffff; justify-content: flex-start; text-align: left; padding-left: 10px; }
         
         @keyframes scrollText {
             0% { transform: translateX(100%); }
