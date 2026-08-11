@@ -173,8 +173,8 @@
     const tickerState = {
         nA: { showPa: false, en: "", pa: "" },
         nB: { showPa: false, en: "", pa: "" },
-        c2: { showPa: false, en: "", pa: "" },
-        c4: { showPa: false, en: "", pa: "" }
+        c2: { showPa: false, en: "", pa: "", activeText: "" },
+        c4: { showPa: false, en: "", pa: "", activeText: "" }
     };
     const tickerTimers = {};
 
@@ -280,9 +280,23 @@
         if (state.en !== newEn || state.pa !== newPa) {
             state.en = newEn;
             state.pa = newPa;
-            renderScrollingText(id, true);
+            
+            // Determine active text immediately to prevent any flicker
+            const targetTxt = (state.showPa && state.pa && state.pa.trim() !== "") ? state.pa : (state.en || "");
+            const cleanTxt = targetTxt.replace(/(\r\n|\n|\r)/gm, " ");
+            
+            if(state.activeText !== cleanTxt) {
+                state.activeText = cleanTxt;
+                renderScrollingText(id, true);
+            }
         }
     }
+
+    // Main robust scroller loop for Row 2 and Row 4
+    const scrollerData = {
+        c2: { pos: 0, textWidth: 0, lastTime: 0, running: false },
+        c4: { pos: 0, textWidth: 0, lastTime: 0, running: false }
+    };
 
     function renderScrollingText(id, forceReset = false) {
         const scrollerEl = document.getElementById(`scroller-${id}`);
@@ -292,51 +306,48 @@
         const SPEED_C2 = 100; // Row 2 speed
         const SPEED_C4 = 120; // Row 4 speed
         const SPEED = (id === "c2") ? SPEED_C2 : SPEED_C4;
+        const containerWidth = (id === "c2") ? 815 : 1720;
 
-        if (forceReset && scrollerEl._scrollRAF) {
-            cancelAnimationFrame(scrollerEl._scrollRAF);
-            scrollerEl._scrollRAF = null;
+        const isPa = state.showPa && state.pa && state.pa.trim() !== "";
+        const currentTxt = (isPa ? state.pa : state.en || "").replace(/(\r\n|\n|\r)/gm, " ");
+
+        if (state.activeText !== currentTxt || forceReset) {
+            state.activeText = currentTxt;
+            scrollerEl.innerText = currentTxt;
+            scrollerData[id].textWidth = scrollerEl.scrollWidth;
+            if (forceReset || !scrollerData[id].running) {
+                scrollerData[id].pos = containerWidth;
+            }
         }
 
-        if (scrollerEl._isInitialized && !forceReset) return;
-        scrollerEl._isInitialized = true;
+        if (scrollerData[id].running) return;
+        scrollerData[id].running = true;
+        scrollerData[id].lastTime = performance.now();
 
-        function startScroll() {
-            const isPa = state.showPa && state.pa && state.pa.trim() !== "";
-            const txt = (isPa ? state.pa : state.en || "").replace(/(\r\n|\n|\r)/gm, " ");
+        function step(now) {
+            const dt = (now - scrollerData[id].lastTime) / 1000;
+            scrollerData[id].lastTime = now;
 
-            scrollerEl.innerText = txt;
-            const textWidth = scrollerEl.scrollWidth;
+            scrollerData[id].pos -= SPEED * dt;
 
-            // Start instantly from right edge with zero extra margin/padding space
-            let position = scrollerEl.parentElement.offsetWidth;
-            let lastTime = performance.now();
+            scrollerEl.style.transform = `translate3d(${scrollerData[id].pos}px, 0, 0)`;
 
-            function animate(now) {
-                const dt = (now - lastTime) / 1000;
-                lastTime = now;
-
-                position -= SPEED * dt;
-
-                scrollerEl.style.transform = `translate3d(${position}px, 0, 0)`;
-
-                // Restart immediately as soon as the text completely scrolls past the left edge
-                if (position <= -textWidth) {
-                    if (state.pa && state.pa.trim() !== "") {
-                        state.showPa = !state.showPa;
-                    }
-                    startScroll();
-                    return;
+            // When full text exits left boundary, instantly toggle language if available and loop back to right edge
+            if (scrollerData[id].pos <= -scrollerData[id].textWidth) {
+                if (state.pa && state.pa.trim() !== "") {
+                    state.showPa = !state.showPa;
                 }
-
-                scrollerEl._scrollRAF = requestAnimationFrame(animate);
+                const nextTxt = ((state.showPa && state.pa && state.pa.trim() !== "") ? state.pa : (state.en || "")).replace(/(\r\n|\n|\r)/gm, " ");
+                state.activeText = nextTxt;
+                scrollerEl.innerText = nextTxt;
+                scrollerData[id].textWidth = scrollerEl.scrollWidth;
+                scrollerData[id].pos = containerWidth; // Restart cleanly from right edge
             }
 
-            if (scrollerEl._scrollRAF) cancelAnimationFrame(scrollerEl._scrollRAF);
-            scrollerEl._scrollRAF = requestAnimationFrame(animate);
+            requestAnimationFrame(step);
         }
 
-        startScroll();
+        requestAnimationFrame(step);
     }
 
     // Clock
