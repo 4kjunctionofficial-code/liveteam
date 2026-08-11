@@ -283,10 +283,10 @@
         }
     }
 
-    // Advanced Continuous Infinite Scroller Engine (Zero Flicker / Zero Jhatka)
+    // Perfect Continuous Scroller Engine (Full cycle completion before language switch)
     const scrollerData = {
-        c2: { pos: 0, textWidth: 0, lastTime: 0, initialized: false, langTimer: 0 },
-        c4: { pos: 0, textWidth: 0, lastTime: 0, initialized: false, langTimer: 0 }
+        c2: { pos: 0, textWidth: 0, lastTime: 0, initialized: false },
+        c4: { pos: 0, textWidth: 0, lastTime: 0, initialized: false }
     };
 
     function initScroller(id) {
@@ -303,13 +303,6 @@
             scrollerData[id].initialized = true;
             scrollerData[id].pos = containerWidth;
             scrollerData[id].lastTime = performance.now();
-
-            // Language switch timer every 8 seconds smoothly without resetting position
-            setInterval(() => {
-                if (state.pa && state.pa.trim() !== "") {
-                    state.showPa = !state.showPa;
-                }
-            }, 8000);
         }
 
         function step(now) {
@@ -321,18 +314,25 @@
 
             if (state.activeText !== currentTxt) {
                 state.activeText = currentTxt;
-                scrollerEl.innerText = currentTxt + " \u00A0 \u00A0 \u00A0 \u00A0 " + currentTxt; // Double duplicate string for seamless infinite loop
-                scrollerData[id].textWidth = scrollerEl.scrollWidth / 2; // Width of single text block
+                scrollerEl.innerText = currentTxt;
+                scrollerData[id].textWidth = scrollerEl.scrollWidth;
             }
 
             scrollerData[id].pos -= SPEED * dt;
-
-            // When first copy completely passes out, seamlessly snap back to 0 without any visual jerk
-            if (scrollerData[id].pos <= -scrollerData[id].textWidth) {
-                scrollerData[id].pos += scrollerData[id].textWidth;
-            }
-
             scrollerEl.style.transform = `translate3d(${scrollerData[id].pos}px, 0, 0)`;
+
+            // When the entire text completely finishes scrolling out of the left boundary,
+            // toggle language and reset position to the right edge instantly.
+            if (scrollerData[id].pos <= -scrollerData[id].textWidth) {
+                if (state.pa && state.pa.trim() !== "") {
+                    state.showPa = !state.showPa;
+                }
+                const nextTxt = ((state.showPa && state.pa && state.pa.trim() !== "") ? state.pa : (state.en || "")).replace(/(\r\n|\n|\r)/gm, " ");
+                state.activeText = nextTxt;
+                scrollerEl.innerText = nextTxt;
+                scrollerData[id].textWidth = scrollerEl.scrollWidth;
+                scrollerData[id].pos = containerWidth; // Restart cleanly from right edge
+            }
 
             requestAnimationFrame(step);
         }
