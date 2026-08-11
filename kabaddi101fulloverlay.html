@@ -18,7 +18,9 @@
         #scoreboard { position: absolute; top: 0px; left: 0px; width: 1920px; height: 1080px; z-index: 9999; opacity: 1; transition: opacity 0.7s ease; background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/101%20png.png'); background-size: cover; background-position: center; background-repeat: no-repeat; }
         #scoreboard.hidden { opacity: 0; }
 
-        .name-area { position: absolute; top: 43px; height: 50px; display: flex; align-items: center; color: #ffffff; font-size: 30px; text-transform: uppercase; text-shadow: 2px 2px 4px #000; overflow: hidden; white-space: nowrap; z-index: 11; font-family: 'Anmol Unicode', 'Bebas Neue', sans-serif; font-weight: bold; }
+        /* Ticker ਵਰਗੇ ਬਿਲਕੁਲ Same Fonts ਅਤੇ Shadow */
+        .name-area { position: absolute; top: 43px; height: 50px; display: flex; align-items: center; color: #ffffff; font-size: 30px; text-transform: uppercase; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); overflow: hidden; white-space: nowrap; z-index: 11; font-family: 'Anmol Unicode', sans-serif; font-weight: bold; }
+        
         #nA-container { left: 1060px; width: 280px; justify-content: flex-end; }
         #nB-container { left: 1575px; width: 280px; justify-content: flex-start; }
         
@@ -28,10 +30,10 @@
 
         .round-display { position: absolute; top: 110px; left: 1450px; transform: translateX(-50%); color: white; font-size: 25px; text-transform: uppercase; text-shadow: 2px 2px 6px #000; z-index: 11; font-family: 'Anmol Unicode', 'Bebas Neue', sans-serif; font-weight: bold; }
 
-        /* Team Name Scroller Animation */
+        /* Team Name Scroller Animation (Ticker ਵਾਂਗ ਸੇਮ) */
         @keyframes scrollTeamName {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+            0% { transform: translateX(50%); }
+            100% { transform: translateX(-100%); }
         }
 
         .team-scroller-box {
@@ -172,6 +174,7 @@
         updateScrollingData("c4", data.row4Txt, data.row4Txt_pa);
     });
 
+    // Scoreboard Names Render & Translate Logic
     function updateTeamNameState(key, en, pa) {
         const state = tickerState[key];
         const newEn = en || "TEAM";
@@ -190,30 +193,51 @@
         const state = tickerState[key];
         if (!el) return;
 
-        const hasPa = state.pa && state.pa.trim() !== "";
-        const isPa = state.showPa && hasPa;
+        const isPa = state.showPa && state.pa && state.pa.trim() !== "";
         const currentTxt = isPa ? state.pa : state.en;
-        const cleanTxt = (currentTxt || "").replace(/(\r\n|\n|\r)/gm, " ");
+        const cleanTxt = (currentTxt || "TEAM").replace(/(\r\n|\n|\r)/gm, " ");
 
-        // If name is long (>10 chars), enable smooth scrolling loop like ticker
-        if (cleanTxt.length > 10) {
-            el.innerHTML = `<div class="team-scroller-box"><div class="team-scroller" id="scroller-${key}">${cleanTxt} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ${cleanTxt} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div></div>`;
-            const scrollerEl = document.getElementById(`scroller-${key}`);
-            const dur = Math.max(6, cleanTxt.length * 0.3);
-            scrollerEl.style.animationDuration = dur + 's';
-        } else {
-            el.innerHTML = `<div style="font-weight:bold;">${cleanTxt}</div>`;
-        }
+        const renderHTML = (txt) => {
+            if (txt.length > 10) {
+                return `<div class="team-scroller-box"><div class="team-scroller" id="scroller-${key}">${txt}</div></div>`;
+            } else {
+                return `<div style="font-weight:bold; width:100%; text-align:center; transition: opacity 0.2s ease-in-out;" id="static-${key}">${txt}</div>`;
+            }
+        };
 
-        if (hasPa && !el.dataset.hasTimer) {
+        const updateAnimation = (txt) => {
+            if (txt.length > 10) {
+                const scrollerEl = document.getElementById(`scroller-${key}`);
+                const dur = Math.max(8, txt.length * 0.25);
+                if(scrollerEl) scrollerEl.style.animationDuration = dur + 's';
+            }
+        };
+
+        // Render Immediately
+        el.innerHTML = renderHTML(cleanTxt);
+        updateAnimation(cleanTxt);
+
+        // Auto Translation Timer
+        if (state.pa && state.pa.trim() !== "" && !el.dataset.hasTimer) {
             el.dataset.hasTimer = "true";
             setInterval(() => {
-                state.showPa = !state.showPa;
-                renderTeamName(key);
+                const textEl = document.getElementById(`scroller-${key}`) || document.getElementById(`static-${key}`);
+                if(textEl) textEl.style.opacity = '0';
+                
+                setTimeout(() => {
+                    state.showPa = !state.showPa;
+                    const newIsPa = state.showPa && state.pa && state.pa.trim() !== "";
+                    const newTxt = newIsPa ? state.pa : state.en;
+                    const newCleanTxt = (newTxt || "TEAM").replace(/(\r\n|\n|\r)/gm, " ");
+                    
+                    el.innerHTML = renderHTML(newCleanTxt);
+                    updateAnimation(newCleanTxt);
+                }, 200);
             }, 8000);
         }
     }
 
+    // Ticker Logic
     function updateStaticTicker(id, en, pa) {
         const el = document.getElementById(id);
         if (tickerTimers[id]) clearInterval(tickerTimers[id]);
@@ -287,6 +311,7 @@
         }
     }
 
+    // Clock
     function updateClock() {
         const now = new Date();
         document.getElementById('live-time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
