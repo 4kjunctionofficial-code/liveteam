@@ -56,10 +56,11 @@
         .scroller { 
             display: inline-block; 
             white-space: nowrap; 
-            will-change: transform;
+            will-change: transform, opacity;
             animation-name: scrollText;
             animation-timing-function: linear;
             animation-iteration-count: infinite;
+            transition: opacity 0.2s ease-in-out;
         }
 
         .box-time { position: absolute; bottom: 1px; left: 3px; width: 190px; height: 40px; display: flex; align-items: center; justify-content: center; z-index: 12; overflow: hidden; }
@@ -201,7 +202,7 @@
 
         const isPa = state.showPa && state.pa.trim() !== "";
         const currentTxt = isPa ? state.pa : state.en;
-        const cleanTxt = currentTxt.replace(/(\r\n|\n|\r)/gm, " ");
+        const cleanTxt = (currentTxt || "").replace(/(\r\n|\n|\r)/gm, " ");
         
         scrollerEl.style.fontWeight = "bold";
         scrollerEl.innerText = cleanTxt;
@@ -214,17 +215,24 @@
 
         if (state.pa && state.pa.trim() !== "") {
             scrollerEl.onanimationiteration = () => {
-                state.showPa = !state.showPa;
-                const nextIsPa = state.showPa && state.pa.trim() !== "";
-                const nextTxt = nextIsPa ? state.pa : state.en;
-                const cleanNextTxt = nextTxt.replace(/(\r\n|\n|\r)/gm, " ");
+                // Smooth fade transition to prevent jerk during translation
+                scrollerEl.style.opacity = '0';
                 
-                scrollerEl.style.fontWeight = "bold";
-                scrollerEl.innerText = cleanNextTxt;
+                setTimeout(() => {
+                    state.showPa = !state.showPa;
+                    const nextIsPa = state.showPa && state.pa.trim() !== "";
+                    const nextTxt = nextIsPa ? state.pa : state.en;
+                    const cleanNextTxt = (nextTxt || "").replace(/(\r\n|\n|\r)/gm, " ");
+                    
+                    scrollerEl.style.fontWeight = "bold";
+                    scrollerEl.innerText = cleanNextTxt;
 
-                const nextLength = cleanNextTxt.length;
-                const nextDuration = Math.max(8, nextLength * 0.25);
-                scrollerEl.style.animationDuration = nextDuration + 's';
+                    const nextLength = cleanNextTxt.length;
+                    const nextDuration = Math.max(8, nextLength * 0.25);
+                    scrollerEl.style.animationDuration = nextDuration + 's';
+                    
+                    scrollerEl.style.opacity = '1';
+                }, 150);
             };
         }
     }
