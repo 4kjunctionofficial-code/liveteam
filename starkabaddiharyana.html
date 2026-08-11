@@ -173,8 +173,8 @@
     const tickerState = {
         nA: { showPa: false, en: "", pa: "" },
         nB: { showPa: false, en: "", pa: "" },
-        c2: { showPa: false, en: "", pa: "", currentText: "" },
-        c4: { showPa: false, en: "", pa: "", currentText: "" }
+        c2: { showPa: false, en: "", pa: "", activeText: "" },
+        c4: { showPa: false, en: "", pa: "", activeText: "" }
     };
     const tickerTimers = {};
 
@@ -280,24 +280,13 @@
         if (state.en !== newEn || state.pa !== newPa) {
             state.en = newEn;
             state.pa = newPa;
-            
-            // Instantly apply data update without resetting position if already running smoothly
-            const isPa = state.showPa && state.pa && state.pa.trim() !== "";
-            const activeTxt = (isPa ? state.pa : state.en || "").replace(/(\r\n|\n|\r)/gm, " ");
-            state.currentText = activeTxt;
-            
-            const scrollerEl = document.getElementById(`scroller-${id}`);
-            if (scrollerEl) {
-                scrollerEl.innerText = activeTxt;
-                scrollerData[id].textWidth = scrollerEl.scrollWidth;
-            }
         }
     }
 
-    // Main continuous scroller engine for Row 2 and Row 4 (Zero Flicker, Seamless Loop)
+    // Advanced Continuous Infinite Scroller Engine (Zero Flicker / Zero Jhatka)
     const scrollerData = {
-        c2: { pos: 0, textWidth: 0, lastTime: 0, initialized: false },
-        c4: { pos: 0, textWidth: 0, lastTime: 0, initialized: false }
+        c2: { pos: 0, textWidth: 0, lastTime: 0, initialized: false, langTimer: 0 },
+        c4: { pos: 0, textWidth: 0, lastTime: 0, initialized: false, langTimer: 0 }
     };
 
     function initScroller(id) {
@@ -312,34 +301,38 @@
 
         if (!scrollerData[id].initialized) {
             scrollerData[id].initialized = true;
-            const isPa = state.showPa && state.pa && state.pa.trim() !== "";
-            const initialTxt = (isPa ? state.pa : state.en || "").replace(/(\r\n|\n|\r)/gm, " ");
-            state.currentText = initialTxt;
-            scrollerEl.innerText = initialTxt;
-            scrollerData[id].textWidth = scrollerEl.scrollWidth;
             scrollerData[id].pos = containerWidth;
             scrollerData[id].lastTime = performance.now();
+
+            // Language switch timer every 8 seconds smoothly without resetting position
+            setInterval(() => {
+                if (state.pa && state.pa.trim() !== "") {
+                    state.showPa = !state.showPa;
+                }
+            }, 8000);
         }
 
         function step(now) {
             const dt = (now - scrollerData[id].lastTime) / 1000;
             scrollerData[id].lastTime = now;
 
-            scrollerData[id].pos -= SPEED * dt;
-            scrollerEl.style.transform = `translate3d(${scrollerData[id].pos}px, 0, 0)`;
+            const isPa = state.showPa && state.pa && state.pa.trim() !== "";
+            const currentTxt = (isPa ? state.pa : (state.en || " ")).replace(/(\r\n|\n|\r)/gm, " ");
 
-            // When text completely goes off-screen to the left
-            if (scrollerData[id].pos <= -scrollerData[id].textWidth) {
-                // Toggle language if Punjabi text exists
-                if (state.pa && state.pa.trim() !== "") {
-                    state.showPa = !state.showPa;
-                }
-                const nextTxt = ((state.showPa && state.pa && state.pa.trim() !== "") ? state.pa : (state.en || "")).replace(/(\r\n|\n|\r)/gm, " ");
-                state.currentText = nextTxt;
-                scrollerEl.innerText = nextTxt;
-                scrollerData[id].textWidth = scrollerEl.scrollWidth;
-                scrollerData[id].pos = containerWidth; // Reset seamlessly to the right edge
+            if (state.activeText !== currentTxt) {
+                state.activeText = currentTxt;
+                scrollerEl.innerText = currentTxt + " \u00A0 \u00A0 \u00A0 \u00A0 " + currentTxt; // Double duplicate string for seamless infinite loop
+                scrollerData[id].textWidth = scrollerEl.scrollWidth / 2; // Width of single text block
             }
+
+            scrollerData[id].pos -= SPEED * dt;
+
+            // When first copy completely passes out, seamlessly snap back to 0 without any visual jerk
+            if (scrollerData[id].pos <= -scrollerData[id].textWidth) {
+                scrollerData[id].pos += scrollerData[id].textWidth;
+            }
+
+            scrollerEl.style.transform = `translate3d(${scrollerData[id].pos}px, 0, 0)`;
 
             requestAnimationFrame(step);
         }
@@ -347,7 +340,6 @@
         requestAnimationFrame(step);
     }
 
-    // Initialize scrollers on load
     window.addEventListener('load', () => {
         initScroller('c2');
         initScroller('c4');
