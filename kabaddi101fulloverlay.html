@@ -38,7 +38,7 @@
         
         /* Row 1 & Row 3 centered */
         .row-1 { bottom: 61px; left: 210px; width: 350px; height: 50px; font-size: 30px; color: #ffffff; justify-content: center; text-align: center; padding-left: 0px; }
-        .row-3 { bottom: 53px; left: 1395px; width: 550px; height: 50px; font-size: 28px; color: #ffffff;  justify-content: center; text-align: center; padding-left: 0px; }
+        .row-3 { bottom: 53px; left: 1395px; width: 550px; height: 50px; font-size: 28px; color: #ffffff; justify-content: center; text-align: center; padding-left: 0px; }
 
         /* Row 2 & Row 4 left-aligned with padding */
         .row-2 { bottom: 53px; left: 587px; width: 815px; height: 50px; font-size: 30px; color: #000000; text-shadow: none; justify-content: flex-start; text-align: left; padding-left: 10px; }
@@ -194,7 +194,7 @@
         }
     }
 
-    // Render scrolling text with constant speed calculated based on text length
+    // Render scrolling text with reduced gap/spacing
     function renderScrollingText(id) {
         const scrollerEl = document.getElementById(`scroller-${id}`);
         const state = tickerState[id];
@@ -206,9 +206,9 @@
         scrollerEl.style.fontWeight = "bold";
         scrollerEl.innerText = currentTxt.replace(/(\r\n|\n|\r)/gm, " ");
 
-        // Constant speed calculation (approx 14 pixels per second for uniform smooth flow)
+        // Adjusted duration to make scrolling smoother with less trailing space
         const textLength = currentTxt.length;
-        const calculatedDuration = Math.max(15, textLength * 0.45);
+        const calculatedDuration = Math.max(10, textLength * 0.35);
         scrollerEl.style.animationDuration = calculatedDuration + 's';
 
         scrollerEl.onanimationiteration = null;
@@ -223,7 +223,7 @@
                 scrollerEl.innerText = nextTxt.replace(/(\r\n|\n|\r)/gm, " ");
 
                 const nextLength = nextTxt.length;
-                const nextDuration = Math.max(15, nextLength * 0.45);
+                const nextDuration = Math.max(10, nextLength * 0.35);
                 scrollerEl.style.animationDuration = nextDuration + 's';
             };
         }
