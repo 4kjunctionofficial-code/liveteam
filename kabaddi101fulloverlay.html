@@ -34,11 +34,16 @@
         #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 1080px; z-index: 9998; opacity: 1; transition: opacity 0.7s ease; background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Copy%20of%20Star%20Kabaddi%20_20260711_110521_0000.png'); background-size: cover; background-position: center; background-repeat: no-repeat; pointer-events: none; }
         #ticker-wrap.hidden { opacity: 0; }
 
-        .row-text { position: absolute; display: flex; align-items: center; text-transform: uppercase; overflow: hidden; box-sizing: border-box; white-space: nowrap; padding-left: 10px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); font-family: 'Anmol Unicode', sans-serif; font-weight: bold; }
-        .row-1 { bottom: 61px; left: 210px; width: 350px; height: 50px; font-size: 35px; color: #ffffff; }
-        .row-2 { bottom: 53px; left: 587px; width: 815px; height: 50px; font-size: 35px; color: #000000; text-shadow: none; }
-        .row-3 { bottom: 53px; left: 1425px; width: 550px; height: 50px; font-size: 30px; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: clip; }
-        .row-4 { bottom: 2px; left: 200px; width: 1730px; height: 50px; font-size: 30px; color: #ffffff; }
+        .row-text { position: absolute; display: flex; align-items: center; text-transform: uppercase; overflow: hidden; box-sizing: border-box; white-space: nowrap; padding-left: 10px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); font-weight: bold; }
+        
+        /* Font family specific classes for accurate sizing */
+        .lang-en { font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px; }
+        .lang-pa { font-family: 'Anmol Unicode', sans-serif; }
+
+        .row-1 { bottom: 61px; left: 210px; width: 350px; height: 50px; font-size: 33px; color: #ffffff; }
+        .row-2 { bottom: 53px; left: 587px; width: 815px; height: 50px; font-size: 33px; color: #000000; text-shadow: none; }
+        .row-3 { bottom: 53px; left: 1425px; width: 550px; height: 50px; font-size: 28px; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: clip; }
+        .row-4 { bottom: 2px; left: 200px; width: 1730px; height: 50px; font-size: 28px; color: #ffffff; }
         
         @keyframes scrollText {
             0% { transform: translateX(100%); }
@@ -152,7 +157,9 @@
         const el = document.getElementById(containerId);
         if (el) {
             const txt = (pa && pa.trim() !== "") ? pa : (en || "TEAM");
-            el.innerHTML = `<div class="team-scroller">${txt}</div>`;
+            const isPunjabi = (pa && pa.trim() !== "");
+            el.className = isPunjabi ? "team-scroller lang-pa" : "team-scroller lang-en";
+            el.innerHTML = txt;
         }
     }
 
@@ -166,7 +173,7 @@
             let isPa = showPunjabi && pa && pa.trim() !== "";
             let rawTxt = isPa ? pa : (en || "");
             
-            el.style.fontWeight = "bold";
+            el.className = `row-text ${id === 'c1' ? 'row-1' : 'row-3'} ${isPa ? 'lang-pa' : 'lang-en'}`;
             el.innerText = rawTxt.replace(/(\r\n|\n|\r)/gm, " ");
             
             showPunjabi = !showPunjabi;
@@ -190,7 +197,7 @@
         }
     }
 
-    // Render scrolling text with optimized speed calculation for English & Punjabi lengths
+    // Render scrolling text with balanced font sizing for English and Punjabi
     function renderScrollingText(id) {
         const scrollerEl = document.getElementById(`scroller-${id}`);
         const state = tickerState[id];
@@ -199,10 +206,9 @@
         const isPa = state.showPa && state.pa.trim() !== "";
         const currentTxt = isPa ? state.pa : state.en;
         
-        scrollerEl.style.fontWeight = "bold";
+        scrollerEl.className = `scroller ${isPa ? 'lang-pa' : 'lang-en'}`;
         scrollerEl.innerText = currentTxt.replace(/(\r\n|\n|\r)/gm, " ");
 
-        // ਅੰਗਰੇਜ਼ੀ ਅੱਖਰਾਂ ਦੀ ਚੌੜਾਈ ਜ਼ਿਆਦਾ ਹੋਣ ਕਾਰਨ ਸਪੀਡ ਨੂੰ ਟੈਕਸਟ ਦੀ ਲੰਬਾਈ ਮੁਤਾਬਕ ਸਹੀ ਐਡਜਸਟ ਕੀਤਾ ਗਿਆ ਹੈ
         const textLength = currentTxt.length;
         const calculatedDuration = Math.max(12, textLength * 0.35);
         scrollerEl.style.animationDuration = calculatedDuration + 's';
@@ -215,7 +221,7 @@
                 const nextIsPa = state.showPa && state.pa.trim() !== "";
                 const nextTxt = nextIsPa ? state.pa : state.en;
                 
-                scrollerEl.style.fontWeight = "bold";
+                scrollerEl.className = `scroller ${nextIsPa ? 'lang-pa' : 'lang-en'}`;
                 scrollerEl.innerText = nextTxt.replace(/(\r\n|\n|\r)/gm, " ");
 
                 const nextLength = nextTxt.length;
