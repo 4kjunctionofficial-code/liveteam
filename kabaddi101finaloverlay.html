@@ -18,10 +18,10 @@
         #scoreboard { position: absolute; top: 0px; left: 0px; width: 1920px; height: 1080px; z-index: 9999; opacity: 1; transition: opacity 0.7s ease; background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/101%20png.png'); background-size: cover; background-position: center; background-repeat: no-repeat; }
         #scoreboard.hidden { opacity: 0; }
 
-        /* Team Name Box styling matching Ticker */
-        .name-area { position: absolute; top: 35px; height: 50px; display: flex; align-items: center; color: #ffffff; font-size: 30px; text-transform: uppercase; overflow: hidden; white-space: nowrap; z-index: 11; font-family: 'Anmol Unicode', sans-serif; font-weight: bold; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
-        #nA-container { left: 1052px; width: 260px; justify-content: flex-end; }
-        #nB-container { left: 1590px; width: 260px; justify-content: flex-start; }
+        /* Team Name Box styling - Centered */
+        .name-area { position: absolute; top: 35px; height: 50px; display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 30px; text-transform: uppercase; overflow: hidden; white-space: nowrap; z-index: 11; font-family: 'Anmol Unicode', sans-serif; font-weight: bold; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); text-align: center; }
+        #nA-container { left: 1052px; width: 260px; }
+        #nB-container { left: 1590px; width: 260px; }
         
         .score-box { position: absolute; top: 40px; height: 50px; width: 50px; display: flex; align-items: center; justify-content: center; font-size: 55px; font-weight: bold; color: #000000; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); z-index: 12; }
         #sA { left: 1345px; } 
@@ -30,7 +30,7 @@
         .round-display { position: absolute; top: 110px; left: 1450px; transform: translateX(-50%); color: white; font-size: 25px; text-transform: uppercase; text-shadow: 2px 2px 6px #000; z-index: 11; font-family: 'Anmol Unicode', 'Bebas Neue', sans-serif; font-weight: bold; }
 
         @keyframes scrollTeamName {
-            0% { transform: translateX(50%); }
+            0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
         }
 
@@ -39,6 +39,7 @@
             white-space: nowrap;
             overflow: hidden;
             width: 100%;
+            text-align: center;
         }
 
         .team-scroller { 
@@ -48,6 +49,7 @@
             animation-name: scrollTeamName;
             animation-timing-function: linear;
             animation-iteration-count: infinite;
+            animation-duration: 6s;
             transition: opacity 0.2s ease-in-out;
             font-family: 'Anmol Unicode', sans-serif;
             font-weight: bold;
@@ -61,29 +63,60 @@
         .row-1 { bottom: 61px; left: 210px; width: 350px; height: 50px; font-size: 30px; color: #ffffff; justify-content: center; text-align: center; padding-left: 0px; }
         .row-3 { bottom: 53px; left: 1395px; width: 550px; height: 50px; font-size: 28px; color: #ffffff; justify-content: center; text-align: center; padding-left: 0px; }
 
-        .row-2 { bottom: 53px; left: 587px; width: 815px; height: 50px; font-size: 30px; color: #000000; text-shadow: none; justify-content: flex-start; text-align: left; padding-left: 0px; }
-        .row-4 { bottom: 2px; left: 200px; width: 1730px; height: 50px; font-size: 30px; color: #ffffff; justify-content: flex-start; text-align: left; padding-left: 0px; }
-        
-        @keyframes scrollText {
-            0% { transform: translateX(50%); }
-            100% { transform: translateX(-100%); }
+        /* ROW 2 */
+        .row-2 {
+            bottom: 50px;
+            left: 587px;
+            width: 815px;
+            height: 50px;
+            font-size: 30px;
+            color: #000000;
+            text-shadow: none;
+            justify-content: flex-start;
+            text-align: left;
+            padding-left: 0;
+            overflow: hidden;
+            position: absolute;
         }
 
-        .scroller-container {
-            display: inline-block;
-            white-space: nowrap;
+        .row-2 .scroller-container {
+            width: 815px;
+            height: 50px;
             overflow: hidden;
-            width: 100%;
+            position: relative;
+        }
+
+        /* ROW 4 */
+        .row-4 {
+            bottom: -6px;
+            left: 200px;
+            width: 1720px;
+            height: 50px;
+            font-size: 25px;
+            color: #ffffff;
+            justify-content: flex-start;
+            text-align: left;
+            padding-left: 0;
+            overflow: hidden;
+            position: absolute;
+        }
+
+        .row-4 .scroller-container {
+            width: 1720px;
+            height: 50px;
+            overflow: hidden;
+            position: relative;
         }
 
         .scroller { 
             display: inline-block; 
             white-space: nowrap; 
-            will-change: transform, opacity;
-            animation-name: scrollText;
-            animation-timing-function: linear;
-            animation-iteration-count: infinite;
-            transition: opacity 0.2s ease-in-out;
+            will-change: transform;
+            font-family: 'Anmol Unicode', sans-serif;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
         }
 
         .box-time { position: absolute; bottom: 1px; left: 3px; width: 190px; height: 40px; display: flex; align-items: center; justify-content: center; z-index: 12; overflow: hidden; }
@@ -135,7 +168,13 @@
         }
     });
 
-    const clientLogos = { "kabaddi101": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Kabaddi%20101%20logo.png" };
+    // Multi-Channel Logo Setup Dictionary (ਇੱਥੇ ਤੁਸੀਂ ਆਪਣੇ ਹੋਰ ਚੈਨਲ ਵੀ ਜੋੜ ਸਕਦੇ ਹੋ)
+    const clientLogos = {
+        "starkabaddiharyana": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Star%20Kabaddi%20_20260718_195824_0000.png",
+        "kabaddi101": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Kabaddi%20101%20logo.png"
+        // ਨਵਾਂ ਚੈਨਲ ਜੋੜਨ ਲਈ ਇੱਥੇ ਇਸ ਤਰ੍ਹਾਂ ਲਿਖੋ: "channel_name": "logo_image_url"
+    };
+
     const tickerState = {
         nA: { showPa: false, en: "", pa: "" },
         nB: { showPa: false, en: "", pa: "" },
@@ -149,6 +188,7 @@
         const logoCont = document.getElementById('logo-container');
         const currentId = matchId.trim().toLowerCase();
 
+        // Dynamic Logo Setup based on link ID
         if (clientLogos[currentId] && data.logoVisible !== false) {
             document.getElementById('main-logo').src = clientLogos[currentId];
             logoCont.classList.remove('hidden');
@@ -174,7 +214,6 @@
         updateScrollingData("c4", data.row4Txt, data.row4Txt_pa);
     });
 
-    // Team Name Render & Ticker-like Animation Logic
     function updateTeamNameState(key, en, pa) {
         const state = tickerState[key];
         const newEn = en || "TEAM";
@@ -201,41 +240,24 @@
             if (txt.length > 10) {
                 return `<div class="team-scroller-box"><div class="team-scroller" id="scroller-${key}">${txt}</div></div>`;
             } else {
-                return `<div style="font-family: 'Anmol Unicode', sans-serif; font-weight: bold; width:100%; text-align:inherit; transition: opacity 0.2s ease-in-out;" id="static-${key}">${txt}</div>`;
-            }
-        };
-
-        const updateAnimation = (txt) => {
-            if (txt.length > 10) {
-                const scrollerEl = document.getElementById(`scroller-${key}`);
-                const dur = Math.max(8, txt.length * 0.25);
-                if(scrollerEl) scrollerEl.style.animationDuration = dur + 's';
+                return `<div style="font-family: 'Anmol Unicode', sans-serif; font-weight: bold; width:100%; text-align:center; transition: opacity 0.2s ease-in-out;" id="static-${key}">${txt}</div>`;
             }
         };
 
         el.innerHTML = renderHTML(cleanTxt);
-        updateAnimation(cleanTxt);
 
         if (state.pa && state.pa.trim() !== "" && !el.dataset.hasTimer) {
             el.dataset.hasTimer = "true";
             setInterval(() => {
-                const textEl = document.getElementById(`scroller-${key}`) || document.getElementById(`static-${key}`);
-                if(textEl) textEl.style.opacity = '0';
-                
-                setTimeout(() => {
-                    state.showPa = !state.showPa;
-                    const newIsPa = state.showPa && state.pa && state.pa.trim() !== "";
-                    const newTxt = newIsPa ? state.pa : state.en;
-                    const newCleanTxt = (newTxt || "TEAM").replace(/(\r\n|\n|\r)/gm, " ");
-                    
-                    el.innerHTML = renderHTML(newCleanTxt);
-                    updateAnimation(newCleanTxt);
-                }, 200);
+                state.showPa = !state.showPa;
+                const newIsPa = state.showPa && state.pa && state.pa.trim() !== "";
+                const newTxt = newIsPa ? state.pa : state.en;
+                const newCleanTxt = (newTxt || "TEAM").replace(/(\r\n|\n|\r)/gm, " ");
+                el.innerHTML = renderHTML(newCleanTxt);
             }, 8000);
         }
     }
 
-    // Ticker Logic
     function updateStaticTicker(id, en, pa) {
         const el = document.getElementById(id);
         if (tickerTimers[id]) clearInterval(tickerTimers[id]);
@@ -258,56 +280,67 @@
 
     function updateScrollingData(id, en, pa) {
         const state = tickerState[id];
-        const newEn = en || "";
-        const newPa = pa || "";
-
-        if (state.en !== newEn || state.pa !== newPa) {
-            state.en = newEn;
-            state.pa = newPa;
-            renderScrollingText(id);
-        }
+        state.en = en || "";
+        state.pa = pa || "";
     }
 
-    function renderScrollingText(id) {
+    // Smooth Infinite Continuous Scroller Engine for Row 2 & Row 4
+    const scrollerData = {
+        c2: { pos: 0, textWidth: 0, lastTime: 0, initialized: false, activeLang: false },
+        c4: { pos: 0, textWidth: 0, lastTime: 0, initialized: false, activeLang: false }
+    };
+
+    function initScroller(id) {
         const scrollerEl = document.getElementById(`scroller-${id}`);
         const state = tickerState[id];
         if (!scrollerEl) return;
 
-        const isPa = state.showPa && state.pa.trim() !== "";
-        const currentTxt = isPa ? state.pa : state.en;
-        const cleanTxt = (currentTxt || "").replace(/(\r\n|\n|\r)/gm, " ");
-        
-        scrollerEl.style.fontWeight = "bold";
-        scrollerEl.innerText = cleanTxt;
+        const SPEED_C2 = 110; 
+        const SPEED_C4 = 100; 
+        const SPEED = (id === "c2") ? SPEED_C2 : SPEED_C4;
+        const containerWidth = (id === "c2") ? 815 : 1720;
 
-        const textLength = cleanTxt.length;
-        const calculatedDuration = Math.max(8, textLength * 0.25);
-        scrollerEl.style.animationDuration = calculatedDuration + 's';
-
-        scrollerEl.onanimationiteration = null;
-
-        if (state.pa && state.pa.trim() !== "") {
-            scrollerEl.onanimationiteration = () => {
-                scrollerEl.style.opacity = '0';
-                
-                setTimeout(() => {
-                    state.showPa = !state.showPa;
-                    const nextIsPa = state.showPa && state.pa.trim() !== "";
-                    const nextTxt = nextIsPa ? state.pa : state.en;
-                    const cleanNextTxt = (nextTxt || "").replace(/(\r\n|\n|\r)/gm, " ");
-                    
-                    scrollerEl.style.fontWeight = "bold";
-                    scrollerEl.innerText = cleanNextTxt;
-
-                    const nextLength = cleanNextTxt.length;
-                    const nextDuration = Math.max(8, nextLength * 0.25);
-                    scrollerEl.style.animationDuration = nextDuration + 's';
-                    
-                    scrollerEl.style.opacity = '1';
-                }, 150);
-            };
+        if (!scrollerData[id].initialized) {
+            scrollerData[id].initialized = true;
+            scrollerData[id].pos = containerWidth;
+            scrollerData[id].lastTime = performance.now();
         }
+
+        function step(now) {
+            const dt = (now - scrollerData[id].lastTime) / 1000;
+            scrollerData[id].lastTime = now;
+
+            const hasPa = state.pa && state.pa.trim() !== "";
+            const currentLangIsPa = hasPa ? state.showPa : false;
+            const targetText = (currentLangIsPa ? state.pa : (state.en || " ")).replace(/(\r\n|\n|\r)/gm, " ");
+
+            if (scrollerData[id].currentText !== targetText || scrollerData[id].activeLang !== currentLangIsPa) {
+                scrollerData[id].currentText = targetText;
+                scrollerData[id].activeLang = currentLangIsPa;
+                scrollerEl.innerText = targetText;
+                scrollerData[id].textWidth = scrollerEl.scrollWidth;
+            }
+
+            scrollerData[id].pos -= SPEED * dt;
+            scrollerEl.style.transform = `translate3d(${scrollerData[id].pos}px, 0, 0)`;
+
+            if (scrollerData[id].pos <= -scrollerData[id].textWidth) {
+                if (hasPa) {
+                    state.showPa = !state.showPa;
+                }
+                scrollerData[id].pos = containerWidth;
+            }
+
+            requestAnimationFrame(step);
+        }
+
+        requestAnimationFrame(step);
     }
+
+    window.addEventListener('load', () => {
+        initScroller('c2');
+        initScroller('c4');
+    });
 
     // Clock
     function updateClock() {
