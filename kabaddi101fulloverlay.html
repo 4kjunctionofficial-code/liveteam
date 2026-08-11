@@ -19,7 +19,7 @@
         #scoreboard { position: absolute; top: 0px; left: 0px; width: 1920px; height: 1080px; z-index: 9999; opacity: 1; transition: opacity 0.7s ease; background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/101%20png.png'); background-size: cover; background-position: center; background-repeat: no-repeat; }
         #scoreboard.hidden { opacity: 0; }
 
-        .name-area { position: absolute; top: 43px; height: 50px; display: flex; align-items: center; color: #ffffff; font-size: 35px; text-transform: uppercase; text-shadow: 2px 2px 4px #000; overflow: hidden; white-space: nowrap; z-index: 11; font-family: 'Anmol Unicode', 'Bebas Neue', sans-serif; font-weight: bold; }
+        .name-area { position: absolute; top: 43px; height: 50px; display: flex; align-items: center; color: #ffffff; font-size: 35px; text-transform: uppercase; text-shadow: 2px 2px 4px #000; overflow: hidden; white-space: nowrap; z-index: 11; font-weight: bold; }
         #nA-container { left: 1050px; width: 270px; justify-content: flex-end; }
         #nB-container { left: 1580px; width: 270px; justify-content: flex-start; }
         
@@ -27,7 +27,7 @@
         #sA { left: 1360px; } 
         #sB { left: 1497px; } 
 
-        .round-display { position: absolute; top: 110px; left: 1450px; transform: translateX(-50%); color: white; font-size: 30px; text-transform: uppercase; text-shadow: 2px 2px 6px #000; z-index: 11; font-family: 'Anmol Unicode', 'Bebas Neue', sans-serif; font-weight: bold; }
+        .round-display { position: absolute; top: 110px; left: 1450px; transform: translateX(-50%); color: white; font-size: 30px; text-transform: uppercase; text-shadow: 2px 2px 6px #000; z-index: 11; font-weight: bold; }
 
         .team-scroller { white-space: nowrap; }
 
@@ -36,14 +36,14 @@
 
         .row-text { position: absolute; display: flex; align-items: center; text-transform: uppercase; overflow: hidden; box-sizing: border-box; white-space: nowrap; padding-left: 10px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); font-weight: bold; }
         
-        /* Font family specific classes for accurate sizing */
-        .lang-en { font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px; }
+        /* ਅੰਗਰੇਜ਼ੀ ਲਈ ਸਾਈਜ਼ ਥੋੜ੍ਹਾ ਘਟਾਇਆ ਗਿਆ ਹੈ ਤਾਂ ਜੋ ਉਹ ਵੱਡੀ ਨਾ ਲੱਗੇ */
+        .lang-en { font-family: 'Bebas Neue', sans-serif; font-size: 28px !important; letter-spacing: 1.5px; }
         .lang-pa { font-family: 'Anmol Unicode', sans-serif; }
 
-        .row-1 { bottom: 61px; left: 210px; width: 350px; height: 50px; font-size: 33px; color: #ffffff; }
-        .row-2 { bottom: 53px; left: 587px; width: 815px; height: 50px; font-size: 33px; color: #000000; text-shadow: none; }
-        .row-3 { bottom: 53px; left: 1425px; width: 550px; height: 50px; font-size: 28px; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: clip; }
-        .row-4 { bottom: 2px; left: 200px; width: 1730px; height: 50px; font-size: 28px; color: #ffffff; }
+        .row-1 { bottom: 61px; left: 210px; width: 350px; height: 50px; font-size: 35px; color: #ffffff; }
+        .row-2 { bottom: 53px; left: 587px; width: 815px; height: 50px; font-size: 35px; color: #000000; text-shadow: none; }
+        .row-3 { bottom: 53px; left: 1425px; width: 550px; height: 50px; font-size: 30px; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: clip; }
+        .row-4 { bottom: 2px; left: 200px; width: 1730px; height: 50px; font-size: 30px; color: #ffffff; }
         
         @keyframes scrollText {
             0% { transform: translateX(100%); }
@@ -197,7 +197,7 @@
         }
     }
 
-    // Render scrolling text with balanced font sizing for English and Punjabi
+    // Render scrolling text
     function renderScrollingText(id) {
         const scrollerEl = document.getElementById(`scroller-${id}`);
         const state = tickerState[id];
@@ -210,7 +210,7 @@
         scrollerEl.innerText = currentTxt.replace(/(\r\n|\n|\r)/gm, " ");
 
         const textLength = currentTxt.length;
-        const calculatedDuration = Math.max(12, textLength * 0.35);
+        const calculatedDuration = Math.max(15, textLength * 0.45);
         scrollerEl.style.animationDuration = calculatedDuration + 's';
 
         scrollerEl.onanimationiteration = null;
@@ -225,7 +225,7 @@
                 scrollerEl.innerText = nextTxt.replace(/(\r\n|\n|\r)/gm, " ");
 
                 const nextLength = nextTxt.length;
-                const nextDuration = Math.max(12, nextLength * 0.35);
+                const nextDuration = Math.max(15, nextLength * 0.45);
                 scrollerEl.style.animationDuration = nextDuration + 's';
             };
         }
