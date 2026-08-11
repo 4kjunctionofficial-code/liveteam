@@ -190,7 +190,7 @@
         }
     }
 
-    // Render scrolling text with constant speed calculated based on text length
+    // Render scrolling text with optimized speed calculation for English & Punjabi lengths
     function renderScrollingText(id) {
         const scrollerEl = document.getElementById(`scroller-${id}`);
         const state = tickerState[id];
@@ -202,9 +202,9 @@
         scrollerEl.style.fontWeight = "bold";
         scrollerEl.innerText = currentTxt.replace(/(\r\n|\n|\r)/gm, " ");
 
-        // Constant speed calculation (approx 14 pixels per second for uniform smooth flow)
+        // ਅੰਗਰੇਜ਼ੀ ਅੱਖਰਾਂ ਦੀ ਚੌੜਾਈ ਜ਼ਿਆਦਾ ਹੋਣ ਕਾਰਨ ਸਪੀਡ ਨੂੰ ਟੈਕਸਟ ਦੀ ਲੰਬਾਈ ਮੁਤਾਬਕ ਸਹੀ ਐਡਜਸਟ ਕੀਤਾ ਗਿਆ ਹੈ
         const textLength = currentTxt.length;
-        const calculatedDuration = Math.max(15, textLength * 0.45);
+        const calculatedDuration = Math.max(12, textLength * 0.35);
         scrollerEl.style.animationDuration = calculatedDuration + 's';
 
         scrollerEl.onanimationiteration = null;
@@ -219,7 +219,7 @@
                 scrollerEl.innerText = nextTxt.replace(/(\r\n|\n|\r)/gm, " ");
 
                 const nextLength = nextTxt.length;
-                const nextDuration = Math.max(15, nextLength * 0.45);
+                const nextDuration = Math.max(12, nextLength * 0.35);
                 scrollerEl.style.animationDuration = nextDuration + 's';
             };
         }
