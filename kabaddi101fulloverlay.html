@@ -19,7 +19,7 @@
         #scoreboard { position: absolute; top: 0px; left: 0px; width: 1920px; height: 1080px; z-index: 9999; opacity: 1; transition: opacity 0.7s ease; background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/101%20png.png'); background-size: cover; background-position: center; background-repeat: no-repeat; }
         #scoreboard.hidden { opacity: 0; }
 
-        .name-area { position: absolute; top: 43px; height: 50px; display: flex; align-items: center; color: #ffffff; font-size: 35px; text-transform: uppercase; text-shadow: 2px 2px 4px #000; overflow: hidden; white-space: nowrap; z-index: 11; font-weight: bold; }
+        .name-area { position: absolute; top: 43px; height: 50px; display: flex; align-items: center; color: #ffffff; text-transform: uppercase; text-shadow: 2px 2px 4px #000; overflow: hidden; white-space: nowrap; z-index: 11; font-weight: bold; }
         #nA-container { left: 1050px; width: 270px; justify-content: flex-end; }
         #nB-container { left: 1580px; width: 270px; justify-content: flex-start; }
         
@@ -27,7 +27,7 @@
         #sA { left: 1360px; } 
         #sB { left: 1497px; } 
 
-        .round-display { position: absolute; top: 110px; left: 1450px; transform: translateX(-50%); color: white; font-size: 30px; text-transform: uppercase; text-shadow: 2px 2px 6px #000; z-index: 11; font-weight: bold; }
+        .round-display { position: absolute; top: 110px; left: 1450px; transform: translateX(-50%); color: white; font-size: 33px; text-transform: uppercase; text-shadow: 2px 2px 6px #000; z-index: 11; font-weight: bold; font-family: 'Anmol Unicode', sans-serif; }
 
         .team-scroller { white-space: nowrap; }
 
@@ -36,14 +36,14 @@
 
         .row-text { position: absolute; display: flex; align-items: center; text-transform: uppercase; overflow: hidden; box-sizing: border-box; white-space: nowrap; padding-left: 10px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); font-weight: bold; }
         
-        /* ਅੰਗਰੇਜ਼ੀ ਲਈ ਸਾਈਜ਼ ਥੋੜ੍ਹਾ ਘਟਾਇਆ ਗਿਆ ਹੈ ਤਾਂ ਜੋ ਉਹ ਵੱਡੀ ਨਾ ਲੱਗੇ */
-        .lang-en { font-family: 'Bebas Neue', sans-serif; font-size: 28px !important; letter-spacing: 1.5px; }
-        .lang-pa { font-family: 'Anmol Unicode', sans-serif; }
+        /* ਅੰਗਰੇਜ਼ੀ ਅਤੇ ਪੰਜਾਬੀ ਲਈ ਵੱਖਰੇ ਫ਼ੌਂਟ ਸਾਈਜ਼ (ਪੰਜਾਬੀ ਥੋੜ੍ਹਾ ਵੱਡਾ ਅਤੇ ਅੰਗਰੇਜ਼ੀ ਛੋਟੀ) */
+        .lang-en { font-family: 'Bebas Neue', sans-serif; font-size: 30px !important; letter-spacing: 1.5px; }
+        .lang-pa { font-family: 'Anmol Unicode', sans-serif; font-size: 38px !important; }
 
-        .row-1 { bottom: 61px; left: 210px; width: 350px; height: 50px; font-size: 35px; color: #ffffff; }
-        .row-2 { bottom: 53px; left: 587px; width: 815px; height: 50px; font-size: 35px; color: #000000; text-shadow: none; }
-        .row-3 { bottom: 53px; left: 1425px; width: 550px; height: 50px; font-size: 30px; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: clip; }
-        .row-4 { bottom: 2px; left: 200px; width: 1730px; height: 50px; font-size: 30px; color: #ffffff; }
+        .row-1 { bottom: 61px; left: 210px; width: 350px; height: 50px; color: #ffffff; }
+        .row-2 { bottom: 53px; left: 587px; width: 815px; height: 50px; color: #000000; text-shadow: none; }
+        .row-3 { bottom: 53px; left: 1425px; width: 550px; height: 50px; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: clip; }
+        .row-4 { bottom: 2px; left: 200px; width: 1730px; height: 50px; color: #ffffff; }
         
         @keyframes scrollText {
             0% { transform: translateX(100%); }
@@ -82,10 +82,10 @@
 </div>
 
 <div id="ticker-wrap">
-    <div class="row-text row-1" id="c1">WELCOME TO LIVE KABADDI</div>
-    <div class="row-text row-2" id="c2"><div class="scroller" id="scroller-c2">SUBSCRIBE OUR CHANNEL</div></div>
-    <div class="row-text row-3" id="c3">LIKE & SHARE</div>
-    <div class="row-text row-4" id="c4"><div class="scroller" id="scroller-c4">KEEP WATCHING</div></div> 
+    <div class="row-text row-1 lang-en" id="c1">WELCOME TO LIVE KABADDI</div>
+    <div class="row-text row-2" id="c2"><div class="scroller lang-en" id="scroller-c2">SUBSCRIBE OUR CHANNEL</div></div>
+    <div class="row-text row-3 lang-en" id="c3">LIKE & SHARE</div>
+    <div class="row-text row-4" id="c4"><div class="scroller lang-en" id="scroller-c4">KEEP WATCHING</div></div> 
 
     <div class="box-time">
         <div class="time-wrap" id="t-wrap"><div class="time-str" id="live-time"></div></div>
