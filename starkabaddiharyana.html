@@ -67,7 +67,7 @@
         .row-4 { bottom: 2px; left: 200px; width: 1730px; height: 50px; font-size: 30px; color: #ffffff; justify-content: flex-start; text-align: left; padding-left: 0px; }
         
         @keyframes scrollText {
-            0% { transform: translateX(0%); }
+            0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
         }
 
@@ -270,10 +270,14 @@
         scrollerEl.style.fontWeight = "bold";
         scrollerEl.innerText = cleanTxt;
 
-        // Dynamic speed calculation based on exact text length (approx 15 characters per second for smooth reading speed)
-        const charCount = cleanTxt.length;
-        const duration = Math.max(10, charCount * 0.22);
-        scrollerEl.style.animationDuration = duration + 's';
+        // Fixed speed formula: Constant pixels per second (approx 100 pixels per second) so speed is identical for short or long text
+        const speed = 90; // pixels per second
+        const containerWidth = scrollerEl.parentElement.offsetWidth || 800;
+        const textWidth = cleanTxt.length * 15; // estimated text width
+        const totalDistance = containerWidth + textWidth;
+        const duration = totalDistance / speed;
+
+        scrollerEl.style.animationDuration = Math.max(8, duration) + 's';
 
         scrollerEl.onanimationiteration = null;
 
@@ -290,9 +294,10 @@
                     scrollerEl.style.fontWeight = "bold";
                     scrollerEl.innerText = cleanNextTxt;
                     
-                    const nextCharCount = cleanNextTxt.length;
-                    const nextDuration = Math.max(10, nextCharCount * 0.22);
-                    scrollerEl.style.animationDuration = nextDuration + 's';
+                    const nextTextWidth = cleanNextTxt.length * 15;
+                    const nextDistance = containerWidth + nextTextWidth;
+                    const nextDuration = nextDistance / speed;
+                    scrollerEl.style.animationDuration = Math.max(8, nextDuration) + 's';
                     
                     scrollerEl.style.opacity = '1';
                 }, 150);
