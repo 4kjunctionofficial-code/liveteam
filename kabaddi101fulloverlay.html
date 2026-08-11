@@ -2,7 +2,6 @@
 <html lang="pa">
 <head>
     <meta charset="UTF-8">
-    <!-- Google Fonts for Bebas Neue and Anmol Unicode / Punjabi support -->
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Anmol+Unicode&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -36,23 +35,27 @@
 
         .row-text { position: absolute; display: flex; align-items: center; text-transform: uppercase; overflow: hidden; box-sizing: border-box; white-space: nowrap; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); font-family: 'Anmol Unicode', sans-serif; font-weight: bold; }
         
-        /* Row 1 & Row 3 centered */
         .row-1 { bottom: 61px; left: 210px; width: 350px; height: 50px; font-size: 30px; color: #ffffff; justify-content: center; text-align: center; padding-left: 0px; }
         .row-3 { bottom: 53px; left: 1395px; width: 550px; height: 50px; font-size: 28px; color: #ffffff; justify-content: center; text-align: center; padding-left: 0px; }
 
-        /* Row 2 & Row 4 left-aligned with padding */
         .row-2 { bottom: 53px; left: 587px; width: 815px; height: 50px; font-size: 30px; color: #000000; text-shadow: none; justify-content: flex-start; text-align: left; padding-left: 10px; }
         .row-4 { bottom: 2px; left: 200px; width: 1730px; height: 50px; font-size: 30px; color: #ffffff; justify-content: flex-start; text-align: left; padding-left: 10px; }
         
         @keyframes scrollText {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .scroller-container {
+            display: inline-block;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 100%;
         }
 
         .scroller { 
             display: inline-block; 
             white-space: nowrap; 
-            position: absolute;
             will-change: transform;
             animation-name: scrollText;
             animation-timing-function: linear;
@@ -82,9 +85,9 @@
 
 <div id="ticker-wrap">
     <div class="row-text row-1" id="c1">WELCOME TO LIVE KABADDI</div>
-    <div class="row-text row-2" id="c2"><div class="scroller" id="scroller-c2">SUBSCRIBE OUR CHANNEL</div></div>
+    <div class="row-text row-2" id="c2"><div class="scroller-container"><div class="scroller" id="scroller-c2">SUBSCRIBE OUR CHANNEL</div></div></div>
     <div class="row-text row-3" id="c3">LIKE & SHARE</div>
-    <div class="row-text row-4" id="c4"><div class="scroller" id="scroller-c4">KEEP WATCHING</div></div> 
+    <div class="row-text row-4" id="c4"><div class="scroller-container"><div class="scroller" id="scroller-c4">KEEP WATCHING</div></div></div> 
 
     <div class="box-time">
         <div class="time-wrap" id="t-wrap"><div class="time-str" id="live-time"></div></div>
@@ -101,7 +104,6 @@
     const db = firebase.database().ref("matchData/" + matchId);
     const userDb = firebase.database().ref("users/" + matchId);
 
-    // Expiry Check
     userDb.on("value", (snap) => {
         const user = snap.val();
         if (!user || Date.now() > new Date(user.expiryDate).getTime()) {
@@ -160,7 +162,6 @@
         }
     }
 
-    // Static Rows (Row 1 & Row 3)
     function updateStaticTicker(id, en, pa) {
         const el = document.getElementById(id);
         if (tickerTimers[id]) clearInterval(tickerTimers[id]);
@@ -181,7 +182,6 @@
         }
     }
 
-    // Update Scrolling Data for Row 2 & 4
     function updateScrollingData(id, en, pa) {
         const state = tickerState[id];
         const newEn = en || "";
@@ -194,7 +194,6 @@
         }
     }
 
-    // Render scrolling text with reduced gap/spacing
     function renderScrollingText(id) {
         const scrollerEl = document.getElementById(`scroller-${id}`);
         const state = tickerState[id];
@@ -202,13 +201,14 @@
 
         const isPa = state.showPa && state.pa.trim() !== "";
         const currentTxt = isPa ? state.pa : state.en;
+        const cleanTxt = currentTxt.replace(/(\r\n|\n|\r)/gm, " ");
         
         scrollerEl.style.fontWeight = "bold";
-        scrollerEl.innerText = currentTxt.replace(/(\r\n|\n|\r)/gm, " ");
+        // Repeat text twice with spacing so it loops seamlessly without large gaps
+        scrollerEl.innerHTML = `<span>${cleanTxt} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ${cleanTxt} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>`;
 
-        // Adjusted duration to make scrolling smoother with less trailing space
-        const textLength = currentTxt.length;
-        const calculatedDuration = Math.max(10, textLength * 0.35);
+        const textLength = cleanTxt.length;
+        const calculatedDuration = Math.max(8, textLength * 0.25);
         scrollerEl.style.animationDuration = calculatedDuration + 's';
 
         scrollerEl.onanimationiteration = null;
@@ -218,18 +218,18 @@
                 state.showPa = !state.showPa;
                 const nextIsPa = state.showPa && state.pa.trim() !== "";
                 const nextTxt = nextIsPa ? state.pa : state.en;
+                const cleanNextTxt = nextTxt.replace(/(\r\n|\n|\r)/gm, " ");
                 
                 scrollerEl.style.fontWeight = "bold";
-                scrollerEl.innerText = nextTxt.replace(/(\r\n|\n|\r)/gm, " ");
+                scrollerEl.innerHTML = `<span>${cleanNextTxt} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ${cleanNextTxt} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>`;
 
-                const nextLength = nextTxt.length;
-                const nextDuration = Math.max(10, nextLength * 0.35);
+                const nextLength = cleanNextTxt.length;
+                const nextDuration = Math.max(8, nextLength * 0.25);
                 scrollerEl.style.animationDuration = nextDuration + 's';
             };
         }
     }
 
-    // Clock
     function updateClock() {
         const now = new Date();
         document.getElementById('live-time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -244,7 +244,6 @@
         document.getElementById('d-wrap').style.opacity = isTime ? "0" : "1"; 
     }, 3000);
 
-    // Watermark
     const wm = document.getElementById('single-wm');
     let x = 100, y = 250, dx = 2.2, dy = 1.6;
     function animateWatermark() {
