@@ -85,7 +85,6 @@
             animation-name: scrollText;
             animation-timing-function: linear;
             animation-iteration-count: infinite;
-            animation-duration: 12s; /* Fixed steady speed for row 2 and 4 */
             transition: opacity 0.2s ease-in-out;
         }
 
@@ -271,6 +270,11 @@
         scrollerEl.style.fontWeight = "bold";
         scrollerEl.innerText = cleanTxt;
 
+        // Dynamic speed calculation based on exact text length (approx 15 characters per second for smooth reading speed)
+        const charCount = cleanTxt.length;
+        const duration = Math.max(10, charCount * 0.22);
+        scrollerEl.style.animationDuration = duration + 's';
+
         scrollerEl.onanimationiteration = null;
 
         if (state.pa && state.pa.trim() !== "") {
@@ -285,6 +289,10 @@
                     
                     scrollerEl.style.fontWeight = "bold";
                     scrollerEl.innerText = cleanNextTxt;
+                    
+                    const nextCharCount = cleanNextTxt.length;
+                    const nextDuration = Math.max(10, nextCharCount * 0.22);
+                    scrollerEl.style.animationDuration = nextDuration + 's';
                     
                     scrollerEl.style.opacity = '1';
                 }, 150);
