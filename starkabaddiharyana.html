@@ -89,17 +89,6 @@
     position: relative;
 }
 
-.row-2 .scroller {
-    position: absolute;
-    left: 0;
-    top: 0;
-    white-space: nowrap;
-    display: inline-block;
-    will-change: transform;
-    animation-name: scrollRow2;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-}
 
 
 /* =========================
@@ -128,49 +117,7 @@
     position: relative;
 }
 
-.row-4 .scroller {
-    position: absolute;
-    left: 0;
-    top: 0;
-    white-space: nowrap;
-    display: inline-block;
-    will-change: transform;
-    animation-name: scrollRow4;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-}
 
-
-/* =========================
-   ROW 2 ANIMATION
-   1402px → 587px
-   ========================= */
-
-@keyframes scrollRow2 {
-    0% {
-        transform: translateX(815px);
-    }
-
-    100% {
-        transform: translateX(-100%);
-    }
-}
-
-
-/* =========================
-   ROW 4 ANIMATION
-   1920px → 200px
-   ========================= */
-
-@keyframes scrollRow4 {
-    0% {
-        transform: translateX(1720px);
-    }
-
-    100% {
-        transform: translateX(-100%);
-    }
-}
         .box-time { position: absolute; bottom: 1px; left: 3px; width: 190px; height: 40px; display: flex; align-items: center; justify-content: center; z-index: 12; overflow: hidden; }
         .time-wrap, .date-wrap { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: opacity 0.3s ease-in-out; }
         .time-str, .date-str { color: #ffffff; font-size: 30px; letter-spacing: 1px; text-shadow: 2px 2px 5px #000; }
@@ -353,102 +300,82 @@
         }
     }
 
-    function renderScrollingText(id) {
+    ```javascript
+function renderScrollingText(id) {
     const scrollerEl = document.getElementById(`scroller-${id}`);
     const state = tickerState[id];
 
     if (!scrollerEl) return;
 
-    const isPa =
-        state.showPa &&
-        state.pa &&
-        state.pa.trim() !== "";
-
-    const currentTxt =
-        isPa ? state.pa : state.en;
-
-    const cleanTxt =
-        (currentTxt || "").replace(/(\r\n|\n|\r)/gm, " ");
-
-    scrollerEl.innerText = cleanTxt;
-    scrollerEl.style.fontWeight = "bold";
-
-    /*
-       SAME SPEED
-       English + Punjabi
-    */
-    const SPEED = 120; // pixels per second
-
-    const textWidth = scrollerEl.scrollWidth;
-
-    let visibleWidth;
-
-    if (id === "c2") {
-        visibleWidth = 815;
-    } else {
-        visibleWidth = 1720;
+    // Previous animation stop
+    if (scrollerEl._scrollRAF) {
+        cancelAnimationFrame(scrollerEl._scrollRAF);
+        scrollerEl._scrollRAF = null;
     }
 
-    /*
-       Right edge ਤੋਂ start
-       Text ਦੀ ਪੂਰੀ width ਵੀ travel ਕਰੇਗੀ
-    */
-    const totalDistance =
-        visibleWidth + textWidth;
-
-    const duration =
-        totalDistance / SPEED;
-
-    scrollerEl.style.animationDuration =
-        Math.max(5, duration) + "s";
-
-    scrollerEl.style.animationDelay = "0s";
-
-    /*
-       Punjabi ↔ English
-    */
-    scrollerEl.onanimationiteration = null;
-
-    if (state.pa && state.pa.trim() !== "") {
-
-        scrollerEl.onanimationiteration = () => {
-
-            state.showPa = !state.showPa;
-
-            const nextIsPa =
-                state.showPa &&
-                state.pa &&
-                state.pa.trim() !== "";
-
-            const nextTxt =
-                nextIsPa ? state.pa : state.en;
-
-            const cleanNextTxt =
-                (nextTxt || "")
-                .replace(/(\r\n|\n|\r)/gm, " ");
-
-            scrollerEl.innerText =
-                cleanNextTxt;
-
-            /*
-               New language ਦੀ width
-               ਪਰ SPEED ਉਹੀ 120px/s
-            */
-            const nextTextWidth =
-                scrollerEl.scrollWidth;
-
-            const nextDistance =
-                visibleWidth + nextTextWidth;
-
-            const nextDuration =
-                nextDistance / SPEED;
-
-            scrollerEl.style.animationDuration =
-                Math.max(5, nextDuration) + "s";
-        };
+    if (scrollerEl._languageTimer) {
+        clearTimeout(scrollerEl._languageTimer);
+        scrollerEl._languageTimer = null;
     }
+
+    const visibleWidth = id === "c2" ? 815 : 1720;
+
+    // Same speed for both languages
+    const SPEED = 120;
+
+    function startScroll() {
+
+        const isPa =
+            state.showPa &&
+            state.pa &&
+            state.pa.trim() !== "";
+
+        const txt =
+            (isPa ? state.pa : state.en || "")
+            .replace(/(\r\n|\n|\r)/gm, " ");
+
+        scrollerEl.innerText = txt;
+
+        // Force browser to calculate real text width
+        const textWidth = scrollerEl.scrollWidth;
+
+        // Start exactly from RIGHT edge
+        let position = visibleWidth;
+
+        const startTime = performance.now();
+
+        function animate(now) {
+
+            const elapsed = (now - startTime) / 1000;
+
+            // Exact same pixel speed
+            position = visibleWidth - (elapsed * SPEED);
+
+            scrollerEl.style.transform =
+                `translate3d(${position}px, 0, 0)`;
+
+            // Text completely passed LEFT edge
+            if (position <= -textWidth) {
+
+                // Switch English ↔ Punjabi
+                if (state.pa && state.pa.trim() !== "") {
+                    state.showPa = !state.showPa;
+                }
+
+                startScroll();
+                return;
+            }
+
+            scrollerEl._scrollRAF =
+                requestAnimationFrame(animate);
+        }
+
+        scrollerEl._scrollRAF =
+            requestAnimationFrame(animate);
+    }
+
+    startScroll();
 }
-
     // Clock
     function updateClock() {
         const now = new Date();
