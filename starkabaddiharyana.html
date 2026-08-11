@@ -30,7 +30,7 @@
         .round-display { position: absolute; top: 110px; left: 1450px; transform: translateX(-50%); color: white; font-size: 25px; text-transform: uppercase; text-shadow: 2px 2px 6px #000; z-index: 11; font-family: 'Anmol Unicode', 'Bebas Neue', sans-serif; font-weight: bold; }
 
         @keyframes scrollTeamName {
-            0% { transform: translateX(50%); }
+            0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
         }
 
@@ -49,6 +49,7 @@
             animation-name: scrollTeamName;
             animation-timing-function: linear;
             animation-iteration-count: infinite;
+            animation-duration: 6s;
             transition: opacity 0.2s ease-in-out;
             font-family: 'Anmol Unicode', sans-serif;
             font-weight: bold;
@@ -62,61 +63,61 @@
         .row-1 { bottom: 61px; left: 210px; width: 350px; height: 50px; font-size: 30px; color: #ffffff; justify-content: center; text-align: center; padding-left: 0px; }
         .row-3 { bottom: 53px; left: 1395px; width: 550px; height: 50px; font-size: 28px; color: #ffffff; justify-content: center; text-align: center; padding-left: 0px; }
 
-        /* =========================
-   ROW 2
-   587px → 1402px
-   ========================= */
+        /* ROW 2 */
+        .row-2 {
+            bottom: 53px;
+            left: 1395px;
+            width: 500px;
+            height: 50px;
+            font-size: 30px;
+            color: #000000;
+            text-shadow: none;
+            justify-content: flex-start;
+            text-align: left;
+            padding-left: 0;
+            overflow: hidden;
+            position: absolute;
+        }
 
-.row-2 {
-    bottom: 53px;
-    left: 587px;
-    width: 815px;
-    height: 50px;
-    font-size: 30px;
-    color: #000000;
-    text-shadow: none;
-    justify-content: flex-start;
-    text-align: left;
-    padding-left: 0;
-    overflow: hidden;
-    position: absolute;
-}
+        .row-2 .scroller-container {
+            width: 500px;
+            height: 50px;
+            overflow: hidden;
+            position: relative;
+        }
 
-.row-2 .scroller-container {
-    width: 815px;
-    height: 50px;
-    overflow: hidden;
-    position: relative;
-}
+        /* ROW 4 */
+        .row-4 {
+            bottom: 2px;
+            left: 200px;
+            width: 1720px;
+            height: 50px;
+            font-size: 30px;
+            color: #ffffff;
+            justify-content: flex-start;
+            text-align: left;
+            padding-left: 0;
+            overflow: hidden;
+            position: absolute;
+        }
 
+        .row-4 .scroller-container {
+            width: 1720px;
+            height: 50px;
+            overflow: hidden;
+            position: relative;
+        }
 
-
-/* =========================
-   ROW 4
-   200px → 1920px
-   ========================= */
-
-.row-4 {
-    bottom: 1px;
-    left: 200px;
-    width: 1720px;
-    height: 50px;
-    font-size: 30px;
-    color: #ffffff;
-    justify-content: flex-start;
-    text-align: left;
-    padding-left: 0;
-    overflow: hidden;
-    position: absolute;
-}
-
-.row-4 .scroller-container {
-    width: 1720px;
-    height: 50px;
-    overflow: hidden;
-    position: relative;
-}
-
+        .scroller { 
+            display: inline-block; 
+            white-space: nowrap; 
+            will-change: transform;
+            font-family: 'Anmol Unicode', sans-serif;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
 
         .box-time { position: absolute; bottom: 1px; left: 3px; width: 190px; height: 40px; display: flex; align-items: center; justify-content: center; z-index: 12; overflow: hidden; }
         .time-wrap, .date-wrap { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: opacity 0.3s ease-in-out; }
@@ -171,8 +172,8 @@
     const tickerState = {
         nA: { showPa: false, en: "", pa: "" },
         nB: { showPa: false, en: "", pa: "" },
-        c2: { showPa: false, en: "", pa: "" },
-        c4: { showPa: false, en: "", pa: "" }
+        c2: { showPa: false, en: "", pa: "", lastEn: "", lastPa: "" },
+        c4: { showPa: false, en: "", pa: "", lastEn: "", lastPa: "" }
     };
     const tickerTimers = {};
 
@@ -206,7 +207,6 @@
         updateScrollingData("c4", data.row4Txt, data.row4Txt_pa);
     });
 
-    // Team Name Render & Ticker-like Animation Logic
     function updateTeamNameState(key, en, pa) {
         const state = tickerState[key];
         const newEn = en || "TEAM";
@@ -237,37 +237,20 @@
             }
         };
 
-        const updateAnimation = (txt) => {
-            if (txt.length > 10) {
-                const scrollerEl = document.getElementById(`scroller-${key}`);
-                const dur = Math.max(8, txt.length * 0.25);
-                if(scrollerEl) scrollerEl.style.animationDuration = dur + 's';
-            }
-        };
-
         el.innerHTML = renderHTML(cleanTxt);
-        updateAnimation(cleanTxt);
 
         if (state.pa && state.pa.trim() !== "" && !el.dataset.hasTimer) {
             el.dataset.hasTimer = "true";
             setInterval(() => {
-                const textEl = document.getElementById(`scroller-${key}`) || document.getElementById(`static-${key}`);
-                if(textEl) textEl.style.opacity = '0';
-                
-                setTimeout(() => {
-                    state.showPa = !state.showPa;
-                    const newIsPa = state.showPa && state.pa && state.pa.trim() !== "";
-                    const newTxt = newIsPa ? state.pa : state.en;
-                    const newCleanTxt = (newTxt || "TEAM").replace(/(\r\n|\n|\r)/gm, " ");
-                    
-                    el.innerHTML = renderHTML(newCleanTxt);
-                    updateAnimation(newCleanTxt);
-                }, 200);
+                state.showPa = !state.showPa;
+                const newIsPa = state.showPa && state.pa && state.pa.trim() !== "";
+                const newTxt = newIsPa ? state.pa : state.en;
+                const newCleanTxt = (newTxt || "TEAM").replace(/(\r\n|\n|\r)/gm, " ");
+                el.innerHTML = renderHTML(newCleanTxt);
             }, 8000);
         }
     }
 
-    // Ticker Logic
     function updateStaticTicker(id, en, pa) {
         const el = document.getElementById(id);
         if (tickerTimers[id]) clearInterval(tickerTimers[id]);
@@ -296,86 +279,62 @@
         if (state.en !== newEn || state.pa !== newPa) {
             state.en = newEn;
             state.pa = newPa;
-            renderScrollingText(id);
+            renderScrollingText(id, true); // Force reset on data change
         }
     }
 
-    ```javascript
-function renderScrollingText(id) {
-    const scrollerEl = document.getElementById(`scroller-${id}`);
-    const state = tickerState[id];
+    function renderScrollingText(id, forceReset = false) {
+        const scrollerEl = document.getElementById(`scroller-${id}`);
+        const state = tickerState[id];
+        if (!scrollerEl) return;
 
-    if (!scrollerEl) return;
+        const visibleWidth = id === "c2" ? 500 : 1720;
+        const SPEED = 110; // Constant steady speed
 
-    // Previous animation stop
-    if (scrollerEl._scrollRAF) {
-        cancelAnimationFrame(scrollerEl._scrollRAF);
-        scrollerEl._scrollRAF = null;
-    }
+        if (forceReset && scrollerEl._scrollRAF) {
+            cancelAnimationFrame(scrollerEl._scrollRAF);
+            scrollerEl._scrollRAF = null;
+        }
 
-    if (scrollerEl._languageTimer) {
-        clearTimeout(scrollerEl._languageTimer);
-        scrollerEl._languageTimer = null;
-    }
+        if (scrollerEl._isInitialized && !forceReset) return;
+        scrollerEl._isInitialized = true;
 
-    const visibleWidth = id === "c2" ? 815 : 1720;
+        function startScroll() {
+            const isPa = state.showPa && state.pa && state.pa.trim() !== "";
+            const txt = (isPa ? state.pa : state.en || "").replace(/(\r\n|\n|\r)/gm, " ");
 
-    // Same speed for both languages
-    const SPEED = 120;
+            scrollerEl.innerText = txt;
+            const textWidth = scrollerEl.scrollWidth;
 
-    function startScroll() {
+            let position = visibleWidth;
+            let lastTime = performance.now();
 
-        const isPa =
-            state.showPa &&
-            state.pa &&
-            state.pa.trim() !== "";
+            function animate(now) {
+                const dt = (now - lastTime) / 1000;
+                lastTime = now;
 
-        const txt =
-            (isPa ? state.pa : state.en || "")
-            .replace(/(\r\n|\n|\r)/gm, " ");
+                position -= SPEED * dt;
 
-        scrollerEl.innerText = txt;
+                scrollerEl.style.transform = `translate3d(${position}px, 0, 0)`;
 
-        // Force browser to calculate real text width
-        const textWidth = scrollerEl.scrollWidth;
-
-        // Start exactly from RIGHT edge
-        let position = visibleWidth;
-
-        const startTime = performance.now();
-
-        function animate(now) {
-
-            const elapsed = (now - startTime) / 1000;
-
-            // Exact same pixel speed
-            position = visibleWidth - (elapsed * SPEED);
-
-            scrollerEl.style.transform =
-                `translate3d(${position}px, 0, 0)`;
-
-            // Text completely passed LEFT edge
-            if (position <= -textWidth) {
-
-                // Switch English ↔ Punjabi
-                if (state.pa && state.pa.trim() !== "") {
-                    state.showPa = !state.showPa;
+                if (position <= -textWidth) {
+                    if (state.pa && state.pa.trim() !== "") {
+                        state.showPa = !state.showPa;
+                    }
+                    startScroll();
+                    return;
                 }
 
-                startScroll();
-                return;
+                scrollerEl._scrollRAF = requestAnimationFrame(animate);
             }
 
-            scrollerEl._scrollRAF =
-                requestAnimationFrame(animate);
+            if (scrollerEl._scrollRAF) cancelAnimationFrame(scrollerEl._scrollRAF);
+            scrollerEl._scrollRAF = requestAnimationFrame(animate);
         }
 
-        scrollerEl._scrollRAF =
-            requestAnimationFrame(animate);
+        startScroll();
     }
 
-    startScroll();
-}
     // Clock
     function updateClock() {
         const now = new Date();
