@@ -68,10 +68,12 @@ textarea{
     margin-bottom:8px;
 }
 
+/* Enabled scrolling and resizing for all textareas */
 textarea {
-    resize: none;
-    overflow: hidden;
-    min-height: 42px;
+    resize: vertical;
+    overflow-y: auto;
+    min-height: 60px;
+    max-height: 200px;
 }
 
 .team-top{
@@ -360,6 +362,10 @@ SWAP
 Camera View
 </button>
 
+<button id="tickVisBtn" class="btn-full btn-red" onclick="toggleVis('tickerVisible')">
+HIDE TICKER
+</button>
+
 <button class="btn-full" style="background:#777;" onclick="resetScores()">
 RESET SCORES
 </button>
@@ -394,18 +400,6 @@ ADD TO LIST
 
 </div>
 
-<!-- QUICK TRANSLATOR TOOL -->
-<div class="card">
-<div class="header">QUICK TRANSLATOR TOOL</div>
-<div class="settings-section">
-    <div style="display:flex; gap:10px; margin-bottom:10px;">
-        <input type="text" id="quickEng" placeholder="Type here in any language..." style="margin-bottom:0;">
-        <button class="btn-full btn-yellow" onclick="translateText('quickEng', 'quickPa')" style="height:auto; min-height:42px; width:100px;">⇄ TRANS</button>
-    </div>
-    <input type="text" id="quickPa" placeholder="Translated output..." readonly style="background:#eee;">
-</div>
-</div>
-
 <!-- TEAM MANAGER -->
 <div class="card">
 <div class="header">TOURNAMENT TEAM MANAGER</div>
@@ -435,47 +429,43 @@ RESET ALL TEAMS
         <!-- Ticker Row 1 -->
         <div class="team-inputs-wrap" style="margin-bottom:12px;">
             <div class="team-input-row">
-                <textarea id="row1Inp" class="team-input" rows="1" placeholder="Title Line 1 (Input)" oninput="autoResize(this); updateTicker();"></textarea>
+                <textarea id="row1Inp" class="team-input" rows="1" placeholder="Title Line 1 (Input)" oninput="updateTicker();"></textarea>
                 <button class="trans-btn" onclick="translateText('row1Inp', 'row1Inp_pa').then(() => updateTicker())" title="Translate">⇄</button>
             </div>
-            <textarea id="row1Inp_pa" class="team-input" rows="1" placeholder="Title Line 1 (Translated)" style="margin-top:5px; width:100%;" oninput="autoResize(this); updateTicker();"></textarea>
+            <textarea id="row1Inp_pa" class="team-input" rows="1" placeholder="Title Line 1 (Translated)" style="margin-top:5px; width:100%;" oninput="updateTicker();"></textarea>
         </div>
 
         <!-- Ticker Row 2 -->
         <div class="team-inputs-wrap" style="margin-bottom:12px;">
             <div class="team-input-row">
-                <textarea id="row2Inp" class="team-input" rows="1" placeholder="Title Line 2 (Input)" oninput="autoResize(this); updateTicker();"></textarea>
+                <textarea id="row2Inp" class="team-input" rows="1" placeholder="Title Line 2 (Input)" oninput="updateTicker();"></textarea>
                 <button class="trans-btn" onclick="translateText('row2Inp', 'row2Inp_pa').then(() => updateTicker())" title="Translate">⇄</button>
             </div>
-            <textarea id="row2Inp_pa" class="team-input" rows="1" placeholder="Title Line 2 (Translated)" style="margin-top:5px; width:100%;" oninput="autoResize(this); updateTicker();"></textarea>
+            <textarea id="row2Inp_pa" class="team-input" rows="1" placeholder="Title Line 2 (Translated)" style="margin-top:5px; width:100%;" oninput="updateTicker();"></textarea>
         </div>
 
         <!-- Ticker Row 3 -->
         <div class="team-inputs-wrap" style="margin-bottom:12px;">
             <div class="team-input-row">
-                <textarea id="row3Inp" class="team-input" rows="1" placeholder="Title Line 3 (Input)" oninput="autoResize(this); updateTicker();"></textarea>
+                <textarea id="row3Inp" class="team-input" rows="1" placeholder="Title Line 3 (Input)" oninput="updateTicker();"></textarea>
                 <button class="trans-btn" onclick="translateText('row3Inp', 'row3Inp_pa').then(() => updateTicker())" title="Translate">⇄</button>
             </div>
-            <textarea id="row3Inp_pa" class="team-input" rows="1" placeholder="Title Line 3 (Translated)" style="margin-top:5px; width:100%;" oninput="autoResize(this); updateTicker();"></textarea>
+            <textarea id="row3Inp_pa" class="team-input" rows="1" placeholder="Title Line 3 (Translated)" style="margin-top:5px; width:100%;" oninput="updateTicker();"></textarea>
         </div>
 
         <!-- Ticker Row 4 -->
         <div class="team-inputs-wrap" style="margin-bottom:12px;">
             <div class="team-input-row">
-                <textarea id="row4Inp" class="team-input" rows="1" placeholder="Title Line 4 (Input)" oninput="autoResize(this); updateTicker();"></textarea>
+                <textarea id="row4Inp" class="team-input" rows="1" placeholder="Title Line 4 (Input)" oninput="updateTicker();"></textarea>
                 <button class="trans-btn" onclick="translateText('row4Inp', 'row4Inp_pa').then(() => updateTicker())" title="Translate">⇄</button>
             </div>
-            <textarea id="row4Inp_pa" class="team-input" rows="1" placeholder="Title Line 4 (Translated)" style="margin-top:5px; width:100%;" oninput="autoResize(this); updateTicker();"></textarea>
+            <textarea id="row4Inp_pa" class="team-input" rows="1" placeholder="Title Line 4 (Translated)" style="margin-top:5px; width:100%;" oninput="updateTicker();"></textarea>
         </div>
 
         <input type="text" id="watermarkInp" placeholder="Channel Name" oninput="updateTicker();">
 
         <button class="btn-full btn-blue" onclick="updateTicker()" style="width:100%;margin-bottom:8px;">
         UPDATE TICKER MANUALLY
-        </button>
-
-        <button id="tickVisBtn" class="btn-full btn-red" onclick="toggleVis('tickerVisible')" style="width:100%;">
-        HIDE TICKER
         </button>
     </div>
 </div>
@@ -536,7 +526,6 @@ db.on("value",(snap)=>{
         document.getElementById("dispA").innerText=curA;
         document.getElementById("dispB").innerText=curB;
         
-        // Prevent overwriting input values while typing locally if needed, but safe here
         if(document.activeElement !== document.getElementById("nameA")) {
             document.getElementById("nameA").value=data.nameA||"";
         }
@@ -567,17 +556,6 @@ db.on("value",(snap)=>{
         
         document.getElementById("watermarkInp").value = data.watermarkTxt || "";
 
-        setTimeout(() => {
-            autoResize(document.getElementById("row1Inp"));
-            autoResize(document.getElementById("row1Inp_pa"));
-            autoResize(document.getElementById("row2Inp"));
-            autoResize(document.getElementById("row2Inp_pa"));
-            autoResize(document.getElementById("row3Inp"));
-            autoResize(document.getElementById("row3Inp_pa"));
-            autoResize(document.getElementById("row4Inp"));
-            autoResize(document.getElementById("row4Inp_pa"));
-        }, 10);
-
         document.getElementById("winnerTeamsInp").value = data.qualifiedTeams || "";
         document.getElementById("loserTeamsInp").value = data.eliminatedTeams || "";
         document.getElementById("allTeamsInp").value = allTeams.join("\n");
@@ -589,7 +567,7 @@ db.on("value",(snap)=>{
         document.getElementById("visBtn").innerText = sVis ? "Hide Scoreboard" : "Show Scoreboard";
 
         const tVis = data.tickerVisible !== false;
-        document.getElementById("tickVisBtn").innerText = tVis ? "Hide Ticker" : "Show Ticker";
+        document.getElementById("tickVisBtn").innerText = tVis ? "HIDE TICKER" : "SHOW TICKER";
 
         camOpposite=data.cameraOpposite||false;
         document.getElementById("teamWrap").style.flexDirection = camOpposite ? "row-reverse" : "row";
@@ -786,11 +764,6 @@ function updateTicker(){
         row4Txt_pa: document.getElementById("row4Inp_pa").value,
         watermarkTxt: document.getElementById("watermarkInp").value
     });
-}
-
-function autoResize(el){
-    el.style.height = "auto";
-    el.style.height = el.scrollHeight + "px";
 }
 
 function toggleVis(field){
