@@ -49,7 +49,7 @@
             animation-name: scrollTeamName;
             animation-timing-function: linear;
             animation-iteration-count: infinite;
-            animation-duration: 8s;
+            animation-duration: 6s;
             transition: opacity 0.2s ease-in-out;
             font-family: 'Anmol Unicode', sans-serif;
             font-weight: bold;
@@ -65,7 +65,7 @@
 
         /* ROW 2 */
         .row-2 {
-            bottom: 47px;
+            bottom: 50px;
             left: 587px;
             width: 815px;
             height: 50px;
@@ -168,8 +168,13 @@
         }
     });
 
-    const clientLogos = { "starkabaddiharyana": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Star%20Kabaddi%20_20260718_195824_0000.png" };
-    
+    // Multi-Channel Logo Setup Dictionary (ਇੱਥੇ ਤੁਸੀਂ ਆਪਣੇ ਹੋਰ ਚੈਨਲ ਵੀ ਜੋੜ ਸਕਦੇ ਹੋ)
+    const clientLogos = {
+        "starkabaddiharyana": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Star%20Kabaddi%20_20260718_195824_0000.png",
+        "kabaddi101": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Kabaddi%20101%20logo.png"
+        // ਨਵਾਂ ਚੈਨਲ ਜੋੜਨ ਲਈ ਇੱਥੇ ਇਸ ਤਰ੍ਹਾਂ ਲਿਖੋ: "channel_name": "logo_image_url"
+    };
+
     const tickerState = {
         nA: { showPa: false, en: "", pa: "" },
         nB: { showPa: false, en: "", pa: "" },
@@ -183,6 +188,7 @@
         const logoCont = document.getElementById('logo-container');
         const currentId = matchId.trim().toLowerCase();
 
+        // Dynamic Logo Setup based on link ID
         if (clientLogos[currentId] && data.logoVisible !== false) {
             document.getElementById('main-logo').src = clientLogos[currentId];
             logoCont.classList.remove('hidden');
@@ -278,7 +284,7 @@
         state.pa = pa || "";
     }
 
-    // Zero-Jhatka Double Buffering Scroller Engine
+    // Smooth Infinite Continuous Scroller Engine for Row 2 & Row 4
     const scrollerData = {
         c2: { pos: 0, textWidth: 0, lastTime: 0, initialized: false, activeLang: false },
         c4: { pos: 0, textWidth: 0, lastTime: 0, initialized: false, activeLang: false }
@@ -304,12 +310,10 @@
             const dt = (now - scrollerData[id].lastTime) / 1000;
             scrollerData[id].lastTime = now;
 
-            // Get current active language text
             const hasPa = state.pa && state.pa.trim() !== "";
             const currentLangIsPa = hasPa ? state.showPa : false;
             const targetText = (currentLangIsPa ? state.pa : (state.en || " ")).replace(/(\r\n|\n|\r)/gm, " ");
 
-            // If text changed or language changed, update seamlessly
             if (scrollerData[id].currentText !== targetText || scrollerData[id].activeLang !== currentLangIsPa) {
                 scrollerData[id].currentText = targetText;
                 scrollerData[id].activeLang = currentLangIsPa;
@@ -320,7 +324,6 @@
             scrollerData[id].pos -= SPEED * dt;
             scrollerEl.style.transform = `translate3d(${scrollerData[id].pos}px, 0, 0)`;
 
-            // When text fully exits the left side, switch language (if available) and reset to right edge instantly
             if (scrollerData[id].pos <= -scrollerData[id].textWidth) {
                 if (hasPa) {
                     state.showPa = !state.showPa;
