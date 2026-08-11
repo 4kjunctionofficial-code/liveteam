@@ -28,15 +28,27 @@
 
         .round-display { position: absolute; top: 110px; left: 1450px; transform: translateX(-50%); color: white; font-size: 25px; text-transform: uppercase; text-shadow: 2px 2px 6px #000; z-index: 11; font-family: 'Anmol Unicode', 'Bebas Neue', sans-serif; font-weight: bold; }
 
+        /* Team Name Scroller Animation */
         @keyframes scrollTeamName {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .team-scroller-box {
+            display: inline-block;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 100%;
         }
 
         .team-scroller { 
             display: inline-block; 
             white-space: nowrap; 
-            animation: scrollTeamName 10s linear infinite;
+            will-change: transform, opacity;
+            animation-name: scrollTeamName;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+            transition: opacity 0.2s ease-in-out;
         }
 
         #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 1080px; z-index: 9998; opacity: 1; transition: opacity 0.7s ease; background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Copy%20of%20Star%20Kabaddi%20_20260711_110521_0000.png'); background-size: cover; background-position: center; background-repeat: no-repeat; pointer-events: none; }
@@ -123,6 +135,8 @@
 
     const clientLogos = { "kabaddi101": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Kabaddi%20101%20logo.png" };
     const tickerState = {
+        nA: { showPa: false, en: "", pa: "" },
+        nB: { showPa: false, en: "", pa: "" },
         c2: { showPa: false, en: "", pa: "" },
         c4: { showPa: false, en: "", pa: "" }
     };
@@ -146,14 +160,8 @@
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
         
-        if (window.lastNameA !== data.nameA || window.lastNameA_pa !== data.nameA_pa) {
-            window.lastNameA = data.nameA; window.lastNameA_pa = data.nameA_pa;
-            setTeamName("nA-container", data.nameA, data.nameA_pa);
-        }
-        if (window.lastNameB !== data.nameB || window.lastNameB_pa !== data.nameB_pa) {
-            window.lastNameB = data.nameB; window.lastNameB_pa = data.nameB_pa;
-            setTeamName("nB-container", data.nameB, data.nameB_pa);
-        }
+        updateTeamNameState("nA", data.nameA, data.nameA_pa);
+        updateTeamNameState("nB", data.nameB, data.nameB_pa);
         
         document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
         document.getElementById('round-display').innerText = data.round || "";
@@ -164,11 +172,45 @@
         updateScrollingData("c4", data.row4Txt, data.row4Txt_pa);
     });
 
-    function setTeamName(containerId, en, pa) {
+    function updateTeamNameState(key, en, pa) {
+        const state = tickerState[key];
+        const newEn = en || "TEAM";
+        const newPa = pa || "";
+
+        if (state.en !== newEn || state.pa !== newPa) {
+            state.en = newEn;
+            state.pa = newPa;
+            renderTeamName(key);
+        }
+    }
+
+    function renderTeamName(key) {
+        const containerId = key === "nA" ? "nA-container" : "nB-container";
         const el = document.getElementById(containerId);
-        if (el) {
-            const txt = (pa && pa.trim() !== "") ? pa : (en || "TEAM");
-            el.innerHTML = `<div class="team-scroller">${txt}</div>`;
+        const state = tickerState[key];
+        if (!el) return;
+
+        const hasPa = state.pa && state.pa.trim() !== "";
+        const isPa = state.showPa && hasPa;
+        const currentTxt = isPa ? state.pa : state.en;
+        const cleanTxt = (currentTxt || "").replace(/(\r\n|\n|\r)/gm, " ");
+
+        // If name is long (>10 chars), enable smooth scrolling loop like ticker
+        if (cleanTxt.length > 10) {
+            el.innerHTML = `<div class="team-scroller-box"><div class="team-scroller" id="scroller-${key}">${cleanTxt} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ${cleanTxt} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div></div>`;
+            const scrollerEl = document.getElementById(`scroller-${key}`);
+            const dur = Math.max(6, cleanTxt.length * 0.3);
+            scrollerEl.style.animationDuration = dur + 's';
+        } else {
+            el.innerHTML = `<div style="font-weight:bold;">${cleanTxt}</div>`;
+        }
+
+        if (hasPa && !el.dataset.hasTimer) {
+            el.dataset.hasTimer = "true";
+            setInterval(() => {
+                state.showPa = !state.showPa;
+                renderTeamName(key);
+            }, 8000);
         }
     }
 
