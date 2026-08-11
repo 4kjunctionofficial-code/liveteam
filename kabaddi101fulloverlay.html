@@ -199,25 +199,46 @@
     }
 
     // Static Rows (Row 1 & Row 3)
-    function updateStaticTicker(id, en, pa) {
-        const el = document.getElementById(id);
-        if (tickerTimers[id]) clearInterval(tickerTimers[id]);
+   ```javascript
+function updateStaticTicker(id, en, pa) {
+    const el = document.getElementById(id);
 
-        let showPunjabi = false;
-        function change() {
-            let isPa = showPunjabi && pa && pa.trim() !== "";
-            let rawTxt = isPa ? pa : (en || "");
-            
-            el.style.fontWeight = "bold";
-            el.innerText = rawTxt.replace(/(\r\n|\n|\r)/gm, " ");
-            
-            showPunjabi = !showPunjabi;
-        }
-        change();
-        if ((pa && pa.trim() !== "")) {
-            tickerTimers[id] = setInterval(change, 8000);
-        }
+    if (tickerTimers[id]) {
+        clearInterval(tickerTimers[id]);
     }
+
+    let showPunjabi = false;
+
+    function change() {
+        const isPa = showPunjabi && pa && pa.trim() !== "";
+        const rawTxt = isPa ? pa : (en || "");
+
+        el.innerHTML = `<span class="ticker-fit">${rawTxt.replace(/(\r\n|\n|\r)/gm, " ")}</span>`;
+
+        const textEl = el.querySelector(".ticker-fit");
+
+        // Reset
+        textEl.style.transform = "scaleX(1)";
+
+        requestAnimationFrame(() => {
+            const availableWidth = el.clientWidth - 10;
+            const textWidth = textEl.scrollWidth;
+
+            if (textWidth > availableWidth) {
+                const scale = availableWidth / textWidth;
+                textEl.style.transform = `scaleX(${scale})`;
+            }
+        });
+
+        showPunjabi = !showPunjabi;
+    }
+
+    change();
+
+    if (pa && pa.trim() !== "") {
+        tickerTimers[id] = setInterval(change, 8000);
+    }
+}
 
     // Update Scrolling Data for Row 2 & 4
     function updateScrollingData(id, en, pa) {
@@ -233,40 +254,60 @@
     }
 
     // Render scrolling text with constant speed calculated based on text length
-    function renderScrollingText(id) {
-        const scrollerEl = document.getElementById(`scroller-${id}`);
-        const state = tickerState[id];
-        if (!scrollerEl) return;
+    ```javascript
+function renderScrollingText(id) {
+    const scrollerEl = document.getElementById(`scroller-${id}`);
+    const state = tickerState[id];
 
-        const isPa = state.showPa && state.pa.trim() !== "";
-        const currentTxt = isPa ? state.pa : state.en;
-        
-        scrollerEl.style.fontWeight = "bold";
-        scrollerEl.innerText = currentTxt.replace(/(\r\n|\n|\r)/gm, " ");
+    if (!scrollerEl) return;
 
-        // Constant speed calculation (approx 14 pixels per second for uniform smooth flow)
-        const textLength = currentTxt.length;
-        const calculatedDuration = Math.max(15, textLength * 0.45);
-        scrollerEl.style.animationDuration = calculatedDuration + 's';
+    const isPa = state.showPa && state.pa.trim() !== "";
+    const currentTxt = isPa ? state.pa : state.en;
 
-        scrollerEl.onanimationiteration = null;
+    scrollerEl.innerText =
+        currentTxt.replace(/(\r\n|\n|\r)/gm, " ");
 
-        if (state.pa && state.pa.trim() !== "") {
-            scrollerEl.onanimationiteration = () => {
-                state.showPa = !state.showPa;
-                const nextIsPa = state.showPa && state.pa.trim() !== "";
-                const nextTxt = nextIsPa ? state.pa : state.en;
-                
-                scrollerEl.style.fontWeight = "bold";
-                scrollerEl.innerText = nextTxt.replace(/(\r\n|\n|\r)/gm, " ");
+    scrollerEl.style.fontWeight = "bold";
 
-                const nextLength = nextTxt.length;
-                const nextDuration = Math.max(15, nextLength * 0.45);
-                scrollerEl.style.animationDuration = nextDuration + 's';
-            };
-        }
+    /*
+       English ਅਤੇ Punjabi ਦੋਨਾਂ ਲਈ
+       SAME VISUAL SPEED
+    */
+    const pixelsPerSecond = 90;
+    const textWidth = scrollerEl.scrollWidth;
+
+    const duration =
+        Math.max(10, textWidth / pixelsPerSecond);
+
+    scrollerEl.style.animationDuration = duration + "s";
+
+    scrollerEl.onanimationiteration = null;
+
+    if (state.pa && state.pa.trim() !== "") {
+
+        scrollerEl.onanimationiteration = () => {
+
+            state.showPa = !state.showPa;
+
+            const nextIsPa =
+                state.showPa && state.pa.trim() !== "";
+
+            const nextTxt =
+                nextIsPa ? state.pa : state.en;
+
+            scrollerEl.innerText =
+                nextTxt.replace(/(\r\n|\n|\r)/gm, " ");
+
+            const nextWidth = scrollerEl.scrollWidth;
+
+            const nextDuration =
+                Math.max(10, nextWidth / pixelsPerSecond);
+
+            scrollerEl.style.animationDuration =
+                nextDuration + "s";
+        };
     }
-
+}
     // Clock
     function updateClock() {
         const now = new Date();
