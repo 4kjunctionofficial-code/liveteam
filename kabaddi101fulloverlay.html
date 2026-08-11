@@ -2,7 +2,6 @@
 <html lang="pa">
 <head>
     <meta charset="UTF-8">
-    <!-- Google Fonts for Bebas Neue and Anmol Unicode / Punjabi support -->
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Anmol+Unicode&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -97,7 +96,6 @@
     const db = firebase.database().ref("matchData/" + matchId);
     const userDb = firebase.database().ref("users/" + matchId);
 
-    // Expiry Check
     userDb.on("value", (snap) => {
         const user = snap.val();
         if (!user || Date.now() > new Date(user.expiryDate).getTime()) {
@@ -156,7 +154,6 @@
         }
     }
 
-    // Static Rows (Row 1 & Row 3)
     function updateStaticTicker(id, en, pa) {
         const el = document.getElementById(id);
         if (tickerTimers[id]) clearInterval(tickerTimers[id]);
@@ -177,7 +174,6 @@
         }
     }
 
-    // Update Scrolling Data for Row 2 & 4
     function updateScrollingData(id, en, pa) {
         const state = tickerState[id];
         const newEn = en || "";
@@ -190,7 +186,6 @@
         }
     }
 
-    // Render scrolling text with constant speed calculated based on text length
     function renderScrollingText(id) {
         const scrollerEl = document.getElementById(`scroller-${id}`);
         const state = tickerState[id];
@@ -202,7 +197,6 @@
         scrollerEl.style.fontWeight = "bold";
         scrollerEl.innerText = currentTxt.replace(/(\r\n|\n|\r)/gm, " ");
 
-        // Constant speed calculation (approx 14 pixels per second for uniform smooth flow)
         const textLength = currentTxt.length;
         const calculatedDuration = Math.max(15, textLength * 0.45);
         scrollerEl.style.animationDuration = calculatedDuration + 's';
@@ -225,7 +219,6 @@
         }
     }
 
-    // Clock
     function updateClock() {
         const now = new Date();
         document.getElementById('live-time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -240,7 +233,6 @@
         document.getElementById('d-wrap').style.opacity = isTime ? "0" : "1"; 
     }, 3000);
 
-    // Watermark
     const wm = document.getElementById('single-wm');
     let x = 100, y = 250, dx = 2.2, dy = 1.6;
     function animateWatermark() {
