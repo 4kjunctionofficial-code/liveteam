@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pa">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anmol+Unicode&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Bebas Neue', sans-serif; overflow: hidden; position: relative; }
+        
+        #logo-container { position: absolute; top: 30px; left: 40px; z-index: 9999; opacity: 1; transition: all 0.7s ease; }
+        #logo-container.hidden { opacity: 0; transform: scale(0); }
+        #main-logo { height: 100px; width: auto; max-width: 450px; object-fit: contain; filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.3)); }
+
+        #single-wm { position: absolute; left: 300px; top: 300px; font-family: 'Bebas Neue', sans-serif; font-size: 25px; font-weight: bold; color: #ffffff; opacity: 0.55; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,.8); white-space: nowrap; z-index: 9997; pointer-events: none; user-select: none; }
+        
+        #scoreboard { position: absolute; top: 0px; left: 0px; width: 1920px; height: 1080px; z-index: 9999; opacity: 1; transition: opacity 0.7s ease; background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/101%20png.png'); background-size: cover; background-position: center; background-repeat: no-repeat; }
+        #scoreboard.hidden { opacity: 0; }
+
+        /* Team Name Box styling matching Ticker */
+        .name-area { position: absolute; top: 35px; height: 50px; display: flex; align-items: center; color: #ffffff; font-size: 30px; text-transform: uppercase; overflow: hidden; white-space: nowrap; z-index: 11; font-family: 'Anmol Unicode', sans-serif; font-weight: bold; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
+        #nA-container { left: 1052px; width: 260px; justify-content: flex-end; }
+        #nB-container { left: 1590px; width: 260px; justify-content: flex-start; }
+        
+        .score-box { position: absolute; top: 40px; height: 50px; width: 50px; display: flex; align-items: center; justify-content: center; font-size: 55px; font-weight: bold; color: #000000; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); z-index: 12; }
+        #sA { left: 1345px; } 
+        #sB { left: 1507px; } 
+
+        .round-display { position: absolute; top: 110px; left: 1450px; transform: translateX(-50%); color: white; font-size: 25px; text-transform: uppercase; text-shadow: 2px 2px 6px #000; z-index: 11; font-family: 'Anmol Unicode', 'Bebas Neue', sans-serif; font-weight: bold; }
+
+        @keyframes scrollTeamName {
+            0% { transform: translateX(50%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .team-scroller-box {
+            display: inline-block;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .team-scroller { 
+            display: inline-block; 
+            white-space: nowrap; 
+            will-change: transform, opacity;
+            animation-name: scrollTeamName;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+            transition: opacity 0.2s ease-in-out;
+            font-family: 'Anmol Unicode', sans-serif;
+            font-weight: bold;
+        }
+
+        #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 1080px; z-index: 9998; opacity: 1; transition: opacity 0.7s ease; background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Copy%20of%20Star%20Kabaddi%20_20260711_110521_0000.png'); background-size: cover; background-position: center; background-repeat: no-repeat; pointer-events: none; }
+        #ticker-wrap.hidden { opacity: 0; }
+
+        .row-text { position: absolute; display: flex; align-items: center; text-transform: uppercase; overflow: hidden; box-sizing: border-box; white-space: nowrap; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); font-family: 'Anmol Unicode', sans-serif; font-weight: bold; }
+        
+        .row-1 { bottom: 61px; left: 210px; width: 350px; height: 50px; font-size: 30px; color: #ffffff; justify-content: center; text-align: center; padding-left: 0px; }
+        .row-3 { bottom: 53px; left: 1395px; width: 550px; height: 50px; font-size: 28px; color: #ffffff; justify-content: center; text-align: center; padding-left: 0px; }
+
+        .row-2 { bottom: 53px; left: 587px; width: 815px; height: 50px; font-size: 30px; color: #000000; text-shadow: none; justify-content: flex-start; text-align: left; padding-left: 0px; }
+        .row-4 { bottom: 2px; left: 200px; width: 1730px; height: 50px; font-size: 30px; color: #ffffff; justify-content: flex-start; text-align: left; padding-left: 0px; }
+        
+        @keyframes scrollText {
+            0% { transform: translateX(50%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .scroller-container {
+            display: inline-block;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .scroller { 
+            display: inline-block; 
+            white-space: nowrap; 
+            will-change: transform, opacity;
+            animation-name: scrollText;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        .box-time { position: absolute; bottom: 1px; left: 3px; width: 190px; height: 40px; display: flex; align-items: center; justify-content: center; z-index: 12; overflow: hidden; }
+        .time-wrap, .date-wrap { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: opacity 0.3s ease-in-out; }
+        .time-str, .date-str { color: #ffffff; font-size: 30px; letter-spacing: 1px; text-shadow: 2px 2px 5px #000; }
+    </style>
+</head>
+<body>
+
+<div id="logo-container" class="hidden">
+    <img id="main-logo" src="" alt="Logo">
+</div>
+
+<div id="single-wm">M LIVE</div>
+    
+<div id="scoreboard">
+    <div class="name-area" id="nA-container"><div id="nA">TEAM 1</div></div>
+    <div class="score-box" id="sA">0</div>
+    <div class="score-box" id="sB">0</div>
+    <div class="name-area" id="nB-container"><div id="nB">TEAM 2</div></div>
+    <div class="round-display" id="round-display">LIVE MATCH</div>
+</div>
+
+<div id="ticker-wrap">
+    <div class="row-text row-1" id="c1">WELCOME TO LIVE KABADDI</div>
+    <div class="row-text row-2" id="c2"><div class="scroller-container"><div class="scroller" id="scroller-c2">SUBSCRIBE OUR CHANNEL</div></div></div>
+    <div class="row-text row-3" id="c3">LIKE & SHARE</div>
+    <div class="row-text row-4" id="c4"><div class="scroller-container"><div class="scroller" id="scroller-c4">KEEP WATCHING</div></div></div> 
+
+    <div class="box-time">
+        <div class="time-wrap" id="t-wrap"><div class="time-str" id="live-time"></div></div>
+        <div class="date-wrap" id="d-wrap" style="opacity:0;"><div class="date-str" id="live-date"></div></div>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
+    firebase.initializeApp(firebaseConfig);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const matchId = urlParams.get('id') || 'defaultMatch';
+    const db = firebase.database().ref("matchData/" + matchId);
+    const userDb = firebase.database().ref("users/" + matchId);
+
+    userDb.on("value", (snap) => {
+        const user = snap.val();
+        if (!user || Date.now() > new Date(user.expiryDate).getTime()) {
+            document.body.innerHTML = `<div style="width:100vw; height:100vh; display:flex; justify-content:center; align-items:center; background:black; color:white; font-size:60px; text-align:center; font-family:Arial;">🛑 PLAN EXPIRED<br><br>HELP LINE<br>MANPREET MUDKI<br>9115426711</div>`;
+        }
+    });
+
+    const clientLogos = { "kabaddi101": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Kabaddi%20101%20logo.png" };
+    const tickerState = {
+        nA: { showPa: false, en: "", pa: "" },
+        nB: { showPa: false, en: "", pa: "" },
+        c2: { showPa: false, en: "", pa: "" },
+        c4: { showPa: false, en: "", pa: "" }
+    };
+    const tickerTimers = {};
+
+    db.on("value", (snap) => {
+        const data = snap.val() || {}; 
+        const logoCont = document.getElementById('logo-container');
+        const currentId = matchId.trim().toLowerCase();
+
+        if (clientLogos[currentId] && data.logoVisible !== false) {
+            document.getElementById('main-logo').src = clientLogos[currentId];
+            logoCont.classList.remove('hidden');
+        } else {
+            logoCont.classList.add('hidden');
+        }
+
+        document.getElementById('scoreboard').classList.toggle('hidden', data.scoreVisible === false);
+        document.getElementById('ticker-wrap').classList.toggle('hidden', data.tickerVisible === false);
+        
+        document.getElementById('sA').innerText = data.scoreA ?? "0";
+        document.getElementById('sB').innerText = data.scoreB ?? "0";
+        
+        updateTeamNameState("nA", data.nameA, data.nameA_pa);
+        updateTeamNameState("nB", data.nameB, data.nameB_pa);
+        
+        document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
+        document.getElementById('round-display').innerText = data.round || "";
+        
+        updateStaticTicker("c1", data.row1Txt, data.row1Txt_pa);
+        updateScrollingData("c2", data.row2Txt, data.row2Txt_pa); 
+        updateStaticTicker("c3", data.row3Txt, data.row3Txt_pa);
+        updateScrollingData("c4", data.row4Txt, data.row4Txt_pa);
+    });
+
+    // Team Name Render & Ticker-like Animation Logic
+    function updateTeamNameState(key, en, pa) {
+        const state = tickerState[key];
+        const newEn = en || "TEAM";
+        const newPa = pa || "";
+
+        if (state.en !== newEn || state.pa !== newPa) {
+            state.en = newEn;
+            state.pa = newPa;
+            renderTeamName(key);
+        }
+    }
+
+    function renderTeamName(key) {
+        const containerId = key === "nA" ? "nA-container" : "nB-container";
+        const el = document.getElementById(containerId);
+        const state = tickerState[key];
+        if (!el) return;
+
+        const isPa = state.showPa && state.pa && state.pa.trim() !== "";
+        const currentTxt = isPa ? state.pa : state.en;
+        const cleanTxt = (currentTxt || "TEAM").replace(/(\r\n|\n|\r)/gm, " ");
+
+        const renderHTML = (txt) => {
+            if (txt.length > 10) {
+                return `<div class="team-scroller-box"><div class="team-scroller" id="scroller-${key}">${txt}</div></div>`;
+            } else {
+                return `<div style="font-family: 'Anmol Unicode', sans-serif; font-weight: bold; width:100%; text-align:inherit; transition: opacity 0.2s ease-in-out;" id="static-${key}">${txt}</div>`;
+            }
+        };
+
+        const updateAnimation = (txt) => {
+            if (txt.length > 10) {
+                const scrollerEl = document.getElementById(`scroller-${key}`);
+                const dur = Math.max(8, txt.length * 0.25);
+                if(scrollerEl) scrollerEl.style.animationDuration = dur + 's';
+            }
+        };
+
+        el.innerHTML = renderHTML(cleanTxt);
+        updateAnimation(cleanTxt);
+
+        if (state.pa && state.pa.trim() !== "" && !el.dataset.hasTimer) {
+            el.dataset.hasTimer = "true";
+            setInterval(() => {
+                const textEl = document.getElementById(`scroller-${key}`) || document.getElementById(`static-${key}`);
+                if(textEl) textEl.style.opacity = '0';
+                
+                setTimeout(() => {
+                    state.showPa = !state.showPa;
+                    const newIsPa = state.showPa && state.pa && state.pa.trim() !== "";
+                    const newTxt = newIsPa ? state.pa : state.en;
+                    const newCleanTxt = (newTxt || "TEAM").replace(/(\r\n|\n|\r)/gm, " ");
+                    
+                    el.innerHTML = renderHTML(newCleanTxt);
+                    updateAnimation(newCleanTxt);
+                }, 200);
+            }, 8000);
+        }
+    }
+
+    // Ticker Logic
+    function updateStaticTicker(id, en, pa) {
+        const el = document.getElementById(id);
+        if (tickerTimers[id]) clearInterval(tickerTimers[id]);
+
+        let showPunjabi = false;
+        function change() {
+            let isPa = showPunjabi && pa && pa.trim() !== "";
+            let rawTxt = isPa ? pa : (en || "");
+            
+            el.style.fontWeight = "bold";
+            el.innerText = rawTxt.replace(/(\r\n|\n|\r)/gm, " ");
+            
+            showPunjabi = !showPunjabi;
+        }
+        change();
+        if ((pa && pa.trim() !== "")) {
+            tickerTimers[id] = setInterval(change, 8000);
+        }
+    }
+
+    function updateScrollingData(id, en, pa) {
+        const state = tickerState[id];
+        const newEn = en || "";
+        const newPa = pa || "";
+
+        if (state.en !== newEn || state.pa !== newPa) {
+            state.en = newEn;
+            state.pa = newPa;
+            renderScrollingText(id);
+        }
+    }
+
+    function renderScrollingText(id) {
+        const scrollerEl = document.getElementById(`scroller-${id}`);
+        const state = tickerState[id];
+        if (!scrollerEl) return;
+
+        const isPa = state.showPa && state.pa.trim() !== "";
+        const currentTxt = isPa ? state.pa : state.en;
+        const cleanTxt = (currentTxt || "").replace(/(\r\n|\n|\r)/gm, " ");
+        
+        scrollerEl.style.fontWeight = "bold";
+        scrollerEl.innerText = cleanTxt;
+
+        const textLength = cleanTxt.length;
+        const calculatedDuration = Math.max(8, textLength * 0.25);
+        scrollerEl.style.animationDuration = calculatedDuration + 's';
+
+        scrollerEl.onanimationiteration = null;
+
+        if (state.pa && state.pa.trim() !== "") {
+            scrollerEl.onanimationiteration = () => {
+                scrollerEl.style.opacity = '0';
+                
+                setTimeout(() => {
+                    state.showPa = !state.showPa;
+                    const nextIsPa = state.showPa && state.pa.trim() !== "";
+                    const nextTxt = nextIsPa ? state.pa : state.en;
+                    const cleanNextTxt = (nextTxt || "").replace(/(\r\n|\n|\r)/gm, " ");
+                    
+                    scrollerEl.style.fontWeight = "bold";
+                    scrollerEl.innerText = cleanNextTxt;
+
+                    const nextLength = cleanNextTxt.length;
+                    const nextDuration = Math.max(8, nextLength * 0.25);
+                    scrollerEl.style.animationDuration = nextDuration + 's';
+                    
+                    scrollerEl.style.opacity = '1';
+                }, 150);
+            };
+        }
+    }
+
+    // Clock
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('live-time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('live-date').innerText = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+    }
+    setInterval(updateClock, 1000); updateClock();
+
+    let isTime = true;
+    setInterval(() => { 
+        isTime = !isTime; 
+        document.getElementById('t-wrap').style.opacity = isTime ? "1" : "0"; 
+        document.getElementById('d-wrap').style.opacity = isTime ? "0" : "1"; 
+    }, 3000);
+
+    const wm = document.getElementById('single-wm');
+    let x = 100, y = 250, dx = 2.2, dy = 1.6;
+    function animateWatermark() {
+        const maxX = 1920 - wm.offsetWidth, maxY = 980 - wm.offsetHeight;
+        x += dx; y += dy;
+        if (x <= 0 || x >= maxX) dx *= -1;
+        if (y <= 170 || y >= maxY) dy *= -1;
+        wm.style.left = x + 'px'; wm.style.top = y + 'px';
+        requestAnimationFrame(animateWatermark);
+    }
+    animateWatermark();
+</script>
+</body>
+</html>
