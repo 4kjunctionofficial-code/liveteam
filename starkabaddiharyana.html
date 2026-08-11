@@ -289,7 +289,6 @@
         const state = tickerState[id];
         if (!scrollerEl) return;
 
-        // Separate speeds for Row 2 and Row 4 (ਕੋਈ ਵੀ ਸਪੀਡ ਇੱਥੋਂ ਘਟਾ ਜਾਂ ਵਧਾ ਸਕਦੇ ਹੋ)
         const SPEED_C2 = 100; // Row 2 speed
         const SPEED_C4 = 120; // Row 4 speed
         const SPEED = (id === "c2") ? SPEED_C2 : SPEED_C4;
@@ -309,11 +308,8 @@
             scrollerEl.innerText = txt;
             const textWidth = scrollerEl.scrollWidth;
 
-            // Start immediately from the right edge
-            let position = 0; 
-            let containerWidth = scrollerEl.parentElement.offsetWidth;
-            position = containerWidth;
-
+            // Start instantly from right edge with zero extra margin/padding space
+            let position = scrollerEl.parentElement.offsetWidth;
             let lastTime = performance.now();
 
             function animate(now) {
@@ -324,7 +320,7 @@
 
                 scrollerEl.style.transform = `translate3d(${position}px, 0, 0)`;
 
-                // When text completely clears the left edge, restart instantly without delay
+                // Restart immediately as soon as the text completely scrolls past the left edge
                 if (position <= -textWidth) {
                     if (state.pa && state.pa.trim() !== "") {
                         state.showPa = !state.showPa;
