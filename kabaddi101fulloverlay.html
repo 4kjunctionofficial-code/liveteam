@@ -168,13 +168,16 @@
 
         let showPunjabi = false;
         function change() {
-            let isPa = showPunjabi && pa && pa.trim() !== "";
+            let hasPa = pa && pa.trim() !== "";
+            let isPa = showPunjabi && hasPa;
             let rawTxt = isPa ? pa : (en || "");
             
             el.style.fontWeight = "bold";
             el.innerText = rawTxt.replace(/(\r\n|\n|\r)/gm, " ");
             
-            showPunjabi = !showPunjabi;
+            if (hasPa) {
+                showPunjabi = !showPunjabi;
+            }
         }
         change();
         if ((pa && pa.trim() !== "")) {
@@ -199,12 +202,12 @@
         const state = tickerState[id];
         if (!scrollerEl) return;
 
-        const isPa = state.showPa && state.pa.trim() !== "";
+        const hasPa = state.pa && state.pa.trim() !== "";
+        const isPa = state.showPa && hasPa;
         const currentTxt = isPa ? state.pa : state.en;
-        const cleanTxt = currentTxt.replace(/(\r\n|\n|\r)/gm, " ");
+        const cleanTxt = (currentTxt || "").replace(/(\r\n|\n|\r)/gm, " ");
         
         scrollerEl.style.fontWeight = "bold";
-        // Repeat text twice with spacing so it loops seamlessly without large gaps
         scrollerEl.innerHTML = `<span>${cleanTxt} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ${cleanTxt} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>`;
 
         const textLength = cleanTxt.length;
@@ -213,12 +216,12 @@
 
         scrollerEl.onanimationiteration = null;
 
-        if (state.pa && state.pa.trim() !== "") {
+        if (hasPa) {
             scrollerEl.onanimationiteration = () => {
                 state.showPa = !state.showPa;
                 const nextIsPa = state.showPa && state.pa.trim() !== "";
                 const nextTxt = nextIsPa ? state.pa : state.en;
-                const cleanNextTxt = nextTxt.replace(/(\r\n|\n|\r)/gm, " ");
+                const cleanNextTxt = (nextTxt || "").replace(/(\r\n|\n|\r)/gm, " ");
                 
                 scrollerEl.style.fontWeight = "bold";
                 scrollerEl.innerHTML = `<span>${cleanNextTxt} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ${cleanNextTxt} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>`;
