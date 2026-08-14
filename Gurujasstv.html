@@ -96,20 +96,17 @@
             border-top: 1px solid rgba(255,255,255,0.1);
         }
 
-        /* ਟਿੱਕਰ ਦੇ ਕੰਬਣ (jitter) ਨੂੰ ਰੋਕਣ ਲਈ ਪ੍ਰੋਫੈਸ਼ਨਲ ਸੈਟਿੰਗ */
+        /* ਟਿੱਕਰ ਦੇ ਕੰਬਣ ਨੂੰ ਰੋਕਣ ਲਈ ਸਹੀ ਐਨੀਮੇਸ਼ਨ ਸੈਟਅੱਪ */
         .scroller {
             display: inline-block;
             white-space: nowrap;
             position: relative;
             will-change: transform;
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-            transform: translateZ(0);
         }
 
         @keyframes tickerScroll {
-            0% { transform: translate3d(0, 0, 0); }
-            100% { transform: translate3d(-50%, 0, 0); }
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
         }
 
         .box-time{
@@ -142,8 +139,7 @@
         .inner-val { transform: skewX(15deg); }
         .name-area { width: 220px; height: 100%; display: flex; align-items: center; overflow: hidden; white-space: nowrap; color: #ffffff; font-size: 28px; font-weight: bold; text-align: center; padding: 0 10px; text-shadow: 2px 2px 4px #000; box-sizing: border-box; text-transform: uppercase; position: relative; z-index: 11; }
         
-        /* ਟੀਮ ਦੇ ਨਾਮ ਦੀ ਸਕ੍ਰੋਲਿੰਗ ਸਪੀਡ ਇੱਥੇ ਹੌਲੀ ਕੀਤੀ ਗਈ ਹੈ (16s) */
-        .team-scroller { display: inline-block; padding-left: 100%; animation: team-scroll 16s linear infinite; will-change: transform; backface-visibility: hidden; }
+        .team-scroller { display: inline-block; padding-left: 100%; animation: team-scroll 16s linear infinite; will-change: transform; }
         @keyframes team-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
         
         .vs-text { color: #ffffff; font-size: 20px; font-weight: 900; margin: 0 10px; text-shadow: 1px 1px 3px #000; background: #333; display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; border-radius: 50%; border: 2px solid #e60000; position: relative; z-index: 11; }
