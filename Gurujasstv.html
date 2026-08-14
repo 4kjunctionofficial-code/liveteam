@@ -20,7 +20,7 @@
         #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 150px; display: flex; z-index: 9998; opacity: 1; transition: all 0.7s ease; background: transparent; }
         #ticker-wrap.hidden { opacity: 0; transform: translateY(160px); }
 
-        /* ਪੂਰੀ ਸਕ੍ਰੀਨ ਦੇ ਹਿਸਾਬ ਨਾਲ ਖੱਬੇ ਤੋਂ ਸੱਜੇ (0 ਤੋਂ 1920) ਜਾਣ ਵਾਲੀ ਲਾਈਟ ਅਤੇ ਫਿਰ ਗਾਇਬ */
+        /* ਖੱਬੇ ਤੋਂ ਸੱਜੇ ਜਾਣ ਵਾਲੀ ਲਾਈਟ (ਇੱਥੋਂ ਤੁਸੀਂ 0.4 ਨੂੰ ਬਦل ਕੇ ਲਾਈਟ ਘਟਾ ਜਾਂ ਵਧਾ ਸਕਦੇ ਹੋ) */
         @keyframes fullScreenShine {
             0% { transform: translateX(-120%) skewX(-20deg); opacity: 0; }
             10% { opacity: 1; }
@@ -39,9 +39,10 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 30%;
+            width: 35%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            /* 0.4 ਨੰਬਰ ਨੂੰ ਘਟਾ ਕੇ (ਜਿਵੇਂ 0.2) ਲਾਈਟ ਘੱਟ ਕਰ ਸਕਦੇ ਹੋ, ਜਾਂ ਵਧਾ ਕੇ (ਜਿਵੇਂ 0.7) ਤੇਜ਼ ਕਰ ਸਕਦੇ ਹੋ */
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
             transform: translateX(-120%) skewX(-20deg);
             animation: fullScreenShine 6s infinite ease-in-out;
             pointer-events: none;
