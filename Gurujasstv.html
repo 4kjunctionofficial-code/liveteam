@@ -20,11 +20,11 @@
         #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 150px; display: flex; z-index: 9998; opacity: 1; transition: all 0.7s ease; background: transparent; }
         #ticker-wrap.hidden { opacity: 0; transform: translateY(160px); }
 
-        /* ਇੱਕ ਪਾਸੇ ਤੋਂ ਦੂਜੇ ਪਾਸੇ ਲੰਘਣ ਵਾਲੀ ਚਮਕਦਾਰ ਲਾਈਟ (Shine Effect) */
+        /* ਇੱਕ ਪਾਸੇ ਤੋਂ ਸ਼ੁਰੂ ਹੋ ਕੇ ਪੂਰੀ ਤਰ੍ਹਾਂ ਪਾਰ ਹੋ ਕੇ ਖਤਮ ਹੋਣ ਵਾਲੀ ਲਾਈਟ */
         @keyframes shineSweep {
-            0% { transform: translateX(-100%); }
-            20% { transform: translateX(100%); }
-            100% { transform: translateX(100%); }
+            0% { transform: translateX(-150%); }
+            40% { transform: translateX(150%); }
+            100% { transform: translateX(150%); }
         }
 
         .shine-box {
@@ -37,11 +37,11 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 50%;
+            width: 40%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            transform: translateX(-100%);
-            animation: shineSweep 4s infinite linear;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            transform: translateX(-150%);
+            animation: shineSweep 5s infinite ease-in-out;
             pointer-events: none;
             z-index: 15;
         }
