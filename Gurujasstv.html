@@ -15,17 +15,18 @@
         #logo-container.hidden { opacity: 0; transform: scale(0); }
         #main-logo { height: 100px; width: auto; max-width: 450px; object-fit: contain; filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.3)); }
 
-        #single-wm { position: absolute; color: rgba(255, 255, 255, 0.9); font-size: 25px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 5px #000; white-space: nowrap; z-index: 1; opacity: 1; }
+        #single-wm { position: absolute; color: rgba(255, 255, 255, 0.7); font-size: 25px; font-weight: bold; text-transform: uppercase; text-shadow: 2px 2px 5px #000; white-space: nowrap; z-index: 1; opacity: 1; }
 
         #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 150px; display: flex; z-index: 9998; opacity: 1; transition: all 0.7s ease; background: transparent; }
         #ticker-wrap.hidden { opacity: 0; transform: translateY(160px); }
 
-        /* ਖੱਬੇ ਤੋਂ ਸੱਜੇ ਪੂਰੀ ਸਕ੍ਰੀਨ ਪਾਰ ਕਰਨ ਵਾਲੀ ਲਾਈਟ */
+        /* ਲਾਈਟ ਹੁਣ ਬਿਲਕੁਲ ਸ਼ੁਰੂ ਤੋਂ ਲੈ ਕੇ ਆਖਰੀ ਛੋਰ ਤੱਕ ਜਾ ਕੇ ਪੂਰੀ ਪਾਰ ਹੋਵੇਗੀ */
         @keyframes fullScreenShine {
             0% { transform: translateX(-150%) skewX(-20deg); opacity: 0; }
             10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateX(550%) skewX(-20deg); opacity: 0; }
+            80% { opacity: 1; }
+            95% { transform: translateX(450%) skewX(-20deg); opacity: 0; }
+            100% { transform: translateX(450%) skewX(-20deg); opacity: 0; }
         }
 
         .shine-container {
@@ -40,10 +41,9 @@
             left: 0;
             width: 20%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
             transform: translateX(-150%) skewX(-20deg);
-            /* 3s ਲਾਈਟ ਚੱਲਣ ਦਾ ਸਮਾਂ, ਅਤੇ 10s ਹਰ ਵਾਰ ਰੁਕਣ ਦਾ ਸਮਾਂ (delay) ਹੈ */
-            animation: fullScreenShine 3s linear 10s infinite;
+            animation: fullScreenShine 4s infinite ease-in-out;
             pointer-events: none;
             z-index: 20;
         }
