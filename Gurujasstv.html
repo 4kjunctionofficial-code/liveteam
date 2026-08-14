@@ -20,12 +20,13 @@
         #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 150px; display: flex; z-index: 9998; opacity: 1; transition: all 0.7s ease; background: transparent; }
         #ticker-wrap.hidden { opacity: 0; transform: translateY(160px); }
 
+        /* ਲਾਈਟ ਹੁਣ ਬਿਲਕੁਲ ਸ਼ੁਰੂ ਤੋਂ ਲੈ ਕੇ ਆਖਰੀ ਛੋਰ ਤੱਕ ਜਾ ਕੇ ਪੂਰੀ ਪਾਰ ਹੋਵੇਗੀ */
         @keyframes fullScreenShine {
-            0% { transform: translateX(-120%) skewX(-20deg); opacity: 0; }
+            0% { transform: translateX(-150%) skewX(-20deg); opacity: 0; }
             10% { opacity: 1; }
-            50% { transform: translateX(350%) skewX(-20deg); opacity: 1; }
-            51% { opacity: 0; }
-            100% { transform: translateX(350%) skewX(-20deg); opacity: 0; }
+            80% { opacity: 1; }
+            95% { transform: translateX(450%) skewX(-20deg); opacity: 0; }
+            100% { transform: translateX(450%) skewX(-20deg); opacity: 0; }
         }
 
         .shine-container {
@@ -38,11 +39,11 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 15%; /* ਲਾਈਟ ਦਾ ਸਾਈਜ਼ ਛੋਟਾ ਕਰ ਦਿੱਤਾ ਗਿਆ ਹੈ */
+            width: 20%;
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            transform: translateX(-120%) skewX(-20deg);
-            animation: fullScreenShine 6s infinite ease-in-out;
+            transform: translateX(-150%) skewX(-20deg);
+            animation: fullScreenShine 7s infinite ease-in-out;
             pointer-events: none;
             z-index: 20;
         }
