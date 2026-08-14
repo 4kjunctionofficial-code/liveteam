@@ -20,11 +20,11 @@
         #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 150px; display: flex; z-index: 9998; opacity: 1; transition: all 0.7s ease; background: transparent; }
         #ticker-wrap.hidden { opacity: 0; transform: translateY(160px); }
 
-        /* ਇੱਕ ਪਾਸੇ ਤੋਂ ਸ਼ੁਰੂ ਹੋ ਕੇ ਪੂਰੀ ਤਰ੍ਹਾਂ ਪਾਰ ਹੋ ਕੇ ਖਤਮ ਹੋਣ ਵਾਲੀ ਲਾਈਟ */
+        /* ਇੱਕ ਪਾਸੇ ਤੋਂ ਸ਼ੁਰੂ ਹੋ ਕੇ ਦੂਜੇ ਪਾਸੇ ਪਾਰ ਜਾਣ ਵਾਲੀ ਅਤੇ ਫਿਰ ਗਾਇਬ ਹੋਣ ਵਾਲੀ ਲਾਈਟ */
         @keyframes shineSweep {
-            0% { transform: translateX(-150%); }
-            40% { transform: translateX(150%); }
-            100% { transform: translateX(150%); }
+            0% { transform: translateX(-150%) skewX(-20deg); }
+            50% { transform: translateX(150%) skewX(-20deg); }
+            100% { transform: translateX(150%) skewX(-20deg); }
         }
 
         .shine-box {
@@ -39,8 +39,8 @@
             left: 0;
             width: 40%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
-            transform: translateX(-150%);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            transform: translateX(-150%) skewX(-20deg);
             animation: shineSweep 5s infinite ease-in-out;
             pointer-events: none;
             z-index: 15;
@@ -212,14 +212,14 @@
 <div id="single-wm">M LIVE</div>
 
 <div id="scoreboard">
-    <div class="main-bar shine-box">
+    <div class="main-bar">
         <div class="s-box s-left"><div class="inner-val" id="sA">0</div></div>
         <div class="name-area" id="nA-container"><div id="nA" style="width:100%; text-align:center;">TEAM 1</div></div>
         <div class="vs-text">VS</div>
         <div class="name-area" id="nB-container"><div id="nB" style="width:100%; text-align:center;">TEAM 2</div></div>
         <div class="s-box s-right"><div class="inner-val" id="sB">0</div></div>
     </div>
-    <div class="round-display shine-box" id="round-display">LIVE MATCH</div>
+    <div class="round-display" id="round-display">LIVE MATCH</div>
 </div>
 
 <div id="ticker-wrap">
