@@ -213,10 +213,13 @@
         roundEl.innerText = data.round || "";
         roundEl.style.display = (data.round || "").trim() === "" ? "none" : "block";
         
-        // ਟੈਕਸਟ ਅਪਡੇਟ ਅਤੇ ਸਪੀਡ ਸੈੱਟ ਕਰੋ
-        updateTickerContent('c1', data.row1Txt || "WELCOME TO LIVE KABADDI");
-        updateTickerContent('c2', data.row2Txt || "SUBSCRIBE OUR CHANNEL");
-        updateTickerContent('c3', data.row3Txt || "LIKE & SHARE");
+        // =========================================================================
+        // ਇੱਥੇ ਨੰਬਰ ਬਦਲ ਕੇ ਸਪੀਡ ਸੈੱਟ ਕਰੋ:
+        // ਨੰਬਰ ਜਿੰਨਾ ਵੱਡਾ ਹੋਵੇਗਾ, ਸਪੀਡ ਉੱਨੀ ਹੀ ਤੇਜ਼ ਹੋਵੇਗੀ (ਭਾਵੇਂ ਅੱਖਰ ਕਿੰਨੇ ਵੀ ਹੋਣ)।
+        // =========================================================================
+        updateTickerSpeedFixed('c1', data.row1Txt || "WELCOME TO LIVE KABADDI", 150); // ਪਹਿਲੀ ਲਾਈਨ
+        updateTickerSpeedFixed('c2', data.row2Txt || "SUBSCRIBE OUR CHANNEL", 120); // ਦੂਜੀ ਲਾਈਨ
+        updateTickerSpeedFixed('c3', data.row3Txt || "LIKE & SHARE", 180);           // ਤੀਜੀ ਲਾਈਨ
     });
 
     function setTeamName(containerId, txt) {
@@ -224,12 +227,14 @@
         el.innerHTML = txt.length > 12 ? `<div class="team-scroller">${txt}</div>` : `<div style="width:100%; text-align:center;">${txt}</div>`;
     }
 
-    // ਇਹ ਫੰਕਸ਼ਨ ਅੱਖਰਾਂ ਦੀ ਗਿਣਤੀ ਦੇ ਹਿਸਾਬ ਨਾਲ ਐਨੀਮੇਸ਼ਨ ਦਾ ਸਮਾਂ (duration) ਸੈੱਟ ਕਰੇਗਾ ਤਾਂ ਜੋ ਸਪੀਡ ਹਮੇਸ਼ਾ ਇੱਕੋ ਜਿਹੇ ਰਹੇ
-    function updateTickerContent(id, txt) {
+    // ਇਹ ਫੰਕਸ਼ਨ ਅੱਖਰਾਂ ਦੀ ਗਿਣਤੀ ਨੂੰ ਫਿਕਸ ਕਰਕੇ ਨੰਬਰ ਦੇ ਹਿਸਾਬ ਨਾਲ ਪੱਕੀ ਸਪੀਡ ਦਿੰਦਾ ਹੈ
+    function updateTickerSpeedFixed(id, txt, speedMultiplier) {
         const el = document.getElementById(id);
         let scroller = el.querySelector('.scroller');
-        const content = `${txt}&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;&nbsp;&nbsp;`;
-        const fullContent = content.repeat(6);
+        
+        // ਟੈਕਸਟ ਨੂੰ ਇੰਨਾ ਲੰبا ਕਰ ਦਿੱਤਾ ਜਾਂਦਾ ਹੈ ਕਿ ਅੱਖਰਾਂ ਦਾ ਫਰਕ ਖਤਮ ਹੋ ਜਾਵੇ
+        const singleBlock = `${txt}&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;&nbsp;&nbsp;`;
+        const fullContent = singleBlock.repeat(15); 
         
         if (!scroller) {
             scroller = document.createElement('div');
@@ -240,11 +245,10 @@
         
         scroller.innerHTML = fullContent;
 
-        // ਅੱਖਰਾਂ ਦੀ ਲੰਬਾਈ ਮਾਪ ਕੇ ਸਪੀਡ (Pixels per second = 80px) ਕੈਲਕੁਲੇਟ ਕਰੋ
+        // ਅੱਖਰਾਂ ਦੀ ਲੰਬਾਈ ਨੂੰ ਨੰਬਰ (speedMultiplier) ਨਾਲ ਤੈਅ ਕਰਨਾ
         setTimeout(() => {
-            const textWidth = scroller.offsetWidth / 2; // ਅੱਧੇ ਹਿੱਸੇ ਦੀ ਚੌੜਾਈ
-            const speedPxPerSec = 80; // ਇੱਥੋਂ ਤੁਸੀਂ ਸਪੀਡ ਘਟਾ ਜਾਂ ਵਧਾ ਸਕਦੇ ਹੋ (ਕੋਈ ਵੀ ਨੰਬਰ ਰੱਖ ਲਓ)
-            const duration = textWidth / speedPxPerSec;
+            const textWidth = scroller.offsetWidth / 2;
+            const duration = textWidth / speedMultiplier;
             scroller.style.animation = `tickerScroll ${duration}s linear infinite`;
         }, 50);
     }
