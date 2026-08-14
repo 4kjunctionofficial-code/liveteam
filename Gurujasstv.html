@@ -20,11 +20,30 @@
         #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 150px; display: flex; z-index: 9998; opacity: 1; transition: all 0.7s ease; background: transparent; }
         #ticker-wrap.hidden { opacity: 0; transform: translateY(160px); }
 
-        /* ਲਾਈਟ ਫਲੈਸ਼ ਐਨੀਮੇਸ਼ਨ */
-        @keyframes lightFlash {
-            0% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.2), inset 0 0 5px rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); }
-            50% { box-shadow: 0 0 25px rgba(230, 0, 0, 0.8), inset 0 0 15px rgba(230, 0, 0, 0.5); border-color: rgba(255, 100, 100, 0.9); }
-            100% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.2), inset 0 0 5px rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); }
+        /* ਇੱਕ ਪਾਸੇ ਤੋਂ ਦੂਜੇ ਪਾਸੇ ਲੰਘਣ ਵਾਲੀ ਚਮਕਦਾਰ ਲਾਈਟ (Shine Effect) */
+        @keyframes shineSweep {
+            0% { transform: translateX(-100%); }
+            20% { transform: translateX(100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .shine-box {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shine-box::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transform: translateX(-100%);
+            animation: shineSweep 4s infinite linear;
+            pointer-events: none;
+            z-index: 15;
         }
 
         .box-live{
@@ -45,8 +64,9 @@
             padding-right:60px;
             box-sizing:border-box;
             text-shadow:3px 3px 5px rgba(0,0,0,0.4);
-            border: 2px solid rgba(255,255,255,0.2);
-            animation: lightFlash 3s infinite;
+            border-left: 2px solid rgba(255,255,255,0.2);
+            border-top: 2px solid rgba(255,255,255,0.2);
+            border-bottom: 2px solid rgba(255,255,255,0.2);
         }
 
         .center-wrap { 
@@ -62,7 +82,6 @@
             padding-right: 60px;
             border-top: 2px solid rgba(255,255,255,0.2);
             border-bottom: 2px solid rgba(255,255,255,0.2);
-            animation: lightFlash 3s infinite;
         }
 
         .row-text { 
@@ -127,8 +146,9 @@
             clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%);
             padding-left:70px;
             box-sizing:border-box;
-            border: 2px solid rgba(255,255,255,0.2);
-            animation: lightFlash 3s infinite;
+            border-right: 2px solid rgba(255,255,255,0.2);
+            border-top: 2px solid rgba(255,255,255,0.2);
+            border-bottom: 2px solid rgba(255,255,255,0.2);
         }
         
         .time-wrap, .date-wrap { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: 0.8s; font-weight: bold; padding-left: 40px; box-sizing: border-box;}
@@ -148,8 +168,7 @@
             padding: 0 5px; 
             position: relative; 
             overflow: hidden; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            animation: lightFlash 3s infinite;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
         }
         
         .s-box { background: linear-gradient(145deg, #e60000, #990000); color: #ffffff; font-size: 42px; font-weight: 900; width: 120px; height: 100%; display: flex; align-items: center; justify-content: center; transform: skewX(-15deg); text-shadow: 2px 2px 4px #000; box-shadow: inset 2px 2px 6px rgba(255,255,255,0.4); position: relative; z-index: 11; }
@@ -175,8 +194,7 @@
             background: rgba(20, 20, 20, 0.95); 
             padding: 4px 15px; 
             border-radius: 4px; 
-            border: 2px solid rgba(255,255,255,0.2);
-            animation: lightFlash 3s infinite;
+            border: 2px solid rgba(255,255,255,0.2); 
         }
     </style>
 </head>
@@ -194,24 +212,24 @@
 <div id="single-wm">M LIVE</div>
 
 <div id="scoreboard">
-    <div class="main-bar">
+    <div class="main-bar shine-box">
         <div class="s-box s-left"><div class="inner-val" id="sA">0</div></div>
         <div class="name-area" id="nA-container"><div id="nA" style="width:100%; text-align:center;">TEAM 1</div></div>
         <div class="vs-text">VS</div>
         <div class="name-area" id="nB-container"><div id="nB" style="width:100%; text-align:center;">TEAM 2</div></div>
         <div class="s-box s-right"><div class="inner-val" id="sB">0</div></div>
     </div>
-    <div class="round-display" id="round-display">LIVE MATCH</div>
+    <div class="round-display shine-box" id="round-display">LIVE MATCH</div>
 </div>
 
 <div id="ticker-wrap">
-    <div class="box-live">Live</div>
+    <div class="box-live shine-box">Live</div>
     <div class="center-wrap">
         <div class="row-text row-1" id="c1"></div>
         <div class="row-text row-2" id="c2"></div>
         <div class="row-text row-3" id="c3"></div>
     </div>
-    <div class="box-time">
+    <div class="box-time shine-box">
         <div class="time-wrap" id="t-wrap"><div class="time-str" id="live-time"></div></div>
         <div class="date-wrap" id="d-wrap" style="opacity:0;"><div class="date-str" id="live-date"></div></div>
     </div>
