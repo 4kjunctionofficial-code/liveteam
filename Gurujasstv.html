@@ -91,19 +91,17 @@
             border-top:1px solid #444;
         }
 
-        /* ਟਿੱਕਰ ਨੂੰ ਸਮੂਥ ਕਰਨ ਲਈ CSS Keyframes ਅਤੇ GPU Acceleration */
-        @keyframes tickerScroll {
-            0% { transform: translate3d(0, 0, 0); }
-            100% { transform: translate3d(-50%, 0, 0); }
-        }
-
         .scroller {
             display: inline-block;
             white-space: nowrap;
             position: relative;
             will-change: transform;
-            animation: tickerScroll 22s linear infinite;
             transform: translateZ(0);
+        }
+
+        @keyframes tickerScroll {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-50%, 0, 0); }
         }
 
         .box-time{
@@ -192,7 +190,6 @@
         const logoCont = document.getElementById('logo-container');
         const currentId = matchId.trim().toLowerCase();
 
-        // Logo visibility
         if (clientLogos[currentId] && data.logoVisible !== false) {
             document.getElementById('main-logo').src = clientLogos[currentId];
             logoCont.classList.remove('hidden');
@@ -200,14 +197,12 @@
             logoCont.classList.add('hidden');
         }
 
-        // Scoreboard & Ticker Wrapper visibility
         document.getElementById('scoreboard').classList.toggle('hidden', data.scoreVisible === false);
         const tickerWrap = document.getElementById('ticker-wrap');
         const whatsappBar = document.querySelector('.whatsapp-bar');
         tickerWrap.classList.toggle('hidden', data.tickerVisible === false);
         whatsappBar.style.display = (data.tickerVisible === false) ? 'none' : 'flex';
         
-        // Update basic data
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
         setTeamName('nA-container', data.nameA || "TEAM 1");
@@ -218,7 +213,7 @@
         roundEl.innerText = data.round || "";
         roundEl.style.display = (data.round || "").trim() === "" ? "none" : "block";
         
-        // ਟਿੱਕਰ ਟੈਕਸਟ ਅਪਡੇਟ (ਸਮੂਥ CSS ਐਨੀਮੇਸ਼ਨ ਲਈ ਡਬਲ ਕੰਟੈਂਟ)
+        // ਟੈਕਸਟ ਅਪਡੇਟ ਅਤੇ ਸਪੀਡ ਸੈੱਟ ਕਰੋ
         updateTickerContent('c1', data.row1Txt || "WELCOME TO LIVE KABADDI");
         updateTickerContent('c2', data.row2Txt || "SUBSCRIBE OUR CHANNEL");
         updateTickerContent('c3', data.row3Txt || "LIKE & SHARE");
@@ -229,21 +224,31 @@
         el.innerHTML = txt.length > 12 ? `<div class="team-scroller">${txt}</div>` : `<div style="width:100%; text-align:center;">${txt}</div>`;
     }
 
-    // ਟਿੱਕਰ ਲਈ ਡਬਲ ਟੈਕਸਟ ਸੈੱਟਅੱਪ ਤਾਂ ਜੋ ਲੂਪ ਬਿਨਾਂ ਕਿਸੇ ਜਟਕੇ ਦੇ ਚੱਲੇ
+    // ਇਹ ਫੰਕਸ਼ਨ ਅੱਖਰਾਂ ਦੀ ਗਿਣਤੀ ਦੇ ਹਿਸਾਬ ਨਾਲ ਐਨੀਮੇਸ਼ਨ ਦਾ ਸਮਾਂ (duration) ਸੈੱਟ ਕਰੇਗਾ ਤਾਂ ਜੋ ਸਪੀਡ ਹਮੇਸ਼ਾ ਇੱਕੋ ਜਿਹੇ ਰਹੇ
     function updateTickerContent(id, txt) {
         const el = document.getElementById(id);
-        const scroller = el.querySelector('.scroller');
+        let scroller = el.querySelector('.scroller');
         const content = `${txt}&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;&nbsp;&nbsp;`;
-        const fullContent = content.repeat(6); // ਲਗਾਤਾਰ ਚੱਲਣ ਲਈ ਰਿਪੀਟ ਕਰੋ
+        const fullContent = content.repeat(6);
         
-        if (scroller) {
-            scroller.innerHTML = fullContent;
-        } else {
-            el.innerHTML = `<div class="scroller">${fullContent}</div>`;
+        if (!scroller) {
+            scroller = document.createElement('div');
+            scroller.className = 'scroller';
+            el.innerHTML = '';
+            el.appendChild(scroller);
         }
+        
+        scroller.innerHTML = fullContent;
+
+        // ਅੱਖਰਾਂ ਦੀ ਲੰਬਾਈ ਮਾਪ ਕੇ ਸਪੀਡ (Pixels per second = 80px) ਕੈਲਕੁਲੇਟ ਕਰੋ
+        setTimeout(() => {
+            const textWidth = scroller.offsetWidth / 2; // ਅੱਧੇ ਹਿੱਸੇ ਦੀ ਚੌੜਾਈ
+            const speedPxPerSec = 80; // ਇੱਥੋਂ ਤੁਸੀਂ ਸਪੀਡ ਘਟਾ ਜਾਂ ਵਧਾ ਸਕਦੇ ਹੋ (ਕੋਈ ਵੀ ਨੰਬਰ ਰੱਖ ਲਓ)
+            const duration = textWidth / speedPxPerSec;
+            scroller.style.animation = `tickerScroll ${duration}s linear infinite`;
+        }, 50);
     }
 
-    // Clock functions
     function updateClock() {
         const now = new Date();
         document.getElementById('live-time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
