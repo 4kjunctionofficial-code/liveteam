@@ -22,7 +22,6 @@
             left: 0;
             user-select: none;
             text-transform: uppercase;
-            /* MOBILE APP AUTO FIT ZOOM FIX */
             transform-origin: top left;
         }
 
@@ -99,7 +98,7 @@
             color: #ffffff; opacity: 0.45; letter-spacing: 3px; pointer-events: none;
         }
 
-        /* --- TICKER STRIPS --- */
+        /* --- TICKER STRIPS (UPDATED: White, Larger & Spaced Text) --- */
         #ticker-wrap {
             position: absolute; bottom: 0; left: 0; width: 1920px; z-index: 9998;
             display: flex; flex-direction: column; transition: opacity 0.5s ease;
@@ -112,12 +111,23 @@
         .strip-bot { background: #121212; border-top: 1px solid rgba(255,255,255,0.15); }
 
         .ticker-col {
-            display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 30px;
-            color: #ffffff; overflow: hidden; position: relative; letter-spacing: 1.5px; padding: 0 20px;
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: 900; 
+            font-size: 34px; /* Thoda wadda size */
+            color: #ffffff !important; /* Pure White */
+            overflow: hidden; position: relative; 
+            letter-spacing: 2.5px; /* Khule akhar */
+            padding: 0 20px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
         }
 
         .w-30 { width: 30%; }
-        .w-40 { width: 40%; border-left: 2px solid rgba(255,255,255,0.3); border-right: 2px solid rgba(255,255,255,0.3); color: #ffcc00; }
+        .w-40 { 
+            width: 40%; 
+            border-left: 2px solid rgba(255,255,255,0.3); 
+            border-right: 2px solid rgba(255,255,255,0.3); 
+            color: #ffffff !important; /* Center column vi hun white kar ditti hai */
+        }
 
         .anim-wrap {
             position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
@@ -181,7 +191,6 @@
 </div>
 
 <script>
-    // AUTO-FIT SCRIPT FOR MOBILE APPS (PRISM / CAMERAFE)
     function autoResizeOverlay() {
         const baseWidth = 1920;
         const baseHeight = 1080;
