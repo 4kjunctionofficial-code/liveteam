@@ -85,9 +85,25 @@
         }
         #match-details-strip.hidden { display: none; }
 
-        /* --- LOGO & WATERMARK --- */
-        #logo-container { position: absolute; top: 25px; left: 30px; z-index: 9999; display: flex; align-items: center; transition: all 0.5s ease; }
-        #logo-container.hidden { opacity: 0; transform: scale(0.8); }
+        /* --- LOGO & WATERMARK (PERIODIC SPIN/PULSE ANIMATION) --- */
+        #logo-container { 
+            position: absolute; top: 25px; left: 30px; z-index: 9999; 
+            display: flex; align-items: center; 
+            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            opacity: 1; transform: scale(1) rotate(0deg);
+        }
+        #logo-container.hidden { opacity: 0; transform: scale(0.7) translateY(-15px) rotate(-180deg); }
+        
+        /* Periodic Animation Class */
+        #logo-container.animate-spin-pulse {
+            animation: logoSpinPulse 1.2s ease-in-out;
+        }
+        @keyframes logoSpinPulse {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.15) rotate(360deg); filter: drop-shadow(0 0 15px rgba(51, 153, 255, 0.8)); }
+            100% { transform: scale(1) rotate(720deg); }
+        }
+
         #main-logo { height: 100px; width: auto; object-fit: contain; }
 
         #single-wm {
@@ -280,7 +296,7 @@
 
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
-        document.getElementById('single-wm').innerText = data.watermarkTxt || "ਐੱਮ ਲਾਈਵ";
+        document.getElementById('single-wm').innerText = data.watermarkTxt || "ਐੱም ਲਾਈਵ";
 
         if(data.resultText && data.resultText !== "No Result Yet" && data.resultText !== lastResult) {
             lastResult = data.resultText;
@@ -424,8 +440,6 @@
                 let timerKey = elementId + "_timer";
                 if (window[timerKey]) clearTimeout(window[timerKey]);
                 
-                // --- 80% SCROLL P]=='ON TIME SETTING ---
-                // ਜਦੋਂ ਟਾਈਮ ਦਾ 80% ਹਿੱਸਾ ਪੂਰਾ ਹੋਵੇਗਾ, ਉਸੇ ਸਮੇਂ ਐਨੀਮੇਸ਼ਨ ਨਾਲ ਅਗਲਾ ਮੈਚ ਆ ਜਾਵੇਗਾ
                 let triggerTime = (isCenter && elementId === 's2-mid') ? (duration * 1000 * 0.8) : (duration * 1000);
 
                 window[timerKey] = setTimeout(() => {
@@ -487,6 +501,17 @@
         isEnglish = !isEnglish;
         renderIndependentTickers();
     }, 16000);
+
+    // --- PERIODIC LOGO ANIMATION (हर 15 ਸੈਕਿੰਡ ਬਾਅਦ ਲੋਗੋ ਘੁੰਮੇਗਾ) ---
+    setInterval(() => {
+        const logoBox = document.getElementById('logo-container');
+        if (logoBox && !logoBox.classList.contains('hidden')) {
+            logoBox.classList.add('animate-spin-pulse');
+            setTimeout(() => {
+                logoBox.classList.remove('animate-spin-pulse');
+            }, 1200);
+        }
+    }, 15000);
 
     setInterval(() => {
         let d = window.currentData;
