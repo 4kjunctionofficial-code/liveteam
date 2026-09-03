@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Blue & Grey Overlay</title>
+    <title>Kabaddi Pro Overlay 2026</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@500;600;700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@500;600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -21,90 +21,86 @@
             user-select: none;
         }
 
-        /* --- TOP CENTER SCOREBOARD --- */
+        /* --- TOP RIGHT SCOREBOARD --- */
         #top-scoreboard-container {
             position: absolute;
-            top: 25px;
-            width: 100%;
+            top: 35px;
+            right: 45px;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: flex-end;
             z-index: 9999;
             transition: opacity 0.5s ease;
+            filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.6));
         }
         #top-scoreboard-container.hidden { opacity: 0; }
-
-        #match-details-strip {
-            background: linear-gradient(90deg, #3a8cc4, #4ea2e2, #3a8cc4);
-            color: #ffffff;
-            font-size: 20px;
-            font-weight: 800;
-            padding: 4px 35px;
-            text-transform: uppercase;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            border-bottom: none;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-        }
-        #match-details-strip.hidden { display: none; }
 
         #main-score-strip {
             display: flex;
             align-items: stretch;
-            height: 55px;
+            height: 52px;
             background: rgba(0, 0, 0, 0.85);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            border-radius: 8px;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.7);
+            border-radius: 4px;
             overflow: hidden;
-            transition: border-radius 0.3s ease;
+        }
+
+        .score-a {
+            background: #4ea2e2; /* Light Blue */
+            color: #ffffff;
+            font-size: 38px;
+            font-weight: 900;
+            padding: 0 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 80px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
         }
 
         .team-name-panel {
             background: #111111;
             color: #ffffff;
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
-            padding: 0 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 350px;
-            max-width: 450px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
-        }
-
-        .score-panel {
-            background: #4ea2e2; /* Light Blue Score Box */
-            color: #ffffff;
-            font-size: 42px;
-            font-weight: 900;
             padding: 0 35px;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 100px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            white-space: nowrap;
+            letter-spacing: 0.5px;
         }
 
-        .vs-panel {
-            background: #ffffff;
+        .divider {
+            width: 2px;
+            background-color: rgba(255, 255, 255, 0.3);
+            margin: 10px 0;
+        }
+
+        .score-b {
+            background: #e2e8f0; /* Light Grey */
             color: #000000;
-            font-size: 22px;
+            font-size: 38px;
             font-weight: 900;
-            padding: 0 20px;
+            padding: 0 25px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Bebas Neue', sans-serif;
-            letter-spacing: 1px;
+            min-width: 80px;
         }
+
+        #match-details-strip {
+            background: #111111;
+            color: #ffcc00;
+            font-size: 16px;
+            font-weight: 800;
+            padding: 4px 20px;
+            margin-top: 4px;
+            text-transform: uppercase;
+            border-radius: 4px;
+            letter-spacing: 1px;
+            box-shadow: 1px 2px 5px rgba(0,0,0,0.5);
+        }
+        #match-details-strip.hidden { display: none; }
 
         /* --- LOGO & WATERMARK --- */
         #logo-container {
@@ -112,7 +108,7 @@
             display: flex; align-items: center; transition: all 0.5s ease;
         }
         #logo-container.hidden { opacity: 0; transform: scale(0.8); }
-        #main-logo { height: 75px; width: auto; object-fit: contain; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.5)); }
+        #main-logo { height: 80px; width: auto; object-fit: contain; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.5)); }
 
         #single-wm {
             position: absolute; left: 300px; top: 300px;
@@ -121,64 +117,45 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.9); z-index: 9997; pointer-events: none;
         }
 
-        /* --- 6-PART TICKER (30% - 40% - 30%) --- */
-        #double-ticker-wrap {
+        /* --- 3-PART BOTTOM TICKER --- */
+        #ticker-wrap {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 1920px;
+            height: 50px;
             z-index: 9998;
             display: flex;
-            flex-direction: column;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.9);
+            background: rgba(20, 20, 20, 0.95);
+            border-top: 3px solid #4ea2e2;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.8);
             transition: opacity 0.5s ease;
         }
-        #double-ticker-wrap.hidden { opacity: 0; }
+        #ticker-wrap.hidden { opacity: 0; }
 
-        .ticker-strip { 
-            display: flex; 
-            height: 48px; 
-            width: 100%; 
-        }
-
-        /* Strip 1: Light Blue (#4ea2e2) */
-        .ticker-strip-1 {
-            background-color: #4ea2e2;
-            border-bottom: 2px solid rgba(0,0,0,0.3);
-        }
-        
-        /* Strip 2: Dark Grey (#4a4a4a) */
-        .ticker-strip-2 {
-            background-color: #4a4a4a;
-        }
-
-        /* Common Columns */
-        .ticker-col {
+        .ticker-box {
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
             font-size: 22px;
             color: #ffffff;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
             white-space: nowrap;
-            padding: 0 20px;
             overflow: hidden;
-            border-right: 2px solid rgba(255,255,255,0.25);
+            position: relative;
         }
-        .ticker-col:last-child { border-right: none; }
 
         .w-30 { width: 30%; }
-        .w-40 { width: 40%; }
+        .w-40 { width: 40%; border-left: 2px solid rgba(255,255,255,0.2); border-right: 2px solid rgba(255,255,255,0.2); background: rgba(5,5,5,0.9); color: #ffcc00; }
 
-        /* Step-by-Step Animation Text */
         .anim-text {
-            display: inline-block;
+            position: absolute;
+            width: 100%;
+            text-align: center;
             transition: opacity 0.5s ease, transform 0.5s ease;
             opacity: 1;
             transform: translateY(0);
-            width: 100%;
-            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.9);
         }
 
     </style>
@@ -189,34 +166,25 @@
 <div id="single-wm">M LIVE</div>
 
 <div id="top-scoreboard-container">
-    <div id="match-details-strip" class="hidden"></div>
     <div id="main-score-strip">
+        <div class="score-a" id="sA">0</div>
         <div class="team-name-panel" id="nA-container"><span id="nA">ਟੀਮ 1</span></div>
-        <div class="score-panel" id="sA">0</div>
-        <div class="vs-panel">VS</div>
-        <div class="score-panel" id="sB">0</div>
+        <div class="divider"></div>
         <div class="team-name-panel" id="nB-container"><span id="nB">ਟੀਮ 2</span></div>
+        <div class="score-b" id="sB">0</div>
     </div>
+    <div id="match-details-strip" class="hidden"></div>
 </div>
 
-<div id="double-ticker-wrap">
+<div id="ticker-wrap">
+    <div class="ticker-box w-30"><span id="t-left" class="anim-text">VILLAGE NAME</span></div>
     
-    <div class="ticker-strip ticker-strip-1">
-        <div class="ticker-col w-30" id="t1-left">LOCATION</div>
-        <div class="ticker-col w-40"><span id="t1-mid-text" class="anim-text">PRIZES LOADING...</span></div>
-        <div class="ticker-col w-30" id="t1-right">LIVE ON KABADDI</div>
-    </div>
+    <div class="ticker-box w-40"><span id="t-center" class="anim-text">KABADDI TOURNAMENT</span></div>
     
-    <div class="ticker-strip ticker-strip-2">
-        <div class="ticker-col w-30"><span id="t2-left-text" class="anim-text">EVENTS LOADING...</span></div>
-        <div class="ticker-col w-40" style="color:#ffcc00;"><span id="t2-mid-text" class="anim-text">MATCHES LOADING...</span></div>
-        <div class="ticker-col w-30" id="t2-right">BOOKING: 9115426711</div>
-    </div>
-
+    <div class="ticker-box w-30"><span id="t-right" class="anim-text">UPCOMING EVENTS</span></div>
 </div>
 
 <script>
-    // Firebase Config - ਆਪਣਾ URL ਪਾਉ
     const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
 
@@ -235,23 +203,18 @@
 
     const clientLogos = { "kabaddi101": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Kabaddi%20101%20logo.png" };
 
-    let isPunjabi = true;
-    let globalData = {}; 
+    // Ticker Arrays & Indices
+    let leftArr = []; let leftIdx = 0;
+    let centerArr = []; let centerIdx = 0;
+    let rightArr = []; let rightIdx = 0;
     
-    // Arrays for Step-by-Step Animation
-    let prizeArr = [];
-    let matchArr = [];
-    let eventArr = [];
-    
-    let pIdx = 0;
-    let mIdx = 0;
-    let eIdx = 0;
+    let isPunjabiScoreboard = true;
 
     // Real-time DB Listener
     db.on("value", (snap) => {
         const data = snap.val() || {}; 
-        globalData = data;
 
+        // Logo
         const logoCont = document.getElementById('logo-container');
         if (clientLogos[matchId.trim().toLowerCase()] && data.logoVisible !== false) {
             document.getElementById('main-logo').src = clientLogos[matchId.trim().toLowerCase()];
@@ -260,100 +223,139 @@
             logoCont.classList.add('hidden');
         }
 
+        // Visibility
         document.getElementById('top-scoreboard-container').classList.toggle('hidden', data.scoreVisible === false);
-        document.getElementById('double-ticker-wrap').classList.toggle('hidden', data.tickerVisible === false);
+        document.getElementById('ticker-wrap').classList.toggle('hidden', data.tickerVisible === false);
         
+        // Match Round
         const roundText = data.round || "";
         const detailsStrip = document.getElementById('match-details-strip');
-        const mainScoreStrip = document.getElementById('main-score-strip');
         if (roundText.trim() === "") {
             detailsStrip.classList.add('hidden');
-            mainScoreStrip.style.borderTopLeftRadius = '8px';
-            mainScoreStrip.style.borderTopRightRadius = '8px';
         } else {
             detailsStrip.classList.remove('hidden');
             detailsStrip.innerText = roundText;
-            mainScoreStrip.style.borderTopLeftRadius = '0px';
-            mainScoreStrip.style.borderTopRightRadius = '0px';
         }
 
+        // Scores & Watermark
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
         document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
 
-        // Call immediately to avoid wait
-        updateStatics();
+        // Update Scoreboard Team Names (Bilingual Toggle handled below)
+        window.currentData = data; 
+        
+        // --- BUILD TICKER ARRAYS ---
+        
+        // 1. LEFT ARRAY (Village & Prizes)
+        leftArr = [];
+        if(data.row1Txt) leftArr.push("📍 " + data.row1Txt);
+        if(data.row1Txt_pa) leftArr.push("📍 " + data.row1Txt_pa);
+        
+        if(data.pzOp1) leftArr.push("🔥 ਓਪਨ 1st: " + data.pzOp1);
+        if(data.pzOp2) leftArr.push("🔥 ਓਪਨ 2nd: " + data.pzOp2);
+        if(data.pzOpBest) leftArr.push("🔥 ਬੈਸਟ (OPEN): " + data.pzOpBest);
+        
+        let wtKg = data.pzWtKg ? data.pzWtKg : "WEIGHT";
+        if(data.pzWt1) leftArr.push(`🏋️ ${wtKg} 1st: ${data.pzWt1}`);
+        if(data.pzWt2) leftArr.push(`🏋️ ${wtKg} 2nd: ${data.pzWt2}`);
+        if(data.pzWtBest) leftArr.push(`🏋️ ਬੈਸਟ (${wtKg}): ${data.pzWtBest}`);
+        
+        if(leftArr.length === 0) leftArr = ["WELCOME TO LIVE KABADDI"];
+
+        // 2. CENTER ARRAY (Matches)
+        centerArr = [];
+        let allMatches = [...(data.nextMatchesWeight || []), ...(data.nextMatchesOpen || [])];
+        
+        if(allMatches.length > 0) {
+            allMatches.forEach(m => {
+                // Parse format: (72 KG) TeamA_En / TeamA_Pa VS TeamB_En / TeamB_Pa
+                let prefix = ""; let mainStr = m;
+                if(m.startsWith("(")) {
+                    let pts = m.split(") ");
+                    prefix = pts[0] + ") ";
+                    mainStr = pts[1] || m;
+                }
+                
+                let teams = mainStr.split(" VS ");
+                let t1 = (teams[0] || "").split(" / ");
+                let t2 = (teams[1] || "").split(" / ");
+                
+                let t1En = t1[0]?.trim(); let t1Pa = t1[1]?.trim() || t1En;
+                let t2En = t2[0]?.trim(); let t2Pa = t2[1]?.trim() || t2En;
+
+                centerArr.push(`👉 ${prefix}${t1En} VS ${t2En}`);
+                centerArr.push(`👉 ${prefix}${t1Pa} VS ${t2Pa}`);
+            });
+        } else {
+            centerArr.push(data.row2Txt || "KABADDI TOURNAMENT");
+            if(data.row2Txt_pa) centerArr.push(data.row2Txt_pa);
+        }
+
+        // 3. RIGHT ARRAY (Upcoming Events & Booking/Ads)
+        rightArr = [];
+        if(data.upcomingEvents && data.upcomingEvents.length > 0) {
+            data.upcomingEvents.forEach((ev, i) => {
+                let dStr = ev.date ? ` (${ev.date})` : "";
+                rightArr.push(`🗓️ ${i+1}. ${ev.name}${dStr}`);
+                if(ev.name_pa) rightArr.push(`🗓️ ${i+1}. ${ev.name_pa}${dStr}`);
+            });
+        }
+        if(data.row6Txt) rightArr.push("📞 " + data.row6Txt);
+        if(data.row6Txt_pa) rightArr.push("📞 " + data.row6Txt_pa);
+        
+        if(rightArr.length === 0) rightArr = ["LIKE & SHARE LIVE STREAM"];
+        
+        // Trigger initial text
+        if(document.getElementById('t-left').innerText === "VILLAGE NAME") {
+            document.getElementById('t-left').innerText = leftArr[0];
+            document.getElementById('t-center').innerText = centerArr[0];
+            document.getElementById('t-right').innerText = rightArr[0];
+        }
     });
 
-    function updateStatics() {
-        const d = globalData;
-        if(Object.keys(d).length === 0) return;
-
-        document.getElementById('nA').innerText = (isPunjabi && d.nameA_pa) ? d.nameA_pa : (d.nameA || "TEAM 1");
-        document.getElementById('nB').innerText = (isPunjabi && d.nameB_pa) ? d.nameB_pa : (d.nameB || "TEAM 2");
-        document.getElementById('t1-left').innerText = (isPunjabi && d.row1Txt_pa) ? d.row1Txt_pa : (d.row1Txt || "LOCATION");
-        document.getElementById('t1-right').innerText = d.row3Txt || "LIVE KABADDI";
-        document.getElementById('t2-right').innerText = d.row6Txt || "BOOKING: 9115426711";
-    }
-
-    // Step-by-Step Text Animation Function
+    // Step-by-Step Animation Function
     function animateTextChange(elementId, newText) {
         const el = document.getElementById(elementId);
-        if (el.innerText === newText) return; // Skip if same
+        if (el.innerText === newText) return; 
         
         el.style.opacity = 0;
-        el.style.transform = 'translateY(-15px)'; // Slide Up
+        el.style.transform = 'translateY(-15px)'; 
         
         setTimeout(() => {
             el.innerText = newText;
-            el.style.transform = 'translateY(15px)'; // Prepare from bottom
+            el.style.transform = 'translateY(15px)'; 
             
             setTimeout(() => {
                 el.style.opacity = 1;
-                el.style.transform = 'translateY(0)'; // Settle
+                el.style.transform = 'translateY(0)'; 
             }, 50);
-        }, 500); // 0.5s fade out duration
+        }, 500); 
     }
 
     // Master Animation Loop (Every 4.5 Seconds)
     setInterval(() => {
-        isPunjabi = !isPunjabi; // Toggle Language
-        updateStatics();
-
-        const d = globalData;
-        if(!d) return;
-
-        // --- Build Prizes Array ---
-        if(d.row2Txt) {
-            prizeArr = d.row2Txt.split(" 🔴 ");
-        } else {
-            prizeArr = ["WELCOME TO LIVE KABADDI"];
+        // Toggle Scoreboard Teams Language
+        if(window.currentData) {
+            isPunjabiScoreboard = !isPunjabiScoreboard;
+            let d = window.currentData;
+            document.getElementById('nA').innerText = (isPunjabiScoreboard && d.nameA_pa) ? d.nameA_pa : (d.nameA || "TEAM 1");
+            document.getElementById('nB').innerText = (isPunjabiScoreboard && d.nameB_pa) ? d.nameB_pa : (d.nameB || "TEAM 2");
         }
 
-        // --- Build Matches Array ---
-        let matches = [];
-        if(d.nextMatchesWeight && d.nextMatchesWeight.length > 0) {
-            d.nextMatchesWeight.forEach(m => matches.push("🏋️ " + m));
+        // Ticker Arrays Cycle
+        if(leftArr.length > 0) {
+            leftIdx = (leftIdx + 1) % leftArr.length;
+            animateTextChange('t-left', leftArr[leftIdx]);
         }
-        if(d.nextMatchesOpen && d.nextMatchesOpen.length > 0) {
-            d.nextMatchesOpen.forEach(m => matches.push("🔥 " + m));
+        if(centerArr.length > 0) {
+            centerIdx = (centerIdx + 1) % centerArr.length;
+            animateTextChange('t-center', centerArr[centerIdx]);
         }
-        matchArr = matches.length > 0 ? matches : ["NO UPCOMING MATCHES"];
-
-        // --- Build Events Array ---
-        let evStr = (isPunjabi && d.row4Txt_pa) ? d.row4Txt_pa : (d.row4Txt || "");
-        eventArr = evStr ? evStr.split(" | ") : ["LIVE UPDATES"];
-
-        // Advance Indices
-        pIdx = (pIdx + 1) % prizeArr.length;
-        mIdx = (mIdx + 1) % matchArr.length;
-        eIdx = (eIdx + 1) % eventArr.length;
-
-        // Apply Animations Step-by-Step
-        animateTextChange('t1-mid-text', prizeArr[pIdx]);
-        animateTextChange('t2-mid-text', matchArr[mIdx]);
-        animateTextChange('t2-left-text', eventArr[eIdx]);
-
+        if(rightArr.length > 0) {
+            rightIdx = (rightIdx + 1) % rightArr.length;
+            animateTextChange('t-right', rightArr[rightIdx]);
+        }
     }, 4500);
 
     // Moving Watermark
