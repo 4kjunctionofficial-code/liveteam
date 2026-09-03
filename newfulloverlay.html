@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Ultra HD - Perfect Round & Match List</title>
+    <title>Kabaddi Ultra HD - Perfect Punjabi & English Match List</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -219,7 +219,7 @@
     let hasMatches = false;
     let lastResult = ""; 
 
-    // Punjabi Dictionary for Rounds and Categories
+    // Punjabi Dictionary for Rounds, Weights & Categories
     const roundDict = {
         "1st Round": "ਪਹਿਲਾ ਰਾਊਂਡ",
         "2nd Round": "ਦੂਜਾ ਰਾਊਂਡ",
@@ -236,9 +236,8 @@
     function translateRound(roundStr) {
         if(!roundStr) return "";
         let cleaned = roundStr.trim();
-        // Check exact match or replace parts
         let translated = roundDict[cleaned] || cleaned;
-        // Handle KG suffix if present e.g. "50 KG" -> "50 ਕਿਲੋ" or keep "50 KG"
+        // Replace KG with ਕਿਲੋ in Punjabi
         translated = translated.replace(/KG/gi, "ਕਿਲੋ");
         return translated;
     }
@@ -312,7 +311,7 @@
         if(data.adTent) leftItems.push({ tEn: "⛺ TENT SERVICE", bEn: data.adTent, tPa: "⛺ ਟੈਂਟ ਪੰਡਾਲ", bPa: data.adTent });
         if(data.adSec) leftItems.push({ tEn: "🛡️ SECURITY", bEn: data.adSec, tPa: "🛡️ ਸਕਿਓਰਿਟੀ", bPa: data.adSec });
 
-        // --- CENTER ITEMS: EXACT TRANSLATED ROUND + TEAMS FOR TOP (PUNJABI) & BOTTOM (ENGLISH) ---
+        // --- CENTER ITEMS: EXACT TRANSLATED KG, ROUND + TEAMS ---
         centerItems = [];
         let matchesList = data.nextMatches || [];
         hasMatches = matchesList.length > 0;
@@ -339,7 +338,6 @@
             let t2En = t2Full.split("=")[0].trim();
             let t2Pa = t2Full.split("=")[1]?.trim() || t2En;
 
-            // Translate bracket content (Round / KG) into Punjabi
             let bracketPaParts = bracketContent.split(" - ").map(part => translateRound(part.trim()));
             let bracketPa = bracketPaParts.join(" - ");
 
@@ -417,7 +415,6 @@
         if(hasMatches) {
             animateText('s1-left', isEnglish ? L.tEn : L.tPa, false);
             animateText('s2-left', isEnglish ? L.bEn : L.bPa, false);
-            // MATCH LIST: TOP ALWAYS PUNJABI (tPa), BOTTOM ALWAYS ENGLISH (bEn)
             animateText('s1-mid', C.tPa, true);
             animateText('s2-mid', C.bEn, true);
             animateText('s1-right', isEnglish ? R.tEn : R.tPa, false);
