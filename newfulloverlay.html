@@ -227,10 +227,7 @@
         "4th Round": "ਚੌਥਾ ਰਾਊਂਡ",
         "Quarter Final": "ਕੁਆਰਟਰ ਫਾਈਨਲ",
         "Semi Final": "ਸੈਮੀ ਫਾਈਨਲ",
-        "Final": "ਫਾਈਨਲ",
-        "Pool A Match": "ਪੂਲ ਏ ਮੈਚ",
-        "Pool B Match": "ਪੂਲ ਬੀ ਮੈਚ",
-        "Open": "ਓਪਨ"
+        "Final": "ਫਾਈਨਲ"
     };
 
     function translateRound(roundStr) {
@@ -304,16 +301,16 @@
             tPa: "📍 ਸਥਾਨ / ਪਿੰਡ", bPa: data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ ਦਾ ਨਾਮ"
         });
 
-        if(data.pzOp1) leftItems.push({ tEn: "🔥 OPEN 1ST PRIZE", bEn: data.pzOp1, tPa: "🔥 ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ", bPa: data.pzOp1 });
-        if(data.pzOp2) leftItems.push({ tEn: "🔥 OPEN 2ND PRIZE", bEn: data.pzOp2, tPa: "🔥 ਓਪਨ ਦੂਜਾ ਇਨਾਮ", bPa: data.pzOp2 });
-        if(data.pzOpBest) leftItems.push({ tEn: "🏅 OPEN BEST PLAYER", bEn: data.pzOpBest, tPa: "🏅 ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ", bPa: data.pzOpBest });
+        if(data.pzOp1) leftItems.push({ tEn: "OPEN 1ST PRIZE", bEn: data.pzOp1, tPa: "ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ", bPa: data.pzOp1 });
+        if(data.pzOp2) leftItems.push({ tEn: "OPEN 2ND PRIZE", bEn: data.pzOp2, tPa: "ਓਪਨ ਦੂਜਾ ਇਨਾਮ", bPa: data.pzOp2 });
+        if(data.pzOpBest) leftItems.push({ tEn: "OPEN BEST PLAYER", bEn: data.pzOpBest, tPa: "ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ", bPa: data.pzOpBest });
 
         let wKg = data.pzWtKg ? `(${data.pzWtKg})` : "(WEIGHT)";
         let wKgPa = data.pzWtKg ? `(${translateRound(data.pzWtKg)})` : "(ਵਜ਼ਨੀ)";
 
-        if(data.pzWt1) leftItems.push({ tEn: `🏋️ ${wKg} 1ST PRIZE`, bEn: data.pzWt1, tPa: `🏋️ ${wKgPa} ਪਹਿਲਾ ਇਨਾਮ`, bPa: data.pzWt1 });
-        if(data.pzWt2) leftItems.push({ tEn: `🏋️ ${wKg} 2ND PRIZE`, bEn: data.pzWt2, tPa: `🏋️ ${wKgPa} ਦੂਜਾ ਇਨਾਮ`, bPa: data.pzWt2 });
-        if(data.pzWtBest) leftItems.push({ tEn: `🏅 ${wKg} BEST PLAYER`, bEn: data.pzWtBest, tPa: `🏅 ${wKgPa} ਬੈਸਟ ਖਿਡਾਰੀ`, bPa: data.pzWtBest });
+        if(data.pzWt1) leftItems.push({ tEn: ` ${wKg} 1ST PRIZE`, bEn: data.pzWt1, tPa: ` ${wKgPa} ਪਹਿਲਾ ਇਨਾਮ`, bPa: data.pzWt1 });
+        if(data.pzWt2) leftItems.push({ tEn: ` ${wKg} 2ND PRIZE`, bEn: data.pzWt2, tPa: ` ${wKgPa} ਦੂਜਾ ਇਨਾਮ`, bPa: data.pzWt2 });
+        if(data.pzWtBest) leftItems.push({ tEn: ` ${wKg} BEST PLAYER`, bEn: data.pzWtBest, tPa: ` ${wKgPa} ਬੈਸਟ ਖਿਡਾਰੀ`, bPa: data.pzWtBest });
 
         if(data.adComm) leftItems.push({ tEn: "🎙️ COMMENTATOR", bEn: data.adComm, tPa: "🎙️ ਕਮੈਂਟੇਟਰ", bPa: data.adComm });
         if(data.adSound) leftItems.push({ tEn: "🔊 SOUND SERVICE", bEn: data.adSound, tPa: "🔊 ਸਾਊਂਡ ਸਰਵਿਸ", bPa: data.adSound });
@@ -377,14 +374,14 @@
         if(data.upcomingEvents && data.upcomingEvents.length > 0) {
             data.upcomingEvents.forEach(ev => {
                 let d = ev.date ? ` (${ev.date})` : "";
-                rightItems.push({ tEn: "📅 UPCOMING EVENTS", bEn: `${ev.name}${d}`, tPa: "📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ", bPa: `${ev.name_pa || ev.name}${d}` });
+                rightItems.push({ tEn: " UPCOMING EVENTS", bEn: `${ev.name}${d}`, tPa: "ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ", bPa: `${ev.name_pa || ev.name}${d}` });
             });
         }
         if(data.row6Txt || data.row6Txt_pa) {
-            rightItems.push({ tEn: "📺 LIVE TELECAST", bEn: data.row6Txt || "LIVE STREAMING", tPa: "📺 ਲਾਈਵ ਪ੍ਰਸਾਰਣ", bPa: data.row6Txt_pa || data.row6Txt || "ਲਾਈਵ ਪ੍ਰਸਾਰਣ" });
+            rightItems.push({ tEn: " LIVE TELECAST", bEn: data.row6Txt || "LIVE STREAMING", tPa: "ਲਾਈਵ ਪ੍ਰਸਾਰਣ", bPa: data.row6Txt_pa || data.row6Txt || "ਲਾਈਵ ਪ੍ਰਸਾਰਣ" });
         }
         if(rightItems.length === 0) {
-            rightItems.push({ tEn: "📅 UPCOMING EVENTS", bEn: "STAY TUNED", tPa: "📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ", bPa: "ਦੇਖਦੇ ਰਹੋ" });
+            rightItems.push({ tEn: "UPCOMING EVENTS", bEn: "STAY TUNED", tPa: "ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ", bPa: "ਦੇਖਦੇ ਰਹੋ" });
         }
         
         document.getElementById('strip-2').style.display = hasMatches ? 'flex' : 'none';
