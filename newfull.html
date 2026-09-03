@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kabaddi Pro Admin Panel</title>
+<title>Kabaddi Pro Admin Panel - Modern Setup</title>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
@@ -49,7 +49,7 @@ textarea { resize: vertical; overflow-y: auto; min-height: 50px; max-height: 200
 .prize-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #ddd; }
 .prize-col label { font-size: 14px; font-weight: bold; color: #1a73e8; margin-bottom: 8px; display: block; border-bottom: 2px solid #1a73e8; padding-bottom: 2px; }
 .prize-col input { font-size: 14px; padding: 8px; margin-bottom: 6px; }
-.setup-box { background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 12px; }
+.setup-box { background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
 
 @media(max-width:768px){
     .controls{ grid-template-columns:repeat(2,1fr); }
@@ -57,7 +57,6 @@ textarea { resize: vertical; overflow-y: auto; min-height: 50px; max-height: 200
     .teams-container { flex-direction: column; }
     .vs-text { padding: 10px 0; }
     .prize-grid { grid-template-columns: 1fr; }
-    .setup-grid { grid-template-columns: 1fr !important; }
 }
 
 .btn-green{background:#28a745;}
@@ -138,71 +137,44 @@ textarea { resize: vertical; overflow-y: auto; min-height: 50px; max-height: 200
 
 <div class="settings-section">
 <div class="setup-box" style="border-top:3px solid #fbbc05;">
-    <label style="font-size:14px; font-weight:bold; color:#b58105; display:block; margin-bottom:5px;">🏆 MATCH ROUND / CATEGORY</label>
-    <div style="display:flex; flex-direction:column; gap:5px;">
-        <select id="roundSelect" onchange="updateRoundFromSelect(this.value)">
-            <option value="">-- Select Round from List --</option>
+    <label style="font-size:14px; font-weight:bold; color:#b58105; display:block; margin-bottom:5px;">🏆 CURRENT MATCH ROUND / CATEGORY</label>
+    <input type="text" id="roundInp" placeholder="e.g. Quarter Final / 72 KG" oninput="syncField('round', this.value)">
+</div>
+
+<div class="header" style="margin-bottom:10px; margin-top:10px;">NEXT MATCH SETUP</div>
+<div class="setup-box" style="border-top:3px solid #1a73e8;">
+    <div style="display:flex; gap:10px; margin-bottom:8px;">
+        <select id="nextTeamA" style="flex:1;"><option value="">Select Team 1</option></select>
+        <select id="nextTeamB" style="flex:1;"><option value="">Select Team 2</option></select>
+    </div>
+
+    <div style="display:flex; gap:10px; margin-bottom:8px;">
+        <select id="matchRoundSelect" style="flex:1;">
+            <option value="">-- Select Round --</option>
             <option value="1st Round">1st Round</option>
             <option value="2nd Round">2nd Round</option>
+            <option value="3rd Round">3rd Round</option>
+            <option value="4th Round">4th Round</option>
             <option value="Quarter Final">Quarter Final</option>
             <option value="Semi Final">Semi Final</option>
-            <option value="Super Final">Super Final</option>
             <option value="Final">Final</option>
         </select>
-        <input type="text" id="roundInp" placeholder="Or Type Match Details..." oninput="syncField('round', this.value)">
+
+        <input type="text" id="matchCategoryInp" placeholder="Type KG or Open (e.g. 50 KG / OPEN)" style="flex:1; margin-bottom:0;">
     </div>
+
+    <button class="btn-full btn-green" onclick="addNewMatch()" style="height:48px; min-height:48px; font-size:15px; margin-top:5px;">+ ADD MATCH TO LIST</button>
 </div>
 
-<div class="header" style="margin-bottom:10px; margin-top:10px;">NEXT MATCH LIST & SETUP</div>
-<select id="nextTeamA"><option value="">Select Next Match Team 1</option></select>
-<select id="nextTeamB"><option value="">Select Next Match Team 2</option></select>
-
-<select id="nextMatchRound" style="margin-top:5px; border-color:#1a73e8;">
-    <option value="">-- Select Round for Match --</option>
-    <option value="Quarter Final">Quarter Final</option>
-    <option value="Semi Final">Semi Final</option>
-    <option value="Super Final">Super Final</option>
-    <option value="Final">Final</option>
-    <option value="Pool A Match">Pool A Match</option>
-    <option value="Pool B Match">Pool B Match</option>
-</select>
-
-<div class="setup-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px; margin-top:5px;">
-    <div class="setup-box" style="border-top:3px solid #1a73e8; margin-bottom:0;">
-        <label style="font-size:13px; font-weight:bold; color:#1a73e8; display:block; margin-bottom:5px;">🏋️ WEIGHT MATCH</label>
-        <select id="selectWeightKg">
-            <option value="">-- Select Weight KG --</option>
-            <option value="30 KG">30 KG</option> <option value="35 KG">35 KG</option> <option value="40 KG">40 KG</option>
-            <option value="45 KG">45 KG</option> <option value="50 KG">50 KG</option> <option value="55 KG">55 KG</option>
-            <option value="60 KG">60 KG</option> <option value="65 KG">65 KG</option> <option value="70 KG">70 KG</option>
-        </select>
-        <input type="text" id="customWeightKg" placeholder="Custom KG...">
-        <button class="btn-full btn-blue" onclick="addNextMatch('weight')" style="height:45px; min-height:45px; font-size:13px; margin-top:5px;">+ ADD TO WEIGHT LIST</button>
-    </div>
-
-    <div class="setup-box" style="border-top:3px solid #6f42c1; margin-bottom:0;">
-        <label style="font-size:13px; font-weight:bold; color:#6f42c1; display:block; margin-bottom:5px;">🔥 OPEN MATCH</label>
-        <select id="selectOpenKg">
-            <option value="">-- Select Category --</option>
-            <option value="70 KG">70 KG</option> <option value="72 KG">72 KG</option>
-            <option value="75 KG">75 KG</option> <option value="80 KG">80 KG</option> <option value="OPEN">OPEN</option>
-        </select>
-        <input type="text" id="customOpenKg" placeholder="Custom Category...">
-        <button class="btn-full btn-purple" onclick="addNextMatch('open')" style="height:45px; min-height:45px; font-size:13px; margin-top:5px;">+ ADD TO OPEN LIST</button>
-    </div>
-</div>
-
-<div class="list-header">🏋️ WEIGHT MATCHES (ਵਜ਼ਨੀ)</div>
-<div id="nextMatchContainerWeight" style="margin-bottom:15px;"></div>
-<div class="list-header">🔥 OPEN MATCHES (ਓਪਨ)</div>
-<div id="nextMatchContainerOpen"></div>
+<div class="list-header">📋 SCHEDULED MATCHES LIST</div>
+<div id="nextMatchContainer"></div>
 </div>
 </div>
 
 <div class="card">
-    <div class="header" style="background:#0066cc;">TICKER SETTINGS (DOUBLE STRIP)</div>
+    <div class="header" style="background:#0066cc;">TICKER SETTINGS</div>
     <div class="settings-section">
-        <label class="ticker-label">1. Village / Location Name (Top Left)</label>
+        <label class="ticker-label">1. Village / Location Name</label>
         <div class="team-inputs-wrap">
             <div class="team-input-row">
                 <input type="text" id="row1Inp" class="team-input" placeholder="e.g. MAHLA, NEAR GORAYA" oninput="syncField('row1Txt', this.value)">
@@ -211,7 +183,7 @@ textarea { resize: vertical; overflow-y: auto; min-height: 50px; max-height: 200
             <input type="text" id="row1Inp_pa" class="team-input" placeholder="Translated Village" oninput="syncField('row1Inp_pa', this.value)">
         </div>
 
-        <label class="ticker-label">2. Tournament Prizes (Top Center)</label>
+        <label class="ticker-label">2. Tournament Prizes</label>
         <div class="prize-grid">
             <div class="prize-col">
                 <label>🔥 OPEN KABADDI</label>
@@ -228,10 +200,7 @@ textarea { resize: vertical; overflow-y: auto; min-height: 50px; max-height: 200
             </div>
         </div>
 
-        <label class="ticker-label">3. Extra Details (Top Right Box)</label>
-        <input type="text" id="row3Inp" placeholder="e.g. LIVE ON KABADDI365" oninput="syncField('row3Txt', this.value)">
-
-        <label class="ticker-label">4. Upcoming Events List (Bottom Left)</label>
+        <label class="ticker-label">3. Upcoming Events</label>
         <div style="background:#f8f9fa; padding:12px; border-radius:8px; border:1px solid #ddd;">
             <div class="team-inputs-wrap" style="margin-bottom:10px;">
                 <div class="team-input-row">
@@ -247,7 +216,7 @@ textarea { resize: vertical; overflow-y: auto; min-height: 50px; max-height: 200
             <div id="upcomingEventsContainer"></div>
         </div>
 
-        <label class="ticker-label">5. Booking Number / Ads (Bottom Right)</label>
+        <label class="ticker-label">4. Booking Number / Ads</label>
         <input type="text" id="row6Inp" placeholder="e.g. BOOKING: 9115426711" oninput="syncField('row6Txt', this.value)">
 
         <label class="ticker-label">Watermark / Channel Name</label>
@@ -258,7 +227,7 @@ textarea { resize: vertical; overflow-y: auto; min-height: 50px; max-height: 200
 <div class="card">
 <div class="header">TOURNAMENT TEAM MANAGER</div>
 <div class="settings-section">
-    <label class="ticker-label">➕ Add New Team (Auto Bilingual)</label>
+    <label class="ticker-label">➕ Add New Team</label>
     <div style="background:#f8f9fa; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:15px;">
         <div class="team-input-row" style="margin-bottom:5px;">
             <input type="text" id="newTeamEn" class="team-input" placeholder="Team Name (English)">
@@ -268,12 +237,8 @@ textarea { resize: vertical; overflow-y: auto; min-height: 50px; max-height: 200
         <button class="btn-full btn-green" onclick="addSingleTeam()" style="height:40px; min-height:40px; font-size:14px; margin-top:8px;">ADD TEAM TO LIST</button>
     </div>
 
-    <label class="ticker-label">📋 All Teams Master List (Format: English=Punjabi)</label>
+    <label class="ticker-label">📋 All Teams Master List</label>
     <textarea id="allTeamsInp" rows="6" placeholder="Example:\nMudki=ਮੁੱਦਕੀ\nFaridkot=ਫਰੀਦਕੋਟ" oninput="syncFieldArrayTeams(this.value)"></textarea>
-    
-    <label class="ticker-label">🏆 Qualified / Eliminated</label>
-    <textarea id="winnerTeamsInp" rows="4" placeholder="Qualified Teams" oninput="syncField('qualifiedTeams', this.value)"></textarea>
-    <textarea id="loserTeamsInp" rows="4" placeholder="Eliminated Teams" oninput="syncField('eliminatedTeams', this.value)"></textarea>
 </div>
 </div>
 
@@ -291,17 +256,16 @@ const matchId = urlParams.get('id') || 'defaultMatch';
 const db = firebase.database().ref("matchData/" + matchId);
 
 let curA=0; let curB=0; let camOpposite=false; let allTeams=[]; 
-let nextMatchesWeight=[]; let nextMatchesOpen=[]; let upcomingEvents=[];
+let nextMatches=[]; let upcomingEvents=[];
 
 function setSafely(id, val) {
     const el = document.getElementById(id);
-    if(el && document.activeElement !== el && document.activeElement !== document.getElementById('roundSelect') && document.activeElement !== document.getElementById('nextMatchRound')) {
+    if(el && document.activeElement !== el && document.activeElement !== document.getElementById('matchRoundSelect')) {
         el.value = val || "";
     }
 }
 
 function syncField(key, val) { db.update({ [key]: val }); }
-function updateRoundFromSelect(val) { if(val) { document.getElementById('roundInp').value = val; syncField('round', val); } }
 function syncFieldArrayTeams(val) { let arr = val.split("\n").map(t=>t.trim()).filter(t=>t!==''); db.update({ allTeams: arr }); }
 
 function syncPrizeField(key, val) {
@@ -355,8 +319,7 @@ db.on("value", (snap) => {
     const data = snap.val();
     if(data) {
         curA = parseFloat(data.scoreA) || 0; curB = parseFloat(data.scoreB) || 0;
-        allTeams = data.allTeams || []; nextMatchesWeight = data.nextMatchesWeight || [];
-        nextMatchesOpen = data.nextMatchesOpen || []; upcomingEvents = data.upcomingEvents || [];
+        allTeams = data.allTeams || []; nextMatches = data.nextMatches || []; upcomingEvents = data.upcomingEvents || [];
 
         document.getElementById("dispA").innerText = curA; document.getElementById("dispB").innerText = curB;
         
@@ -368,7 +331,6 @@ db.on("value", (snap) => {
         setSafely("watermarkInp", data.watermarkTxt);
         setSafely("pzOp1", data.pzOp1); setSafely("pzOp2", data.pzOp2); setSafely("pzOpBest", data.pzOpBest);
         setSafely("pzWtKg", data.pzWtKg); setSafely("pzWt1", data.pzWt1); setSafely("pzWt2", data.pzWt2); setSafely("pzWtBest", data.pzWtBest);
-        setSafely("winnerTeamsInp", data.qualifiedTeams); setSafely("loserTeamsInp", data.eliminatedTeams);
         setSafely("allTeamsInp", allTeams.join("\n"));
 
         renderNextMatches(); renderUpcomingEvents(); updateDropdowns();
@@ -386,17 +348,9 @@ function addUpcomingEvent() {
     const namePa = document.getElementById("ueName_pa").value.trim();
     const dateVal = document.getElementById("ueDate").value;
     if(nameEn === "") return;
-    
-    let dateStr = "";
-    if(dateVal) {
-        const d = new Date(dateVal);
-        dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-    }
-    
+    let dateStr = dateVal ? new Date(dateVal).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : "";
     upcomingEvents.push({ name: nameEn, name_pa: namePa, date: dateStr });
-    document.getElementById("ueName").value = "";
-    document.getElementById("ueName_pa").value = "";
-    document.getElementById("ueDate").value = "";
+    document.getElementById("ueName").value = ""; document.getElementById("ueName_pa").value = ""; document.getElementById("ueDate").value = "";
     syncUpcomingEventsToDB();
 }
 
@@ -405,25 +359,17 @@ function deleteUpcomingEvent(index) { upcomingEvents.splice(index, 1); syncUpcom
 function syncUpcomingEventsToDB() {
     let evEn = upcomingEvents.map((ev, i) => (i+1) + ". " + ev.name + (ev.date ? " (" + ev.date + ")" : "")).join(" | ");
     let evPa = upcomingEvents.map((ev, i) => (i+1) + ". " + (ev.name_pa || ev.name) + (ev.date ? " (" + ev.date + ")" : "")).join(" | ");
-    if(evEn === "") evEn = "UPCOMING EVENTS";
-    if(evPa === "") evPa = "ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ";
-    db.update({ upcomingEvents: upcomingEvents, row4Txt: evEn, row4Txt_pa: evPa });
+    db.update({ upcomingEvents: upcomingEvents, row4Txt: evEn || "UPCOMING EVENTS", row4Txt_pa: evPa || "ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ" });
 }
 
 function renderUpcomingEvents() {
     const container = document.getElementById("upcomingEventsContainer");
-    if(upcomingEvents.length === 0) {
-        container.innerHTML = `<div style="text-align:center; color:#999; font-size:13px;">No events added yet.</div>`;
-        return;
-    }
+    if(upcomingEvents.length === 0) { container.innerHTML = `<div style="text-align:center; color:#999; font-size:13px;">No events added yet.</div>`; return; }
     let html = "";
     upcomingEvents.forEach((ev, idx) => {
         let displayDate = ev.date ? `<small style="color:#666;">(${ev.date})</small>` : "";
         let displayName = ev.name_pa ? `${ev.name} / ${ev.name_pa}` : ev.name;
-        html += `<div class="event-item">
-            <span>${idx+1}. ${displayName} ${displayDate}</span>
-            <button class="btn-red" style="border:none; border-radius:4px; padding:4px 10px; color:white; cursor:pointer;" onclick="deleteUpcomingEvent(${idx})">X</button>
-        </div>`;
+        html += `<div class="event-item"><span>${idx+1}. ${displayName} ${displayDate}</span><button class="btn-red" style="border:none; border-radius:4px; padding:4px 10px; color:white; cursor:pointer;" onclick="deleteUpcomingEvent(${idx})">X</button></div>`;
     });
     container.innerHTML = html;
 }
@@ -433,25 +379,19 @@ function addSingleTeam() {
     let pa = document.getElementById("newTeamPa").value.trim();
     if(!en) return;
     let combined = pa ? `${en}=${pa}` : en;
-    if(!allTeams.includes(combined)) {
-        allTeams.push(combined);
-        db.update({ allTeams: allTeams });
-    }
-    document.getElementById("newTeamEn").value = "";
-    document.getElementById("newTeamPa").value = "";
+    if(!allTeams.includes(combined)) { allTeams.push(combined); db.update({ allTeams: allTeams }); }
+    document.getElementById("newTeamEn").value = ""; document.getElementById("newTeamPa").value = "";
 }
 
 function updateDropdowns(){
     const a=document.getElementById("teamSelectA"); const b=document.getElementById("teamSelectB");
     const na=document.getElementById("nextTeamA"); const nb=document.getElementById("nextTeamB");
     a.innerHTML='<option value="">Select Team A</option>'; b.innerHTML='<option value="">Select Team B</option>';
-    na.innerHTML='<option value="">Select Next Match Team 1</option>'; nb.innerHTML='<option value="">Select Next Match Team 2</option>';
+    na.innerHTML='<option value="">Select Team 1</option>'; nb.innerHTML='<option value="">Select Team 2</option>';
     
     allTeams.forEach(teamStr => {
         let parts = teamStr.split("=");
-        let en = parts[0].trim();
-        let pa = parts[1] ? parts[1].trim() : "";
-        let display = pa ? `${en} / ${pa}` : en;
+        let display = parts[1] ? `${parts[0].trim()} / ${parts[1].trim()}` : parts[0].trim();
         let opt = `<option value="${teamStr}">${display}</option>`;
         a.innerHTML += opt; b.innerHTML += opt; na.innerHTML += opt; nb.innerHTML += opt;
     });
@@ -462,57 +402,47 @@ function selectTeamB(val){ if(!val) return; let p = val.split("="); db.update({ 
 
 function formatDisplayMatch(matchStr) { return matchStr.replace(/=/g, " / "); }
 
-function renderListHTML(list, typeStr) {
-    if(list.length === 0) return `<div style="text-align:center; padding:10px; color:#999; font-size:14px;">No Matches Added</div>`;
+function renderNextMatches() {
+    const container = document.getElementById("nextMatchContainer");
+    if(nextMatches.length === 0) { container.innerHTML = `<div style="text-align:center; padding:10px; color:#999; font-size:14px;">No Scheduled Matches</div>`; return; }
     let html = "";
-    list.forEach((matchStr, index) => {
+    nextMatches.forEach((matchStr, index) => {
         html += `<div class="match-item">
             <div class="match-title">${formatDisplayMatch(matchStr)}</div>
             <div class="match-actions">
-                <button class="btn-sm btn-start" onclick="startSpecificMatch(${index}, '${typeStr}')">START</button>
-                <button class="btn-sm btn-delete" onclick="deleteSpecificMatch(${index}, '${typeStr}')">X</button>
+                <button class="btn-sm btn-start" onclick="startSpecificMatch(${index})">START</button>
+                <button class="btn-sm btn-delete" onclick="deleteSpecificMatch(${index})">X</button>
             </div>
         </div>`;
     });
-    return html;
+    container.innerHTML = html;
 }
 
-function renderNextMatches() {
-    document.getElementById("nextMatchContainerWeight").innerHTML = renderListHTML(nextMatchesWeight, 'weight');
-    document.getElementById("nextMatchContainerOpen").innerHTML = renderListHTML(nextMatchesOpen, 'open');
-}
-
-function addNextMatch(type){
+function addNewMatch(){
     const a = document.getElementById("nextTeamA").value;
     const b = document.getElementById("nextTeamB").value;
-    const roundVal = document.getElementById("nextMatchRound").value;
+    const round = document.getElementById("matchRoundSelect").value;
+    const cat = document.getElementById("matchCategoryInp").value.trim();
     if(a === "" || b === "") return;
-    
-    let kgPrefix = "";
-    if(type === 'weight') { kgPrefix = document.getElementById("customWeightKg").value.trim() || document.getElementById("selectWeightKg").value; } 
-    else { kgPrefix = document.getElementById("customOpenKg").value.trim() || document.getElementById("selectOpenKg").value; }
 
-    let tag = kgPrefix;
-    if(roundVal) tag = tag ? `${tag} - ${roundVal}` : roundVal;
+    let tagParts = [];
+    if(cat) tagParts.push(cat);
+    if(round) tagParts.push(round);
+    let tag = tagParts.join(" - ");
 
     let matchStr = a + " VS " + b;
     if(tag) matchStr = "(" + tag + ") " + matchStr;
 
-    if(type === 'weight') nextMatchesWeight.push(matchStr);
-    else nextMatchesOpen.push(matchStr);
-
+    nextMatches.push(matchStr);
     document.getElementById("nextTeamA").value = ""; document.getElementById("nextTeamB").value = "";
-    document.getElementById("customWeightKg").value = ""; document.getElementById("customOpenKg").value = "";
-    document.getElementById("selectWeightKg").value = ""; document.getElementById("selectOpenKg").value = "";
-    document.getElementById("nextMatchRound").value = "";
+    document.getElementById("matchRoundSelect").value = ""; document.getElementById("matchCategoryInp").value = "";
     
-    syncMatchListsToDB();
+    syncMatchListToDB();
 }
 
-function startSpecificMatch(index, type) {
-    let rawMatchStr = (type === 'weight') ? nextMatchesWeight[index] : nextMatchesOpen[index];
+function startSpecificMatch(index) {
+    let rawMatchStr = nextMatches[index];
     let category = ""; let matchStr = rawMatchStr;
-    
     if(rawMatchStr.startsWith("(")) {
         let parts = rawMatchStr.split(") ");
         category = parts[0].replace("(", "").trim();
@@ -523,55 +453,35 @@ function startSpecificMatch(index, type) {
     let t1Parts = (teams[0] || "").split("=");
     let t2Parts = (teams[1] || "").split("=");
     
-    if(type === 'weight') nextMatchesWeight.splice(index, 1);
-    else nextMatchesOpen.splice(index, 1);
+    nextMatches.splice(index, 1);
 
     let updateObj = { 
-        nameA: t1Parts[0].trim(), 
-        nameA_pa: t1Parts[1] ? t1Parts[1].trim() : "", 
-        nameB: t2Parts[0].trim(), 
-        nameB_pa: t2Parts[1] ? t2Parts[1].trim() : "", 
+        nameA: t1Parts[0].trim(), nameA_pa: t1Parts[1] ? t1Parts[1].trim() : "", 
+        nameB: t2Parts[0].trim(), nameB_pa: t2Parts[1] ? t2Parts[1].trim() : "", 
         scoreA: 0, scoreB: 0, scoreVisible: true 
     };
 
-    if(category) {
-        updateObj.round = category;
-        document.getElementById("roundInp").value = category;
-    }
+    if(category) { updateObj.round = category; document.getElementById("roundInp").value = category; }
 
-    db.update(updateObj).then(() => syncMatchListsToDB());
+    db.update(updateObj).then(() => syncMatchListToDB());
 }
 
-function deleteSpecificMatch(index, type) {
-    if(type === 'weight') nextMatchesWeight.splice(index, 1);
-    else nextMatchesOpen.splice(index, 1);
-    syncMatchListsToDB();
+function deleteSpecificMatch(index) {
+    nextMatches.splice(index, 1);
+    syncMatchListToDB();
 }
 
-function getTickerMatches(matchArray, isPa) {
-    return matchArray.map(m => {
+function syncMatchListToDB() {
+    let tEn = ""; let tPa = "";
+    nextMatches.forEach(m => {
         let prefix = ""; let main = m;
         if(m.startsWith("(")) { let p = m.split(") "); prefix = p[0] + ") "; main = p[1] || m; }
-        let teams = main.split(" VS ");
-        let t1 = (teams[0] || "").split("="); let t2 = (teams[1] || "").split("=");
-        let t1Name = isPa && t1[1] ? t1[1] : t1[0];
-        let t2Name = isPa && t2[1] ? t2[1] : (t2[0] || "");
-        return prefix + t1Name + " VS " + t2Name;
-    }).join(" , ");
-}
-
-function syncMatchListsToDB() {
-    let tickerEn = ""; let tickerPa = "";
-    let wtEn = getTickerMatches(nextMatchesWeight, false); let wtPa = getTickerMatches(nextMatchesWeight, true);
-    let opEn = getTickerMatches(nextMatchesOpen, false); let opPa = getTickerMatches(nextMatchesOpen, true);
-    
-    if (wtEn) tickerEn += "WEIGHT MATCH: " + wtEn;
-    if (wtPa) tickerPa += "ਵਜ਼ਨੀ ਮੈਚ: " + wtPa;
-    if (wtEn && opEn) { tickerEn += " || "; tickerPa += " || "; }
-    if (opEn) tickerEn += "OPEN MATCH: " + opEn;
-    if (opPa) tickerPa += "ਓਪਨ ਮੈਚ: " + opPa;
-
-    db.update({ nextMatchesWeight: nextMatchesWeight, nextMatchesOpen: nextMatchesOpen, row5Txt: tickerEn, row5Txt_pa: tickerPa });
+        let tms = main.split(" VS ");
+        let t1 = (tms[0] || "").split("="); let t2 = (tms[1] || "").split("=");
+        tEn += `${prefix}${t1[0]} VS ${t2[0]} , `;
+        tPa += `${prefix}${t1[1] || t1[0]} VS ${t2[1] || t2[0]} , `;
+    });
+    db.update({ nextMatches: nextMatches, row5Txt: tEn, row5Txt_pa: tPa });
 }
 
 function changeScore(team,val){
@@ -592,35 +502,14 @@ function showResultLayer(){
     const teamA = document.getElementById("nameA").value; const teamB = document.getElementById("nameB").value;
     let winner=""; let loser="";
     if(curA>curB){ winner=teamA; loser=teamB; } else if(curB>curA){ winner=teamB; loser=teamA; } else { winner="TIE"; }
-    let winners = document.getElementById("winnerTeamsInp").value.split("\n").filter(t=>t.trim()!=='');
-    if(winner !== "TIE") winners.push(winner + " (WIN)");
-    let losers = document.getElementById("loserTeamsInp").value.split("\n").filter(t=>t.trim()!=='');
-    if(winner !== "TIE") losers.push(loser);
-    document.getElementById("winnerTeamsInp").value = winners.join("\n"); document.getElementById("loserTeamsInp").value = losers.join("\n");
-    if(loser !== ""){ allTeams = allTeams.filter(t => !t.toLowerCase().startsWith(loser.toLowerCase()+"=")); }
-    
-    nextMatchesWeight = nextMatchesWeight.filter(m=>!(m.toLowerCase().includes(teamA.toLowerCase()) && m.toLowerCase().includes(teamB.toLowerCase())));
-    nextMatchesOpen = nextMatchesOpen.filter(m=>!(m.toLowerCase().includes(teamA.toLowerCase()) && m.toLowerCase().includes(teamB.toLowerCase())));
     
     let resTextStr = winner !== "TIE" ? `${winner} WIN vs ${loser} (${curA}-${curB})` : `MATCH TIED (${curA}-${curB})`;
-
-    db.update({ 
-        resultText: resTextStr,
-        qualifiedTeams: winners.join("\n"), 
-        eliminatedTeams: losers.join("\n"), 
-        allTeams: allTeams, 
-        scoreA: 0, scoreB: 0, nameA: "", nameA_pa: "", nameB: "", nameB_pa: "" 
-    }).then(() => syncMatchListsToDB());
+    db.update({ resultText: resTextStr, scoreA: 0, scoreB: 0, nameA: "", nameA_pa: "", nameB: "", nameB_pa: "" });
 }
 
 function clearAllTeams(){
     if(confirm("Delete All Teams?")){
-        db.update({
-            allTeams:[], qualifiedTeams:"", eliminatedTeams:"", nextMatchesWeight:[], nextMatchesOpen:[], upcomingEvents:[],
-            scoreA:0, scoreB:0, nameA:"", nameA_pa:"", nameB:"", nameB_pa:"",
-            row1Txt:"", row1Txt_pa:"", row2Txt:"", row3Txt:"", row4Txt:"", row5Txt:"", row5Txt_pa:"", row6Txt:"",
-            pzOp1:"", pzOp2:"", pzOpBest:"", pzWtKg:"", pzWt1:"", pzWt2:"", pzWtBest:"", resultText:"No Result Yet"
-        });
+        db.update({ allTeams:[], nextMatches:[], upcomingEvents:[], scoreA:0, scoreB:0, nameA:"", nameA_pa:"", nameB:"", nameB_pa:"", resultText:"No Result Yet" });
         document.querySelectorAll('input[type="text"], textarea, input[type="date"]').forEach(el => el.value = '');
     }
 }
