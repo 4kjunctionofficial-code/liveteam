@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Ultra HD - 2 Color Ticker & Result</title>
+    <title>Kabaddi Ultra HD - Slanted Overlay</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@600;700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -19,9 +19,10 @@
             overflow: hidden;
             position: relative;
             user-select: none;
+            text-transform: uppercase; /* ALL CAPS */
         }
 
-        /* --- HD SCOREBOARD --- */
+        /* --- HD SCOREBOARD (NO BLACK SHADOW) --- */
         #top-scoreboard-container {
             position: absolute;
             top: 35px;
@@ -31,81 +32,91 @@
             align-items: flex-end;
             z-index: 9999;
             transition: opacity 0.5s ease;
-            filter: drop-shadow(4px 6px 12px rgba(0,0,0,0.8));
+            /* Filter drop-shadow completely removed */
         }
         #top-scoreboard-container.hidden { opacity: 0; }
 
+        /* SKewed (Slanted) Main Strip for the '/' effect */
         #main-score-strip {
             display: flex;
             align-items: stretch;
             height: 65px;
-            border-radius: 8px;
+            border-radius: 4px;
             overflow: hidden;
             border: 2px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.7);
+            transform: skewX(18deg); /* Creates the / slant */
+            /* Box-shadow removed */
         }
 
-        /* Team 1 Side */
+        /* Un-skew wrapper to keep text straight */
+        .unskew {
+            transform: skewX(-18deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Team 1 Side (Royal Blue) */
         .score-a {
-            background: #0d3b7a; color: #ffcc00; font-size: 48px; font-weight: 900;
-            padding: 0 30px; display: flex; align-items: center; justify-content: center;
-            min-width: 90px; font-family: 'Bebas Neue', sans-serif; text-shadow: 2px 3px 5px rgba(0,0,0,0.9);
+            background: #0d3b7a; color: #ffcc00; font-size: 50px; font-weight: 900;
+            padding: 0 35px; font-family: 'Bebas Neue', sans-serif;
         }
         .team-a-panel {
             background: #1a5bb8; color: #ffffff; font-size: 35px; font-weight: 800;
-            padding: 0 40px; display: flex; align-items: center; justify-content: center;
-            white-space: nowrap; min-width: 150px; text-shadow: 2px 3px 5px rgba(0,0,0,0.9); text-transform: uppercase;
+            padding: 0 45px; white-space: nowrap; min-width: 150px;
         }
 
-        .divider { width: 5px; background-color: #ffcc00; }
+        /* The Slanted Color Divider '/' */
+        .divider { width: 6px; background-color: #ffcc00; }
 
-        /* Team 2 Side */
+        /* Team 2 Side (Dark Charcoal) */
         .team-b-panel {
             background: #242424; color: #ffffff; font-size: 35px; font-weight: 800;
-            padding: 0 40px; display: flex; align-items: center; justify-content: center;
-            white-space: nowrap; min-width: 150px; text-shadow: 2px 3px 5px rgba(0,0,0,0.9); text-transform: uppercase;
+            padding: 0 45px; white-space: nowrap; min-width: 150px;
         }
         .score-b {
-            background: #111111; color: #ffcc00; font-size: 48px; font-weight: 900;
-            padding: 0 30px; display: flex; align-items: center; justify-content: center;
-            min-width: 90px; font-family: 'Bebas Neue', sans-serif; text-shadow: 2px 3px 5px rgba(0,0,0,0.9);
+            background: #111111; color: #ffcc00; font-size: 50px; font-weight: 900;
+            padding: 0 35px; font-family: 'Bebas Neue', sans-serif;
         }
 
+        /* Match Round Details */
         #match-details-strip {
-            background: rgba(0, 0, 0, 0.9); color: #ffffff; font-size: 22px; font-weight: 800;
-            padding: 5px 35px; margin-top: 6px; text-transform: uppercase; border-radius: 6px;
-            letter-spacing: 1.5px; border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 3px 10px rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.85); color: #ffcc00; font-size: 22px; font-weight: 800;
+            padding: 4px 35px; margin-top: 6px; border-radius: 4px;
+            letter-spacing: 1.5px; border: 1px solid rgba(255, 255, 255, 0.3);
+            transform: skewX(18deg); /* Match the slant */
+            margin-right: 25px; /* Alignment fix due to skew */
         }
         #match-details-strip.hidden { display: none; }
 
         /* --- LOGO & WATERMARK --- */
         #logo-container { position: absolute; top: 25px; left: 30px; z-index: 9999; display: flex; align-items: center; transition: all 0.5s ease; }
         #logo-container.hidden { opacity: 0; transform: scale(0.8); }
-        #main-logo { height: 95px; width: auto; object-fit: contain; filter: drop-shadow(3px 5px 10px rgba(0,0,0,0.8)); }
+        #main-logo { height: 95px; width: auto; object-fit: contain; }
 
         #single-wm {
             position: absolute; left: 300px; top: 300px; font-family: 'Bebas Neue', sans-serif; font-size: 48px; font-weight: bold;
-            color: #ffffff; opacity: 0.45; text-transform: uppercase; letter-spacing: 3px;
-            text-shadow: 2px 3px 8px rgba(0,0,0,0.9); z-index: 9997; pointer-events: none;
+            color: #ffffff; opacity: 0.45; letter-spacing: 3px; pointer-events: none;
         }
 
-        /* --- SOLID 2-COLOR TICKER --- */
+        /* --- SOLID 2-COLOR TICKER (NO SHADOW) --- */
         #ticker-wrap {
             position: absolute; bottom: 0; left: 0; width: 1920px; z-index: 9998;
-            display: flex; flex-direction: column; box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.9);
-            transition: opacity 0.5s ease; text-transform: uppercase;
+            display: flex; flex-direction: column; transition: opacity 0.5s ease;
+            /* Box-shadow removed */
         }
         #ticker-wrap.hidden { opacity: 0; }
 
         .ticker-strip { display: flex; width: 100%; height: 55px; }
 
-        .strip-top { background: #0b4596; border-bottom: 2px solid rgba(0,0,0,0.8); }
+        .strip-top { background: #0b4596; border-bottom: 2px solid rgba(0,0,0,0.4); }
         .strip-bot { background: #121212; border-top: 1px solid rgba(255,255,255,0.1); }
 
         .ticker-col {
             display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 28px;
-            color: #ffffff; overflow: hidden; position: relative; text-shadow: 2px 3px 5px rgba(0,0,0,1);
-            letter-spacing: 1px; padding: 0 15px;
+            color: #ffffff; overflow: hidden; position: relative; letter-spacing: 1px; padding: 0 15px;
         }
 
         .w-30 { width: 30%; }
@@ -120,51 +131,23 @@
         .scroll-container { width: 100%; overflow: hidden; display: flex; align-items: center; white-space: nowrap; }
         .scroll-text {
             display: inline-block; white-space: nowrap;
-            padding-left: 100%; /* Starts outside right edge */
-            animation: scrollMarquee 11s linear forwards; /* 11s gives it time to finish within 11.5s cycle */
+            padding-left: 100%; 
+            animation: scrollMarquee 11s linear forwards; 
         }
-        @keyframes scrollMarquee {
-            0%   { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
-        }
+        @keyframes scrollMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        /* --- CENTER RESULT POP-UP BOX --- */
+        /* --- CENTER RESULT WINDOW (POP-UP) - NO HEAVY SHADOW --- */
         #result-popup {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            background: rgba(10, 10, 10, 0.95);
-            border: 6px solid #ffcc00;
-            padding: 50px 100px;
-            border-radius: 20px;
-            color: white;
-            text-align: center;
-            z-index: 100000;
-            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            background: rgba(15, 15, 15, 0.95); border: 4px solid #ffcc00;
+            padding: 40px 80px; border-radius: 12px; color: white; text-align: center;
+            z-index: 100000; transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             opacity: 0;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.9);
-            text-transform: uppercase;
+            /* Box-shadow removed */
         }
-        #result-popup.show {
-            transform: translate(-50%, -50%) scale(1);
-            opacity: 1;
-        }
-        .res-title {
-            font-size: 55px;
-            color: #ffcc00;
-            margin-bottom: 25px;
-            font-weight: 900;
-            text-shadow: 2px 3px 5px rgba(0,0,0,1);
-            border-bottom: 3px solid rgba(255, 204, 0, 0.5);
-            padding-bottom: 10px;
-        }
-        .res-text {
-            font-size: 65px;
-            font-weight: 800;
-            text-shadow: 2px 3px 5px rgba(0,0,0,1);
-            line-height: 1.2;
-        }
+        #result-popup.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        .res-title { font-size: 45px; color: #ffcc00; margin-bottom: 20px; font-weight: 900; border-bottom: 2px solid rgba(255, 204, 0, 0.4); padding-bottom: 5px; }
+        .res-text { font-size: 60px; font-weight: 800; line-height: 1.2; }
 
     </style>
 </head>
@@ -174,19 +157,19 @@
 <div id="single-wm">M LIVE</div>
 
 <div id="result-popup">
-    <div class="res-title">🏆 MATCH RESULT 🏆</div>
+    <div class="res-title">🏆 MATCH RESULT</div>
     <div class="res-text" id="res-msg">WINNER NAME</div>
 </div>
 
 <div id="top-scoreboard-container">
     <div id="main-score-strip">
-        <div class="score-a" id="sA">0</div>
-        <div class="team-a-panel" id="nA-container"><span id="nA">TEAM 1</span></div>
+        <div class="score-a"><div class="unskew" id="sA">0</div></div>
+        <div class="team-a-panel"><div class="unskew" id="nA">TEAM 1</div></div>
         <div class="divider"></div>
-        <div class="team-b-panel" id="nB-container"><span id="nB">TEAM 2</span></div>
-        <div class="score-b" id="sB">0</div>
+        <div class="team-b-panel"><div class="unskew" id="nB">TEAM 2</div></div>
+        <div class="score-b"><div class="unskew" id="sB">0</div></div>
     </div>
-    <div id="match-details-strip" class="hidden"></div>
+    <div id="match-details-strip" class="hidden"><div class="unskew" id="match-round"></div></div>
 </div>
 
 <div id="ticker-wrap">
@@ -228,7 +211,7 @@
     let leftIdx = 0, centerIdx = 0, rightIdx = 0;
     let isEnglish = true; 
     let hasMatches = false;
-    let lastResult = ""; // Track result state
+    let lastResult = ""; 
 
     db.on("value", (snap) => {
         const data = snap.val() || {}; 
@@ -251,7 +234,7 @@
             detailsStrip.classList.add('hidden');
         } else {
             detailsStrip.classList.remove('hidden');
-            detailsStrip.innerText = roundText;
+            document.getElementById('match-round').innerText = roundText;
         }
 
         document.getElementById('sA').innerText = data.scoreA ?? "0";
@@ -264,7 +247,7 @@
             showResultPopup(data.resultText);
         }
         if (!data.resultText || data.resultText === "No Result Yet") {
-            lastResult = ""; // Reset tracker if admin resets
+            lastResult = ""; 
         }
 
         processTickerData(data);
@@ -274,17 +257,11 @@
         const popup = document.getElementById('result-popup');
         document.getElementById('res-msg').innerText = text;
         popup.classList.add('show');
-        
-        // Hide after 15 seconds
-        setTimeout(() => {
-            popup.classList.remove('show');
-        }, 15000); 
+        setTimeout(() => { popup.classList.remove('show'); }, 15000); 
     }
 
     function processTickerData(data) {
-        // --- 1. BUILD LEFT ITEMS (Village & Individual Prizes) ---
         leftItems = [];
-        
         leftItems.push({
             tEn: "📍 LOCATION", bEn: data.row1Txt || "VILLAGE NAME",
             tPa: "📍 ਸਥਾਨ / ਪਿੰਡ", bPa: data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ ਦਾ ਨਾਮ"
@@ -301,12 +278,10 @@
         if(data.pzWt2) leftItems.push({ tEn: `🏋️ ${wKg} 2ND PRIZE`, bEn: data.pzWt2, tPa: `🏋️ ${wKgPa} ਦੂਜਾ ਇਨਾਮ`, bPa: data.pzWt2 });
         if(data.pzWtBest) leftItems.push({ tEn: `🏅 ${wKg} BEST PLAYER`, bEn: data.pzWtBest, tPa: `🏅 ${wKgPa} ਬੈਸਟ ਖਿਡਾਰੀ`, bPa: data.pzWtBest });
 
-        // --- 2. BUILD CENTER ITEMS (Matches) ---
         centerItems = [];
         let wtMatches = data.nextMatchesWeight || [];
         let opMatches = data.nextMatchesOpen || [];
         let maxM = Math.max(wtMatches.length, opMatches.length);
-        
         hasMatches = maxM > 0;
         
         if(hasMatches) {
@@ -325,75 +300,52 @@
                     return {en, pa};
                 };
                 
-                let wM = splitMatch(wt);
-                let oM = splitMatch(op);
-                
-                centerItems.push({
-                    tEn: `🏋️ ${wM.en}`, bEn: `🔥 ${oM.en}`,
-                    tPa: `🏋️ ${wM.pa}`, bPa: `🔥 ${oM.pa}`
-                });
+                let wM = splitMatch(wt); let oM = splitMatch(op);
+                centerItems.push({ tEn: `🏋️ ${wM.en}`, bEn: `🔥 ${oM.en}`, tPa: `🏋️ ${wM.pa}`, bPa: `🔥 ${oM.pa}` });
             }
         } else {
-            centerItems.push({
-                tEn: "KABADDI TOURNAMENT", bEn: "LIVE UPDATES",
-                tPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", bPa: "ਲਾਈਵ ਅੱਪਡੇਟ"
-            });
+            centerItems.push({ tEn: "KABADDI TOURNAMENT", bEn: "LIVE UPDATES", tPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", bPa: "ਲਾਈਵ ਅੱਪਡੇਟ" });
         }
 
-        // --- 3. BUILD RIGHT ITEMS (Upcoming Events & Booking) ---
         rightItems = [];
         if(data.upcomingEvents && data.upcomingEvents.length > 0) {
             data.upcomingEvents.forEach(ev => {
                 let d = ev.date ? ` (${ev.date})` : "";
-                rightItems.push({
-                    tEn: "📅 UPCOMING EVENTS", bEn: `${ev.name}${d}`,
-                    tPa: "📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ", bPa: `${ev.name_pa || ev.name}${d}`
-                });
+                rightItems.push({ tEn: "📅 UPCOMING EVENTS", bEn: `${ev.name}${d}`, tPa: "📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ", bPa: `${ev.name_pa || ev.name}${d}` });
             });
         }
         if(data.row6Txt || data.row6Txt_pa) {
-            rightItems.push({
-                tEn: "📞 FOR BOOKING & ADS", bEn: data.row6Txt || "CONTACT US",
-                tPa: "📞 ਬੁਕਿੰਗ ਅਤੇ ਐਡ ਲਈ", bPa: data.row6Txt_pa || data.row6Txt || "ਸੰਪਰਕ ਕਰੋ"
-            });
+            rightItems.push({ tEn: "📞 FOR BOOKING & ADS", bEn: data.row6Txt || "CONTACT US", tPa: "📞 ਬੁਕਿੰਗ ਅਤੇ ਐਡ ਲਈ", bPa: data.row6Txt_pa || data.row6Txt || "ਸੰਪਰਕ ਕਰੋ" });
         }
         if(rightItems.length === 0) {
             rightItems.push({ tEn: "📅 UPCOMING EVENTS", bEn: "STAY TUNED", tPa: "📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ", bPa: "ਦੇਖਦੇ ਰਹੋ" });
         }
         
         document.getElementById('strip-2').style.display = hasMatches ? 'flex' : 'none';
-        
-        if(document.getElementById('s1-left').innerText === "📍 LOCATION") {
-            renderTicker();
-        }
+        if(document.getElementById('s1-left').innerText === "📍 LOCATION") { renderTicker(); }
     }
 
-    // Advanced Animation (Center Expand / Vertical Slide + Auto Smart Scroll)
     function animateText(elementId, newText, isCenter = false) {
         const el = document.getElementById(elementId);
         if (!el) return;
-        
         let currentText = el.innerText.trim();
         if (currentText === newText.trim()) return; 
 
         el.style.opacity = 0;
         
         if(isCenter) {
-            el.style.transform = 'scaleX(0)'; // Expand from Center (I shape)
+            el.style.transform = 'scaleX(0)'; 
             el.style.transformOrigin = 'center';
         } else {
-            el.style.transform = 'translateY(-15px)'; // Slide Vertical
+            el.style.transform = 'translateY(-15px)'; 
         }
         
         setTimeout(() => {
-            // Smart Scroll Logic: Determine if text is too long for the box
-            let scrollLimit = isCenter ? 40 : 22; // Center is 40% width, sides are 30%
+            let scrollLimit = isCenter ? 40 : 22; 
             
             if(newText.length > scrollLimit) {
-                // Apply Scrolling
                 el.innerHTML = `<div class="scroll-container"><span class="scroll-text">${newText}</span></div>`;
             } else {
-                // Static Centered
                 el.innerHTML = newText;
             }
 
@@ -418,10 +370,8 @@
         if(hasMatches) {
             animateText('s1-left', isEnglish ? L.tEn : L.tPa, false);
             animateText('s2-left', isEnglish ? L.bEn : L.bPa, false);
-            
             animateText('s1-mid', isEnglish ? C.tEn : C.tPa, true);
             animateText('s2-mid', isEnglish ? C.bEn : C.bPa, true);
-            
             animateText('s1-right', isEnglish ? R.tEn : R.tPa, false);
             animateText('s2-right', isEnglish ? R.bEn : R.bPa, false);
         } else {
@@ -431,14 +381,9 @@
         }
     }
 
-    // MASTER ANIMATION LOOP (INCREASED TO 11.5 SECONDS)
+    // MASTER ANIMATION LOOP (11.5 SECONDS)
     setInterval(() => {
-        if(!isEnglish) {
-            leftIdx++;
-            centerIdx++;
-            rightIdx++;
-        }
-        
+        if(!isEnglish) { leftIdx++; centerIdx++; rightIdx++; }
         isEnglish = !isEnglish; 
         
         let d = window.currentData;
@@ -446,19 +391,16 @@
             document.getElementById('nA').innerText = (!isEnglish && d.nameA_pa) ? d.nameA_pa : (d.nameA || "TEAM 1");
             document.getElementById('nB').innerText = (!isEnglish && d.nameB_pa) ? d.nameB_pa : (d.nameB || "TEAM 2");
         }
-        
         renderTicker();
-    }, 11500); // 11.5 seconds per frame
+    }, 11500);
 
-    // Watermark Animation
+    // Watermark
     const wm = document.getElementById('single-wm');
     let x = 200, y = 200, dx = 1.8, dy = 1.4;
     function animateWatermark() {
-        const maxX = 1920 - wm.offsetWidth - 50;
-        const maxY = 950 - wm.offsetHeight;
+        const maxX = 1920 - wm.offsetWidth - 50; const maxY = 950 - wm.offsetHeight;
         x += dx; y += dy;
-        if (x <= 50 || x >= maxX) dx *= -1;
-        if (y <= 120 || y >= maxY) dy *= -1;
+        if (x <= 50 || x >= maxX) dx *= -1; if (y <= 120 || y >= maxY) dy *= -1;
         wm.style.left = x + 'px'; wm.style.top = y + 'px';
         requestAnimationFrame(animateWatermark);
     }
