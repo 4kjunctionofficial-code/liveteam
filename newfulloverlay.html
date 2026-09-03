@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Ultra HD - Sky Blue Theme & Slow Scroll</title>
+    <title>Kabaddi Ultra HD - Working Overlay</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -57,7 +57,6 @@
             height: 100%;
         }
 
-        /* Sky Blue Score & Panel Side A */
         .score-a {
             background: #007acc; color: #ffffff; font-size: 56px; font-weight: 900;
             padding: 0 35px; font-family: 'Bebas Neue', sans-serif;
@@ -96,7 +95,7 @@
             color: #ffffff; opacity: 0.45; letter-spacing: 3px; pointer-events: none;
         }
 
-        /* --- TICKER STRIPS (SKY BLUE TOP STRIP) --- */
+        /* --- TICKER STRIPS --- */
         #ticker-wrap {
             position: absolute; bottom: 0; left: 0; width: 1920px; z-index: 9998;
             display: flex; flex-direction: column; transition: opacity 0.5s ease;
@@ -105,7 +104,6 @@
 
         .ticker-strip { display: flex; width: 100%; height: 60px; }
 
-        /* Sky Blue Top Strip */
         .strip-top { background: #3399ff; border-bottom: 2px solid rgba(0,0,0,0.5); }
         .strip-bot { background: #121212; border-top: 1px solid rgba(255,255,255,0.15); }
 
@@ -119,25 +117,15 @@
         .w-30 { width: 30%; }
         .w-40 { width: 40%; border-left: 2px solid rgba(255,255,255,0.3); border-right: 2px solid rgba(255,255,255,0.3); color: #ffffff !important; }
 
-        /* INDEPENDENT ANIMATIONS FOR EACH BOX */
-        .anim-wrap-left {
+        .anim-wrap {
             position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
-            transition: opacity 0.8s ease, transform 0.8s ease; opacity: 1;
-        }
-        .anim-wrap-mid {
-            position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
-            transition: opacity 0.8s ease, transform 0.8s ease; opacity: 1;
-        }
-        .anim-wrap-right {
-            position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
-            transition: opacity 0.8s ease, transform 0.8s ease; opacity: 1;
+            transition: opacity 0.6s ease, transform 0.6s ease; opacity: 1;
         }
 
-        /* VERY SLOW & SMOOTH SCROLLING SPEED (28s) */
         .scroll-container { width: 100%; overflow: hidden; display: flex; align-items: center; white-space: nowrap; }
         .scroll-text {
             display: inline-block; white-space: nowrap; padding-left: 100%; 
-            animation: scrollMarquee 28s linear forwards; 
+            animation: scrollMarquee 25s linear infinite; 
         }
         @keyframes scrollMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
@@ -178,15 +166,15 @@
 
 <div id="ticker-wrap">
     <div class="ticker-strip strip-top" id="strip-1">
-        <div class="ticker-col w-30"><div id="s1-left" class="anim-wrap-left">📍 ਸਥਾਨ</div></div>
-        <div class="ticker-col w-40"><div id="s1-mid" class="anim-wrap-mid">ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ</div></div>
-        <div class="ticker-col w-30"><div id="s1-right" class="anim-wrap-right">📅 ਆਉਣ ਵਾਲੇ ਮੇਲੇ</div></div>
+        <div class="ticker-col w-30"><div id="s1-left" class="anim-wrap">📍 ਸਥਾਨ</div></div>
+        <div class="ticker-col w-40"><div id="s1-mid" class="anim-wrap">ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ</div></div>
+        <div class="ticker-col w-30"><div id="s1-right" class="anim-wrap">📅 ਆਉਣ ਵਾਲੇ ਮੇਲੇ</div></div>
     </div>
     
     <div class="ticker-strip strip-bot" id="strip-2" style="display: none;">
-        <div class="ticker-col w-30"><div id="s2-left" class="anim-wrap-left">ਪਿੰਡ</div></div>
-        <div class="ticker-col w-40"><div id="s2-mid" class="anim-wrap-mid">ਲਾਈਵ ਮੈਚ</div></div>
-        <div class="ticker-col w-30"><div id="s2-right" class="anim-wrap-right">ਵੇਰਵਾ</div></div>
+        <div class="ticker-col w-30"><div id="s2-left" class="anim-wrap">ਪਿੰਡ</div></div>
+        <div class="ticker-col w-40"><div id="s2-mid" class="anim-wrap">ਲਾਈਵ ਮੈਚ</div></div>
+        <div class="ticker-col w-30"><div id="s2-right" class="anim-wrap">ਵੇਰਵਾ</div></div>
     </div>
 </div>
 
@@ -227,6 +215,7 @@
     let rightItems = [];
     
     let leftIdx = 0, centerIdx = 0, rightIdx = 0;
+
     const roundDict = {
         "1st Round": "ਪਹਿਲਾ ਰਾਊਂਡ", "2nd Round": "ਦੂਜਾ ਰਾਊਂਡ", "3rd Round": "ਤੀਜਾ ਰਾਊਂਡ",
         "4th Round": "ਚੌਥਾ ਰਾਊਂਡ", "Quarter Final": "ਕੁਆਰਟਰ ਫਾਈਨਲ", "Semi Final": "ਸੈਮੀ ਫਾਈਨਲ",
@@ -236,8 +225,7 @@
 
     function translateRound(roundStr) {
         if(!roundStr) return "";
-        let cleaned = roundStr.trim();
-        let translated = cleaned;
+        let translated = roundStr.trim();
         for (let key in roundDict) {
             let regex = new RegExp(key, 'gi');
             if (regex.test(translated)) {
@@ -289,6 +277,7 @@
     });
 
     let hasMatches = false;
+    let lastResult = "";
 
     function showResultPopup(text) {
         const popup = document.getElementById('result-popup');
@@ -379,20 +368,22 @@
         renderTickerImmediate();
     }
 
-    function animateIndependent(elementId, newText) {
+    function animateText(elementId, newText) {
         const el = document.getElementById(elementId);
-        if (!el || el.innerText.trim() === newText.trim()) return; 
+        if (!el) return;
+        let currentText = el.innerText.trim();
+        if (currentText === newText.trim()) return; 
 
         el.style.opacity = 0;
-        el.style.transform = 'translateY(-12px)';
+        el.style.transform = 'translateY(-15px)';
         
         setTimeout(() => {
-            if(newText.length > 20) {
+            if(newText.length > 22) {
                 el.innerHTML = `<div class="scroll-container"><span class="scroll-text">${newText}</span></div>`;
             } else {
                 el.innerHTML = newText;
             }
-            el.style.transform = 'translateY(12px)';
+            el.style.transform = 'translateY(15px)';
             setTimeout(() => { el.style.opacity = 1; el.style.transform = 'translateY(0)'; }, 60);
         }, 400); 
     }
@@ -403,23 +394,22 @@
         let R = rightItems[rightIdx % rightItems.length];
 
         if(hasMatches) {
-            animateIndependent('s1-left', L.tPa);
-            animateIndependent('s2-left', L.bEn);
-            animateIndependent('s1-mid', C.tPa);
-            animateIndependent('s2-mid', C.bEn);
-            animateIndependent('s1-right', R.tPa);
-            animateIndependent('s2-right', R.bEn);
+            animateText('s1-left', L.tPa);
+            animateText('s2-left', L.bEn);
+            animateText('s1-mid', C.tPa);
+            animateText('s2-mid', C.bEn);
+            animateText('s1-right', R.tPa);
+            animateText('s2-right', R.bEn);
         } else {
-            animateIndependent('s1-left', L.tPa);
-            animateIndependent('s1-mid', C.tPa);
-            animateIndependent('s1-right', R.tPa);
+            animateText('s1-left', L.tPa);
+            animateText('s1-mid', C.tPa);
+            animateText('s1-right', R.tPa);
         }
     }
 
-    // INDEPENDENT TIMERS FOR EACH BOX SO THEY MOVE AT DIFFERENT TIMES
-    setInterval(() => { leftIdx++; renderTickerImmediate(); }, 14000);
-    setInterval(() => { centerIdx++; renderTickerImmediate(); }, 11000);
-    setInterval(() => { rightIdx++; renderTickerImmediate(); }, 16000);
+    setInterval(() => { leftIdx++; renderTickerImmediate(); }, 12000);
+    setInterval(() => { centerIdx++; renderTickerImmediate(); }, 10000);
+    setInterval(() => { rightIdx++; renderTickerImmediate(); }, 14000);
 
     setInterval(() => {
         let d = window.currentData;
@@ -427,7 +417,7 @@
             document.getElementById('nA').innerText = d.nameA_pa || d.nameA || "ਟੀਮ 1";
             document.getElementById('nB').innerText = d.nameB_pa || d.nameB || "ਟੀਮ 2";
         }
-    }, 3000);
+    }, 2000);
 
     const wm = document.getElementById('single-wm');
     let x = 200, y = 200, dx = 1.8, dy = 1.4;
