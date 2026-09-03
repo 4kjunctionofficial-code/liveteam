@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Ultra HD - Perfect Punjabi & English Match List</title>
+    <title>Kabaddi Ultra HD - Open in English & Rest in Punjabi</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -219,7 +219,7 @@
     let hasMatches = false;
     let lastResult = ""; 
 
-    // Punjabi Dictionary for Rounds, Weights & Categories
+    // Punjabi Dictionary for Rounds (Keeping OPEN and KG in English as requested)
     const roundDict = {
         "1st Round": "ਪਹਿਲਾ ਰਾਊਂਡ",
         "2nd Round": "ਦੂਜਾ ਰਾਊਂਡ",
@@ -229,16 +229,19 @@
         "Semi Final": "ਸੈਮੀ ਫਾਈਨਲ",
         "Final": "ਫਾਈਨਲ",
         "Pool A Match": "ਪੂਲ ਏ ਮੈਚ",
-        "Pool B Match": "ਪੂਲ ਬੀ ਮੈਚ",
-        "Open": "ਓਪਨ"
+        "Pool B Match": "ਪੂਲ ਬੀ ਮੈਚ"
     };
 
     function translateRound(roundStr) {
         if(!roundStr) return "";
         let cleaned = roundStr.trim();
-        let translated = roundDict[cleaned] || cleaned;
-        // Replace KG with ਕਿਲੋ in Punjabi
-        translated = translated.replace(/KG/gi, "ਕਿਲੋ");
+        // If it contains OPEN or KG, keep them in English, translate rest if available
+        let translated = cleaned;
+        for (let key in roundDict) {
+            if (cleaned.toLowerCase().includes(key.toLowerCase())) {
+                translated = translated.replace(new RegExp(key, 'gi'), roundDict[key]);
+            }
+        }
         return translated;
     }
 
@@ -311,7 +314,7 @@
         if(data.adTent) leftItems.push({ tEn: "⛺ TENT SERVICE", bEn: data.adTent, tPa: "⛺ ਟੈਂਟ ਪੰਡਾਲ", bPa: data.adTent });
         if(data.adSec) leftItems.push({ tEn: "🛡️ SECURITY", bEn: data.adSec, tPa: "🛡️ ਸਕਿਓਰਿਟੀ", bPa: data.adSec });
 
-        // --- CENTER ITEMS: EXACT TRANSLATED KG, ROUND + TEAMS ---
+        // --- CENTER ITEMS: TOP = PUNJABI (WITH OPEN/KG IN ENGLISH), BOTTOM = FULL ENGLISH ---
         centerItems = [];
         let matchesList = data.nextMatches || [];
         hasMatches = matchesList.length > 0;
@@ -323,7 +326,7 @@
             if(m.startsWith("(")) {
                 let closeIdx = m.indexOf(")");
                 if(closeIdx !== -1) {
-                    bracketContent = m.substring(1, closeIdx).trim(); // e.g. "50 KG - Quarter Final"
+                    bracketContent = m.substring(1, closeIdx).trim(); // e.g. "OPEN - Quarter Final" or "50 KG - Final"
                     teamPart = m.substring(closeIdx + 1).trim();     // e.g. "TeamA = TeamA_Pa VS TeamB = TeamB_Pa"
                 }
             }
@@ -338,8 +341,8 @@
             let t2En = t2Full.split("=")[0].trim();
             let t2Pa = t2Full.split("=")[1]?.trim() || t2En;
 
-            let bracketPaParts = bracketContent.split(" - ").map(part => translateRound(part.trim()));
-            let bracketPa = bracketPaParts.join(" - ");
+            // Translate bracket content but keep OPEN and KG in English
+            let bracketPa = translateRound(bracketContent);
 
             let tagEn = bracketContent ? `(${bracketContent}) ` : "";
             let tagPa = bracketPa ? `(${bracketPa}) ` : "";
