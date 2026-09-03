@@ -303,7 +303,6 @@
 
     function processTickerData(data) {
         leftItems = [];
-        // HINT ON TOP STRIP, DETAIL ON BOTTOM STRIP (Separated completely)
         leftItems.push({
             hintEn: "📍 LOCATION", hintPa: "📍 ਸਥਾਨ",
             detailEn: data.row1Txt || "VILLAGE NAME",
@@ -326,7 +325,7 @@
         if(data.adTent) leftItems.push({ hintEn: "⛺ TENT SERVICE", hintPa: "⛺ ਟੈਂਟ ਪੰਡਾਲ", detailEn: data.adTent, detailPa: data.adTent });
         if(data.adSec) leftItems.push({ hintEn: "🛡️ SECURITY", hintPa: "🛡️ ਸਕਿਓਰਿਟੀ", detailEn: data.adSec, detailPa: data.adSec });
 
-        // --- MATCH LIST (UNTOUCHED & STABLE) ---
+        // --- MATCH LIST SETTING (UPDATED HERE) ---
         centerItems = [];
         let matchesList = data.nextMatches || [];
         hasMatches = matchesList.length > 0;
@@ -369,11 +368,12 @@
                 let res = parseMatchFull(mStr, idx);
                 centerItems.push({ 
                     hintPa: "⚔️ ਅਗਲਾ ਮੈਚ (NEXT MATCH)", hintEn: "⚔️ NEXT MATCH",
-                    tPa: res.pa, bEn: res.en 
+                    tPa: res.pa, bEn: res.en,
+                    isMultiple: matchesList.length > 1 // Check if multiple matches exist
                 });
             });
         } else {
-            centerItems.push({ hintPa: "⚔️ ਮੈਚ ਲਿਸਟ", hintEn: "⚔️ MATCH LIST", tPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", bEn: "KABADDI TOURNAMENT" });
+            centerItems.push({ hintPa: "⚔️ ਮੈਚ ਲਿਸਟ", hintEn: "⚔️ MATCH LIST", tPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", bEn: "KABADDI TOURNAMENT", isMultiple: false });
         }
 
         rightItems = [];
@@ -419,7 +419,7 @@
             let length = dummy.innerText.length;
 
             if (length > 25) {
-                let duration = Math.max(32, length * 0.85); // Ultra slow & smooth
+                let duration = Math.max(32, length * 0.85); 
                 el.innerHTML = `<div class="scroll-container"><span class="scroll-text" style="--scroll-duration: ${duration}s;">${textToShow}</span></div>`;
                 
                 let timerKey = elementId + "_timer";
@@ -456,14 +456,21 @@
         let R = rightItems[rightIdx % rightItems.length];
 
         if (hasMatches) {
-            // Top strip: Hint (Punjabi or English based on toggle)
             runSmartTicker('s1-left', isEnglish ? L.hintEn : L.hintPa, false);
-            runSmartTicker('s1-mid', C.hintPa, true);
             runSmartTicker('s1-right', isEnglish ? R.hintEn : R.hintPa, false);
 
-            // Bottom strip: Detail (Punjabi or English based on toggle)
+            // Match list display logic based on single or multiple matches
+            if (C.isMultiple) {
+                // If multiple matches: Top shows Punjabi, Bottom shows English
+                runSmartTicker('s1-mid', C.tPa, true);
+                runSmartTicker('s2-mid', C.bEn, true);
+            } else {
+                // If single match type: Top alternates Punjabi/English, Bottom alternates or stays consistent
+                runSmartTicker('s1-mid', isEnglish ? C.hintEn : C.hintPa, true);
+                runSmartTicker('s2-mid', isEnglish ? C.bEn : C.tPa, true);
+            }
+
             runSmartTicker('s2-left', isEnglish ? L.detailEn : L.detailPa, false);
-            runSmartTicker('s2-mid', C.bEn, true); // Match list bottom is English
             runSmartTicker('s2-right', isEnglish ? R.detailEn : R.detailPa, false);
         } else {
             runSmartTicker('s1-left', isEnglish ? L.hintEn : L.hintPa, false);
@@ -476,13 +483,11 @@
         }
     }
 
-    // GLOBAL LANGUAGE TOGGLE FOR SIDES (16 seconds cycle)
     setInterval(() => {
         isEnglish = !isEnglish;
         renderIndependentTickers();
     }, 16000);
 
-    // SCOREBOARD SYNC
     setInterval(() => {
         let d = window.currentData;
         if(d) {
