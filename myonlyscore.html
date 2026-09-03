@@ -161,15 +161,67 @@
             text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
         }
 
-        /* --- VERTICAL SLIDE ANIMATION --- */
+        /* --- SMART CENTER / HORIZONTAL TICKER ANIMATION --- */
         .anim-wrap {
-            position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
-            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
-            opacity: 1; transform: translateY(0);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            overflow: visible;
+            opacity: 1;
+            transform: scale(1);
+            transform-origin: center center;
             will-change: transform, opacity;
+            transition:
+                transform 0.45s cubic-bezier(0.25, 1, 0.5, 1),
+                opacity 0.45s ease;
         }
-        .anim-out-up { opacity: 0; transform: translateY(-25px); }
-        .anim-in-down { opacity: 0; transform: translateY(25px); }
+
+        /* Normal text: animation starts from the center */
+        .anim-wrap.anim-center-in {
+            animation: tickerCenterIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes tickerCenterIn {
+            0%   { opacity: 0; transform: scale(0.55); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Long text: scroll from center toward the outside edge and repeat */
+        .anim-wrap.marquee-mode {
+            justify-content: flex-start;
+            overflow: hidden;
+            padding: 0;
+        }
+
+        .anim-wrap.marquee-mode .ticker-text {
+            display: inline-block;
+            width: max-content;
+            min-width: max-content;
+            transform: translateX(0);
+            animation: tickerMarquee var(--marquee-duration, 10s) linear infinite;
+            will-change: transform;
+        }
+
+        @keyframes tickerMarquee {
+            0%   { transform: translateX(calc((100% - var(--text-width, 100%)) / 2)); }
+            100% { transform: translateX(calc(-1 * var(--text-width, 100%) + (100% - var(--text-width, 100%)) / 2)); }
+        }
+
+        .anim-wrap.anim-out-up {
+            opacity: 0;
+            transform: scale(0.55);
+        }
+
+        .anim-wrap.anim-in-down {
+            opacity: 0;
+            transform: scale(1.08);
+        }
 
         /* --- RESULT POPUP --- */
         #result-popup {
@@ -328,11 +380,11 @@
     }
 
     function processTickerData(data) {
-        // --- 1ST COLUMN: Location & Prizes (Top = Punjabi, Bottom = English) ---
+        // --- 1ST COLUMN: Village Name & Prizes (Top = Punjabi, Bottom = English) ---
         leftItems = [];
         let vNameEn = data.row1Txt || "VILLAGE NAME";
         let vNamePa = data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ ਦਾ ਨਾਮ";
-        leftItems.push({ topText: `📍 ਸਥਾਨ: ${vNamePa}`, botText: `📍 LOCATION: ${vNameEn}` });
+        leftItems.push({ topText: `📍 ${vNamePa}`, botText: `📍 ${vNameEn}` });
 
         let prizeList = [];
         if(data.pzOp1) prizeList.push({ top: `🔥 ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ: ${data.pzOp1}`, bot: `🔥 OPEN 1ST PRIZE: ${data.pzOp1}` });
@@ -429,7 +481,7 @@
         renderIndependentTickers();
     }
 
-    // --- VERTICAL SLIDE TICKER FUNCTION ---
+    // --- SMART TICKER: CENTER-IN + AUTO SCROLL WHEN TEXT IS TOO LONG ---
     function runSmartTicker(elementId, textToShow) {
         const el = document.getElementById(elementId);
         if (!el) return;
@@ -437,17 +489,41 @@
         if (el.dataset.currentText === textToShow) return;
         el.dataset.currentText = textToShow;
 
-        el.classList.add('anim-out-up');
+        // Stop any previous animation cleanly.
+        el.classList.remove('marquee-mode', 'anim-center-in', 'anim-out-up', 'anim-in-down');
+        el.style.removeProperty('--marquee-duration');
+        el.style.removeProperty('--text-width');
+        el.innerHTML = '';
 
-        setTimeout(() => {
-            el.innerHTML = textToShow;
-            el.classList.remove('anim-out-up');
-            el.classList.add('anim-in-down');
+        // Keep the text in its own element so its real width can be measured.
+        const textNode = document.createElement('span');
+        textNode.className = 'ticker-text';
+        textNode.innerHTML = textToShow;
+        el.appendChild(textNode);
 
-            requestAnimationFrame(() => {
-                el.classList.remove('anim-in-down');
-            });
-        }, 400);
+        // Let the browser calculate the actual rendered text width.
+        requestAnimationFrame(() => {
+            const boxWidth = el.clientWidth;
+            const textWidth = textNode.scrollWidth;
+
+            // If text is wider than the ticker box, scroll it horizontally.
+            // Otherwise keep it centered and animate it in from the center.
+            if (textWidth > boxWidth - 20) {
+                const extraDistance = textWidth - boxWidth;
+                const duration = Math.max(7, (textWidth + boxWidth) / 120);
+
+                el.classList.add('marquee-mode');
+                el.style.setProperty('--text-width', `${textWidth}px`);
+                el.style.setProperty('--marquee-duration', `${duration}s`);
+
+                // Re-trigger marquee from the center every time the text changes.
+                textNode.style.animation = 'none';
+                void textNode.offsetWidth;
+                textNode.style.animation = `tickerMarquee ${duration}s linear infinite`;
+            } else {
+                el.classList.add('anim-center-in');
+            }
+        });
     }
 
     function renderIndependentTickers() {
