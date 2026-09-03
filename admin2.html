@@ -8,52 +8,16 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <style>
-body{
-    font-family:'Segoe UI',sans-serif;
-    background:#f0f2f5;
-    margin:0;
-    padding:8px;
-}
-
-#main-panel{
-    width:100%;
-    max-width:760px;
-    margin:auto;
-}
-
-.card{
-    background:white;
-    border-radius:14px;
-    box-shadow:0 5px 15px rgba(0,0,0,.15);
-    overflow:hidden;
-    margin-bottom:15px;
-}
-
-.header{
-    background:#1a73e8;
-    color:white;
-    padding:10px;
-    text-align:center;
-    font-size:16px;
-    font-weight:bold;
-    text-transform: uppercase;
-}
+body{ font-family:'Segoe UI',sans-serif; background:#f0f2f5; margin:0; padding:8px; }
+#main-panel{ width:100%; max-width:760px; margin:auto; }
+.card{ background:white; border-radius:14px; box-shadow:0 5px 15px rgba(0,0,0,.15); overflow:hidden; margin-bottom:15px; }
+.header{ background:#1a73e8; color:white; padding:10px; text-align:center; font-size:16px; font-weight:bold; text-transform: uppercase; }
 
 .teams-container{ display:flex; gap:10px; padding:12px; align-items:center; }
 .team-box{ flex:1; }
 .vs-text{ font-size:24px; font-weight:bold; color:#999; }
 
-select, input, textarea{
-    width:100%;
-    padding:10px;
-    border:2px solid #ddd;
-    border-radius:8px;
-    font-size:16px;
-    font-weight:bold;
-    box-sizing:border-box;
-    margin-bottom:8px;
-}
-
+select, input, textarea{ width:100%; padding:10px; border:2px solid #ddd; border-radius:8px; font-size:16px; font-weight:bold; box-sizing:border-box; margin-bottom:8px; }
 textarea { resize: vertical; overflow-y: auto; min-height: 50px; max-height: 200px; }
 
 .team-top{ display:flex; gap:6px; align-items: stretch; }
@@ -61,10 +25,7 @@ textarea { resize: vertical; overflow-y: auto; min-height: 50px; max-height: 200
 .team-input-row { display:flex; gap:5px; }
 .team-input{ flex:1; margin-bottom: 0 !important; }
 
-.trans-btn {
-    background:#fbbc05; border:none; border-radius:8px;
-    font-weight:bold; cursor:pointer; padding:0 12px; font-size:16px; color:black;
-}
+.trans-btn { background:#fbbc05; border:none; border-radius:8px; font-weight:bold; cursor:pointer; padding:0 12px; font-size:16px; color:black; }
 
 .score-val{ text-align:center; font-size:52px; font-weight:900; margin:6px 0; }
 .pm-wrap{ display:flex; gap:6px; }
@@ -73,201 +34,3 @@ textarea { resize: vertical; overflow-y: auto; min-height: 50px; max-height: 200
 .btn-minus{ background:#dc3545; }
 
 .controls{ padding:12px; display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; }
-.btn-full{
-    border:none; color:white; height:70px; min-height:70px; padding:10px;
-    border-radius:12px; font-size:18px; font-weight:900; cursor:pointer;
-    width:100%; display:flex; align-items:center; justify-content:center;
-    text-align:center; line-height:1.2; overflow:hidden; word-break:break-word;
-}
-
-/* MATCH LIST STYLES */
-.match-item { background: #fff; border: 2px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 10px; }
-.match-title { font-size: 16px; font-weight: bold; text-align: center; color: #333; }
-.match-actions { display: flex; gap: 5px; justify-content: center; }
-.btn-sm { flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; color: white; cursor: pointer; font-size: 14px; }
-.btn-start { background: #1a73e8; }
-.btn-walkover { background: #fd7e14; }
-.btn-delete { background: #dc3545; max-width: 40px; }
-
-/* MOBILE */
-@media(max-width:768px){
-    .controls{ grid-template-columns:repeat(2,1fr); }
-    .btn-full{ font-size:16px; height:68px; }
-    .teams-container { flex-direction: column; }
-    .vs-text { padding: 10px 0; }
-}
-
-@media(max-width:480px){
-    .controls{ grid-template-columns:repeat(2,1fr); gap:8px; }
-    .btn-full{ font-size:15px; height:64px; padding:8px; }
-    .match-actions { flex-wrap: wrap; }
-    .btn-sm { font-size: 12px; }
-}
-
-.btn-green{background:#28a745;}
-.btn-red{background:#ea4335;}
-.btn-yellow{background:#fbbc05;color:black;}
-.btn-dark{background:#333;}
-.btn-blue{background:#1a73e8;}
-
-.settings-section{ padding:12px; }
-.result-box{ background:#111; color:white; border-radius:10px; padding:18px; text-align:center; }
-.result-title{ font-size:28px; font-weight:900; color:#fbbc05; }
-.result-text{ font-size:20px; font-weight:bold; margin-top:10px; }
-.ticker-label { font-size: 14px; font-weight: 800; color: #1a73e8; margin: 10px 0 5px 0; display: block; }
-</style>
-</head>
-
-<body>
-
-<div id="main-panel">
-
-<div class="card">
-    <div class="header" style="background:#fbbc05; color:black;">LANGUAGE TRANSLATION SETTINGS</div>
-    <div class="settings-section" style="display:flex; align-items:center; gap:10px;">
-        <span style="font-weight:bold; font-size:16px;">Translate to:</span>
-        <select id="targetLang" style="margin-bottom:0; border: 2px solid #fbbc05;">
-            <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
-            <option value="hi">Hindi (हिन्दी)</option>
-            <option value="en">English</option>
-            <option value="ur">Urdu (اردو)</option>
-        </select>
-    </div>
-</div>
-
-<div class="card">
-<div class="header">LIVE SCORE BOARD</div>
-<div class="teams-container" id="teamWrap">
-
-<div class="team-box">
-<select id="teamSelectA" onchange="selectTeamA(this.value)">
-<option value="">Select Team A</option>
-</select>
-<div class="team-top">
-    <div class="team-inputs-wrap">
-        <div class="team-input-row">
-            <input type="text" id="nameA" class="team-input" placeholder="Team 1 (Input)" oninput="updateTeamA()">
-            <button class="trans-btn" onclick="translateText('nameA', 'nameA_pa').then(() => updateTeamA())" title="Translate">⇄</button>
-        </div>
-        <input type="text" id="nameA_pa" class="team-input" placeholder="Team 1 (Translated)" oninput="updateTeamA()">
-    </div>
-</div>
-<div class="score-val" id="dispA">0</div>
-<div class="pm-wrap">
-<button class="btn-pm btn-minus" onclick="changeScore('scoreA',-1)">-</button>
-<button class="btn-pm btn-plus" onclick="changeScore('scoreA',1)">+</button>
-</div>
-</div>
-
-<div class="vs-text">VS</div>
-
-<div class="team-box">
-<select id="teamSelectB" onchange="selectTeamB(this.value)">
-<option value="">Select Team B</option>
-</select>
-<div class="team-top">
-    <div class="team-inputs-wrap">
-        <div class="team-input-row">
-            <input type="text" id="nameB" class="team-input" placeholder="Team 2 (Input)" oninput="updateTeamB()">
-            <button class="trans-btn" onclick="translateText('nameB', 'nameB_pa').then(() => updateTeamB())" title="Translate">⇄</button>
-        </div>
-        <input type="text" id="nameB_pa" class="team-input" placeholder="Team 2 (Translated)" oninput="updateTeamB()">
-    </div>
-</div>
-<div class="score-val" id="dispB">0</div>
-<div class="pm-wrap">
-<button class="btn-pm btn-minus" onclick="changeScore('scoreB',-1)">-</button>
-<button class="btn-pm btn-plus" onclick="changeScore('scoreB',1)">+</button>
-</div>
-</div>
-</div>
-
-<div class="controls">
-<button class="btn-full btn-green" onclick="showResultLayer()">RESULT</button>
-<button id="visBtn" class="btn-full btn-red" onclick="toggleVis('scoreVisible')">Hide Scoreboard</button>
-<button class="btn-full btn-yellow" onclick="swapTeams()">SWAP</button>
-<button class="btn-full btn-dark" id="camBtn" onclick="toggleCameraView()">Camera View</button>
-<button id="tickVisBtn" class="btn-full btn-red" onclick="toggleVis('tickerVisible')">HIDE TICKER</button>
-<button class="btn-full" style="background:#777;" onclick="resetScores()">RESET SCORES</button>
-</div>
-
-<div class="settings-section">
-<input type="text" id="roundInp" placeholder="MATCH ROUND / CATEGORY (e.g. 72 KG QUARTER FINAL)" oninput="updateTicker();">
-
-<div class="header" style="margin-bottom:10px; margin-top:10px;">NEXT MATCH LIST & SETUP</div>
-<select id="nextTeamA"><option value="">Select Next Match Team 1</option></select>
-<select id="nextTeamB"><option value="">Select Next Match Team 2</option></select>
-<button class="btn-full btn-green" onclick="addNextMatch()" style="width:100%;margin-bottom:12px; height:50px; min-height:50px;">ADD TO LIST</button>
-<div id="nextMatchContainer"></div>
-</div>
-</div>
-
-<div class="card">
-    <div class="header" style="background:#0066cc;">TICKER SETTINGS (6-PART DOUBLE STRIP)</div>
-    <div class="settings-section">
-        
-        <h3 style="border-bottom: 2px solid #ccc; padding-bottom: 5px; margin-bottom: 10px;">🔴 STRIP 1 (TOP)</h3>
-        
-        <label class="ticker-label">1. Village / Location Name (Left)</label>
-        <div class="team-inputs-wrap">
-            <div class="team-input-row">
-                <textarea id="row1Inp" class="team-input" rows="1" placeholder="e.g. MAHLA, NEAR GORAYA" oninput="updateTicker();"></textarea>
-                <button class="trans-btn" onclick="translateText('row1Inp', 'row1Inp_pa').then(() => updateTicker())">⇄</button>
-            </div>
-            <textarea id="row1Inp_pa" class="team-input" rows="1" placeholder="Translated Village" oninput="updateTicker();"></textarea>
-        </div>
-
-        <label class="ticker-label">2. Sponsor & Tournament Name (Center Scrolling)</label>
-        <div class="team-inputs-wrap">
-            <div class="team-input-row">
-                <textarea id="row2Inp" class="team-input" rows="1" placeholder="e.g. SPONSOR: SANT BABA..." oninput="updateTicker();"></textarea>
-                <button class="trans-btn" onclick="translateText('row2Inp', 'row2Inp_pa').then(() => updateTicker())">⇄</button>
-            </div>
-            <textarea id="row2Inp_pa" class="team-input" rows="1" placeholder="Translated Sponsor" oninput="updateTicker();"></textarea>
-        </div>
-
-        <label class="ticker-label">3. Prizes & Best Player (Right)</label>
-        <div class="team-inputs-wrap">
-            <div class="team-input-row">
-                <textarea id="row3Inp" class="team-input" rows="1" placeholder="e.g. 1st PRIZE: 75,000" oninput="updateTicker();"></textarea>
-                <button class="trans-btn" onclick="translateText('row3Inp', 'row3Inp_pa').then(() => updateTicker())">⇄</button>
-            </div>
-            <textarea id="row3Inp_pa" class="team-input" rows="1" placeholder="Translated Prizes" oninput="updateTicker();"></textarea>
-        </div>
-
-        <h3 style="border-bottom: 2px solid #ccc; padding-bottom: 5px; margin-top: 20px; margin-bottom: 10px;">🔴 STRIP 2 (BOTTOM)</h3>
-
-        <label class="ticker-label">4. Upcoming Events & Dates (Left)</label>
-        <div class="team-inputs-wrap">
-            <div class="team-input-row">
-                <textarea id="row4Inp" class="team-input" rows="1" placeholder="e.g. UPCOMING EVENTS" oninput="updateTicker();"></textarea>
-                <button class="trans-btn" onclick="translateText('row4Inp', 'row4Inp_pa').then(() => updateTicker())">⇄</button>
-            </div>
-            <textarea id="row4Inp_pa" class="team-input" rows="1" placeholder="Translated Upcoming" oninput="updateTicker();"></textarea>
-        </div>
-
-        <label class="ticker-label">5. Live Match Lists (Center Scrolling) - Auto Combines</label>
-        
-        <div class="team-inputs-wrap" style="background:#f8f9fa; padding:10px; border-radius:8px; border:1px solid #ddd;">
-            <label style="font-size:13px; font-weight:bold; color:#555;">🏋️ Weight Matches (e.g. 72kg, 65kg)</label>
-            <div class="team-input-row">
-                <textarea id="matchListWeight" class="team-input" rows="2" placeholder="Weight Matches List..." oninput="updateTicker();"></textarea>
-                <button class="trans-btn" onclick="translateText('matchListWeight', 'matchListWeight_pa').then(() => updateTicker())">⇄</button>
-            </div>
-            <textarea id="matchListWeight_pa" class="team-input" rows="2" placeholder="Translated Weight Matches" oninput="updateTicker();"></textarea>
-
-            <label style="font-size:13px; font-weight:bold; color:#555; margin-top:10px;">🔥 Open Matches (e.g. Open Club)</label>
-            <div class="team-input-row">
-                <textarea id="matchListOpen" class="team-input" rows="2" placeholder="Open Matches List..." oninput="updateTicker();"></textarea>
-                <button class="trans-btn" onclick="translateText('matchListOpen', 'matchListOpen_pa').then(() => updateTicker())">⇄</button>
-            </div>
-            <textarea id="matchListOpen_pa" class="team-input" rows="2" placeholder="Translated Open Matches" oninput="updateTicker();"></textarea>
-        </div>
-
-        <label class="ticker-label">6. Booking Number / Ads (Right)</label>
-        <div class="team-inputs-wrap">
-            <div class="team-input-row">
-                <textarea id="row6Inp" class="team-input" rows="1" placeholder="e.g. BOOKING: 9115426711" oninput="updateTicker();"></textarea>
-                <button class="trans-btn" onclick="translateText('row6Inp', 'row6Inp_pa').then(() => updateTicker())">⇄</button>
-            </div>
-            <textarea id="row6Inp_pa" class="team-input" rows="1" placeholder="Translated Booking" oninput="updateTicker();
