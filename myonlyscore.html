@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Ultra HD - Prize Center Ticker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@700;800&display=swap" rel="stylesheet">
+    <title>Kabaddi Ultra HD - Bold Alternate Ticker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@800;900&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -130,35 +130,32 @@
         }
         #ticker-wrap.hidden { opacity: 0; }
 
-        .ticker-strip { display: flex; width: 100%; height: 68px; background: linear-gradient(90deg, #1a8cff, #3399ff, #1a8cff); border-top: 2.5px solid rgba(255,255,255,0.4); }
+        .ticker-strip { display: flex; width: 100%; height: 72px; background: linear-gradient(90deg, #1a8cff, #3399ff, #1a8cff); border-top: 2.5px solid rgba(255,255,255,0.4); }
 
         .ticker-col {
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            font-weight: 900; overflow: hidden; position: relative; padding: 0 10px;
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.8);
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: 900; font-size: 38px; color: #ffffff !important; 
+            overflow: hidden; position: relative; letter-spacing: 2.5px; padding: 0 15px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.85);
         }
 
         .w-30 { width: 30%; }
-        .w-40 { width: 40%; border-left: 2.5px solid rgba(255,255,255,0.35); border-right: 2.5px solid rgba(255,255,255,0.35); }
+        .w-40 { width: 40%; border-left: 2.5px solid rgba(255,255,255,0.35); border-right: 2.5px solid rgba(255,255,255,0.35); color: #ffffff !important; }
 
-        /* DUAL LINE TEXT STYLING INSIDE COLUMNS */
-        .t-pa { font-size: 26px; color: #ffffff; letter-spacing: 1.5px; line-height: 1.1; text-align: center; width: 100%; }
-        .t-en { font-size: 22px; color: #ffcc00; letter-spacing: 1.5px; line-height: 1.1; text-align: center; width: 100%; margin-top: 2px; }
-
-        /* 3D VS DESIGN IN MATCH LIST */
+        /* BOLD 3D VS DESIGN IN MATCH LIST */
         .match-vs-3d {
             color: #ffcc00;
             background: #111;
-            padding: 1px 10px;
-            border-radius: 4px;
-            margin: 0 6px;
+            padding: 2px 14px;
+            border-radius: 6px;
+            margin: 0 10px;
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 26px;
+            font-size: 36px;
             letter-spacing: 2px;
-            box-shadow: 0 3px 0 #b38f00, 0 5px 10px rgba(0,0,0,0.7);
+            box-shadow: 0 4px 0 #b38f00, 0 6px 12px rgba(0,0,0,0.7);
             display: inline-block;
             transform: translateY(-2px);
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
         }
 
         /* --- SLOW & SMOOTH ANIMATIONS --- */
@@ -169,7 +166,6 @@
             width: 100%;
             height: 100%;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             white-space: nowrap;
@@ -196,14 +192,13 @@
             padding: 0;
         }
 
-        .anim-wrap.marquee-mode .marquee-inner {
+        .anim-wrap.marquee-mode .ticker-text {
             display: inline-block;
             width: max-content;
             min-width: max-content;
             transform: translateX(0);
             animation: tickerMarquee var(--marquee-duration, 16s) linear infinite;
             will-change: transform;
-            text-align: center;
         }
 
         @keyframes tickerMarquee {
@@ -293,6 +288,7 @@
     let rightItems = [];
     
     let leftIdx = 0, centerIdx = 0, rightIdx = 0;
+    let isEnglish = false; 
     let lastResult = ""; 
 
     const dict = {
@@ -370,7 +366,6 @@
         // --- CENTER COLUMN: Prizes & Match List ---
         centerItems = [];
 
-        // Adding Prizes to Center Column
         let prizeList = [];
         if(data.pzOp1) prizeList.push({ pa: `🔥 ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ: ${data.pzOp1}`, en: `🔥 OPEN 1ST PRIZE: ${data.pzOp1}` });
         if(data.pzOp2) prizeList.push({ pa: `🔥 ਓਪਨ ਦੂਜਾ ਇਨਾਮ: ${data.pzOp2}`, en: `🔥 OPEN 2ND PRIZE: ${data.pzOp2}` });
@@ -390,7 +385,6 @@
 
         prizeList.forEach(p => { centerItems.push(p); });
 
-        // Adding Matches to Center Column
         let matchesList = data.nextMatches || [];
         let parseMatchFull = (m, index) => {
             let bracketContent = "";
@@ -460,38 +454,27 @@
         renderIndependentTickers();
     }
 
-    // --- DUAL-LINE SMART TICKER ---
-    function runSmartTicker(elementId, paText, enText) {
+    // --- SMART TICKER WITH BOLD TEXT & SLOW SCROLL ---
+    function runSmartTicker(elementId, textToShow) {
         const el = document.getElementById(elementId);
         if (!el) return;
 
-        const comboKey = paText + "|" + enText;
-        if (el.dataset.currentText === comboKey) return;
-        el.dataset.currentText = comboKey;
+        if (el.dataset.currentText === textToShow) return;
+        el.dataset.currentText = textToShow;
 
         el.classList.remove('marquee-mode', 'anim-center-in');
         el.style.removeProperty('--marquee-duration');
         el.style.removeProperty('--text-width');
         el.innerHTML = '';
 
-        const innerWrap = document.createElement('div');
-        innerWrap.className = 'marquee-inner';
-
-        const paDiv = document.createElement('div');
-        paDiv.className = 't-pa';
-        paDiv.innerHTML = paText;
-
-        const enDiv = document.createElement('div');
-        enDiv.className = 't-en';
-        enDiv.innerHTML = enText;
-
-        innerWrap.appendChild(paDiv);
-        innerWrap.appendChild(enDiv);
-        el.appendChild(innerWrap);
+        const textNode = document.createElement('span');
+        textNode.className = 'ticker-text';
+        textNode.innerHTML = textToShow;
+        el.appendChild(textNode);
 
         requestAnimationFrame(() => {
             const boxWidth = el.clientWidth;
-            const textWidth = innerWrap.scrollWidth;
+            const textWidth = textNode.scrollWidth;
 
             if (textWidth > boxWidth - 20) {
                 const duration = Math.max(12, (textWidth + boxWidth) / 150);
@@ -500,9 +483,9 @@
                 el.style.setProperty('--text-width', `${textWidth}px`);
                 el.style.setProperty('--marquee-duration', `${duration}s`);
 
-                innerWrap.style.animation = 'none';
-                void innerWrap.offsetWidth;
-                innerWrap.style.animation = `tickerMarquee ${duration}s linear infinite`;
+                textNode.style.animation = 'none';
+                void textNode.offsetWidth;
+                textNode.style.animation = `tickerMarquee ${duration}s linear infinite`;
             } else {
                 el.classList.add('anim-center-in');
             }
@@ -514,9 +497,9 @@
         let C = centerItems[centerIdx % centerItems.length];
         let R = rightItems[rightIdx % rightItems.length];
 
-        runSmartTicker('s1-left', L.pa, L.en);
-        runSmartTicker('s1-mid', C.pa, C.en);
-        runSmartTicker('s1-right', R.pa, R.en);
+        runSmartTicker('s1-left', isEnglish ? L.en : L.pa);
+        runSmartTicker('s1-mid', isEnglish ? C.en : C.pa);
+        runSmartTicker('s1-right', isEnglish ? R.en : R.pa);
     }
 
     // Rotate items every 8 seconds smoothly
@@ -526,6 +509,12 @@
         rightIdx++;
         renderIndependentTickers();
     }, 8000);
+
+    // Toggle Language between Punjabi and English every 14 seconds
+    setInterval(() => {
+        isEnglish = !isEnglish;
+        renderIndependentTickers();
+    }, 14000);
 
     // --- PERIODIC SLOW SPIN ANIMATION FOR LOGO ---
     setInterval(() => {
@@ -541,8 +530,8 @@
     setInterval(() => {
         let d = window.currentData;
         if(d) {
-            document.getElementById('nA').innerText = d.nameA_pa || d.nameA || "ਟੀਮ 1";
-            document.getElementById('nB').innerText = d.nameB_pa || d.nameB || "ਟੀਮ 2";
+            document.getElementById('nA').innerText = (!isEnglish && d.nameA_pa) ? d.nameA_pa : (d.nameA || "ਟੀਮ 1");
+            document.getElementById('nB').innerText = (!isEnglish && d.nameB_pa) ? d.nameB_pa : (d.nameB || "ਟੀਮ 2");
         }
     }, 2000);
 
