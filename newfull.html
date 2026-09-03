@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kabaddi Pro Admin Panel - Ultimate Edition</title>
+<title>Kabaddi Pro Admin Panel</title>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
@@ -130,7 +130,6 @@ textarea { resize: vertical; overflow-y: auto; min-height: 50px; max-height: 200
 
 <div class="controls">
 <button class="btn-full btn-green" onclick="showResultLayer()">RESULT</button>
-<button class="btn-full btn-orange" onclick="restartMatch()">RESTART MATCH</button>
 <button id="visBtn" class="btn-full btn-red" onclick="toggleVis('scoreVisible')">Hide Scoreboard</button>
 <button class="btn-full btn-yellow" onclick="swapTeams()">SWAP</button>
 <button class="btn-full btn-dark" id="camBtn" onclick="toggleCameraView()">Camera View</button>
@@ -264,7 +263,6 @@ const db = firebase.database().ref("matchData/" + matchId);
 
 let curA=0; let curB=0; let camOpposite=false; let allTeams=[]; 
 let nextMatches=[]; let upcomingEvents=[];
-let lastActiveMatch = { nameA: "", nameA_pa: "", nameB: "", nameB_pa: "", round: "" };
 
 function setSafely(id, val) {
     const el = document.getElementById(id);
@@ -354,11 +352,6 @@ db.on("value", (snap) => {
     if(data) {
         curA = parseFloat(data.scoreA) || 0; curB = parseFloat(data.scoreB) || 0;
         allTeams = data.allTeams || []; nextMatches = data.nextMatches || []; upcomingEvents = data.upcomingEvents || [];
-
-        // Save state for restart match
-        if(data.nameA) {
-            lastActiveMatch = { nameA: data.nameA, nameA_pa: data.nameA_pa || "", nameB: data.nameB, nameB_pa: data.nameB_pa || "", round: data.round || "" };
-        }
 
         document.getElementById("dispA").innerText = curA; document.getElementById("dispB").innerText = curB;
         
@@ -576,23 +569,6 @@ function toggleVis(field){ db.child(field).once("value",snap=>{ db.update({ [fie
 function swapTeams(){ db.update({ nameA: document.getElementById("nameB").value, nameA_pa: document.getElementById("nameB_pa").value, nameB: document.getElementById("nameA").value, nameB_pa: document.getElementById("nameA_pa").value, scoreA: curB, scoreB: curA }); }
 function resetScores(){ if(confirm("Reset Scores?")){ db.update({ scoreA:0, scoreB:0 }); } }
 function toggleCameraView(){ db.update({ cameraOpposite: !camOpposite }); }
-
-function restartMatch() {
-    if(!lastActiveMatch.nameA) { alert("Pehlan koi active match nahi hai!"); return; }
-    if(confirm("Ki tuc pichhla match otho hi shuru karna chaunde ho?")) {
-        db.update({
-            nameA: lastActiveMatch.nameA,
-            nameA_pa: lastActiveMatch.nameA_pa,
-            nameB: lastActiveMatch.nameB,
-            nameB_pa: lastActiveMatch.nameB_pa,
-            round: lastActiveMatch.round,
-            scoreA: 0,
-            scoreB: 0,
-            scoreVisible: true,
-            resultText: "No Result Yet"
-        });
-    }
-}
 
 function showResultLayer(){
     if(curA === 0 && curB === 0){ alert("Score 0-0 hai."); return; }
