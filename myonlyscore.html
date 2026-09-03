@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Ultra HD - Clean Text Ticker</title>
+    <title>Kabaddi Ultra HD - Clean Single Line Ticker</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@800;900&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -123,35 +123,34 @@
         }
         #ticker-wrap.hidden { opacity: 0; }
 
-        .ticker-strip { display: flex; width: 100%; height: 72px; background: linear-gradient(90deg, #1a8cff, #3399ff, #1a8cff); border-top: 2.5px solid rgba(255,255,255,0.4); }
+        .ticker-strip { display: flex; width: 100%; height: 65px; background: linear-gradient(90deg, #1a8cff, #3399ff, #1a8cff); border-top: 2.5px solid rgba(255,255,255,0.4); }
 
         .ticker-col {
             display: flex; align-items: center; justify-content: center; 
-            font-weight: 900; font-size: 38px; color: #ffffff !important; 
-            overflow: hidden; position: relative; letter-spacing: 2.5px; padding: 0 15px;
-            /* Outer shadow completely removed for clean ultra HD look */
-            text-shadow: none; 
+            font-weight: 900; font-size: 34px; color: #ffffff !important; 
+            overflow: hidden; position: relative; letter-spacing: 2px; padding: 0 15px;
+            text-shadow: none;
         }
 
         .w-30 { width: 30%; }
         .w-40 { width: 40%; border-left: 2.5px solid rgba(255,255,255,0.35); border-right: 2.5px solid rgba(255,255,255,0.35); color: #ffffff !important; }
 
-        /* CLEAN BOLD VS DESIGN IN MATCH LIST */
+        /* CLEAN VS DESIGN IN MATCH LIST */
         .match-vs-3d {
             color: #ffcc00;
             background: #111;
-            padding: 2px 14px;
+            padding: 2px 12px;
             border-radius: 6px;
             margin: 0 10px;
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 36px;
+            font-size: 32px;
             letter-spacing: 2px;
             display: inline-block;
             transform: translateY(-2px);
             text-shadow: none;
         }
 
-        /* --- SLOW & SMOOTH ANIMATIONS --- */
+        /* --- SMART CENTER / MARQUEE ANIMATION --- */
         .anim-wrap {
             position: absolute;
             left: 0;
@@ -167,15 +166,15 @@
             transform: scale(1);
             transform-origin: center center;
             will-change: transform, opacity;
-            transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease;
+            transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.45s ease;
         }
 
         .anim-wrap.anim-center-in {
-            animation: tickerCenterIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+            animation: tickerCenterIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
 
         @keyframes tickerCenterIn {
-            0%   { opacity: 0; transform: scale(0.65); }
+            0%   { opacity: 0; transform: scale(0.55); }
             100% { opacity: 1; transform: scale(1); }
         }
 
@@ -190,7 +189,7 @@
             width: max-content;
             min-width: max-content;
             transform: translateX(0);
-            animation: tickerMarquee var(--marquee-duration, 16s) linear infinite;
+            animation: tickerMarquee var(--marquee-duration, 12s) linear infinite;
             will-change: transform;
         }
 
@@ -350,13 +349,11 @@
     }
 
     function processTickerData(data) {
-        // --- 1ST COLUMN: Village Name ---
         leftItems = [];
         let vNameEn = data.row1Txt || "VILLAGE NAME";
         let vNamePa = data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ ਦਾ ਨਾਮ";
         leftItems.push({ pa: `${vNamePa}`, en: `${vNameEn}` });
 
-        // --- CENTER COLUMN: Prizes & Match List (Icons removed from Open / KG) ---
         centerItems = [];
 
         let prizeList = [];
@@ -423,7 +420,6 @@
             centerItems.push({ pa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ - ਲਾਈਵ ਅੱਪਡੇਟ", en: "KABADDI TOURNAMENT - LIVE UPDATES" });
         }
 
-        // --- 3RD COLUMN: Upcoming Events & Live Telecast ---
         rightItems = [];
         if(data.upcomingEvents && data.upcomingEvents.length > 0) {
             data.upcomingEvents.forEach(ev => {
@@ -447,7 +443,7 @@
         renderIndependentTickers();
     }
 
-    // --- SMART TICKER ---
+    // --- SMART TICKER: CENTER-IN + AUTO SCROLL WHEN TEXT IS TOO LONG ---
     function runSmartTicker(elementId, textToShow) {
         const el = document.getElementById(elementId);
         if (!el) return;
