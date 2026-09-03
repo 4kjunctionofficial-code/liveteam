@@ -94,7 +94,7 @@
         }
         #match-details-strip.hidden { display: none; }
 
-        /* --- LOGO & WATERMARK (GHAINT SLOW SPIN ANIMATION - NO ZOOM) --- */
+        /* --- LOGO & WATERMARK --- */
         #logo-container { 
             position: absolute; top: 25px; left: 30px; z-index: 9999; 
             display: flex; align-items: center; 
@@ -105,7 +105,6 @@
         }
         #logo-container.hidden { opacity: 0; transform: scale(0.3) translateY(-40px) rotate(-360deg); }
         
-        /* Slow and smooth spin animation without zoom */
         #logo-container.animate-slow-spin {
             animation: logoSlowSpin 2.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
@@ -123,7 +122,7 @@
             text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
         }
 
-        /* --- TICKER STRIPS (ULTRA HD & SHINY) --- */
+        /* --- TICKER STRIPS (ULTRA HD & SLIDE ANIMATION) --- */
         #ticker-wrap {
             position: absolute; bottom: 0; left: 0; width: 1920px; z-index: 9998;
             display: flex; flex-direction: column; transition: opacity 0.5s ease;
@@ -162,19 +161,19 @@
             text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
         }
 
+        /* --- VERTICAL SLIDE ANIMATION WRAPPER --- */
         .anim-wrap {
             position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
-            transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); opacity: 1;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease;
+            opacity: 1; transform: translateY(0);
             will-change: transform, opacity;
         }
-
-        .scroll-container { width: 100%; overflow: hidden; display: flex; align-items: center; white-space: nowrap; }
-        .scroll-text {
-            display: inline-block; white-space: nowrap; padding-left: 100%; 
-            animation: scrollMarquee var(--scroll-duration, 30s) linear infinite; 
-            will-change: transform;
+        .anim-out-up {
+            opacity: 0; transform: translateY(-30px);
         }
-        @keyframes scrollMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        .anim-in-down {
+            opacity: 0; transform: translateY(30px);
+        }
 
         /* --- 10 SECONDS RESULT WINDOW --- */
         #result-popup {
@@ -312,7 +311,7 @@
 
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
-        document.getElementById('single-wm').innerText = data.watermarkTxt || "ਐੱਮ ਲਾਈਵ";
+        document.getElementById('single-wm').innerText = data.watermarkTxt || "ਐੱም ਲਾਈਵ";
 
         if(data.resultText && data.resultText !== "No Result Yet" && data.resultText !== lastResult) {
             lastResult = data.resultText;
@@ -434,6 +433,7 @@
         renderIndependentTickers();
     }
 
+    // --- VERTICAL SLIDE TICKER FUNCTION ---
     function runSmartTicker(elementId, textToShow, isCenter = false) {
         const el = document.getElementById(elementId);
         if (!el) return;
@@ -441,48 +441,29 @@
         if (el.dataset.currentText === textToShow) return;
         el.dataset.currentText = textToShow;
 
-        el.style.opacity = 0;
-        el.style.transform = 'translateY(-10px)';
+        // Slide out upwards
+        el.classList.add('anim-out-up');
 
         setTimeout(() => {
-            let dummy = document.createElement("div");
-            dummy.innerHTML = textToShow;
-            let length = dummy.innerText.length;
+            el.innerHTML = textToShow;
+            el.classList.remove('anim-out-up');
+            el.classList.add('anim-in-down');
 
-            if (length > 25) {
-                let duration = Math.max(30, length * 0.8); 
-                el.innerHTML = `<div class="scroll-container"><span class="scroll-text" style="--scroll-duration: ${duration}s;">${textToShow}</span></div>`;
-                
-                let timerKey = elementId + "_timer";
-                if (window[timerKey]) clearTimeout(window[timerKey]);
-                
-                let triggerTime = (isCenter && elementId === 's2-mid') ? (duration * 1000 * 0.8) : (duration * 1000);
-
-                window[timerKey] = setTimeout(() => {
-                    if (isCenter) centerIdx++;
-                    else if (elementId.includes("left")) leftIdx++;
-                    else if (elementId.includes("right")) rightIdx++;
-                    renderIndependentTickers();
-                }, triggerTime);
-
-            } else {
-                el.innerHTML = textToShow;
-                let timerKey = elementId + "_timer";
-                if (window[timerKey]) clearTimeout(window[timerKey]);
-
-                window[timerKey] = setTimeout(() => {
-                    if (isCenter) centerIdx++;
-                    else if (elementId.includes("left")) leftIdx++;
-                    else if (elementId.includes("right")) rightIdx++;
-                    renderIndependentTickers();
-                }, 12000); 
-            }
-
-            el.style.transform = 'translateY(10px)';
             requestAnimationFrame(() => {
-                el.style.opacity = 1; 
-                el.style.transform = 'translateY(0)';
+                el.classList.remove('anim-in-down');
             });
+
+            let timerKey = elementId + "_timer";
+            if (window[timerKey]) clearTimeout(window[timerKey]);
+
+            // Change item every 6 seconds with smooth vertical slide
+            window[timerKey] = setTimeout(() => {
+                if (isCenter) centerIdx++;
+                else if (elementId.includes("left")) leftIdx++;
+                else if (elementId.includes("right")) rightIdx++;
+                renderIndependentTickers();
+            }, 6000);
+
         }, 400);
     }
 
@@ -521,7 +502,7 @@
         renderIndependentTickers();
     }, 16000);
 
-    // --- PERIODIC SLOW SPIN ANIMATION (हर 15 ਸੈਕਿੰਡ ਬਾਅਦ ਲੋਗੋ ਹੌਲੀ ਜਿਹੀ ਘੁੰਮੇਗਾ - ਬਿਨਾਂ ਜ਼ੂਮ ਤੋਂ) ---
+    // --- PERIODIC SLOW SPIN ANIMATION FOR LOGO ---
     setInterval(() => {
         const logoBox = document.getElementById('logo-container');
         if (logoBox && !logoBox.classList.contains('hidden')) {
