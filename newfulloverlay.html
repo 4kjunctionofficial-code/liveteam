@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Ultra HD - Spacious Overlay</title>
+    <title>Kabaddi Ultra HD - Mobile Friendly Overlay</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -17,12 +17,16 @@
             background: transparent;
             font-family: 'Noto Sans Gurmukhi', 'Mukta', Arial, sans-serif;
             overflow: hidden;
-            position: relative;
+            position: absolute;
+            top: 0;
+            left: 0;
             user-select: none;
             text-transform: uppercase;
+            /* MOBILE APP AUTO FIT ZOOM FIX */
+            transform-origin: top left;
         }
 
-        /* --- HD SCOREBOARD (WITHOUT VS DIVIDER) --- */
+        /* --- HD SCOREBOARD --- */
         #top-scoreboard-container {
             position: absolute;
             top: 35px;
@@ -63,7 +67,6 @@
             padding: 0 50px; white-space: nowrap; min-width: 180px; letter-spacing: 1px;
         }
 
-        /* Divider without VS text */
         .vs-divider {
             width: 10px;
             background: #111111;
@@ -178,6 +181,21 @@
 </div>
 
 <script>
+    // AUTO-FIT SCRIPT FOR MOBILE APPS (PRISM / CAMERAFE)
+    function autoResizeOverlay() {
+        const baseWidth = 1920;
+        const baseHeight = 1080;
+        const scaleX = window.innerWidth / baseWidth;
+        const scaleY = window.innerHeight / baseHeight;
+        const scale = Math.min(scaleX, scaleY);
+        document.body.style.transform = `scale(${scale})`;
+        document.body.style.width = `${baseWidth}px`;
+        document.body.style.height = `${baseHeight}px`;
+    }
+    window.addEventListener('resize', autoResizeOverlay);
+    window.addEventListener('load', autoResizeOverlay);
+    autoResizeOverlay();
+
     const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
 
@@ -273,7 +291,6 @@
         if(data.adTent) leftItems.push({ tEn: "⛺ TENT SERVICE", bEn: data.adTent, tPa: "⛺ ਟੈਂਟ ਪੰਡਾਲ", bPa: data.adTent });
         if(data.adSec) leftItems.push({ tEn: "🛡️ SECURITY", bEn: data.adSec, tPa: "🛡️ ਸਕਿਓਰਿਟੀ", bPa: data.adSec });
 
-        // --- CENTER ITEMS (MATCH LIST WITH VS) ---
         centerItems = [];
         let wtMatches = data.nextMatchesWeight || [];
         let opMatches = data.nextMatchesOpen || [];
