@@ -209,8 +209,10 @@
         }
 
         @keyframes tickerMarquee {
-            0%   { transform: translateX(calc((100% - var(--text-width, 100%)) / 2)); }
-            100% { transform: translateX(calc(-1 * var(--text-width, 100%) + (100% - var(--text-width, 100%)) / 2)); }
+            /* Full text is shown first, then it slowly leaves the box */
+            0%   { transform: translateX(var(--start-x, 0px)); }
+            12%  { transform: translateX(var(--start-x, 0px)); }
+            100% { transform: translateX(var(--end-x, 0px)); }
         }
 
         .anim-wrap.anim-out-up {
@@ -476,54 +478,91 @@
             rightItems.push({ topText: "📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ - ਦੇਖਦੇ ਰਹੋ", botText: "📅 UPCOMING EVENTS - STAY TUNED" });
         }
         
-        // Show/Hide bottom strip depending on match availability
-        document.getElementById('strip-2').style.display = hasMatches ? 'flex' : 'none';
+        // Keep the second ticker box visible in both modes.
+        // With matches: it shows the match list in English/Punjabi.
+        // Without matches: it becomes the prize/details box.
+        document.getElementById('strip-2').style.display = 'flex';
         renderIndependentTickers();
     }
 
-    // --- SMART TICKER: CENTER-IN + AUTO SCROLL WHEN TEXT IS TOO LONG ---
-    function runSmartTicker(elementId, textToShow) {
+    // --- SMART BILINGUAL TICKER: PUNJABI + ENGLISH, SLOW SCROLL ---
+    function runBilingualTicker(elementId, paText, enText) {
         const el = document.getElementById(elementId);
         if (!el) return;
 
-        if (el.dataset.currentText === textToShow) return;
-        el.dataset.currentText = textToShow;
+        const signature = `${paText}||${enText}`;
+        if (el.dataset.currentPair === signature && el.dataset.ready === "1") return;
+        el.dataset.currentPair = signature;
+        el.dataset.ready = "0";
 
-        // Stop any previous animation cleanly.
         el.classList.remove('marquee-mode', 'anim-center-in', 'anim-out-up', 'anim-in-down');
         el.style.removeProperty('--marquee-duration');
         el.style.removeProperty('--text-width');
+        el.style.removeProperty('--start-x');
+        el.style.removeProperty('--end-x');
         el.innerHTML = '';
 
-        // Keep the text in its own element so its real width can be measured.
         const textNode = document.createElement('span');
         textNode.className = 'ticker-text';
-        textNode.innerHTML = textToShow;
         el.appendChild(textNode);
 
-        // Let the browser calculate the actual rendered text width.
-        requestAnimationFrame(() => {
-            const boxWidth = el.clientWidth;
-            const textWidth = textNode.scrollWidth;
+        let language = 0; // 0 = Punjabi, 1 = English
+        let cycleTimer = null;
 
-            // If text is wider than the ticker box, scroll it horizontally.
-            // Otherwise keep it centered and animate it in from the center.
-            if (textWidth > boxWidth - 20) {
-                const extraDistance = textWidth - boxWidth;
-                const duration = Math.max(7, (textWidth + boxWidth) / 120);
+        function showLanguage() {
+            const txt = language === 0 ? paText : enText;
+            textNode.innerHTML = txt || "";
+            textNode.style.animation = 'none';
+            el.classList.remove('marquee-mode', 'anim-center-in');
 
-                el.classList.add('marquee-mode');
-                el.style.setProperty('--text-width', `${textWidth}px`);
-                el.style.setProperty('--marquee-duration', `${duration}s`);
+            requestAnimationFrame(() => {
+                const boxWidth = el.clientWidth;
+                const textWidth = textNode.scrollWidth;
 
-                // Re-trigger marquee from the center every time the text changes.
-                textNode.style.animation = 'none';
-                void textNode.offsetWidth;
-                textNode.style.animation = `tickerMarquee ${duration}s linear infinite`;
-            } else {
-                el.classList.add('anim-center-in');
-            }
-        });
+                if (textWidth > boxWidth - 20) {
+                    const overflow = textWidth - boxWidth;
+
+                    // Slow speed: about 55 px/sec, with a short pause before leaving.
+                    const duration = Math.max(14, (overflow / 55) + 4);
+
+                    // Start centered so the complete text is visible first.
+                    const startX = Math.max(0, (boxWidth - textWidth) / 2);
+                    const endX = -overflow;
+
+                    el.classList.add('marquee-mode');
+                    el.style.setProperty('--text-width', `${textWidth}px`);
+                    el.style.setProperty('--start-x', `${startX}px`);
+                    el.style.setProperty('--end-x', `${endX}px`);
+                    el.style.setProperty('--marquee-duration', `${duration}s`);
+
+                    textNode.style.animation = `tickerMarquee ${duration}s linear 1`;
+
+                    clearTimeout(cycleTimer);
+                    cycleTimer = setTimeout(() => {
+                        language = language === 0 ? 1 : 0;
+                        showLanguage();
+                    }, duration * 1000 + 500);
+                } else {
+                    // Short text: always animate from the center.
+                    el.classList.add('anim-center-in');
+
+                    clearTimeout(cycleTimer);
+                    cycleTimer = setTimeout(() => {
+                        language = language === 0 ? 1 : 0;
+                        showLanguage();
+                    }, 5000);
+                }
+
+                el.dataset.ready = "1";
+            });
+        }
+
+        showLanguage();
+    }
+
+    // Backward-compatible wrapper for places that only have one text.
+    function runSmartTicker(elementId, textToShow) {
+        runBilingualTicker(elementId, textToShow, textToShow);
     }
 
     function renderIndependentTickers() {
@@ -534,19 +573,33 @@
         if (hasMatches) {
             // DOUBLE LINE MODE (When matches exist)
             document.getElementById('strip-2').style.display = 'flex';
-            runSmartTicker('s1-left', L.topText);
-            runSmartTicker('s1-mid', C.topText);
-            runSmartTicker('s1-right', R.topText);
+            runBilingualTicker('s1-left', L.topText, L.botText);
+            runBilingualTicker('s1-mid', C.topText, C.botText);
+            runBilingualTicker('s1-right', R.topText, R.botText);
 
-            runSmartTicker('s2-left', L.botText);
-            runSmartTicker('s2-mid', C.botText);
-            runSmartTicker('s2-right', R.botText);
+            runBilingualTicker('s2-left', L.botText, L.topText);
+            runBilingualTicker('s2-mid', C.botText, C.topText);
+            runBilingualTicker('s2-right', R.botText, R.topText);
         } else {
-            // SINGLE LINE FALLBACK MODE (When no matches exist)
-            document.getElementById('strip-2').style.display = 'none';
-            runSmartTicker('s1-left', L.topText);
-            runSmartTicker('s1-mid', C.topText);
-            runSmartTicker('s1-right', R.topText);
+            // SINGLE LINE MODE:
+            // Keep the second box visible and use it for prize/service details.
+            document.getElementById('strip-2').style.display = 'flex';
+
+            runBilingualTicker('s1-left', L.topText, L.botText);
+            runBilingualTicker('s1-mid', C.topText, C.botText);
+            runBilingualTicker('s1-right', R.topText, R.botText);
+
+            // Second box shows the next prize/detail instead of duplicating the village name.
+            const prizeItem = leftItems.length > 1
+                ? leftItems[(leftIdx % (leftItems.length - 1)) + 1]
+                : L;
+
+            runBilingualTicker('s2-left', prizeItem.topText, prizeItem.botText);
+            runBilingualTicker('s2-mid',
+                '🏆 ਇਨਾਮ / PRIZE',
+                '🏆 PRIZE / DETAILS'
+            );
+            runBilingualTicker('s2-right', R.topText, R.botText);
         }
     }
 
