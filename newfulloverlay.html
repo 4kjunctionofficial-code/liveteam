@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Ultra HD - Full Scroll Completion Animation</title>
+    <title>Kabaddi Ultra HD - Perfect Stable Overlay</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -137,11 +137,10 @@
             transition: opacity 0.6s ease, transform 0.6s ease; opacity: 1;
         }
 
-        /* DYNAMIC SCROLL SPEED (Calculated precisely per text length) */
         .scroll-container { width: 100%; overflow: hidden; display: flex; align-items: center; white-space: nowrap; }
         .scroll-text {
             display: inline-block; white-space: nowrap; padding-left: 100%; 
-            animation: scrollMarquee var(--scroll-duration, 25s) linear forwards; 
+            animation: scrollMarquee var(--scroll-duration, 30s) linear forwards; 
         }
         @keyframes scrollMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
@@ -233,7 +232,7 @@
     let rightItems = [];
     
     let leftIdx = 0, centerIdx = 0, rightIdx = 0;
-    let isEnglish = true; 
+    let isEnglish = false; // Starts with Punjabi, then English cleanly
     let hasMatches = false;
     let lastResult = ""; 
 
@@ -304,27 +303,29 @@
 
     function processTickerData(data) {
         leftItems = [];
+        // Storing structured items so Punjabi and English never mix up
         leftItems.push({
-            tEn: "📍 LOCATION", bEn: data.row1Txt || "VILLAGE NAME",
-            tPa: "📍 ਸਥਾਨ", bPa: data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ ਦਾ ਨਾਮ"
+            en: "📍 LOCATION: " + (data.row1Txt || "VILLAGE NAME"),
+            pa: "📍 ਸਥਾਨ: " + (data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ ਦਾ ਨਾਮ")
         });
 
-        if(data.pzOp1) leftItems.push({ tEn: "🔥 OPEN 1ST PRIZE", bEn: data.pzOp1, tPa: "🔥 ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ", bPa: data.pzOp1 });
-        if(data.pzOp2) leftItems.push({ tEn: "🔥 OPEN 2ND PRIZE", bEn: data.pzOp2, tPa: "🔥 ਓਪਨ ਦੂਜਾ ਇਨਾਮ", bPa: data.pzOp2 });
-        if(data.pzOpBest) leftItems.push({ tEn: "🏅 OPEN BEST PLAYER", bEn: data.pzOpBest, tPa: "🏅 ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ", bPa: data.pzOpBest });
+        if(data.pzOp1) leftItems.push({ en: "🔥 OPEN 1ST PRIZE: " + data.pzOp1, pa: "🔥 ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ: " + data.pzOp1 });
+        if(data.pzOp2) leftItems.push({ en: "🔥 OPEN 2ND PRIZE: " + data.pzOp2, pa: "🔥 ਓਪਨ ਦੂਜਾ ਇਨਾਮ: " + data.pzOp2 });
+        if(data.pzOpBest) leftItems.push({ en: "🏅 OPEN BEST PLAYER: " + data.pzOpBest, pa: "🏅 ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ: " + data.pzOpBest });
 
-        let wKg = data.pzWtKg ? `(${data.pzWtKg})` : "(WEIGHT)";
-        let wKgPa = data.pzWtKg ? `(${translateToPunjabi(data.pzWtKg)})` : "(ਵਜ਼ਨੀ)";
+        let wKg = data.pzWtKg ? data.pzWtKg : "WEIGHT";
+        let wKgPa = data.pzWtKg ? translateToPunjabi(data.pzWtKg) : "ਵਜ਼ਨੀ";
 
-        if(data.pzWt1) leftItems.push({ tEn: `🏋️ ${wKg} 1ST PRIZE`, bEn: data.pzWt1, tPa: `🏋️ ${wKgPa} ਪਹਿਲਾ ਇਨਾਮ`, bPa: data.pzWt1 });
-        if(data.pzWt2) leftItems.push({ tEn: `🏋️ ${wKg} 2ND PRIZE`, bEn: data.pzWt2, tPa: `🏋️ ${wKgPa} ਦੂਜਾ ਇਨਾਮ`, bPa: data.pzWt2 });
-        if(data.pzWtBest) leftItems.push({ tEn: `🏅 ${wKg} BEST PLAYER`, bEn: data.pzWtBest, tPa: `🏅 ${wKgPa} ਬੈਸਟ ਖਿਡਾਰੀ`, bPa: data.pzWtBest });
+        if(data.pzWt1) leftItems.push({ en: `🏋️ (${wKg}) 1ST PRIZE: ` + data.pzWt1, pa: `🏋️ (${wKgPa}) ਪਹਿਲਾ ਇਨਾਮ: ` + data.pzWt1 });
+        if(data.pzWt2) leftItems.push({ en: `🏋️ (${wKg}) 2ND PRIZE: ` + data.pzWt2, pa: `🏋️ (${wKgPa}) ਦੂਜਾ ਇਨਾਮ: ` + data.pzWt2 });
+        if(data.pzWtBest) leftItems.push({ en: `🏅 (${wKg}) BEST PLAYER: ` + data.pzWtBest, pa: `🏅 (${wKgPa}) ਬੈਸਟ ਖਿਡਾਰੀ: ` + data.pzWtBest });
 
-        if(data.adComm) leftItems.push({ tEn: "🎙️ COMMENTATOR", bEn: data.adComm, tPa: "🎙️ ਕਮੈਂਟੇਟਰ", bPa: data.adComm });
-        if(data.adSound) leftItems.push({ tEn: "🔊 SOUND SERVICE", bEn: data.adSound, tPa: "🔊 ਸਾਊਂਡ ਸਰਵਿਸ", bPa: data.adSound });
-        if(data.adTent) leftItems.push({ tEn: "⛺ TENT SERVICE", bEn: data.adTent, tPa: "⛺ ਟੈਂਟ ਪੰਡਾਲ", bPa: data.adTent });
-        if(data.adSec) leftItems.push({ tEn: "🛡️ SECURITY", bEn: data.adSec, tPa: "🛡️ ਸਕਿਓਰਿਟੀ", bPa: data.adSec });
+        if(data.adComm) leftItems.push({ en: "🎙️ COMMENTATOR: " + data.adComm, pa: "🎙️ ਕਮੈਂਟੇਟਰ: " + data.adComm });
+        if(data.adSound) leftItems.push({ en: "🔊 SOUND SERVICE: " + data.adSound, pa: "🔊 ਸਾਊਂਡ ਸਰਵਿਸ: " + data.adSound });
+        if(data.adTent) leftItems.push({ en: "⛺ TENT SERVICE: " + data.adTent, pa: "⛺ ਟੈਂਟ ਪੰਡਾਲ: " + data.adTent });
+        if(data.adSec) leftItems.push({ en: "🛡️ SECURITY: " + data.adSec, pa: "🛡️ ਸਕਿਓਰਿਟੀ: " + data.adSec });
 
+        // --- MATCH LIST (100% UNTOUCHED & STABLE) ---
         centerItems = [];
         let matchesList = data.nextMatches || [];
         hasMatches = matchesList.length > 0;
@@ -375,26 +376,31 @@
         if(data.upcomingEvents && data.upcomingEvents.length > 0) {
             data.upcomingEvents.forEach(ev => {
                 let d = ev.date ? ` (${ev.date})` : "";
-                rightItems.push({ tEn: `📅 UPCOMING EVENTS`, bEn: `${ev.name}${d}`, tPa: `📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ`, bPa: `${ev.name_pa || ev.name}${d}` });
+                rightItems.push({ 
+                    en: `📅 UPCOMING EVENTS: ${ev.name}${d}`, 
+                    pa: `📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ: ${ev.name_pa || ev.name}${d}` 
+                });
             });
         }
         if(data.row6Txt || data.row6Txt_pa) {
-            rightItems.push({ tEn: `📺 LIVE TELECAST`, bEn: data.row6Txt || "LIVE STREAMING", tPa: `📺 ਲਾਈਵ ਪ੍ਰਸਾਰਣ`, bPa: data.row6Txt_pa || data.row6Txt || "ਲਾਈਵ ਪ੍ਰਸਾਰਣ" });
+            rightItems.push({ 
+                en: `📺 LIVE TELECAST: ${data.row6Txt || "LIVE STREAMING"}`, 
+                pa: `📺 ਲਾਈਵ ਪ੍ਰਸਾਰਣ: ${data.row6Txt_pa || data.row6Txt || "ਲਾਈਵ ਪ੍ਰਸਾਰਣ"}` 
+            });
         }
         if(rightItems.length === 0) {
-            rightItems.push({ tEn: `📅 UPCOMING EVENTS`, bEn: "STAY TUNED", tPa: `📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ`, bPa: "ਦੇਖਦੇ ਰਹੋ" });
+            rightItems.push({ en: `📅 UPCOMING EVENTS: STAY TUNED`, pa: `📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ: ਦੇਖਦੇ ਰਹੋ` });
         }
         
         document.getElementById('strip-2').style.display = hasMatches ? 'flex' : 'none';
         renderIndependentTickers();
     }
 
-    // SMART FUNCTION: Waits for exact scroll duration before switching to next item
-    function runSmartTicker(elementId, itemObj, isCenter = false) {
+    // SMART SCROLLING TIMER: Waits for exact text completion before moving to next item
+    function runSmartTicker(elementId, textToShow, isCenter = false) {
         const el = document.getElementById(elementId);
         if (!el) return;
 
-        let textToShow = isCenter ? itemObj.tPa : (isEnglish ? itemObj.tEn : itemObj.bEn);
         if (el.dataset.currentText === textToShow) return;
         el.dataset.currentText = textToShow;
 
@@ -406,12 +412,10 @@
             dummy.innerHTML = textToShow;
             let length = dummy.innerText.length;
 
-            if (length > 22) {
-                // Dynamic duration based on text length (Slow & Smooth)
-                let duration = Math.max(28, length * 0.7); 
+            if (length > 25) {
+                let duration = Math.max(30, length * 0.8); // Ultra slow & smooth
                 el.innerHTML = `<div class="scroll-container"><span class="scroll-text" style="--scroll-duration: ${duration}s;">${textToShow}</span></div>`;
                 
-                // Schedule next update precisely AFTER the scroll finishes
                 let timerKey = elementId + "_timer";
                 if (window[timerKey]) clearTimeout(window[timerKey]);
                 
@@ -432,7 +436,7 @@
                     else if (elementId.includes("left")) leftIdx++;
                     else if (elementId.includes("right")) rightIdx++;
                     renderIndependentTickers();
-                }, 10000); // Static text display duration
+                }, 12000); 
             }
 
             el.style.transform = 'translateY(12px)';
@@ -446,27 +450,28 @@
         let R = rightItems[rightIdx % rightItems.length];
 
         if (hasMatches) {
-            runSmartTicker('s1-left', L, false);
-            runSmartTicker('s2-left', { tEn: L.bEn, tPa: L.bPa }, false);
+            // Left & Right boxes follow the clean Punjabi <-> English global toggle safely
+            runSmartTicker('s1-left', isEnglish ? L.en : L.pa, false);
+            runSmartTicker('s2-left', isEnglish ? L.en : L.pa, false);
             
             // Match list: Top strictly Punjabi, Bottom strictly English
-            runSmartTicker('s1-mid', C, true);
-            runSmartTicker('s2-mid', { tPa: C.bEn }, true);
+            runSmartTicker('s1-mid', C.tPa, true);
+            runSmartTicker('s2-mid', C.bEn, true);
 
-            runSmartTicker('s1-right', R, false);
-            runSmartTicker('s2-right', { tEn: R.bEn, tPa: R.bPa }, false);
+            runSmartTicker('s1-right', isEnglish ? R.en : R.pa, false);
+            runSmartTicker('s2-right', isEnglish ? R.en : R.pa, false);
         } else {
-            runSmartTicker('s1-left', L, false);
-            runSmartTicker('s1-mid', C, true);
-            runSmartTicker('s1-right', R, false);
+            runSmartTicker('s1-left', isEnglish ? L.en : L.pa, false);
+            runSmartTicker('s1-mid', C.tPa, true);
+            runSmartTicker('s1-right', isEnglish ? R.en : R.pa, false);
         }
     }
 
-    // GLOBAL LANGUAGE TOGGLE FOR SIDES
+    // GLOBAL LANGUAGE TOGGLE FOR SIDES (16 seconds per language cycle)
     setInterval(() => {
         isEnglish = !isEnglish;
         renderIndependentTickers();
-    }, 15000);
+    }, 16000);
 
     // SCOREBOARD SYNC
     setInterval(() => {
