@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Ultra HD - Mobile Friendly Overlay</title>
+    <title>Kabaddi Ultra HD - Fixed Ticker Overlay</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -66,10 +66,7 @@
             padding: 0 50px; white-space: nowrap; min-width: 180px; letter-spacing: 1px;
         }
 
-        .vs-divider {
-            width: 10px;
-            background: #111111;
-        }
+        .vs-divider { width: 10px; background: #111111; }
 
         .team-b-panel {
             background: #242424; color: #ffffff; font-size: 38px; font-weight: 800;
@@ -98,7 +95,7 @@
             color: #ffffff; opacity: 0.45; letter-spacing: 3px; pointer-events: none;
         }
 
-        /* --- TICKER STRIPS (UPDATED: White, Larger & Spaced Text) --- */
+        /* --- TICKER STRIPS --- */
         #ticker-wrap {
             position: absolute; bottom: 0; left: 0; width: 1920px; z-index: 9998;
             display: flex; flex-direction: column; transition: opacity 0.5s ease;
@@ -112,22 +109,13 @@
 
         .ticker-col {
             display: flex; align-items: center; justify-content: center; 
-            font-weight: 900; 
-            font-size: 34px; /* Thoda wadda size */
-            color: #ffffff !important; /* Pure White */
-            overflow: hidden; position: relative; 
-            letter-spacing: 2.5px; /* Khule akhar */
-            padding: 0 20px;
+            font-weight: 900; font-size: 34px; color: #ffffff !important; 
+            overflow: hidden; position: relative; letter-spacing: 2.5px; padding: 0 20px;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
         }
 
         .w-30 { width: 30%; }
-        .w-40 { 
-            width: 40%; 
-            border-left: 2px solid rgba(255,255,255,0.3); 
-            border-right: 2px solid rgba(255,255,255,0.3); 
-            color: #ffffff !important; /* Center column vi hun white kar ditti hai */
-        }
+        .w-40 { width: 40%; border-left: 2px solid rgba(255,255,255,0.3); border-right: 2px solid rgba(255,255,255,0.3); color: #ffffff !important; }
 
         .anim-wrap {
             position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
@@ -300,13 +288,10 @@
         if(data.adTent) leftItems.push({ tEn: "⛺ TENT SERVICE", bEn: data.adTent, tPa: "⛺ ਟੈਂਟ ਪੰਡਾਲ", bPa: data.adTent });
         if(data.adSec) leftItems.push({ tEn: "🛡️ SECURITY", bEn: data.adSec, tPa: "🛡️ ਸਕਿਓਰਿਟੀ", bPa: data.adSec });
 
+        // --- CENTER ITEMS (FIXED MATCH LIST FETCHING) ---
         centerItems = [];
-        let wtMatches = data.nextMatchesWeight || [];
-        let opMatches = data.nextMatchesOpen || [];
-        
-        let hasWt = wtMatches.length > 0;
-        let hasOp = opMatches.length > 0;
-        hasMatches = hasWt || hasOp;
+        let matchesList = data.nextMatches || [];
+        hasMatches = matchesList.length > 0;
         
         let splitMatch = (m) => {
             let prefix = ""; let main = m;
@@ -318,20 +303,16 @@
             return {en, pa};
         };
 
-        if(hasWt && hasOp) {
-            let maxM = Math.max(wtMatches.length, opMatches.length);
-            for(let i=0; i<maxM; i++) {
-                let wM = splitMatch(wtMatches[i % wtMatches.length]);
-                let oM = splitMatch(opMatches[i % opMatches.length]);
-                centerItems.push({ tEn: `🏋️ ${wM.en}`, bEn: `🔥 ${oM.en}`, tPa: `🏋️ ${wM.pa}`, bPa: `🔥 ${oM.pa}` });
-            }
-        } else if (hasWt || hasOp) {
-            let activeMatches = hasWt ? wtMatches : opMatches;
-            let icon = hasWt ? "🏋️" : "🔥";
-            for(let i=0; i<activeMatches.length; i++) {
-                let m = splitMatch(activeMatches[i]);
-                centerItems.push({ tEn: `${icon} ${m.pa}`, bEn: `${icon} ${m.en}`, tPa: `${icon} ${m.pa}`, bPa: `${icon} ${m.en}` });
-            }
+        if(hasMatches) {
+            matchesList.forEach(mStr => {
+                let m = splitMatch(mStr);
+                centerItems.push({
+                    tEn: `⚔️ ${m.pa}`, // Top strip gets Punjabi
+                    bEn: `⚔️ ${m.en}`, // Bottom strip gets English
+                    tPa: `⚔️ ${m.pa}`, 
+                    bPa: `⚔️ ${m.en}`
+                });
+            });
         } else {
             centerItems.push({ tEn: "KABADDI TOURNAMENT", bEn: "LIVE UPDATES", tPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", bPa: "ਲਾਈਵ ਅੱਪਡੇਟ" });
         }
