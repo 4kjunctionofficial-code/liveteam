@@ -161,7 +161,7 @@
             text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
         }
 
-        /* --- VERTICAL SLIDE & MARQUEE SCROLL ANIMATION --- */
+        /* --- VERTICAL SLIDE ANIMATION --- */
         .anim-wrap {
             position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
             transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
@@ -170,13 +170,6 @@
         }
         .anim-out-up { opacity: 0; transform: translateY(-25px); }
         .anim-in-down { opacity: 0; transform: translateY(25px); }
-
-        .scroll-container { width: 100%; overflow: hidden; display: flex; align-items: center; white-space: nowrap; }
-        .scroll-text {
-            display: inline-block; white-space: nowrap; padding-left: 100%; 
-            animation: scrollMarquee 15s linear infinite; 
-        }
-        @keyframes scrollMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
         /* --- RESULT POPUP --- */
         #result-popup {
@@ -335,8 +328,8 @@
     }
 
     function processTickerData(data) {
+        // --- 1ST COLUMN: Location & Prizes (Top = Punjabi, Bottom = English) ---
         leftItems = [];
-        
         let vNameEn = data.row1Txt || "VILLAGE NAME";
         let vNamePa = data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ ਦਾ ਨਾਮ";
         leftItems.push({ topText: `📍 ਸਥਾਨ: ${vNamePa}`, botText: `📍 LOCATION: ${vNameEn}` });
@@ -362,6 +355,7 @@
             leftItems.push({ topText: p.top, botText: p.bot });
         });
 
+        // --- 2ND COLUMN: Match List or Tournament Banner ---
         centerItems = [];
         let matchesList = data.nextMatches || [];
         hasMatches = matchesList.length > 0;
@@ -405,9 +399,11 @@
                 centerItems.push({ topText: res.pa, botText: res.en });
             });
         } else {
+            // SINGLE LINE FALLBACK WHEN NO MATCHES EXIST
             centerItems.push({ topText: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ - ਲਾਈਵ ਅੱਪਡੇਟ", botText: "KABADDI TOURNAMENT - LIVE UPDATES" });
         }
 
+        // --- 3RD COLUMN: Upcoming Events & Live Telecast ---
         rightItems = [];
         if(data.upcomingEvents && data.upcomingEvents.length > 0) {
             data.upcomingEvents.forEach(ev => {
@@ -428,11 +424,13 @@
             rightItems.push({ topText: "📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ - ਦੇਖਦੇ ਰਹੋ", botText: "📅 UPCOMING EVENTS - STAY TUNED" });
         }
         
+        // Show/Hide bottom strip depending on match availability
+        document.getElementById('strip-2').style.display = hasMatches ? 'flex' : 'none';
         renderIndependentTickers();
     }
 
-    // --- INTELLIGENT TEXT DISPLAY (SMART MARQUEE IF LONG TEXT, ELSE SLIDE) ---
-    function renderSmartText(elementId, textToShow) {
+    // --- VERTICAL SLIDE TICKER FUNCTION ---
+    function runSmartTicker(elementId, textToShow) {
         const el = document.getElementById(elementId);
         if (!el) return;
 
@@ -442,13 +440,7 @@
         el.classList.add('anim-out-up');
 
         setTimeout(() => {
-            // Check if text is too long for the box (Single Line Marquee trigger)
-            if (textToShow.length > 32 || (!hasMatches && textToShow.length > 25)) {
-                el.innerHTML = `<div class="scroll-container"><span class="scroll-text">${textToShow}</span></div>`;
-            } else {
-                el.innerHTML = textToShow;
-            }
-
+            el.innerHTML = textToShow;
             el.classList.remove('anim-out-up');
             el.classList.add('anim-in-down');
 
@@ -464,24 +456,21 @@
         let R = rightItems[rightIdx % rightItems.length];
 
         if (hasMatches) {
+            // DOUBLE LINE MODE (When matches exist)
             document.getElementById('strip-2').style.display = 'flex';
-            renderSmartText('s1-left', L.topText);
-            renderSmartText('s1-mid', C.topText);
-            renderSmartText('s1-right', R.topText);
+            runSmartTicker('s1-left', L.topText);
+            runSmartTicker('s1-mid', C.topText);
+            runSmartTicker('s1-right', R.topText);
 
-            renderSmartText('s2-left', L.botText);
-            renderSmartText('s2-mid', C.botText);
-            renderSmartText('s2-right', R.botText);
+            runSmartTicker('s2-left', L.botText);
+            runSmartTicker('s2-mid', C.botText);
+            runSmartTicker('s2-right', R.botText);
         } else {
-            // SINGLE LINE MODE (Top = Punjabi, Bottom = English)
-            document.getElementById('strip-2').style.display = 'flex';
-            renderSmartText('s1-left', L.topText);
-            renderSmartText('s1-mid', C.topText);
-            renderSmartText('s1-right', R.topText);
-
-            renderSmartText('s2-left', L.botText);
-            renderSmartText('s2-mid', C.botText);
-            renderSmartText('s2-right', R.botText);
+            // SINGLE LINE FALLBACK MODE (When no matches exist)
+            document.getElementById('strip-2').style.display = 'none';
+            runSmartTicker('s1-left', L.topText);
+            runSmartTicker('s1-mid', C.topText);
+            runSmartTicker('s1-right', R.topText);
         }
     }
 
