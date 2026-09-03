@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Ultra HD - Open in English & Rest in Punjabi</title>
+    <title>Kabaddi Ultra HD - 100% Punjabi Match List</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -219,7 +219,7 @@
     let hasMatches = false;
     let lastResult = ""; 
 
-    // Punjabi Dictionary for Rounds (Keeping OPEN and KG in English as requested)
+    // Complete Punjabi Dictionary for Rounds, Weights, and OPEN
     const roundDict = {
         "1st Round": "ਪਹਿਲਾ ਰਾਊਂਡ",
         "2nd Round": "ਦੂਜਾ ਰਾਊਂਡ",
@@ -229,19 +229,25 @@
         "Semi Final": "ਸੈਮੀ ਫਾਈਨਲ",
         "Final": "ਫਾਈਨਲ",
         "Pool A Match": "ਪੂਲ ਏ ਮੈਚ",
-        "Pool B Match": "ਪੂਲ ਬੀ ਮੈਚ"
+        "Pool B Match": "ਪੂਲ ਬੀ ਮੈਚ",
+        "Open": "ਓਪਨ"
     };
 
     function translateRound(roundStr) {
         if(!roundStr) return "";
         let cleaned = roundStr.trim();
-        // If it contains OPEN or KG, keep them in English, translate rest if available
         let translated = cleaned;
+        
+        // Translate known keywords including OPEN
         for (let key in roundDict) {
-            if (cleaned.toLowerCase().includes(key.toLowerCase())) {
-                translated = translated.replace(new RegExp(key, 'gi'), roundDict[key]);
+            let regex = new RegExp(key, 'gi');
+            if (regex.test(translated)) {
+                translated = translated.replace(regex, roundDict[key]);
             }
         }
+        
+        // Replace KG with ਕਿਲੋ
+        translated = translated.replace(/KG/gi, "ਕਿਲੋ");
         return translated;
     }
 
@@ -303,7 +309,7 @@
         if(data.pzOpBest) leftItems.push({ tEn: "🏅 OPEN BEST PLAYER", bEn: data.pzOpBest, tPa: "🏅 ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ", bPa: data.pzOpBest });
 
         let wKg = data.pzWtKg ? `(${data.pzWtKg})` : "(WEIGHT)";
-        let wKgPa = data.pzWtKg ? `(${data.pzWtKg})` : "(ਵਜ਼ਨੀ)";
+        let wKgPa = data.pzWtKg ? `(${translateRound(data.pzWtKg)})` : "(ਵਜ਼ਨੀ)";
 
         if(data.pzWt1) leftItems.push({ tEn: `🏋️ ${wKg} 1ST PRIZE`, bEn: data.pzWt1, tPa: `🏋️ ${wKgPa} ਪਹਿਲਾ ਇਨਾਮ`, bPa: data.pzWt1 });
         if(data.pzWt2) leftItems.push({ tEn: `🏋️ ${wKg} 2ND PRIZE`, bEn: data.pzWt2, tPa: `🏋️ ${wKgPa} ਦੂਜਾ ਇਨਾਮ`, bPa: data.pzWt2 });
@@ -314,7 +320,7 @@
         if(data.adTent) leftItems.push({ tEn: "⛺ TENT SERVICE", bEn: data.adTent, tPa: "⛺ ਟੈਂਟ ਪੰਡਾਲ", bPa: data.adTent });
         if(data.adSec) leftItems.push({ tEn: "🛡️ SECURITY", bEn: data.adSec, tPa: "🛡️ ਸਕਿਓਰਿਟੀ", bPa: data.adSec });
 
-        // --- CENTER ITEMS: TOP = PUNJABI (WITH OPEN/KG IN ENGLISH), BOTTOM = FULL ENGLISH ---
+        // --- CENTER ITEMS: TOP = PUNJABI (WITH OPEN/KG FULLY PUNJABI), BOTTOM = FULL ENGLISH ---
         centerItems = [];
         let matchesList = data.nextMatches || [];
         hasMatches = matchesList.length > 0;
@@ -341,7 +347,7 @@
             let t2En = t2Full.split("=")[0].trim();
             let t2Pa = t2Full.split("=")[1]?.trim() || t2En;
 
-            // Translate bracket content but keep OPEN and KG in English
+            // Fully translate bracket content into Punjabi (including OPEN and KG)
             let bracketPa = translateRound(bracketContent);
 
             let tagEn = bracketContent ? `(${bracketContent}) ` : "";
