@@ -215,10 +215,10 @@
         <div class="ticker-col w-30"><div id="s1-right" class="anim-wrap">📅 ਆਉਣ ਵਾਲੇ ਮੇਲੇ</div></div>
     </div>
     
-    <div class="ticker-strip strip-bot" id="strip-2" style="display: none;">
-        <div class="ticker-col w-30"><div id="s2-left" class="anim-wrap">ਪਿੰਡ</div></div>
-        <div class="ticker-col w-40"><div id="s2-mid" class="anim-wrap">ਲਾਈਵ ਮੈਚ</div></div>
-        <div class="ticker-col w-30"><div id="s2-right" class="anim-wrap">ਵੇਰਵਾ</div></div>
+    <div class="ticker-strip strip-bot" id="strip-2">
+        <div class="ticker-col w-30"><div id="s2-left" class="anim-wrap">VILLAGE NAME</div></div>
+        <div class="ticker-col w-40"><div id="s2-mid" class="anim-wrap">KABADDI TOURNAMENT</div></div>
+        <div class="ticker-col w-30"><div id="s2-right" class="anim-wrap">UPCOMING EVENTS</div></div>
     </div>
 </div>
 
@@ -259,7 +259,6 @@
     let rightItems = [];
     
     let leftIdx = 0, centerIdx = 0, rightIdx = 0;
-    let isEnglish = false; 
     let hasMatches = false;
     let lastResult = ""; 
 
@@ -329,36 +328,34 @@
     }
 
     function processTickerData(data) {
-        // --- 1ST COLUMN: Village Name (Top = English, Bottom = Punjabi) ---
+        // --- 1ST COLUMN: Location & Prizes (Top = Punjabi, Bottom = English) ---
         leftItems = [];
         let vNameEn = data.row1Txt || "VILLAGE NAME";
         let vNamePa = data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ ਦਾ ਨਾਮ";
-        leftItems.push({ topText: vNameEn, botText: vNamePa });
+        leftItems.push({ topText: `📍 ਸਥਾਨ: ${vNamePa}`, botText: `📍 LOCATION: ${vNameEn}` });
 
-        // Prizes & Details for 1st Column
         let prizeList = [];
-        if(data.pzOp1) prizeList.push({ top: "🔥 OPEN 1ST PRIZE", bot: data.pzOp1 });
-        if(data.pzOp2) prizeList.push({ top: "🔥 OPEN 2ND PRIZE", bot: data.pzOp2 });
-        if(data.pzOpBest) prizeList.push({ top: "🏅 OPEN BEST PLAYER", bot: data.pzOpBest });
+        if(data.pzOp1) prizeList.push({ top: `🔥 ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ: ${data.pzOp1}`, bot: `🔥 OPEN 1ST PRIZE: ${data.pzOp1}` });
+        if(data.pzOp2) prizeList.push({ top: `🔥 ਓਪਨ ਦੂਜਾ ਇਨਾਮ: ${data.pzOp2}`, bot: `🔥 OPEN 2ND PRIZE: ${data.pzOp2}` });
+        if(data.pzOpBest) prizeList.push({ top: `🏅 ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ: ${data.pzOpBest}`, bot: `🏅 OPEN BEST PLAYER: ${data.pzOpBest}` });
 
         let wKg = data.pzWtKg ? data.pzWtKg : "WEIGHT";
         let wKgPa = data.pzWtKg ? translateToPunjabi(data.pzWtKg) : "ਵਜ਼ਨੀ";
 
-        if(data.pzWt1) prizeList.push({ top: `🏋️ (${wKg}) 1ST PRIZE`, bot: data.pzWt1 });
-        if(data.pzWt2) prizeList.push({ top: `🏋️ (${wKg}) 2ND PRIZE`, bot: data.pzWt2 });
-        if(data.pzWtBest) prizeList.push({ top: `🏅 (${wKg}) BEST PLAYER`, bot: data.pzWtBest });
+        if(data.pzWt1) prizeList.push({ top: `🏋️ (${wKgPa}) ਪਹਿਲਾ ਇਨਾਮ: ${data.pzWt1}`, bot: `🏋️ (${wKg}) 1ST PRIZE: ${data.pzWt1}` });
+        if(data.pzWt2) prizeList.push({ top: `🏋️ (${wKgPa}) ਦੂਜਾ ਇਨਾਮ: ${data.pzWt2}`, bot: `🏋️ (${wKg}) 2ND PRIZE: ${data.pzWt2}` });
+        if(data.pzWtBest) prizeList.push({ top: `🏅 (${wKgPa}) ਬੈਸਟ ਖਿਡਾਰੀ: ${data.pzWtBest}`, bot: `🏅 (${wKg}) BEST PLAYER: ${data.pzWtBest}` });
 
-        if(data.adComm) prizeList.push({ top: "🎙️ COMMENTATOR", bot: data.adComm });
-        if(data.adSound) prizeList.push({ top: "🔊 SOUND SERVICE", bot: data.adSound });
-        if(data.adTent) prizeList.push({ top: "⛺ TENT SERVICE", bot: data.adTent });
-        if(data.adSec) prizeList.push({ top: "🛡️ SECURITY", bot: data.adSec });
+        if(data.adComm) prizeList.push({ top: `🎙️ ਕਮੈਂਟੇਟਰ: ${data.adComm}`, bot: `🎙️ COMMENTATOR: ${data.adComm}` });
+        if(data.adSound) prizeList.push({ top: `🔊 ਸਾਊਂਡ ਸਰਵਿਸ: ${data.adSound}`, bot: `🔊 SOUND SERVICE: ${data.adSound}` });
+        if(data.adTent) prizeList.push({ top: `⛺ ਟੈਂਟ ਪੰਡਾਲ: ${data.adTent}`, bot: `⛺ TENT SERVICE: ${data.adTent}` });
+        if(data.adSec) prizeList.push({ top: `🛡️ ਸਕਿਓਰਿਟੀ: ${data.adSec}`, bot: `🛡️ SECURITY: ${data.adSec}` });
 
         prizeList.forEach(p => {
-            let pPa = translateToPunjabi(p.top);
             leftItems.push({ topText: p.top, botText: p.bot });
         });
 
-        // --- 2ND COLUMN: Match List (Top = Punjabi, Bottom = English) ---
+        // --- 2ND COLUMN: Match List or Tournament Banner ---
         centerItems = [];
         let matchesList = data.nextMatches || [];
         hasMatches = matchesList.length > 0;
@@ -402,29 +399,37 @@
                 centerItems.push({ topText: res.pa, botText: res.en });
             });
         } else {
-            centerItems.push({ topText: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", botText: "KABADDI TOURNAMENT" });
+            // SINGLE LINE FALLBACK WHEN NO MATCHES EXIST
+            centerItems.push({ topText: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ - ਲਾਈਵ ਅੱਪਡੇਟ", botText: "KABADDI TOURNAMENT - LIVE UPDATES" });
         }
 
-        // --- 3RD COLUMN: Upcoming Events (Top = English, Bottom = Punjabi) ---
+        // --- 3RD COLUMN: Upcoming Events & Live Telecast ---
         rightItems = [];
         if(data.upcomingEvents && data.upcomingEvents.length > 0) {
             data.upcomingEvents.forEach(ev => {
                 let d = ev.date ? ` (${ev.date})` : "";
-                rightItems.push({ topText: `${ev.name}${d}`, botText: `${ev.name_pa || ev.name}${d}` });
+                rightItems.push({ 
+                    topText: `📅 ਆਉਣ ਵਾਲੇ ਮੇਲੇ: ${ev.name_pa || ev.name}${d}`, 
+                    botText: `📅 UPCOMING EVENTS: ${ev.name}${d}` 
+                });
             });
         }
         if(data.row6Txt || data.row6Txt_pa) {
-            rightItems.push({ topText: data.row6Txt || "LIVE STREAMING", botText: data.row6Txt_pa || data.row6Txt || "ਲਾਈਵ ਪ੍ਰਸਾਰਣ" });
+            rightItems.push({ 
+                topText: `📺 ਲਾਈਵ ਪ੍ਰਸਾਰਣ: ${data.row6Txt_pa || data.row6Txt}`, 
+                botText: `📺 LIVE TELECAST: ${data.row6Txt || data.row6Txt_pa}` 
+            });
         }
         if(rightItems.length === 0) {
-            rightItems.push({ topText: "STAY TUNED", botText: "ਦੇਖਦੇ ਰਹੋ" });
+            rightItems.push({ topText: "📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ - ਦੇਖਦੇ ਰਹੋ", botText: "📅 UPCOMING EVENTS - STAY TUNED" });
         }
         
+        // Show/Hide bottom strip depending on match availability
         document.getElementById('strip-2').style.display = hasMatches ? 'flex' : 'none';
         renderIndependentTickers();
     }
 
-    // --- SINGLE LINE TICKER UPDATE FUNCTION ---
+    // --- VERTICAL SLIDE TICKER FUNCTION ---
     function runSmartTicker(elementId, textToShow) {
         const el = document.getElementById(elementId);
         if (!el) return;
@@ -450,15 +455,23 @@
         let C = centerItems[centerIdx % centerItems.length];
         let R = rightItems[rightIdx % rightItems.length];
 
-        // 1st Strip (Top): Village Name, Match List (Punjabi), Upcoming Events
-        runSmartTicker('s1-left', L.topText);
-        runSmartTicker('s1-mid', C.topText);
-        runSmartTicker('s1-right', R.topText);
+        if (hasMatches) {
+            // DOUBLE LINE MODE (When matches exist)
+            document.getElementById('strip-2').style.display = 'flex';
+            runSmartTicker('s1-left', L.topText);
+            runSmartTicker('s1-mid', C.topText);
+            runSmartTicker('s1-right', R.topText);
 
-        // 2nd Strip (Bottom): Prizes/Details, Match List (English), Telecast/Events
-        runSmartTicker('s2-left', L.botText);
-        runSmartTicker('s2-mid', C.botText);
-        runSmartTicker('s2-right', R.botText);
+            runSmartTicker('s2-left', L.botText);
+            runSmartTicker('s2-mid', C.botText);
+            runSmartTicker('s2-right', R.botText);
+        } else {
+            // SINGLE LINE FALLBACK MODE (When no matches exist)
+            document.getElementById('strip-2').style.display = 'none';
+            runSmartTicker('s1-left', L.topText);
+            runSmartTicker('s1-mid', C.topText);
+            runSmartTicker('s1-right', R.topText);
+        }
     }
 
     // Rotate items every 6 seconds smoothly
