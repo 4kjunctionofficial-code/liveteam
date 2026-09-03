@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Live Scoreboard & Ticker</title>
+    <title>Kabaddi 6-Part Double Ticker Scoreboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@500;600;700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -32,7 +32,6 @@
         }
         #top-scoreboard-container.hidden { opacity: 0; }
 
-        /* Patti 1: Match Details (Optional) */
         #match-details-strip {
             background: linear-gradient(90deg, #071930, #132e54, #071930);
             color: #ffffff;
@@ -47,11 +46,8 @@
             box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
             letter-spacing: 1px;
         }
-        #match-details-strip.hidden {
-            display: none; /* Hides the upper strip completely if no text */
-        }
+        #match-details-strip.hidden { display: none; }
 
-        /* Patti 2: Main Score Box */
         #main-score-strip {
             display: flex;
             align-items: stretch;
@@ -61,7 +57,6 @@
             border-radius: 6px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.6);
             overflow: hidden;
-            transition: border-radius 0.3s ease;
         }
 
         .team-name-panel {
@@ -82,7 +77,7 @@
 
         .score-panel {
             background: #091a2f;
-            color: #4ab3f4; /* Light Blue Score */
+            color: #4ab3f4; 
             font-size: 40px;
             font-weight: 800;
             padding: 0 30px;
@@ -102,135 +97,102 @@
             align-items: center;
             justify-content: center;
             font-family: 'Bebas Neue', sans-serif;
-            letter-spacing: 1px;
         }
 
-        /* Top Left Logo Container */
+        /* Logos & Watermarks */
         #logo-container {
-            position: absolute;
-            top: 25px;
-            left: 30px;
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            transition: all 0.5s ease;
+            position: absolute; top: 25px; left: 30px; z-index: 9999;
+            display: flex; align-items: center; transition: all 0.5s ease;
         }
         #logo-container.hidden { opacity: 0; transform: scale(0.8); }
         #main-logo { height: 75px; width: auto; object-fit: contain; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.5)); }
 
-        /* Floating Moving Watermark */
         #single-wm {
-            position: absolute;
-            left: 300px;
-            top: 300px;
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 38px;
-            font-weight: bold;
-            color: #ffffff;
-            opacity: 0.5;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
-            white-space: nowrap;
-            z-index: 9997;
-            pointer-events: none;
+            position: absolute; left: 300px; top: 300px;
+            font-family: 'Bebas Neue', sans-serif; font-size: 38px; font-weight: bold;
+            color: #ffffff; opacity: 0.5; text-transform: uppercase; letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9); z-index: 9997; pointer-events: none;
         }
 
-        /* --- EXACT KABADDI365 STYLE BOTTOM TICKER --- */
-        #ticker-wrap {
+        /* --- NEW DOUBLE TICKER (2 Strips, 6 Parts) --- */
+        #double-ticker-wrap {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 1920px;
-            height: 48px;
             z-index: 9998;
-            background: rgba(15, 15, 15, 0.9); /* Solid Dark Background */
             display: flex;
-            align-items: center;
+            flex-direction: column;
             box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.8);
             transition: opacity 0.5s ease;
         }
-        #ticker-wrap.hidden { opacity: 0; }
+        #double-ticker-wrap.hidden { opacity: 0; }
 
-        .ticker-left-blue {
-            background: #0078d4; /* Deep Blue from Video */
-            color: #ffffff;
-            font-weight: 700;
-            font-size: 22px;
-            height: 100%;
+        .ticker-strip {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 25px;
-            text-transform: uppercase;
-            white-space: nowrap;
+            height: 44px; /* Total ticker height 88px */
+            width: 100%;
         }
 
-        .ticker-middle-scroll {
-            flex: 1;
-            height: 100%;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
+        /* Strip 1: Top Row */
+        .strip1-left {
+            background: #0066cc; /* Blue */
+            color: #fff; font-weight: 700; font-size: 20px;
+            padding: 0 25px; display: flex; align-items: center; justify-content: center;
+            text-transform: uppercase; white-space: nowrap; border-right: 2px solid rgba(0,0,0,0.5);
+        }
+        .strip1-mid {
+            background: rgba(20, 20, 20, 0.95); /* Dark Grey */
+            flex: 1; position: relative; overflow: hidden; display: flex; align-items: center;
+        }
+        .strip1-right {
+            background: #1a1a1a; color: #ffcc00; font-weight: 700; font-size: 20px;
+            padding: 0 25px; display: flex; align-items: center; justify-content: center;
+            white-space: nowrap; border-left: 2px solid rgba(255,255,255,0.2);
         }
 
+        /* Strip 2: Bottom Row */
+        .strip2-left {
+            background: #cc0000; /* Red */
+            color: #fff; font-weight: 700; font-size: 20px;
+            padding: 0 25px; display: flex; align-items: center; justify-content: center;
+            text-transform: uppercase; white-space: nowrap; border-right: 2px solid rgba(0,0,0,0.5);
+        }
+        .strip2-mid {
+            background: rgba(10, 10, 10, 0.98); /* Pitch Black */
+            flex: 1; position: relative; overflow: hidden; display: flex; align-items: center;
+        }
+        .strip2-right {
+            background: #0066cc; /* Blue */
+            color: #fff; font-weight: 700; font-size: 20px;
+            padding: 0 25px; display: flex; align-items: center; justify-content: center;
+            white-space: nowrap; border-left: 2px solid rgba(0,0,0,0.5);
+        }
+
+        /* Scrolling Animation */
         .scroller-text {
             display: inline-block;
             white-space: nowrap;
             position: absolute;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 600;
             color: #ffffff;
             will-change: transform;
-            animation: scrollText 22s linear infinite;
+            animation: scrollText 25s linear infinite;
         }
-
         @keyframes scrollText {
-            0% { transform: translateX(100%); }
+            0% { transform: translateX(100vw); }
             100% { transform: translateX(-100%); }
-        }
-
-        .ticker-right-dark {
-            background: rgba(30, 30, 30, 0.95); /* Slightly lighter black to stand out */
-            color: #ffffff;
-            font-weight: 600;
-            font-size: 22px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 30px;
-            white-space: nowrap;
-            border-left: 2px solid rgba(255, 255, 255, 0.2);
-        }
-
-        /* Live Clock (Hidden by default, adjust if you need it) */
-        .clock-box {
-            position: absolute;
-            bottom: 60px;
-            left: 30px;
-            background: rgba(0, 0, 0, 0.7);
-            color: #fff;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-size: 16px;
-            font-weight: bold;
-            opacity: 0; /* Set to 1 if you want to show the clock */
         }
     </style>
 </head>
 <body>
 
-<div id="logo-container" class="hidden">
-    <img id="main-logo" src="" alt="Logo">
-</div>
-
+<div id="logo-container" class="hidden"><img id="main-logo" src="" alt="Logo"></div>
 <div id="single-wm">M LIVE</div>
 
 <div id="top-scoreboard-container">
     <div id="match-details-strip" class="hidden"></div>
-    
     <div id="main-score-strip">
         <div class="team-name-panel" id="nA-container"><span id="nA">ਟੀਮ 1</span></div>
         <div class="score-panel" id="sA">0</div>
@@ -240,18 +202,26 @@
     </div>
 </div>
 
-<div id="ticker-wrap">
-    <div class="ticker-left-blue" id="c1">MAHLA, NEAR GORAYA (JALANDHAR)</div>
-    <div class="ticker-middle-scroll">
-        <div class="scroller-text" id="scroller-c2">ਮੇਨ ਸਪਾਂਸਰ : ਸੰਤ ਬਾਬਾ ਜਵਾਲਾ ਸਿੰਘ (ਕੁਹਾਰਕਾ) | ਪੂਜਾ ਕੁਹਾਰਕਾ USA</div>
+<div id="double-ticker-wrap">
+    <div class="ticker-strip" style="border-top: 2px solid #ffcc00;">
+        <div class="strip1-left" id="t1-left">LOCATION / VILLAGE</div>
+        <div class="strip1-mid">
+            <div class="scroller-text" id="t1-mid">ਸਪਾਂਸਰ ਅਤੇ ਟੂਰਨਾਮੈਂਟ ਦਾ ਨਾਮ...</div>
+        </div>
+        <div class="strip1-right" id="t1-right">ਪਹਿਲਾ ਇਨਾਮ: 00,000</div>
     </div>
-    <div class="ticker-right-dark" id="c3">ਪਹਿਲਾ ਇਨਾਮ: 75,000</div>
+    
+    <div class="ticker-strip" style="border-top: 1px solid rgba(255,255,255,0.2);">
+        <div class="strip2-left" id="t2-left">UPCOMING EVENTS</div>
+        <div class="strip2-mid">
+            <div class="scroller-text" id="t2-mid">KABADDI TOURNAMENT</div>
+        </div>
+        <div class="strip2-right" id="t2-right">BOOKING: 9115426711</div>
+    </div>
 </div>
 
-<div class="clock-box" id="live-time">00:00:00</div>
-
 <script>
-    // Firebase Config - ਆਪਣਾ ਸਹੀ URL ਪਾਉ
+    // Firebase Config - ਆਪਣਾ URL ਪਾਉ
     const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
 
@@ -260,25 +230,22 @@
     const db = firebase.database().ref("matchData/" + matchId);
     const userDb = firebase.database().ref("users/" + matchId);
 
-    // Plan Expiry Check
     userDb.on("value", (snap) => {
         const user = snap.val();
         if (!user || Date.now() > new Date(user.expiryDate).getTime()) {
-            document.body.innerHTML = `<div style="width:100vw; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; background:black; color:white; font-size:50px; text-align:center; font-family:Arial;">🛑 PLAN EXPIRED<br><br>HELP LINE: MANPREET MUDKI<br>9115426711</div>`;
+            document.body.innerHTML = `<div style="width:100vw; height:100vh; display:flex; justify-content:center; align-items:center; background:black; color:white; font-size:50px; text-align:center;">🛑 PLAN EXPIRED<br><br>HELP LINE: MANPREET MUDKI<br>9115426711</div>`;
         }
     });
 
     const clientLogos = { "kabaddi101": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Kabaddi%20101%20logo.png" };
 
-    // Realtime Updates from Firebase
     db.on("value", (snap) => {
         const data = snap.val() || {}; 
         const logoCont = document.getElementById('logo-container');
-        const currentId = matchId.trim().toLowerCase();
-
-        // Logo Logic
-        if (clientLogos[currentId] && data.logoVisible !== false) {
-            document.getElementById('main-logo').src = clientLogos[currentId];
+        
+        // Logo
+        if (clientLogos[matchId.trim().toLowerCase()] && data.logoVisible !== false) {
+            document.getElementById('main-logo').src = clientLogos[matchId.trim().toLowerCase()];
             logoCont.classList.remove('hidden');
         } else {
             logoCont.classList.add('hidden');
@@ -286,13 +253,12 @@
 
         // Visibility Toggles
         document.getElementById('top-scoreboard-container').classList.toggle('hidden', data.scoreVisible === false);
-        document.getElementById('ticker-wrap').classList.toggle('hidden', data.tickerVisible === false);
+        document.getElementById('double-ticker-wrap').classList.toggle('hidden', data.tickerVisible === false);
         
-        // Dynamic "Do Pattiya / Single" Logic
+        // Scoreboard Match Details Logic
         const roundText = data.round || "";
         const detailsStrip = document.getElementById('match-details-strip');
         const mainScoreStrip = document.getElementById('main-score-strip');
-        
         if (roundText.trim() === "") {
             detailsStrip.classList.add('hidden');
             mainScoreStrip.style.borderTopLeftRadius = '6px';
@@ -304,29 +270,34 @@
             mainScoreStrip.style.borderTopRightRadius = '0px';
         }
 
-        // Scores and Teams
+        // Teams & Scores
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
+        document.getElementById('nA-container').innerHTML = `<span>${(data.nameA_pa && data.nameA_pa.trim() !== "") ? data.nameA_pa : (data.nameA || "ਟੀਮ 1")}</span>`;
+        document.getElementById('nB-container').innerHTML = `<span>${(data.nameB_pa && data.nameB_pa.trim() !== "") ? data.nameB_pa : (data.nameB || "ਟੀਮ 2")}</span>`;
         
-        const nameA = (data.nameA_pa && data.nameA_pa.trim() !== "") ? data.nameA_pa : (data.nameA || "ਟੀਮ 1");
-        const nameB = (data.nameB_pa && data.nameB_pa.trim() !== "") ? data.nameB_pa : (data.nameB || "ਟੀਮ 2");
-        document.getElementById('nA-container').innerHTML = `<span>${nameA}</span>`;
-        document.getElementById('nB-container').innerHTML = `<span>${nameB}</span>`;
-        
-        // Watermark & Ticker Update
+        // Watermark
         document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
         
-        if(data.row1Txt_pa || data.row1Txt) document.getElementById('c1').innerText = data.row1Txt_pa || data.row1Txt;
-        if(data.row2Txt_pa || data.row2Txt) document.getElementById('scroller-c2').innerText = data.row2Txt_pa || data.row2Txt;
-        if(data.row3Txt_pa || data.row3Txt) document.getElementById('c3').innerText = data.row3Txt_pa || data.row3Txt;
-    });
+        // --- TICKER DATA MAPPING ---
+        // Strip 1
+        document.getElementById('t1-left').innerText = data.row1Txt_pa || data.row1Txt || "MAHLA, NEAR GORAYA";
+        document.getElementById('t1-mid').innerText = data.row2Txt_pa || data.row2Txt || "ਮੇਨ ਸਪਾਂਸਰ : ਸੰਤ ਬਾਬਾ ਜਵਾਲਾ ਸਿੰਘ ਜੀ";
+        document.getElementById('t1-right').innerText = data.row3Txt_pa || data.row3Txt || "ਪਹਿਲਾ ਇਨਾਮ: 75,000";
 
-    // Clock
-    function updateClock() {
-        const now = new Date();
-        document.getElementById('live-time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    }
-    setInterval(updateClock, 1000); updateClock();
+        // Strip 2
+        document.getElementById('t2-left').innerText = data.row4Txt_pa || data.row4Txt || "UPCOMING EVENTS";
+        
+        // Dynamic Match List / Fallback Logic for Bottom Mid
+        const matchListText = data.row5Txt_pa || data.row5Txt || "";
+        if (matchListText.trim() === "") {
+            document.getElementById('t2-mid').innerText = "KABADDI TOURNAMENT";
+        } else {
+            document.getElementById('t2-mid').innerText = matchListText;
+        }
+
+        document.getElementById('t2-right').innerText = data.row6Txt_pa || data.row6Txt || "BOOKING: 9115426711";
+    });
 
     // Moving Watermark
     const wm = document.getElementById('single-wm');
