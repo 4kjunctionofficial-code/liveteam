@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi 6-Part Double Ticker Scoreboard</title>
+    <title>Kabaddi Pro Overlay 2026</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@500;600;700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -19,7 +21,7 @@
             user-select: none;
         }
 
-        /* --- TOP CENTER SCOREBOARD (Wide Strip Style) --- */
+        /* --- TOP CENTER SCOREBOARD --- */
         #top-scoreboard-container {
             position: absolute;
             top: 25px;
@@ -32,37 +34,41 @@
         }
         #top-scoreboard-container.hidden { opacity: 0; }
 
+        /* Round / Category Strip */
         #match-details-strip {
             background: linear-gradient(90deg, #071930, #132e54, #071930);
-            color: #ffffff;
-            font-size: 18px;
-            font-weight: 700;
+            color: #ffcc00;
+            font-size: 20px;
+            font-weight: 800;
             padding: 4px 35px;
             text-transform: uppercase;
-            border-top-left-radius: 6px;
-            border-top-right-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
             border-bottom: none;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
             letter-spacing: 1px;
+            transition: all 0.3s ease;
         }
         #match-details-strip.hidden { display: none; }
 
+        /* Main Score Strip */
         #main-score-strip {
             display: flex;
             align-items: stretch;
-            height: 52px;
-            background: rgba(0, 0, 0, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 6px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            height: 55px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 8px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.7);
             overflow: hidden;
+            transition: border-radius 0.3s ease;
         }
 
         .team-name-panel {
             background: #111111;
             color: #ffffff;
-            font-size: 30px;
+            font-size: 32px;
             font-weight: 700;
             padding: 0 45px;
             display: flex;
@@ -72,34 +78,36 @@
             max-width: 450px;
             white-space: nowrap;
             overflow: hidden;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
         }
 
         .score-panel {
             background: #091a2f;
-            color: #4ab3f4; 
-            font-size: 40px;
-            font-weight: 800;
-            padding: 0 30px;
+            color: #4ab3f4; /* Cyan Blue */
+            font-size: 42px;
+            font-weight: 900;
+            padding: 0 35px;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 90px;
+            min-width: 100px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
         }
 
         .vs-panel {
             background: #ffffff;
             color: #000000;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 900;
-            padding: 0 18px;
+            padding: 0 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1px;
         }
 
-        /* Logos & Watermarks */
+        /* --- LOGO & WATERMARK --- */
         #logo-container {
             position: absolute; top: 25px; left: 30px; z-index: 9999;
             display: flex; align-items: center; transition: all 0.5s ease;
@@ -114,7 +122,7 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.9); z-index: 9997; pointer-events: none;
         }
 
-        /* --- NEW DOUBLE TICKER (2 Strips, 6 Parts) --- */
+        /* --- DOUBLE STRIP TICKER (6-PART) --- */
         #double-ticker-wrap {
             position: absolute;
             bottom: 0;
@@ -123,67 +131,71 @@
             z-index: 9998;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.9);
             transition: opacity 0.5s ease;
         }
         #double-ticker-wrap.hidden { opacity: 0; }
 
-        .ticker-strip {
-            display: flex;
-            height: 44px; /* Total ticker height 88px */
-            width: 100%;
-        }
+        .ticker-strip { display: flex; height: 46px; width: 100%; }
 
-        /* Strip 1: Top Row */
-        .strip1-left {
+        /* STRIP 1 (TOP) */
+        .s1-left {
             background: #0066cc; /* Blue */
-            color: #fff; font-weight: 700; font-size: 20px;
-            padding: 0 25px; display: flex; align-items: center; justify-content: center;
-            text-transform: uppercase; white-space: nowrap; border-right: 2px solid rgba(0,0,0,0.5);
+            color: #fff; font-weight: 700; font-size: 22px;
+            padding: 0 30px; display: flex; align-items: center; justify-content: center;
+            white-space: nowrap; border-right: 2px solid rgba(0,0,0,0.6);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
-        .strip1-mid {
-            background: rgba(20, 20, 20, 0.95); /* Dark Grey */
+        .s1-mid {
+            background: rgba(20, 20, 20, 0.98); /* Very Dark Grey */
             flex: 1; position: relative; overflow: hidden; display: flex; align-items: center;
         }
-        .strip1-right {
-            background: #1a1a1a; color: #ffcc00; font-weight: 700; font-size: 20px;
-            padding: 0 25px; display: flex; align-items: center; justify-content: center;
+        .s1-right {
+            background: #111111; color: #ffcc00; font-weight: 800; font-size: 22px;
+            padding: 0 30px; display: flex; align-items: center; justify-content: center;
             white-space: nowrap; border-left: 2px solid rgba(255,255,255,0.2);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
 
-        /* Strip 2: Bottom Row */
-        .strip2-left {
+        /* STRIP 2 (BOTTOM) */
+        .s2-left {
             background: #cc0000; /* Red */
-            color: #fff; font-weight: 700; font-size: 20px;
-            padding: 0 25px; display: flex; align-items: center; justify-content: center;
-            text-transform: uppercase; white-space: nowrap; border-right: 2px solid rgba(0,0,0,0.5);
+            color: #fff; font-weight: 700; font-size: 22px;
+            padding: 0 30px; display: flex; align-items: center; justify-content: center;
+            white-space: nowrap; border-right: 2px solid rgba(0,0,0,0.6);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
-        .strip2-mid {
-            background: rgba(10, 10, 10, 0.98); /* Pitch Black */
+        .s2-mid {
+            background: rgba(5, 5, 5, 1); /* Pitch Black */
             flex: 1; position: relative; overflow: hidden; display: flex; align-items: center;
         }
-        .strip2-right {
+        .s2-right {
             background: #0066cc; /* Blue */
-            color: #fff; font-weight: 700; font-size: 20px;
-            padding: 0 25px; display: flex; align-items: center; justify-content: center;
-            white-space: nowrap; border-left: 2px solid rgba(0,0,0,0.5);
+            color: #fff; font-weight: 800; font-size: 22px;
+            padding: 0 30px; display: flex; align-items: center; justify-content: center;
+            white-space: nowrap; border-left: 2px solid rgba(0,0,0,0.6);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
 
-        /* Scrolling Animation */
+        /* SCROLLING TEXT CSS */
         .scroller-text {
             display: inline-block;
             white-space: nowrap;
             position: absolute;
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 600;
             color: #ffffff;
             will-change: transform;
-            animation: scrollText 25s linear infinite;
+            animation: scrollText 28s linear infinite;
         }
+        /* Faster speed for prizes since it might be shorter */
+        .scroller-fast { animation: scrollText 22s linear infinite; }
+
         @keyframes scrollText {
             0% { transform: translateX(100vw); }
             100% { transform: translateX(-100%); }
         }
+
     </style>
 </head>
 <body>
@@ -203,21 +215,23 @@
 </div>
 
 <div id="double-ticker-wrap">
+    
     <div class="ticker-strip" style="border-top: 2px solid #ffcc00;">
-        <div class="strip1-left" id="t1-left">LOCATION / VILLAGE</div>
-        <div class="strip1-mid">
-            <div class="scroller-text" id="t1-mid">ਸਪਾਂਸਰ ਅਤੇ ਟੂਰਨਾਮੈਂਟ ਦਾ ਨਾਮ...</div>
+        <div class="s1-left" id="t1-left">LOCATION</div>
+        <div class="s1-mid">
+            <div class="scroller-text scroller-fast" id="t1-mid" style="color:#ffcc00;">🏆 PRIZES LOADING...</div>
         </div>
-        <div class="strip1-right" id="t1-right">ਪਹਿਲਾ ਇਨਾਮ: 00,000</div>
+        <div class="s1-right" id="t1-right">LIVE ON KABADDI</div>
     </div>
     
     <div class="ticker-strip" style="border-top: 1px solid rgba(255,255,255,0.2);">
-        <div class="strip2-left" id="t2-left">UPCOMING EVENTS</div>
-        <div class="strip2-mid">
-            <div class="scroller-text" id="t2-mid">KABADDI TOURNAMENT</div>
+        <div class="s2-left" id="t2-left">LIVE UPDATES</div>
+        <div class="s2-mid">
+            <div class="scroller-text" id="t2-mid">MATCHES & EVENTS LOADING...</div>
         </div>
-        <div class="strip2-right" id="t2-right">BOOKING: 9115426711</div>
+        <div class="s2-right" id="t2-right">BOOKING: 9115426711</div>
     </div>
+
 </div>
 
 <script>
@@ -230,6 +244,7 @@
     const db = firebase.database().ref("matchData/" + matchId);
     const userDb = firebase.database().ref("users/" + matchId);
 
+    // Plan Expiry Check
     userDb.on("value", (snap) => {
         const user = snap.val();
         if (!user || Date.now() > new Date(user.expiryDate).getTime()) {
@@ -239,11 +254,23 @@
 
     const clientLogos = { "kabaddi101": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Kabaddi%20101%20logo.png" };
 
+    // Translation Toggle State
+    let isPunjabi = true;
+    let globalData = {}; // Store latest data from DB
+
+    // Auto-Toggle Timer (Changes Languages Every 6 Seconds for Static Elements)
+    setInterval(() => {
+        isPunjabi = !isPunjabi;
+        updateStaticElements();
+    }, 6000);
+
+    // Real-time DB Listener
     db.on("value", (snap) => {
         const data = snap.val() || {}; 
+        globalData = data; // Save for toggle timer
+
+        // Logo Logic
         const logoCont = document.getElementById('logo-container');
-        
-        // Logo
         if (clientLogos[matchId.trim().toLowerCase()] && data.logoVisible !== false) {
             document.getElementById('main-logo').src = clientLogos[matchId.trim().toLowerCase()];
             logoCont.classList.remove('hidden');
@@ -251,18 +278,18 @@
             logoCont.classList.add('hidden');
         }
 
-        // Visibility Toggles
+        // Visibility
         document.getElementById('top-scoreboard-container').classList.toggle('hidden', data.scoreVisible === false);
         document.getElementById('double-ticker-wrap').classList.toggle('hidden', data.tickerVisible === false);
         
-        // Scoreboard Match Details Logic
+        // Round Details
         const roundText = data.round || "";
         const detailsStrip = document.getElementById('match-details-strip');
         const mainScoreStrip = document.getElementById('main-score-strip');
         if (roundText.trim() === "") {
             detailsStrip.classList.add('hidden');
-            mainScoreStrip.style.borderTopLeftRadius = '6px';
-            mainScoreStrip.style.borderTopRightRadius = '6px';
+            mainScoreStrip.style.borderTopLeftRadius = '8px';
+            mainScoreStrip.style.borderTopRightRadius = '8px';
         } else {
             detailsStrip.classList.remove('hidden');
             detailsStrip.innerText = roundText;
@@ -270,36 +297,79 @@
             mainScoreStrip.style.borderTopRightRadius = '0px';
         }
 
-        // Teams & Scores
+        // Scores
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
-        document.getElementById('nA-container').innerHTML = `<span>${(data.nameA_pa && data.nameA_pa.trim() !== "") ? data.nameA_pa : (data.nameA || "ਟੀਮ 1")}</span>`;
-        document.getElementById('nB-container').innerHTML = `<span>${(data.nameB_pa && data.nameB_pa.trim() !== "") ? data.nameB_pa : (data.nameB || "ਟੀਮ 2")}</span>`;
         
         // Watermark
         document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
-        
-        // --- TICKER DATA MAPPING ---
-        // Strip 1
-        document.getElementById('t1-left').innerText = data.row1Txt_pa || data.row1Txt || "MAHLA, NEAR GORAYA";
-        document.getElementById('t1-mid').innerText = data.row2Txt_pa || data.row2Txt || "ਮੇਨ ਸਪਾਂਸਰ : ਸੰਤ ਬਾਬਾ ਜਵਾਲਾ ਸਿੰਘ ਜੀ";
-        document.getElementById('t1-right').innerText = data.row3Txt_pa || data.row3Txt || "ਪਹਿਲਾ ਇਨਾਮ: 75,000";
 
-        // Strip 2
-        document.getElementById('t2-left').innerText = data.row4Txt_pa || data.row4Txt || "UPCOMING EVENTS";
-        
-        // Dynamic Match List / Fallback Logic for Bottom Mid
-        const matchListText = data.row5Txt_pa || data.row5Txt || "";
-        if (matchListText.trim() === "") {
-            document.getElementById('t2-mid').innerText = "KABADDI TOURNAMENT";
-        } else {
-            document.getElementById('t2-mid').innerText = matchListText;
-        }
-
-        document.getElementById('t2-right').innerText = data.row6Txt_pa || data.row6Txt || "BOOKING: 9115426711";
+        // Call update immediately on data change
+        updateStaticElements();
+        updateScrollingElements();
     });
 
-    // Moving Watermark
+    // Update Static Elements (Teams, Location, Info, Booking)
+    function updateStaticElements() {
+        const d = globalData;
+        if(Object.keys(d).length === 0) return;
+
+        // Team Names (Bilingual Toggle)
+        document.getElementById('nA').innerText = (isPunjabi && d.nameA_pa) ? d.nameA_pa : (d.nameA || "TEAM 1");
+        document.getElementById('nB').innerText = (isPunjabi && d.nameB_pa) ? d.nameB_pa : (d.nameB || "TEAM 2");
+
+        // Strip 1 Left (Location)
+        document.getElementById('t1-left').innerText = (isPunjabi && d.row1Txt_pa) ? d.row1Txt_pa : (d.row1Txt || "LOCATION");
+
+        // Strip 1 Right (Extra Info - No translation in admin panel, static)
+        document.getElementById('t1-right').innerText = d.row3Txt || "LIVE KABADDI";
+
+        // Strip 2 Left (Static Title - Bilingually toggles)
+        document.getElementById('t2-left').innerText = isPunjabi ? "ਤਾਜ਼ਾ ਅਪਡੇਟ" : "LIVE UPDATES";
+
+        // Strip 2 Right (Booking)
+        document.getElementById('t2-right').innerText = d.row6Txt || "BOOKING: 9115426711";
+    }
+
+    // Update Scrolling Elements (Prizes, Match Lists, Events)
+    // We use onanimationiteration to seamlessly change language without jerky reloads
+    function updateScrollingElements() {
+        const d = globalData;
+        if(Object.keys(d).length === 0) return;
+
+        const scroller1 = document.getElementById('t1-mid');
+        const scroller2 = document.getElementById('t2-mid');
+
+        // Strip 1 Mid (Prizes - Admin panel auto-generates string)
+        // Since prizes are purely emoji + numbers mostly, we just pass the string.
+        let prizeStr = d.row2Txt || "WELCOME TO LIVE KABADDI TOURNAMENT";
+        if(scroller1.innerText !== prizeStr) {
+            scroller1.innerText = prizeStr;
+        }
+
+        // Strip 2 Mid (Upcoming Events + Match List)
+        // Combine row4 (Events) and row5 (Matches)
+        scroller2.onanimationiteration = () => {
+            let eventsText = (isPunjabi && d.row4Txt_pa) ? d.row4Txt_pa : (d.row4Txt || "");
+            let matchText = (isPunjabi && d.row5Txt_pa) ? d.row5Txt_pa : (d.row5Txt || "");
+            
+            let combined = "";
+            if(eventsText && matchText) combined = eventsText + " 🟢 " + matchText;
+            else if(eventsText) combined = eventsText;
+            else if(matchText) combined = matchText;
+            else combined = "SUBSCRIBE OUR CHANNEL AND SHARE LIVE STREAM";
+
+            scroller2.innerText = combined;
+        };
+
+        // Initialize the first run if empty
+        if(scroller2.innerText === "MATCHES & EVENTS LOADING...") {
+            let combined = (d.row4Txt || "") + " 🟢 " + (d.row5Txt || "");
+            scroller2.innerText = combined.trim() === "🟢" ? "SUBSCRIBE OUR CHANNEL" : combined;
+        }
+    }
+
+    // Moving Watermark Animation
     const wm = document.getElementById('single-wm');
     let x = 200, y = 200, dx = 1.8, dy = 1.4;
     function animateWatermark() {
@@ -312,6 +382,7 @@
         requestAnimationFrame(animateWatermark);
     }
     animateWatermark();
+
 </script>
 </body>
 </html>
