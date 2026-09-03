@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kabaddi Pro Admin Panel - Modern Setup</title>
+<title>Kabaddi Pro Admin Panel</title>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
@@ -153,14 +153,11 @@ textarea { resize: vertical; overflow-y: auto; min-height: 50px; max-height: 200
             <option value="">-- Select Round --</option>
             <option value="1st Round">1st Round</option>
             <option value="2nd Round">2nd Round</option>
-            <option value="3rd Round">3rd Round</option>
-            <option value="4th Round">4th Round</option>
             <option value="Quarter Final">Quarter Final</option>
             <option value="Semi Final">Semi Final</option>
             <option value="Final">Final</option>
         </select>
-
-        <input type="text" id="matchCategoryInp" placeholder="Type KG or Open (e.g. 50 KG / OPEN)" style="flex:1; margin-bottom:0;">
+        <input type="text" id="matchCategoryInp" placeholder="Type KG or Open..." style="flex:1; margin-bottom:0;">
     </div>
 
     <button class="btn-full btn-green" onclick="addNewMatch()" style="height:48px; min-height:48px; font-size:15px; margin-top:5px;">+ ADD MATCH TO LIST</button>
@@ -227,14 +224,14 @@ textarea { resize: vertical; overflow-y: auto; min-height: 50px; max-height: 200
 <div class="card">
 <div class="header">TOURNAMENT TEAM MANAGER</div>
 <div class="settings-section">
-    <label class="ticker-label">➕ Add New Team</label>
+    <label class="ticker-label">➕ Add Teams (Comma separated e.g. Mudki, Faridkot, Talwandi)</label>
     <div style="background:#f8f9fa; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:15px;">
         <div class="team-input-row" style="margin-bottom:5px;">
-            <input type="text" id="newTeamEn" class="team-input" placeholder="Team Name (English)">
-            <button class="trans-btn" onclick="translateToInput('newTeamEn', 'newTeamPa')">⇄</button>
+            <input type="text" id="newTeamEn" class="team-input" placeholder="Teams in English (Comma separated)">
+            <button class="trans-btn" onclick="translateBatchTeams()">⇄</button>
         </div>
-        <input type="text" id="newTeamPa" class="team-input" placeholder="Team Name (Punjabi)">
-        <button class="btn-full btn-green" onclick="addSingleTeam()" style="height:40px; min-height:40px; font-size:14px; margin-top:8px;">ADD TEAM TO LIST</button>
+        <textarea id="newTeamPa" rows="2" class="team-input" placeholder="Teams in Punjabi (Auto-translated or manual)"></textarea>
+        <button class="btn-full btn-green" onclick="addBatchTeams()" style="height:42px; min-height:42px; font-size:14px; margin-top:8px;">ADD TEAMS TO LIST</button>
     </div>
 
     <label class="ticker-label">📋 All Teams Master List</label>
@@ -298,6 +295,17 @@ async function translateToInput(sourceId, targetId) {
         const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`);
         const data = await res.json();
         document.getElementById(targetId).value = data[0][0][0];
+    } catch(e) { alert("Translation error! Check internet."); }
+}
+
+async function translateBatchTeams() {
+    const text = document.getElementById("newTeamEn").value;
+    const targetLang = document.getElementById("targetLang").value; 
+    if(!text) return;
+    try {
+        const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`);
+        const data = await res.json();
+        document.getElementById("newTeamPa").value = data[0][0][0];
     } catch(e) { alert("Translation error! Check internet."); }
 }
 
@@ -374,13 +382,25 @@ function renderUpcomingEvents() {
     container.innerHTML = html;
 }
 
-function addSingleTeam() {
-    let en = document.getElementById("newTeamEn").value.trim();
-    let pa = document.getElementById("newTeamPa").value.trim();
-    if(!en) return;
-    let combined = pa ? `${en}=${pa}` : en;
-    if(!allTeams.includes(combined)) { allTeams.push(combined); db.update({ allTeams: allTeams }); }
-    document.getElementById("newTeamEn").value = ""; document.getElementById("newTeamPa").value = "";
+function addBatchTeams() {
+    let enStr = document.getElementById("newTeamEn").value.trim();
+    let paStr = document.getElementById("newTeamPa").value.trim();
+    if(!enStr) return;
+
+    let enArr = enStr.split(",").map(t => t.trim()).filter(t => t !== '');
+    let paArr = paStr ? paStr.split(",").map(t => t.trim()).filter(t => t !== '') : [];
+
+    enArr.forEach((en, i) => {
+        let pa = paArr[i] || "";
+        let combined = pa ? `${en}=${pa}` : en;
+        if(!allTeams.includes(combined)) {
+            allTeams.push(combined);
+        }
+    });
+
+    db.update({ allTeams: allTeams });
+    document.getElementById("newTeamEn").value = "";
+    document.getElementById("newTeamPa").value = "";
 }
 
 function updateDropdowns(){
@@ -391,7 +411,9 @@ function updateDropdowns(){
     
     allTeams.forEach(teamStr => {
         let parts = teamStr.split("=");
-        let display = parts[1] ? `${parts[0].trim()} / ${parts[1].trim()}` : parts[0].trim();
+        let en = parts[0].trim();
+        let pa = parts[1] ? parts[1].trim() : "";
+        let display = pa ? `${en} / ${pa}` : en;
         let opt = `<option value="${teamStr}">${display}</option>`;
         a.innerHTML += opt; b.innerHTML += opt; na.innerHTML += opt; nb.innerHTML += opt;
     });
