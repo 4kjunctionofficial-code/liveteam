@@ -23,9 +23,11 @@
             user-select: none;
             text-transform: uppercase;
             transform-origin: top left;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
         }
 
-        /* --- HD SCOREBOARD (SKY BLUE THEME) --- */
+        /* --- ULTRA HD SCOREBOARD (SKY BLUE THEME) --- */
         #top-scoreboard-container {
             position: absolute;
             top: 35px;
@@ -42,10 +44,11 @@
             display: flex;
             align-items: stretch;
             height: 75px;
-            border-radius: 6px;
+            border-radius: 8px;
             overflow: hidden;
-            border: 2px solid rgba(255, 255, 255, 0.6);
+            border: 2.5px solid rgba(255, 255, 255, 0.9);
             transform: skewX(16deg); 
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
         }
 
         .unskew {
@@ -58,51 +61,59 @@
         }
 
         .score-a {
-            background: #007acc; color: #ffffff; font-size: 56px; font-weight: 900;
-            padding: 0 35px; font-family: 'Bebas Neue', sans-serif;
+            background: linear-gradient(135deg, #0066cc, #0099ff); color: #ffffff; font-size: 58px; font-weight: 900;
+            padding: 0 38px; font-family: 'Bebas Neue', sans-serif;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
         .team-a-panel {
-            background: #3399ff; color: #ffffff; font-size: 38px; font-weight: 800;
-            padding: 0 50px; white-space: nowrap; min-width: 180px; letter-spacing: 1px;
+            background: linear-gradient(135deg, #1a8cff, #4da6ff); color: #ffffff; font-size: 38px; font-weight: 800;
+            padding: 0 50px; white-space: nowrap; min-width: 180px; letter-spacing: 1.5px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
         }
 
-        .vs-divider { width: 10px; background: #111111; }
+        .vs-divider { width: 12px; background: #111111; }
 
         .team-b-panel {
-            background: #242424; color: #ffffff; font-size: 38px; font-weight: 800;
-            padding: 0 50px; white-space: nowrap; min-width: 180px; letter-spacing: 1px;
+            background: linear-gradient(135deg, #1f1f1f, #2e2e2e); color: #ffffff; font-size: 38px; font-weight: 800;
+            padding: 0 50px; white-space: nowrap; min-width: 180px; letter-spacing: 1.5px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
         }
         .score-b {
-            background: #111111; color: #ffcc00; font-size: 56px; font-weight: 900;
-            padding: 0 35px; font-family: 'Bebas Neue', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a, #1a1a1a); color: #ffcc00; font-size: 58px; font-weight: 900;
+            padding: 0 38px; font-family: 'Bebas Neue', sans-serif;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
         }
 
         #match-details-strip {
-            background: rgba(0, 0, 0, 0.9); color: #ffcc00; font-size: 24px; font-weight: 800;
+            background: rgba(0, 0, 0, 0.95); color: #ffcc00; font-size: 24px; font-weight: 800;
             padding: 6px 40px; margin-top: 8px; border-radius: 6px;
-            letter-spacing: 2px; border: 1px solid rgba(255, 255, 255, 0.4);
+            letter-spacing: 2.5px; border: 1.5px solid rgba(255, 204, 0, 0.6);
             transform: skewX(16deg); margin-right: 25px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
         }
         #match-details-strip.hidden { display: none; }
 
-        /* --- LOGO & WATERMARK (ULTRA SMOOTH ZOOM PULSE ANIMATION) --- */
+        /* --- LOGO & WATERMARK (SPIN & DROP / ZOOM PULSE ANIMATION) --- */
         #logo-container { 
             position: absolute; top: 25px; left: 30px; z-index: 9999; 
             display: flex; align-items: center; 
             transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            opacity: 1; transform: scale(1);
+            opacity: 1; transform: scale(1) rotate(0deg);
             will-change: transform;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
         }
-        #logo-container.hidden { opacity: 0; transform: scale(0.5) translateY(-20px); }
+        #logo-container.hidden { opacity: 0; transform: scale(0.3) translateY(-40px) rotate(-360deg); }
         
+        /* Spin and Drop Animation Style */
         #logo-container.animate-zoom-pulse {
-            animation: logoZoomPulse 1.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            animation: logoSpinDrop 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
-        @keyframes logoZoomPulse {
-            0% { transform: scale(1); }
-            30% { transform: scale(1.35) rotate(-4deg); filter: drop-shadow(0 0 25px rgba(51, 153, 255, 0.95)); }
-            60% { transform: scale(0.92) rotate(4deg); }
-            100% { transform: scale(1) rotate(0deg); }
+        @keyframes logoSpinDrop {
+            0% { transform: scale(1) rotate(0deg); }
+            35% { transform: scale(1.3) rotate(360deg); filter: drop-shadow(0 0 25px rgba(51, 153, 255, 0.95)); }
+            70% { transform: scale(0.9) rotate(720deg); }
+            100% { transform: scale(1) rotate(720deg); }
         }
 
         #main-logo { height: 100px; width: auto; object-fit: contain; }
@@ -110,43 +121,46 @@
         #single-wm {
             position: absolute; left: 300px; top: 300px; font-family: 'Bebas Neue', sans-serif; font-size: 50px; font-weight: bold;
             color: #ffffff; opacity: 0.45; letter-spacing: 3px; pointer-events: none;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
         }
 
-        /* --- TICKER STRIPS (SKY BLUE TOP) --- */
+        /* --- TICKER STRIPS (ULTRA HD & SHINY) --- */
         #ticker-wrap {
             position: absolute; bottom: 0; left: 0; width: 1920px; z-index: 9998;
             display: flex; flex-direction: column; transition: opacity 0.5s ease;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.8);
         }
         #ticker-wrap.hidden { opacity: 0; }
 
         .ticker-strip { display: flex; width: 100%; height: 60px; }
 
-        .strip-top { background: #3399ff; border-bottom: 2px solid rgba(0,0,0,0.5); }
-        .strip-bot { background: #121212; border-top: 1px solid rgba(255,255,255,0.15); }
+        .strip-top { background: linear-gradient(90deg, #1a8cff, #3399ff, #1a8cff); border-bottom: 2.5px solid rgba(0,0,0,0.6); }
+        .strip-bot { background: linear-gradient(90deg, #0d0d0d, #1a1a1a, #0d0d0d); border-top: 1.5px solid rgba(255,255,255,0.25); }
 
         .ticker-col {
             display: flex; align-items: center; justify-content: center; 
-            font-weight: 900; font-size: 32px; color: #ffffff !important; 
+            font-weight: 900; font-size: 33px; color: #ffffff !important; 
             overflow: hidden; position: relative; letter-spacing: 2px; padding: 0 15px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.8);
         }
 
         .w-30 { width: 30%; }
-        .w-40 { width: 40%; border-left: 2px solid rgba(255,255,255,0.3); border-right: 2px solid rgba(255,255,255,0.3); color: #ffffff !important; }
+        .w-40 { width: 40%; border-left: 2.5px solid rgba(255,255,255,0.35); border-right: 2.5px solid rgba(255,255,255,0.35); color: #ffffff !important; }
 
         /* 3D GHAIENT VS DESIGN IN MATCH LIST */
         .match-vs-3d {
             color: #ffcc00;
             background: #111;
-            padding: 2px 10px;
+            padding: 2px 12px;
             border-radius: 6px;
-            margin: 0 8px;
+            margin: 0 10px;
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 30px;
+            font-size: 32px;
             letter-spacing: 2px;
-            box-shadow: 0 4px 0 #b38f00, 0 6px 10px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 0 #b38f00, 0 6px 12px rgba(0,0,0,0.7);
             display: inline-block;
             transform: translateY(-2px);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
         }
 
         .anim-wrap {
@@ -166,15 +180,15 @@
         /* --- 10 SECONDS RESULT WINDOW --- */
         #result-popup {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
-            background: rgba(15, 15, 15, 0.95); border: 5px solid #ffcc00;
-            padding: 50px 80px; border-radius: 16px; color: white; text-align: center;
+            background: rgba(15, 15, 15, 0.98); border: 6px solid #ffcc00;
+            padding: 50px 80px; border-radius: 18px; color: white; text-align: center;
             z-index: 100000; transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            opacity: 0; box-shadow: 0 15px 50px rgba(0,0,0,0.9);
+            opacity: 0; box-shadow: 0 20px 60px rgba(0,0,0,0.95);
         }
         #result-popup.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        .res-title { font-size: 45px; color: #ffcc00; margin-bottom: 15px; font-weight: 900; border-bottom: 2px solid rgba(255, 204, 0, 0.4); padding-bottom: 8px; letter-spacing: 2px; }
-        .res-text-pa { font-size: 55px; font-weight: 800; line-height: 1.2; color: #ffffff; margin-bottom: 10px; letter-spacing: 1.5px; }
-        .res-text-en { font-size: 45px; font-weight: 800; line-height: 1.2; color: #3399ff; letter-spacing: 1.5px; }
+        .res-title { font-size: 45px; color: #ffcc00; margin-bottom: 15px; font-weight: 900; border-bottom: 2px solid rgba(255, 204, 0, 0.4); padding-bottom: 8px; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+        .res-text-pa { font-size: 55px; font-weight: 800; line-height: 1.2; color: #ffffff; margin-bottom: 10px; letter-spacing: 1.5px; text-shadow: 2px 2px 5px rgba(0,0,0,0.8); }
+        .res-text-en { font-size: 45px; font-weight: 800; line-height: 1.2; color: #3399ff; letter-spacing: 1.5px; text-shadow: 2px 2px 5px rgba(0,0,0,0.8); }
 
     </style>
 </head>
@@ -508,14 +522,14 @@
         renderIndependentTickers();
     }, 16000);
 
-    // --- PERIODIC LOGO ZOOM PULSE ANIMATION (हर 15 ਸੈਕਿੰਡ ਬਾਅਦ ਲੋਗੋ ਜ਼ੂਮ ਮਾਰੂਗਾ) ---
+    // --- PERIODIC LOGO SPIN & DROP ANIMATION (हर 15 ਸੈਕਿੰਡ ਬਾਅਦ ਲੋਗੋ ਘੁੰਮ ਕੇ ਡਿੱਗੇਗਾ) ---
     setInterval(() => {
         const logoBox = document.getElementById('logo-container');
         if (logoBox && !logoBox.classList.contains('hidden')) {
             logoBox.classList.add('animate-zoom-pulse');
             setTimeout(() => {
                 logoBox.classList.remove('animate-zoom-pulse');
-            }, 1400);
+            }, 1500);
         }
     }, 15000);
 
