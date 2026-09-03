@@ -1,129 +1,503 @@
 <!DOCTYPE html>
-<html>
+<html lang="pa">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kabaddi Ultra HD - Hint Top & Detail Bottom Overlay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@700;800&display=swap" rel="stylesheet">
+    
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
     <style>
-        body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Arial', sans-serif; overflow: hidden; position: relative; }
-        
-        #logo-container { position: absolute; top: 30px; left: 40px; z-index: 9999; opacity: 1; transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1); }
-        #logo-container.hidden { opacity: 0; transform: scale(0); pointer-events: none; }
-        #main-logo { height: 100px; width: auto; max-width: 450px; object-fit: contain; filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.3)); } 
-
-        /* Jump & Spin (Firki) Animation Setup */
-        #scoreboard { 
-            position: absolute; 
-            top: 40px; 
-            right: 80px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            z-index: 9999; 
-            opacity: 1; 
-            transform: scale(1) rotate(0deg) translateY(0); 
-            transition: all 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Bounce, jump and spin effect */
-        }
-        #scoreboard.hidden { 
-            opacity: 0; 
-            transform: scale(0.2) rotate(360deg) translateY(-150px); /* Firki maarda hoya gayab hovega */
-            pointer-events: none; 
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            width: 1920px;
+            height: 1080px;
+            background: transparent;
+            font-family: 'Noto Sans Gurmukhi', 'Mukta', Arial, sans-serif;
+            overflow: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            user-select: none;
+            text-transform: uppercase;
+            transform-origin: top left;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
         }
 
-        .main-bar { display: flex; align-items: center; height: 65px; background: rgba(255, 255, 255, 1); border-radius: 6px; border: 3px solid #000080; padding: 0; position: relative; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
-
-        .s-box { 
-            background: #000080; 
-            color: #ffffff; 
-            font-size: 42px; 
-            font-weight: 900; 
-            font-family: Arial, sans-serif; 
-            width: 120px; 
-            height: 100%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            position: relative; 
-            z-index: 11; 
+        /* --- ULTRA HD SCOREBOARD (SKY BLUE THEME) --- */
+        #top-scoreboard-container {
+            position: absolute;
+            top: 35px;
+            right: 45px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
         }
-        .s-left { border-right: 2px solid #ffffff; } 
-        .s-right { border-left: 2px solid #ffffff; }
-        .inner-val { transform: skewX(15deg); }
-        
-        .name-area { width: 220px; height: 100%; display: flex; align-items: center; overflow: hidden; white-space: nowrap; color: #000080; font-size: 28px; font-weight: bold; text-align: center; padding: 0 10px; box-sizing: border-box; text-transform: uppercase; background: #ffffff; } 
-        .team-scroller { display: inline-block; padding-left: 100%; animation: team-scroll 8s linear infinite; }
-        @keyframes team-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-        
-        .vs-text { color: #ffffff; font-size: 20px; font-weight: 900; margin: 0 5px; background: #000080; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; z-index: 11; }
+        #top-scoreboard-container.hidden { opacity: 0; }
 
-        .round-display { color: white; font-size: 22px; font-weight: bold; text-transform: uppercase; margin-top: 15px; text-shadow: 2px 2px 6px #000; letter-spacing: 2px; display: block; background: rgba(0,0,0,0.6); padding: 4px 15px; border-radius: 4px; }  
+        #main-score-strip {
+            display: flex;
+            align-items: stretch;
+            height: 75px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2.5px solid rgba(255, 255, 255, 0.9);
+            transform: skewX(16deg); 
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+        }
+
+        .unskew {
+            transform: skewX(-16deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .score-a {
+            background: linear-gradient(135deg, #0066cc, #0099ff); color: #ffffff; font-size: 58px; font-weight: 900;
+            padding: 0 38px; font-family: 'Bebas Neue', sans-serif;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .team-a-panel {
+            background: linear-gradient(135deg, #1a8cff, #4da6ff); color: #ffffff; font-size: 38px; font-weight: 800;
+            padding: 0 50px; white-space: nowrap; min-width: 180px; letter-spacing: 1.5px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .vs-divider { width: 12px; background: #111111; }
+
+        .team-b-panel {
+            background: linear-gradient(135deg, #1f1f1f, #2e2e2e); color: #ffffff; font-size: 38px; font-weight: 800;
+            padding: 0 50px; white-space: nowrap; min-width: 180px; letter-spacing: 1.5px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+        .score-b {
+            background: linear-gradient(135deg, #0a0a0a, #1a1a1a); color: #ffcc00; font-size: 58px; font-weight: 900;
+            padding: 0 38px; font-family: 'Bebas Neue', sans-serif;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        #match-details-strip {
+            background: rgba(0, 0, 0, 0.95); color: #ffcc00; font-size: 24px; font-weight: 800;
+            padding: 6px 40px; margin-top: 8px; border-radius: 6px;
+            letter-spacing: 2.5px; border: 1.5px solid rgba(255, 204, 0, 0.6);
+            transform: skewX(16deg); margin-right: 25px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+        }
+        #match-details-strip.hidden { display: none; }
+
+        /* --- LOGO & WATERMARK --- */
+        #logo-container { 
+            position: absolute; top: 25px; left: 30px; z-index: 9999; 
+            display: flex; align-items: center; 
+            transition: opacity 0.6s ease, transform 0.6s ease; 
+            opacity: 1; transform: scale(1) rotate(0deg);
+            will-change: transform;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+        }
+        #logo-container.hidden { opacity: 0; transform: scale(0.3) translateY(-40px) rotate(-360deg); }
+        
+        #logo-container.animate-slow-spin {
+            animation: logoSlowSpin 2.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes logoSlowSpin {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { filter: drop-shadow(0 0 20px rgba(51, 153, 255, 0.9)); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+
+        #main-logo { height: 100px; width: auto; object-fit: contain; }
+
+        #single-wm {
+            position: absolute; left: 300px; top: 300px; font-family: 'Bebas Neue', sans-serif; font-size: 50px; font-weight: bold;
+            color: #ffffff; opacity: 0.45; letter-spacing: 3px; pointer-events: none;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
+        }
+
+        /* --- TICKER STRIPS --- */
+        #ticker-wrap {
+            position: absolute; bottom: 0; left: 0; width: 1920px; z-index: 9998;
+            display: flex; flex-direction: column; transition: opacity 0.5s ease;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.8);
+        }
+        #ticker-wrap.hidden { opacity: 0; }
+
+        .ticker-strip { display: flex; width: 100%; height: 60px; }
+
+        .strip-top { background: linear-gradient(90deg, #1a8cff, #3399ff, #1a8cff); border-bottom: 2.5px solid rgba(0,0,0,0.6); }
+        .strip-bot { background: linear-gradient(90deg, #0d0d0d, #1a1a1a, #0d0d0d); border-top: 1.5px solid rgba(255,255,255,0.25); }
+
+        .ticker-col {
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: 900; font-size: 33px; color: #ffffff !important; 
+            overflow: hidden; position: relative; letter-spacing: 2px; padding: 0 15px;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.8);
+        }
+
+        .w-30 { width: 30%; }
+        .w-40 { width: 40%; border-left: 2.5px solid rgba(255,255,255,0.35); border-right: 2.5px solid rgba(255,255,255,0.35); color: #ffffff !important; }
+
+        /* 3D GHAIENT VS DESIGN IN MATCH LIST */
+        .match-vs-3d {
+            color: #ffcc00;
+            background: #111;
+            padding: 2px 12px;
+            border-radius: 6px;
+            margin: 0 10px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 32px;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 0 #b38f00, 0 6px 12px rgba(0,0,0,0.7);
+            display: inline-block;
+            transform: translateY(-2px);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+        }
+
+        /* --- VERTICAL SLIDE ANIMATION --- */
+        .anim-wrap {
+            position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
+            opacity: 1; transform: translateY(0);
+            will-change: transform, opacity;
+        }
+        .anim-out-up { opacity: 0; transform: translateY(-25px); }
+        .anim-in-down { opacity: 0; transform: translateY(25px); }
+
+        /* --- RESULT POPUP --- */
+        #result-popup {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            background: rgba(15, 15, 15, 0.98); border: 6px solid #ffcc00;
+            padding: 50px 80px; border-radius: 18px; color: white; text-align: center;
+            z-index: 100000; transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0; box-shadow: 0 20px 60px rgba(0,0,0,0.95);
+        }
+        #result-popup.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        .res-title { font-size: 45px; color: #ffcc00; margin-bottom: 15px; font-weight: 900; border-bottom: 2px solid rgba(255, 204, 0, 0.4); padding-bottom: 8px; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+        .res-text-pa { font-size: 55px; font-weight: 800; line-height: 1.2; color: #ffffff; margin-bottom: 10px; letter-spacing: 1.5px; text-shadow: 2px 2px 5px rgba(0,0,0,0.8); }
+        .res-text-en { font-size: 45px; font-weight: 800; line-height: 1.2; color: #3399ff; letter-spacing: 1.5px; text-shadow: 2px 2px 5px rgba(0,0,0,0.8); }
+
     </style>
 </head>
 <body>
 
-<div id="logo-container" class="hidden">
-    <img id="main-logo" src="" alt="Logo">
+<div id="logo-container" class="hidden"><img id="main-logo" src="" alt="Logo"></div>
+<div id="single-wm">ਐੱਮ ਲਾਈਵ</div>
+
+<div id="result-popup">
+    <div class="res-title">🏆 ਮੈਚ ਨਤੀਜਾ / MATCH RESULT</div>
+    <div class="res-text-pa" id="res-msg-pa">ਵਿਨਰ ਨਾਮ</div>
+    <div class="res-text-en" id="res-msg-en">WINNER NAME</div>
 </div>
 
-<div id="scoreboard">
-    <div class="main-bar">
-        <div class="s-box s-left"><div class="inner-val" id="sA">0</div></div>
-        <div class="name-area" id="nA-container"><div id="nA" style="width:100%; text-align:center;">TEAM 1</div></div>
-        <div class="vs-text">VS</div>
-        <div class="name-area" id="nB-container"><div id="nB" style="width:100%; text-align:center;">TEAM 2</div></div>
-        <div class="s-box s-right"><div class="inner-val" id="sB">0</div></div>
+<div id="top-scoreboard-container">
+    <div id="main-score-strip">
+        <div class="score-a"><div class="unskew" id="sA">0</div></div>
+        <div class="team-a-panel"><div class="unskew" id="nA">ਟੀਮ 1</div></div>
+        <div class="vs-divider"><div class="unskew"></div></div>
+        <div class="team-b-panel"><div class="unskew" id="nB">ਟੀਮ 2</div></div>
+        <div class="score-b"><div class="unskew" id="sB">0</div></div>
     </div>
-    <div class="round-display" id="round-display">LIVE MATCH</div>
+    <div id="match-details-strip" class="hidden"><div class="unskew" id="match-round"></div></div>
+</div>
+
+<div id="ticker-wrap">
+    <div class="ticker-strip strip-top" id="strip-1">
+        <div class="ticker-col w-30"><div id="s1-left" class="anim-wrap">📍 ਸਥਾਨ</div></div>
+        <div class="ticker-col w-40"><div id="s1-mid" class="anim-wrap">ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ</div></div>
+        <div class="ticker-col w-30"><div id="s1-right" class="anim-wrap">📅 ਆਉਣ ਵਾਲੇ ਮੇਲੇ</div></div>
+    </div>
+    
+    <div class="ticker-strip strip-bot" id="strip-2" style="display: none;">
+        <div class="ticker-col w-30"><div id="s2-left" class="anim-wrap">ਪਿੰਡ</div></div>
+        <div class="ticker-col w-40"><div id="s2-mid" class="anim-wrap">ਲਾਈਵ ਮੈਚ</div></div>
+        <div class="ticker-col w-30"><div id="s2-right" class="anim-wrap">ਵੇਰਵਾ</div></div>
+    </div>
 </div>
 
 <script>
+    function autoResizeOverlay() {
+        const baseWidth = 1920;
+        const baseHeight = 1080;
+        const scaleX = window.innerWidth / baseWidth;
+        const scaleY = window.innerHeight / baseHeight;
+        const scale = Math.min(scaleX, scaleY);
+        document.body.style.transform = `scale(${scale})`;
+        document.body.style.width = `${baseWidth}px`;
+        document.body.style.height = `${baseHeight}px`;
+    }
+    window.addEventListener('resize', autoResizeOverlay);
+    window.addEventListener('load', autoResizeOverlay);
+    autoResizeOverlay();
+
     const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
 
     const urlParams = new URLSearchParams(window.location.search);
     const matchId = urlParams.get('id') || 'defaultMatch';
     const db = firebase.database().ref("matchData/" + matchId);
+    const userDb = firebase.database().ref("users/" + matchId);
 
-    const clientLogos = {
-        "mudki1": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/image-Photoroom%20(4).png"
+    userDb.on("value", (snap) => {
+        const user = snap.val();
+        if (!user || Date.now() > new Date(user.expiryDate).getTime()) {
+            document.body.innerHTML = `<div style="width:100vw; height:100vh; display:flex; justify-content:center; align-items:center; background:black; color:white; font-size:50px; text-align:center;">🛑 ਪਲਾਨ ਖਤਮ ਹੋ ਗਿਆ ਹੈ<br>ਹੈਲਪ ਲਾਈਨ: ਮਨਪ੍ਰੀਤ ਮੁਦਕੀ<br>9115426711</div>`;
+        }
+    });
+
+    const clientLogos = { "gurujastv": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/kabaddisports1.png" };
+
+    let leftItems = [];
+    let centerItems = [];
+    let rightItems = [];
+    
+    let leftIdx = 0, centerIdx = 0, rightIdx = 0;
+    let isEnglish = false; 
+    let hasMatches = false;
+    let lastResult = ""; 
+
+    const dict = {
+        "Kabaddi": "ਕਬੱਡੀ", "Open": "ਓਪਨ", "Quarter Final": "ਕੁਆਰਟਰ ਫਾਈਨਲ",
+        "Semi Final": "ਸੈਮੀ ਫਾਈਨਲ", "Final": "ਫਾਈਨਲ", "1st Round": "ਪਹਿਲਾ ਰਾਊਂਡ",
+        "2nd Round": "ਦੂਜਾ ਰਾਊਂਡ", "3rd Round": "ਤੀਜਾ ਰਾਊਂਡ", "4th Round": "ਚੌਥਾ ਰਾਊਂਡ",
+        "Pool A": "ਪੂਲ ਏ", "Pool B": "ਪੂਲ ਬੀ"
     };
+
+    function translateToPunjabi(text) {
+        if(!text) return "";
+        let translated = text.trim();
+        for (let key in dict) {
+            let regex = new RegExp(key, 'gi');
+            translated = translated.replace(regex, dict[key]);
+        }
+        translated = translated.replace(/KG/gi, "ਕਿਲੋ");
+        return translated;
+    }
 
     db.on("value", (snap) => {
         const data = snap.val() || {}; 
-        const logoCont = document.getElementById('logo-container');
-        const currentId = matchId.trim().toLowerCase();
+        window.currentData = data; 
 
-        // Logo visibility with animation
-        if (clientLogos[currentId] && data.logoVisible !== false) {
-            document.getElementById('main-logo').src = clientLogos[currentId];
+        const logoCont = document.getElementById('logo-container');
+        if (clientLogos[matchId.trim().toLowerCase()] && data.logoVisible !== false) {
+            document.getElementById('main-logo').src = clientLogos[matchId.trim().toLowerCase()];
             logoCont.classList.remove('hidden');
         } else {
             logoCont.classList.add('hidden');
         }
 
-        // Scoreboard visibility with jump & spin (firki) animation
-        const scoreboard = document.getElementById('scoreboard');
-        if (data.scoreVisible === false) {
-            scoreboard.classList.add('hidden');
-        } else {
-            scoreboard.classList.remove('hidden');
-        }
+        document.getElementById('top-scoreboard-container').classList.toggle('hidden', data.scoreVisible === false);
+        document.getElementById('ticker-wrap').classList.toggle('hidden', data.tickerVisible === false);
         
-        // Update basic data
+        const roundText = data.round || "";
+        const detailsStrip = document.getElementById('match-details-strip');
+        if (roundText.trim() === "") {
+            detailsStrip.classList.add('hidden');
+        } else {
+            detailsStrip.classList.remove('hidden');
+            document.getElementById('match-round').innerText = translateToPunjabi(roundText);
+        }
+
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
-        setTeamName('nA-container', data.nameA || "TEAM 1");
-        setTeamName('nB-container', data.nameB || "TEAM 2");
-        
-        const roundEl = document.getElementById('round-display');
-        roundEl.innerText = data.round || "";
-        roundEl.style.display = (data.round || "").trim() === "" ? "none" : "block";
+        document.getElementById('single-wm').innerText = data.watermarkTxt || "ਐੱਮ ਲਾਈਵ";
+
+        if(data.resultText && data.resultText !== "No Result Yet" && data.resultText !== lastResult) {
+            lastResult = data.resultText;
+            showResultPopup(data.resultText);
+        }
+        if (!data.resultText || data.resultText === "No Result Yet") {
+            lastResult = ""; 
+        }
+
+        processTickerData(data);
     });
 
-    function setTeamName(containerId, txt) {
-        const el = document.getElementById(containerId);
-        el.innerHTML = txt.length > 12 ? `<div class="team-scroller">${txt}</div>` : `<div style="width:100%; text-align:center;">${txt}</div>`;
+    function showResultPopup(text) {
+        const popup = document.getElementById('result-popup');
+        document.getElementById('res-msg-pa').innerText = translateToPunjabi(text);
+        document.getElementById('res-msg-en').innerText = text;
+        popup.classList.add('show');
+        setTimeout(() => { popup.classList.remove('show'); }, 10000); 
     }
+
+    function processTickerData(data) {
+        // --- 1ST COLUMN: Village Name (Top = English, Bottom = Punjabi) ---
+        leftItems = [];
+        let vNameEn = data.row1Txt || "VILLAGE NAME";
+        let vNamePa = data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ ਦਾ ਨਾਮ";
+        leftItems.push({ topText: vNameEn, botText: vNamePa });
+
+        // Prizes & Details for 1st Column
+        let prizeList = [];
+        if(data.pzOp1) prizeList.push({ top: "🔥 OPEN 1ST PRIZE", bot: data.pzOp1 });
+        if(data.pzOp2) prizeList.push({ top: "🔥 OPEN 2ND PRIZE", bot: data.pzOp2 });
+        if(data.pzOpBest) prizeList.push({ top: "🏅 OPEN BEST PLAYER", bot: data.pzOpBest });
+
+        let wKg = data.pzWtKg ? data.pzWtKg : "WEIGHT";
+        let wKgPa = data.pzWtKg ? translateToPunjabi(data.pzWtKg) : "ਵਜ਼ਨੀ";
+
+        if(data.pzWt1) prizeList.push({ top: `🏋️ (${wKg}) 1ST PRIZE`, bot: data.pzWt1 });
+        if(data.pzWt2) prizeList.push({ top: `🏋️ (${wKg}) 2ND PRIZE`, bot: data.pzWt2 });
+        if(data.pzWtBest) prizeList.push({ top: `🏅 (${wKg}) BEST PLAYER`, bot: data.pzWtBest });
+
+        if(data.adComm) prizeList.push({ top: "🎙️ COMMENTATOR", bot: data.adComm });
+        if(data.adSound) prizeList.push({ top: "🔊 SOUND SERVICE", bot: data.adSound });
+        if(data.adTent) prizeList.push({ top: "⛺ TENT SERVICE", bot: data.adTent });
+        if(data.adSec) prizeList.push({ top: "🛡️ SECURITY", bot: data.adSec });
+
+        prizeList.forEach(p => {
+            let pPa = translateToPunjabi(p.top);
+            leftItems.push({ topText: p.top, botText: p.bot });
+        });
+
+        // --- 2ND COLUMN: Match List (Top = Punjabi, Bottom = English) ---
+        centerItems = [];
+        let matchesList = data.nextMatches || [];
+        hasMatches = matchesList.length > 0;
+        
+        let parseMatchFull = (m, index) => {
+            let bracketContent = "";
+            let teamPart = m;
+            if(m.startsWith("(")) {
+                let closeIdx = m.indexOf(")");
+                if(closeIdx !== -1) {
+                    bracketContent = m.substring(1, closeIdx).trim(); 
+                    teamPart = m.substring(closeIdx + 1).trim();     
+                }
+            }
+
+            let tms = teamPart.split(" VS ");
+            let t1Full = (tms[0] || "").trim();
+            let t2Full = (tms[1] || "").trim();
+            let t1En = t1Full.split("=")[0].trim();
+            let t1Pa = t1Full.split("=")[1]?.trim() || t1En;
+            let t2En = t2Full.split("=")[0].trim();
+            let t2Pa = t2Full.split("=")[1]?.trim() || t2En;
+
+            let bracketPa = translateToPunjabi(bracketContent);
+            let tagPa = bracketPa ? `(${bracketPa}) ` : "";
+            let tagEn = bracketContent ? `(${bracketContent}) ` : "";
+            let numTag = `${index + 1}. `;
+
+            let vsHtmlPa = ` <span class="match-vs-3d">ਬਨਾਮ</span> `;
+            let vsHtmlEn = ` <span class="match-vs-3d">VS</span> `;
+
+            return { 
+                pa: `${numTag}${tagPa}${t1Pa}${vsHtmlPa}${t2Pa}`, 
+                en: `${numTag}${tagEn}${t1En}${vsHtmlEn}${t2En}` 
+            };
+        };
+
+        if(hasMatches) {
+            matchesList.forEach((mStr, idx) => {
+                let res = parseMatchFull(mStr, idx);
+                centerItems.push({ topText: res.pa, botText: res.en });
+            });
+        } else {
+            centerItems.push({ topText: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", botText: "KABADDI TOURNAMENT" });
+        }
+
+        // --- 3RD COLUMN: Upcoming Events (Top = English, Bottom = Punjabi) ---
+        rightItems = [];
+        if(data.upcomingEvents && data.upcomingEvents.length > 0) {
+            data.upcomingEvents.forEach(ev => {
+                let d = ev.date ? ` (${ev.date})` : "";
+                rightItems.push({ topText: `${ev.name}${d}`, botText: `${ev.name_pa || ev.name}${d}` });
+            });
+        }
+        if(data.row6Txt || data.row6Txt_pa) {
+            rightItems.push({ topText: data.row6Txt || "LIVE STREAMING", botText: data.row6Txt_pa || data.row6Txt || "ਲਾਈਵ ਪ੍ਰਸਾਰਣ" });
+        }
+        if(rightItems.length === 0) {
+            rightItems.push({ topText: "STAY TUNED", botText: "ਦੇਖਦੇ ਰਹੋ" });
+        }
+        
+        document.getElementById('strip-2').style.display = hasMatches ? 'flex' : 'none';
+        renderIndependentTickers();
+    }
+
+    // --- SINGLE LINE TICKER UPDATE FUNCTION ---
+    function runSmartTicker(elementId, textToShow) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+
+        if (el.dataset.currentText === textToShow) return;
+        el.dataset.currentText = textToShow;
+
+        el.classList.add('anim-out-up');
+
+        setTimeout(() => {
+            el.innerHTML = textToShow;
+            el.classList.remove('anim-out-up');
+            el.classList.add('anim-in-down');
+
+            requestAnimationFrame(() => {
+                el.classList.remove('anim-in-down');
+            });
+        }, 400);
+    }
+
+    function renderIndependentTickers() {
+        let L = leftItems[leftIdx % leftItems.length];
+        let C = centerItems[centerIdx % centerItems.length];
+        let R = rightItems[rightIdx % rightItems.length];
+
+        // 1st Strip (Top): Village Name, Match List (Punjabi), Upcoming Events
+        runSmartTicker('s1-left', L.topText);
+        runSmartTicker('s1-mid', C.topText);
+        runSmartTicker('s1-right', R.topText);
+
+        // 2nd Strip (Bottom): Prizes/Details, Match List (English), Telecast/Events
+        runSmartTicker('s2-left', L.botText);
+        runSmartTicker('s2-mid', C.botText);
+        runSmartTicker('s2-right', R.botText);
+    }
+
+    // Rotate items every 6 seconds smoothly
+    setInterval(() => {
+        leftIdx++;
+        centerIdx++;
+        rightIdx++;
+        renderIndependentTickers();
+    }, 6000);
+
+    // --- PERIODIC SLOW SPIN ANIMATION FOR LOGO ---
+    setInterval(() => {
+        const logoBox = document.getElementById('logo-container');
+        if (logoBox && !logoBox.classList.contains('hidden')) {
+            logoBox.classList.add('animate-slow-spin');
+            setTimeout(() => {
+                logoBox.classList.remove('animate-slow-spin');
+            }, 2200);
+        }
+    }, 15000);
+
+    setInterval(() => {
+        let d = window.currentData;
+        if(d) {
+            document.getElementById('nA').innerText = d.nameA || "ਟੀਮ 1";
+            document.getElementById('nB').innerText = d.nameB || "ਟੀਮ 2";
+        }
+    }, 2000);
+
+    const wm = document.getElementById('single-wm');
+    let x = 200, y = 200, dx = 1.8, dy = 1.4;
+    function animateWatermark() {
+        const maxX = 1920 - wm.offsetWidth - 50; const maxY = 950 - wm.offsetHeight;
+        x += dx; y += dy;
+        if (x <= 50 || x >= maxX) dx *= -1; if (y <= 120 || y >= maxY) dy *= -1;
+        wm.style.left = x + 'px'; wm.style.top = y + 'px';
+        requestAnimationFrame(animateWatermark);
+    }
+    animateWatermark();
 </script>
 </body>
 </html>
