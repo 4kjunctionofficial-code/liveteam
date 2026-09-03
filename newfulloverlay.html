@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Ultra HD - Perfect Stable Overlay</title>
+    <title>Kabaddi Ultra HD - Hint Top & Detail Bottom Overlay</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -109,8 +109,8 @@
 
         .ticker-col {
             display: flex; align-items: center; justify-content: center; 
-            font-weight: 900; font-size: 34px; color: #ffffff !important; 
-            overflow: hidden; position: relative; letter-spacing: 2.5px; padding: 0 20px;
+            font-weight: 900; font-size: 32px; color: #ffffff !important; 
+            overflow: hidden; position: relative; letter-spacing: 2px; padding: 0 15px;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
         }
 
@@ -121,11 +121,11 @@
         .match-vs-3d {
             color: #ffcc00;
             background: #111;
-            padding: 2px 12px;
+            padding: 2px 10px;
             border-radius: 6px;
-            margin: 0 10px;
+            margin: 0 8px;
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 32px;
+            font-size: 30px;
             letter-spacing: 2px;
             box-shadow: 0 4px 0 #b38f00, 0 6px 10px rgba(0,0,0,0.5);
             display: inline-block;
@@ -232,7 +232,7 @@
     let rightItems = [];
     
     let leftIdx = 0, centerIdx = 0, rightIdx = 0;
-    let isEnglish = false; // Starts with Punjabi, then English cleanly
+    let isEnglish = false; 
     let hasMatches = false;
     let lastResult = ""; 
 
@@ -280,7 +280,7 @@
 
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
-        document.getElementById('single-wm').innerText = data.watermarkTxt || "ਐੱਮ ਲਾਈਵ";
+        document.getElementById('single-wm').innerText = data.watermarkTxt || "ਐੱም ਲਾਈਵ";
 
         if(data.resultText && data.resultText !== "No Result Yet" && data.resultText !== lastResult) {
             lastResult = data.resultText;
@@ -303,29 +303,30 @@
 
     function processTickerData(data) {
         leftItems = [];
-        // Storing structured items so Punjabi and English never mix up
+        // HINT ON TOP STRIP, DETAIL ON BOTTOM STRIP (Separated completely)
         leftItems.push({
-            en: "📍 LOCATION: " + (data.row1Txt || "VILLAGE NAME"),
-            pa: "📍 ਸਥਾਨ: " + (data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ ਦਾ ਨਾਮ")
+            hintEn: "📍 LOCATION", hintPa: "📍 ਸਥਾਨ",
+            detailEn: data.row1Txt || "VILLAGE NAME",
+            detailPa: data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ ਦਾ ਨਾਮ"
         });
 
-        if(data.pzOp1) leftItems.push({ en: "🔥 OPEN 1ST PRIZE: " + data.pzOp1, pa: "🔥 ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ: " + data.pzOp1 });
-        if(data.pzOp2) leftItems.push({ en: "🔥 OPEN 2ND PRIZE: " + data.pzOp2, pa: "🔥 ਓਪਨ ਦੂਜਾ ਇਨਾਮ: " + data.pzOp2 });
-        if(data.pzOpBest) leftItems.push({ en: "🏅 OPEN BEST PLAYER: " + data.pzOpBest, pa: "🏅 ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ: " + data.pzOpBest });
+        if(data.pzOp1) leftItems.push({ hintEn: "🔥 OPEN 1ST PRIZE", hintPa: "🔥 ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ", detailEn: data.pzOp1, detailPa: data.pzOp1 });
+        if(data.pzOp2) leftItems.push({ hintEn: "🔥 OPEN 2ND PRIZE", hintPa: "🔥 ਓਪਨ ਦੂਜਾ ਇਨਾਮ", detailEn: data.pzOp2, detailPa: data.pzOp2 });
+        if(data.pzOpBest) leftItems.push({ hintEn: "🏅 OPEN BEST PLAYER", hintPa: "🏅 ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ", detailEn: data.pzOpBest, detailPa: data.pzOpBest });
 
         let wKg = data.pzWtKg ? data.pzWtKg : "WEIGHT";
         let wKgPa = data.pzWtKg ? translateToPunjabi(data.pzWtKg) : "ਵਜ਼ਨੀ";
 
-        if(data.pzWt1) leftItems.push({ en: `🏋️ (${wKg}) 1ST PRIZE: ` + data.pzWt1, pa: `🏋️ (${wKgPa}) ਪਹਿਲਾ ਇਨਾਮ: ` + data.pzWt1 });
-        if(data.pzWt2) leftItems.push({ en: `🏋️ (${wKg}) 2ND PRIZE: ` + data.pzWt2, pa: `🏋️ (${wKgPa}) ਦੂਜਾ ਇਨਾਮ: ` + data.pzWt2 });
-        if(data.pzWtBest) leftItems.push({ en: `🏅 (${wKg}) BEST PLAYER: ` + data.pzWtBest, pa: `🏅 (${wKgPa}) ਬੈਸਟ ਖਿਡਾਰੀ: ` + data.pzWtBest });
+        if(data.pzWt1) leftItems.push({ hintEn: `🏋️ (${wKg}) 1ST PRIZE`, hintPa: `🏋️ (${wKgPa}) ਪਹਿਲਾ ਇਨਾਮ`, detailEn: data.pzWt1, detailPa: data.pzWt1 });
+        if(data.pzWt2) leftItems.push({ hintEn: `🏋️ (${wKg}) 2ND PRIZE`, hintPa: `🏋️ (${wKgPa}) ਦੂਜਾ ਇਨਾਮ`, detailEn: data.pzWt2, detailPa: data.pzWt2 });
+        if(data.pzWtBest) leftItems.push({ hintEn: `🏅 (${wKg}) BEST PLAYER`, hintPa: `🏅 (${wKgPa}) ਬੈਸਟ ਖਿਡਾਰੀ`, detailEn: data.pzWtBest, detailPa: data.pzWtBest });
 
-        if(data.adComm) leftItems.push({ en: "🎙️ COMMENTATOR: " + data.adComm, pa: "🎙️ ਕਮੈਂਟੇਟਰ: " + data.adComm });
-        if(data.adSound) leftItems.push({ en: "🔊 SOUND SERVICE: " + data.adSound, pa: "🔊 ਸਾਊਂਡ ਸਰਵਿਸ: " + data.adSound });
-        if(data.adTent) leftItems.push({ en: "⛺ TENT SERVICE: " + data.adTent, pa: "⛺ ਟੈਂਟ ਪੰਡਾਲ: " + data.adTent });
-        if(data.adSec) leftItems.push({ en: "🛡️ SECURITY: " + data.adSec, pa: "🛡️ ਸਕਿਓਰਿਟੀ: " + data.adSec });
+        if(data.adComm) leftItems.push({ hintEn: "🎙️ COMMENTATOR", hintPa: "🎙️ ਕਮੈਂਟੇਟਰ", detailEn: data.adComm, detailPa: data.adComm });
+        if(data.adSound) leftItems.push({ hintEn: "🔊 SOUND SERVICE", hintPa: "🔊 ਸਾਊਂਡ ਸਰਵਿਸ", detailEn: data.adSound, detailPa: data.adSound });
+        if(data.adTent) leftItems.push({ hintEn: "⛺ TENT SERVICE", hintPa: "⛺ ਟੈਂਟ ਪੰਡਾਲ", detailEn: data.adTent, detailPa: data.adTent });
+        if(data.adSec) leftItems.push({ hintEn: "🛡️ SECURITY", hintPa: "🛡️ ਸਕਿਓਰਿਟੀ", detailEn: data.adSec, detailPa: data.adSec });
 
-        // --- MATCH LIST (100% UNTOUCHED & STABLE) ---
+        // --- MATCH LIST (UNTOUCHED & STABLE) ---
         centerItems = [];
         let matchesList = data.nextMatches || [];
         hasMatches = matchesList.length > 0;
@@ -366,10 +367,13 @@
         if(hasMatches) {
             matchesList.forEach((mStr, idx) => {
                 let res = parseMatchFull(mStr, idx);
-                centerItems.push({ tPa: res.pa, bEn: res.en });
+                centerItems.push({ 
+                    hintPa: "⚔️ ਅਗਲਾ ਮੈਚ (NEXT MATCH)", hintEn: "⚔️ NEXT MATCH",
+                    tPa: res.pa, bEn: res.en 
+                });
             });
         } else {
-            centerItems.push({ tPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", bEn: "KABADDI TOURNAMENT" });
+            centerItems.push({ hintPa: "⚔️ ਮੈਚ ਲਿਸਟ", hintEn: "⚔️ MATCH LIST", tPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", bEn: "KABADDI TOURNAMENT" });
         }
 
         rightItems = [];
@@ -377,26 +381,28 @@
             data.upcomingEvents.forEach(ev => {
                 let d = ev.date ? ` (${ev.date})` : "";
                 rightItems.push({ 
-                    en: `📅 UPCOMING EVENTS: ${ev.name}${d}`, 
-                    pa: `📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ: ${ev.name_pa || ev.name}${d}` 
+                    hintEn: "📅 UPCOMING EVENTS", hintPa: "📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ",
+                    detailEn: `${ev.name}${d}`, detailPa: `${ev.name_pa || ev.name}${d}` 
                 });
             });
         }
         if(data.row6Txt || data.row6Txt_pa) {
             rightItems.push({ 
-                en: `📺 LIVE TELECAST: ${data.row6Txt || "LIVE STREAMING"}`, 
-                pa: `📺 ਲਾਈਵ ਪ੍ਰਸਾਰਣ: ${data.row6Txt_pa || data.row6Txt || "ਲਾਈਵ ਪ੍ਰਸਾਰਣ"}` 
+                hintEn: "📺 LIVE TELECAST", hintPa: "📺 ਲਾਈਵ ਪ੍ਰਸਾਰਣ",
+                detailEn: data.row6Txt || "LIVE STREAMING", detailPa: data.row6Txt_pa || data.row6Txt || "ਲਾਈਵ ਪ੍ਰਸਾਰਣ" 
             });
         }
         if(rightItems.length === 0) {
-            rightItems.push({ en: `📅 UPCOMING EVENTS: STAY TUNED`, pa: `📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ: ਦੇਖਦੇ ਰਹੋ` });
+            rightItems.push({ 
+                hintEn: "📅 UPCOMING EVENTS", hintPa: "📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ",
+                detailEn: "STAY TUNED", detailPa: "ਦੇਖਦੇ ਰਹੋ" 
+            });
         }
         
         document.getElementById('strip-2').style.display = hasMatches ? 'flex' : 'none';
         renderIndependentTickers();
     }
 
-    // SMART SCROLLING TIMER: Waits for exact text completion before moving to next item
     function runSmartTicker(elementId, textToShow, isCenter = false) {
         const el = document.getElementById(elementId);
         if (!el) return;
@@ -413,7 +419,7 @@
             let length = dummy.innerText.length;
 
             if (length > 25) {
-                let duration = Math.max(30, length * 0.8); // Ultra slow & smooth
+                let duration = Math.max(32, length * 0.85); // Ultra slow & smooth
                 el.innerHTML = `<div class="scroll-container"><span class="scroll-text" style="--scroll-duration: ${duration}s;">${textToShow}</span></div>`;
                 
                 let timerKey = elementId + "_timer";
@@ -450,24 +456,27 @@
         let R = rightItems[rightIdx % rightItems.length];
 
         if (hasMatches) {
-            // Left & Right boxes follow the clean Punjabi <-> English global toggle safely
-            runSmartTicker('s1-left', isEnglish ? L.en : L.pa, false);
-            runSmartTicker('s2-left', isEnglish ? L.en : L.pa, false);
-            
-            // Match list: Top strictly Punjabi, Bottom strictly English
-            runSmartTicker('s1-mid', C.tPa, true);
-            runSmartTicker('s2-mid', C.bEn, true);
+            // Top strip: Hint (Punjabi or English based on toggle)
+            runSmartTicker('s1-left', isEnglish ? L.hintEn : L.hintPa, false);
+            runSmartTicker('s1-mid', C.hintPa, true);
+            runSmartTicker('s1-right', isEnglish ? R.hintEn : R.hintPa, false);
 
-            runSmartTicker('s1-right', isEnglish ? R.en : R.pa, false);
-            runSmartTicker('s2-right', isEnglish ? R.en : R.pa, false);
+            // Bottom strip: Detail (Punjabi or English based on toggle)
+            runSmartTicker('s2-left', isEnglish ? L.detailEn : L.detailPa, false);
+            runSmartTicker('s2-mid', C.bEn, true); // Match list bottom is English
+            runSmartTicker('s2-right', isEnglish ? R.detailEn : R.detailPa, false);
         } else {
-            runSmartTicker('s1-left', isEnglish ? L.en : L.pa, false);
-            runSmartTicker('s1-mid', C.tPa, true);
-            runSmartTicker('s1-right', isEnglish ? R.en : R.pa, false);
+            runSmartTicker('s1-left', isEnglish ? L.hintEn : L.hintPa, false);
+            runSmartTicker('s1-mid', C.hintPa, true);
+            runSmartTicker('s1-right', isEnglish ? R.hintEn : R.hintPa, false);
+
+            runSmartTicker('s2-left', isEnglish ? L.detailEn : L.detailPa, false);
+            runSmartTicker('s2-mid', C.bEn, true);
+            runSmartTicker('s2-right', isEnglish ? R.detailEn : R.detailPa, false);
         }
     }
 
-    // GLOBAL LANGUAGE TOGGLE FOR SIDES (16 seconds per language cycle)
+    // GLOBAL LANGUAGE TOGGLE FOR SIDES (16 seconds cycle)
     setInterval(() => {
         isEnglish = !isEnglish;
         renderIndependentTickers();
