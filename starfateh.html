@@ -2,55 +2,230 @@
 <html lang="pa">
 <head>
     <meta charset="UTF-8">
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kabaddi Live Scoreboard Overlay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@600;700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        body { margin: 0; padding: 0; width: 1920px; height: 1080px; background: transparent; font-family: 'Bebas Neue', sans-serif; overflow: hidden; position: relative; }
-        
-        #logo-container { position: absolute; top: 30px; left: 40px; z-index: 9999; opacity: 1; transition: all 0.7s ease; }
-        #logo-container.hidden { opacity: 0; transform: scale(0); }
-        #main-logo { height: 100px; width: auto; max-width: 450px; object-fit: contain; filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.3)); }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            width: 1920px;
+            height: 1080px;
+            background: transparent;
+            font-family: 'Noto Sans Gurmukhi', 'Mukta', Arial, sans-serif;
+            overflow: hidden;
+            position: relative;
+            user-select: none;
+        }
 
-        #single-wm { position: absolute; left: 300px; top: 300px; font-family: 'Bebas Neue', sans-serif; font-size: 42px; font-weight: bold; color: #ffffff; opacity: 0.55; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,.8); white-space: nowrap; z-index: 9997; pointer-events: none; user-select: none; }
-        
-        /* NEW TOP-RIGHT SCOREBOARD STYLES */
-        #scoreboard { position: absolute; top: 30px; right: 40px; width: fit-content; height: auto; z-index: 9999; opacity: 1; transition: opacity 0.7s ease; display: flex; flex-direction: column; align-items: flex-end; background: transparent; }
+        /* Top Left Logo Container */
+        #logo-container {
+            position: absolute;
+            top: 25px;
+            left: 30px;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid #ffcc00;
+            border-radius: 6px;
+            padding: 4px 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            transition: all 0.5s ease;
+        }
+        #logo-container.hidden { opacity: 0; transform: scale(0.8); }
+        #main-logo { height: 45px; width: auto; object-fit: contain; }
+
+        /* Floating Moving Watermark */
+        #single-wm {
+            position: absolute;
+            left: 300px;
+            top: 300px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 38px;
+            font-weight: bold;
+            color: #ffffff;
+            opacity: 0.5;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+            white-space: nowrap;
+            z-index: 9997;
+            pointer-events: none;
+        }
+
+        /* --- EXACT TOP-RIGHT SCOREBOARD (Video Design Match) --- */
+        #scoreboard {
+            position: absolute;
+            top: 25px;
+            right: 35px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            transition: opacity 0.5s ease;
+        }
         #scoreboard.hidden { opacity: 0; }
 
-        .main-score-row { display: flex; flex-direction: row; height: 50px; border-radius: 4px; overflow: hidden; box-shadow: 2px 2px 6px rgba(0,0,0,0.6); font-family: Arial, sans-serif; }
-        
-        .score-box-new { display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 900; padding: 0 20px; }
-        .team-score-left { background-color: #8ac4ea; color: black; }
-        .team-score-right { background-color: #e6e6e6; color: black; }
+        .score-main-bar {
+            display: flex;
+            align-items: center;
+            height: 46px;
+            background: #09182b; /* Dark Navy Blue */
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
 
-        .team-name-new { display: flex; align-items: center; justify-content: center; background-color: #0b1d3a; color: white; font-size: 28px; font-weight: bold; padding: 0 30px; text-shadow: 1px 1px 2px black; }
-        .team-name-new:first-of-type { border-right: 2px solid #1a365d; }
+        /* Team A Score Box (Light Cyan / Blue) */
+        .score-a {
+            background-color: #4ab3f4;
+            color: #000000;
+            font-size: 28px;
+            font-weight: 900;
+            padding: 0 16px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 55px;
+        }
 
-        .match-info-new { background-color: #b08d44; color: white; font-size: 16px; font-family: Arial, sans-serif; font-weight: bold; padding: 6px 20px; margin-top: 4px; border-radius: 3px; box-shadow: 1px 1px 4px rgba(0,0,0,0.5); text-shadow: 1px 1px 1px black; text-transform: uppercase; }
-        
-        .team-scroller { white-space: nowrap; }
+        /* Team Names Box */
+        .team-box {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 700;
+            padding: 0 22px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+        }
 
-        /* BOTTOM TICKER STYLES (UNCHANGED) */
-        #ticker-wrap { position: absolute; bottom: 0px; left: 0px; width: 1920px; height: 1080px; z-index: 9998; opacity: 1; transition: opacity 0.7s ease; background-image: url('https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Copy%20of%20Star%20Kabaddi%20_20260711_110521_0000.png'); background-size: cover; background-position: center; background-repeat: no-repeat; pointer-events: none; }
+        .divider {
+            width: 2px;
+            height: 60%;
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Team B Score Box (Light Grey / White) */
+        .score-b {
+            background-color: #e2e8f0;
+            color: #000000;
+            font-size: 28px;
+            font-weight: 900;
+            padding: 0 16px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 55px;
+        }
+
+        /* Category / Round Strip (Bottom of Scoreboard) */
+        .round-box {
+            margin-top: 4px;
+            background: rgba(0, 0, 0, 0.9);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 800;
+            padding: 3px 14px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+        }
+
+        /* --- BOTTOM TICKER OVERLAY (Kabaddi365 Style) --- */
+        #ticker-wrap {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 1920px;
+            height: 60px;
+            z-index: 9998;
+            background: linear-gradient(180deg, #091a2f 0%, #030b16 100%);
+            border-top: 3px solid #ffcc00;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.8);
+            transition: opacity 0.5s ease;
+        }
         #ticker-wrap.hidden { opacity: 0; }
 
-        .row-text { position: absolute; display: flex; align-items: center; text-transform: uppercase; overflow: hidden; box-sizing: border-box; white-space: nowrap; padding-left: 10px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
-        .row-1 { bottom: 61px; left: 210px; width: 350px; height: 50px; font-size: 35px; color: #ffffff; }
-        .row-2 { bottom: 53px; left: 587px; width: 815px; height: 50px; font-size: 35px; color: #000000; text-shadow: none; }
-        .row-3 { bottom: 53px; left: 1425px; width: 550px; height: 50px; font-size: 30px; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: clip; }
-        .row-4 { bottom: 2px; left: 200px; width: 1730px; height: 50px; font-size: 30px; color: #ffffff; }
-        
+        .ticker-badge-left {
+            background: #ffcc00;
+            color: #000;
+            font-weight: 900;
+            font-size: 18px;
+            padding: 0 20px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .ticker-middle {
+            flex: 1;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            padding-left: 20px;
+        }
+
+        .scroller-text {
+            display: inline-block;
+            white-space: nowrap;
+            position: absolute;
+            font-size: 22px;
+            font-weight: 700;
+            color: #ffffff;
+            will-change: transform;
+            animation: scrollText 22s linear infinite;
+        }
+
         @keyframes scrollText {
             0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
         }
 
-        .scroller { display: inline-block; white-space: nowrap; position: absolute; will-change: transform; animation: scrollText 25s linear infinite; }
+        .ticker-badge-right {
+            background: #102a45;
+            color: #ffcc00;
+            border-left: 2px solid #ffcc00;
+            font-weight: 800;
+            font-size: 18px;
+            padding: 0 25px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+        }
 
-        .box-time { position: absolute; bottom: 1px; left: 3px; width: 190px; height: 40px; display: flex; align-items: center; justify-content: center; z-index: 12; overflow: hidden; }
-        .time-wrap, .date-wrap { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: opacity 0.3s ease-in-out; }
-        .time-str, .date-str { color: #ffffff; font-size: 30px; letter-spacing: 1px; text-shadow: 2px 2px 5px #000; }
+        /* Live Clock */
+        .clock-box {
+            position: absolute;
+            bottom: 68px;
+            left: 30px;
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: bold;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -60,31 +235,30 @@
 </div>
 
 <div id="single-wm">M LIVE</div>
-    
-<!-- REPLACED SCOREBOARD HTML -->
+
 <div id="scoreboard">
-    <div class="main-score-row">
-        <div class="score-box-new team-score-left" id="sA">0</div>
-        <div class="team-name-new" id="nA-container"><div id="nA">TEAM 1</div></div>
-        <div class="team-name-new" id="nB-container"><div id="nB">TEAM 2</div></div>
-        <div class="score-box-new team-score-right" id="sB">0</div>
+    <div class="score-main-bar">
+        <div class="score-a" id="sA">0</div>
+        <div class="team-box" id="nA-container"><span id="nA">ਟੀਮ 1</span></div>
+        <div class="divider"></div>
+        <div class="team-box" id="nB-container"><span id="nB">ਟੀਮ 2</span></div>
+        <div class="score-b" id="sB">0</div>
     </div>
-    <div class="match-info-new" id="round-display">LIVE MATCH</div>
+    <div class="round-box" id="round-display">72 KG QUARTER FINAL</div>
 </div>
 
 <div id="ticker-wrap">
-    <div class="row-text row-1" id="c1">WELCOME TO LIVE KABADDI</div>
-    <div class="row-text row-2" id="c2"><div class="scroller" id="scroller-c2">SUBSCRIBE OUR CHANNEL</div></div>
-    <div class="row-text row-3" id="c3">LIKE & SHARE</div>
-    <div class="row-text row-4" id="c4"><div class="scroller" id="scroller-c4">KEEP WATCHING</div></div> 
-
-    <div class="box-time">
-        <div class="time-wrap" id="t-wrap"><div class="time-str" id="live-time"></div></div>
-        <div class="date-wrap" id="d-wrap" style="opacity:0;"><div class="date-str" id="live-date"></div></div>
+    <div class="ticker-badge-left" id="c1">UPCOMING EVENTS</div>
+    <div class="ticker-middle">
+        <div class="scroller-text" id="scroller-c2">ਲਾਈਵ ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ ਵਿੱਚ ਤੁਹਾਡਾ ਸਵਾਗਤ ਹੈ</div>
     </div>
+    <div class="ticker-badge-right" id="c3">KAHRI SAHRI (HOSHIARPUR)</div>
 </div>
 
+<div class="clock-box" id="live-time">00:00:00</div>
+
 <script>
+    // Firebase Config
     const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
 
@@ -93,20 +267,17 @@
     const db = firebase.database().ref("matchData/" + matchId);
     const userDb = firebase.database().ref("users/" + matchId);
 
+    // Plan Expiry Check
     userDb.on("value", (snap) => {
         const user = snap.val();
         if (!user || Date.now() > new Date(user.expiryDate).getTime()) {
-            document.body.innerHTML = `<div style="width:100vw; height:100vh; display:flex; justify-content:center; align-items:center; background:black; color:white; font-size:60px; text-align:center; font-family:Arial;">🛑 PLAN EXPIRED<br><br>HELP LINE<br>MANPREET MUDKI<br>9115426711</div>`;
+            document.body.innerHTML = `<div style="width:100vw; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; background:black; color:white; font-size:50px; text-align:center; font-family:Arial;">🛑 PLAN EXPIRED<br><br>HELP LINE: MANPREET MUDKI<br>9115426711</div>`;
         }
     });
 
     const clientLogos = { "kabaddi101": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Kabaddi%20101%20logo.png" };
-    const tickerState = {
-        c2: { showPa: false, en: "", pa: "" },
-        c4: { showPa: false, en: "", pa: "" }
-    };
-    const tickerTimers = {};
 
+    // Realtime Updates from Firebase
     db.on("value", (snap) => {
         const data = snap.val() || {}; 
         const logoCont = document.getElementById('logo-container');
@@ -125,110 +296,35 @@
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
         
-        if (window.lastNameA !== data.nameA || window.lastNameA_pa !== data.nameA_pa) {
-            window.lastNameA = data.nameA; window.lastNameA_pa = data.nameA_pa;
-            setTeamName("nA-container", data.nameA, data.nameA_pa);
-        }
-        if (window.lastNameB !== data.nameB || window.lastNameB_pa !== data.nameB_pa) {
-            window.lastNameB = data.nameB; window.lastNameB_pa = data.nameB_pa;
-            setTeamName("nB-container", data.nameB, data.nameB_pa);
-        }
+        const nameA = (data.nameA_pa && data.nameA_pa.trim() !== "") ? data.nameA_pa : (data.nameA || "ਟੀਮ 1");
+        const nameB = (data.nameB_pa && data.nameB_pa.trim() !== "") ? data.nameB_pa : (data.nameB || "ਟੀਮ 2");
+        document.getElementById('nA-container').innerHTML = `<span>${nameA}</span>`;
+        document.getElementById('nB-container').innerHTML = `<span>${nameB}</span>`;
         
+        document.getElementById('round-display').innerText = data.round || "LIVE MATCH";
         document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
-        document.getElementById('round-display').innerText = data.round || "";
         
-        updateStaticTicker("c1", data.row1Txt, data.row1Txt_pa);
-        updateScrollingData("c2", data.row2Txt, data.row2Txt_pa); 
-        updateStaticTicker("c3", data.row3Txt, data.row3Txt_pa);
-        updateScrollingData("c4", data.row4Txt, data.row4Txt_pa);
+        if(data.row1Txt_pa || data.row1Txt) document.getElementById('c1').innerText = data.row1Txt_pa || data.row1Txt;
+        if(data.row2Txt_pa || data.row2Txt) document.getElementById('scroller-c2').innerText = data.row2Txt_pa || data.row2Txt;
+        if(data.row3Txt_pa || data.row3Txt) document.getElementById('c3').innerText = data.row3Txt_pa || data.row3Txt;
     });
 
-    function setTeamName(containerId, en, pa) {
-        const el = document.getElementById(containerId);
-        if (el) {
-            const txt = (pa && pa.trim() !== "") ? pa : (en || "TEAM");
-            el.innerHTML = `<div class="team-scroller">${txt}</div>`;
-        }
-    }
-
-    function updateStaticTicker(id, en, pa) {
-        const el = document.getElementById(id);
-        if (tickerTimers[id]) clearInterval(tickerTimers[id]);
-
-        let showPunjabi = false;
-        function change() {
-            let isPa = showPunjabi && pa && pa.trim() !== "";
-            let rawTxt = isPa ? pa : (en || "");
-            
-            el.style.fontWeight = isPa ? "bold" : "normal";
-            el.innerText = rawTxt.replace(/(\r\n|\n|\r)/gm, " ");
-            
-            showPunjabi = !showPunjabi;
-        }
-        change();
-        if ((pa && pa.trim() !== "")) {
-            tickerTimers[id] = setInterval(change, 8000);
-        }
-    }
-
-    function updateScrollingData(id, en, pa) {
-        const state = tickerState[id];
-        const newEn = en || "";
-        const newPa = pa || "";
-
-        if (state.en !== newEn || state.pa !== newPa) {
-            state.en = newEn;
-            state.pa = newPa;
-            renderScrollingText(id);
-        }
-    }
-
-    function renderScrollingText(id) {
-        const scrollerEl = document.getElementById(`scroller-${id}`);
-        const state = tickerState[id];
-        if (!scrollerEl) return;
-
-        const isPa = state.showPa && state.pa.trim() !== "";
-        const currentTxt = isPa ? state.pa : state.en;
-        
-        scrollerEl.style.fontWeight = isPa ? "bold" : "normal";
-        scrollerEl.innerText = currentTxt.replace(/(\r\n|\n|\r)/gm, " ");
-
-        scrollerEl.onanimationiteration = null;
-
-        if (state.pa && state.pa.trim() !== "") {
-            scrollerEl.onanimationiteration = () => {
-                state.showPa = !state.showPa;
-                const nextIsPa = state.showPa && state.pa.trim() !== "";
-                const nextTxt = nextIsPa ? state.pa : state.en;
-                
-                scrollerEl.style.fontWeight = nextIsPa ? "bold" : "normal";
-                scrollerEl.innerText = nextTxt.replace(/(\r\n|\n|\r)/gm, " ");
-            };
-        }
-    }
-
+    // Clock
     function updateClock() {
         const now = new Date();
-        document.getElementById('live-time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        document.getElementById('live-date').innerText = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+        document.getElementById('live-time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     }
     setInterval(updateClock, 1000); updateClock();
 
-    let isTime = true;
-    setInterval(() => { 
-        isTime = !isTime; 
-        document.getElementById('t-wrap').style.opacity = isTime ? "1" : "0"; 
-        document.getElementById('d-wrap').style.opacity = isTime ? "0" : "1"; 
-    }, 3000);
-
+    // Moving Watermark
     const wm = document.getElementById('single-wm');
-    let x = 100, y = 250, dx = 2.2, dy = 1.6;
+    let x = 200, y = 200, dx = 1.8, dy = 1.4;
     function animateWatermark() {
-        const maxX = 1920 - wm.offsetWidth, maxY = 980 - wm.offsetHeight;
+        const maxX = 1920 - wm.offsetWidth - 50;
+        const maxY = 950 - wm.offsetHeight;
         x += dx; y += dy;
-        if (x <= 0 || x >= maxX) dx *= -1;
-        if (y <= 170 || y >= maxY) dy *= -1;
+        if (x <= 50 || x >= maxX) dx *= -1;
+        if (y <= 120 || y >= maxY) dy *= -1;
         wm.style.left = x + 'px'; wm.style.top = y + 'px';
         requestAnimationFrame(animateWatermark);
     }
