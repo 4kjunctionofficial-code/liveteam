@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Ultra HD - Perfect Language Sync Overlay</title>
+    <title>Kabaddi Ultra HD - Exact Punjabi & English Match List</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -122,11 +122,10 @@
             transition: opacity 0.6s ease, transform 0.6s ease; opacity: 1;
         }
 
-        /* VERY SLOW & SMOOTH SCROLLING SPEED */
         .scroll-container { width: 100%; overflow: hidden; display: flex; align-items: center; white-space: nowrap; }
         .scroll-text {
             display: inline-block; white-space: nowrap; padding-left: 100%; 
-            animation: scrollMarquee 24s linear forwards; /* Slower speed: 24 seconds */
+            animation: scrollMarquee 18s linear forwards;
         }
         @keyframes scrollMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
@@ -289,7 +288,7 @@
         if(data.adTent) leftItems.push({ tEn: "⛺ TENT SERVICE", bEn: data.adTent, tPa: "⛺ ਟੈਂਟ ਪੰਡਾਲ", bPa: data.adTent });
         if(data.adSec) leftItems.push({ tEn: "🛡️ SECURITY", bEn: data.adSec, tPa: "🛡️ ਸਕਿਓਰਿਟੀ", bPa: data.adSec });
 
-        // --- CENTER ITEMS (PERFECT LANGUAGE SYNC: TOP PUNJABI, BOTTOM ENGLISH) ---
+        // --- CENTER ITEMS (TOP = PUNJABI, BOTTOM = ENGLISH STRICTLY) ---
         centerItems = [];
         let matchesList = data.nextMatches || [];
         hasMatches = matchesList.length > 0;
@@ -300,6 +299,7 @@
             let tms = main.split(" VS ");
             let t1 = (tms[0] || "").split(" / "); let t2 = (tms[1] || "").split(" / ");
             let en = `${prefix}${t1[0]?.trim() || ""} VS ${t2[0]?.trim() || ""}`;
+            // If Punjabi translation exists, use it. Otherwise fallback to English.
             let pa = `${prefix}${t1[1]?.trim() || t1[0]?.trim() || ""} VS ${t2[1]?.trim() || t2[0]?.trim() || ""}`;
             return {en, pa};
         };
@@ -308,10 +308,10 @@
             matchesList.forEach(mStr => {
                 let m = splitMatch(mStr);
                 centerItems.push({
-                    tEn: `⚔️ ${m.pa}`, // English mode vich vi upar Punjabi
-                    bEn: `⚔️ ${m.en}`, // te hethan English
-                    tPa: `⚔️ ${m.pa}`, // Punjabi mode vich vi upar Punjabi
-                    bPa: `⚔️ ${m.en}`  // te hethan English
+                    tEn: `⚔️ ${m.pa}`, // Top strip strictly Punjabi
+                    bEn: `⚔️ ${m.en}`, // Bottom strip strictly English
+                    tPa: `⚔️ ${m.pa}`, 
+                    bPa: `⚔️ ${m.en}`
                 });
             });
         } else {
@@ -369,9 +369,9 @@
         if(hasMatches) {
             animateText('s1-left', isEnglish ? L.tEn : L.tPa, false);
             animateText('s2-left', isEnglish ? L.bEn : L.bPa, false);
-            // Match list: Top always Punjabi, Bottom always English
+            // MATCH LIST: TOP ALWAYS PUNJABI (tPa), BOTTOM ALWAYS ENGLISH (bEn)
             animateText('s1-mid', C.tPa, true);
-            animateText('s2-mid', C.bPa, true);
+            animateText('s2-mid', C.bEn, true);
             animateText('s1-right', isEnglish ? R.tEn : R.tPa, false);
             animateText('s2-right', isEnglish ? R.bEn : R.bPa, false);
         } else {
@@ -383,7 +383,7 @@
 
     setInterval(() => {
         if(!isEnglish) { leftIdx++; rightIdx++; }
-        centerIdx++; // Match list cycles continuously
+        centerIdx++; 
         isEnglish = !isEnglish; 
         
         let d = window.currentData;
