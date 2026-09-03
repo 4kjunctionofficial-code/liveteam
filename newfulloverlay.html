@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Ultra HD - Final Custom Overlay</title>
+    <title>Kabaddi Ultra HD - Full Scroll Completion Animation</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -137,15 +137,15 @@
             transition: opacity 0.6s ease, transform 0.6s ease; opacity: 1;
         }
 
-        /* VERY SLOW SCROLLING SPEED (36 SECONDS FOR FULL SMOOTH LOOP) */
+        /* DYNAMIC SCROLL SPEED (Calculated precisely per text length) */
         .scroll-container { width: 100%; overflow: hidden; display: flex; align-items: center; white-space: nowrap; }
         .scroll-text {
             display: inline-block; white-space: nowrap; padding-left: 100%; 
-            animation: scrollMarquee 36s linear infinite; 
+            animation: scrollMarquee var(--scroll-duration, 25s) linear forwards; 
         }
         @keyframes scrollMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        /* --- 10 SECONDS RESULT WINDOW (BILINGUAL) --- */
+        /* --- 10 SECONDS RESULT WINDOW --- */
         #result-popup {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
             background: rgba(15, 15, 15, 0.95); border: 5px solid #ffcc00;
@@ -237,7 +237,6 @@
     let hasMatches = false;
     let lastResult = ""; 
 
-    // Translation Dictionary for English terms to Pure Punjabi
     const dict = {
         "Kabaddi": "ਕਬੱਡੀ", "Open": "ਓਪਨ", "Quarter Final": "ਕੁਆਰਟਰ ਫਾਈਨਲ",
         "Semi Final": "ਸੈਮੀ ਫਾਈਨਲ", "Final": "ਫਾਈਨਲ", "1st Round": "ਪਹਿਲਾ ਰਾਊਂਡ",
@@ -282,7 +281,7 @@
 
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
-        document.getElementById('single-wm').innerText = data.watermarkTxt || "ਐੱም ਲਾਈਵ";
+        document.getElementById('single-wm').innerText = data.watermarkTxt || "ਐੱਮ ਲਾਈਵ";
 
         if(data.resultText && data.resultText !== "No Result Yet" && data.resultText !== lastResult) {
             lastResult = data.resultText;
@@ -326,7 +325,6 @@
         if(data.adTent) leftItems.push({ tEn: "⛺ TENT SERVICE", bEn: data.adTent, tPa: "⛺ ਟੈਂਟ ਪੰਡਾਲ", bPa: data.adTent });
         if(data.adSec) leftItems.push({ tEn: "🛡️ SECURITY", bEn: data.adSec, tPa: "🛡️ ਸਕਿਓਰਿਟੀ", bPa: data.adSec });
 
-        // --- CENTER ITEMS: PARSING MATCH LIST WITH NUMBERING AND 3D VS ---
         centerItems = [];
         let matchesList = data.nextMatches || [];
         hasMatches = matchesList.length > 0;
@@ -353,10 +351,8 @@
             let bracketPa = translateToPunjabi(bracketContent);
             let tagPa = bracketPa ? `(${bracketPa}) ` : "";
             let tagEn = bracketContent ? `(${bracketContent}) ` : "";
-
             let numTag = `${index + 1}. `;
 
-            // Using 3D HTML block for VS
             let vsHtmlPa = ` <span class="match-vs-3d">ਬਨਾਮ</span> `;
             let vsHtmlEn = ` <span class="match-vs-3d">VS</span> `;
 
@@ -369,10 +365,7 @@
         if(hasMatches) {
             matchesList.forEach((mStr, idx) => {
                 let res = parseMatchFull(mStr, idx);
-                centerItems.push({
-                    tPa: res.pa, // Top line strictly Punjabi
-                    bEn: res.en  // Bottom line strictly English
-                });
+                centerItems.push({ tPa: res.pa, bEn: res.en });
             });
         } else {
             centerItems.push({ tPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", bEn: "KABADDI TOURNAMENT" });
@@ -393,66 +386,87 @@
         }
         
         document.getElementById('strip-2').style.display = hasMatches ? 'flex' : 'none';
-        renderTickersIndependent();
+        renderIndependentTickers();
     }
 
-    // INDEPENDENT ANIMATION: Only updates text after current scroll iteration/fade completes smoothly
-    function animateIndependent(elementId, newHtml) {
+    // SMART FUNCTION: Waits for exact scroll duration before switching to next item
+    function runSmartTicker(elementId, itemObj, isCenter = false) {
         const el = document.getElementById(elementId);
         if (!el) return;
-        if (el.innerHTML.trim() === newHtml.trim()) return; 
+
+        let textToShow = isCenter ? itemObj.tPa : (isEnglish ? itemObj.tEn : itemObj.bEn);
+        if (el.dataset.currentText === textToShow) return;
+        el.dataset.currentText = textToShow;
 
         el.style.opacity = 0;
         el.style.transform = 'translateY(-12px)';
-        
-        setTimeout(() => {
-            // Check length to decide if scroll marquee is needed
-            let plainTextTag = document.createElement("div");
-            plainTextTag.innerHTML = newHtml;
-            let textLen = plainTextTag.innerText.length;
 
-            if(textLen > 25) {
-                el.innerHTML = `<div class="scroll-container"><span class="scroll-text">${newHtml}</span></div>`;
+        setTimeout(() => {
+            let dummy = document.createElement("div");
+            dummy.innerHTML = textToShow;
+            let length = dummy.innerText.length;
+
+            if (length > 22) {
+                // Dynamic duration based on text length (Slow & Smooth)
+                let duration = Math.max(28, length * 0.7); 
+                el.innerHTML = `<div class="scroll-container"><span class="scroll-text" style="--scroll-duration: ${duration}s;">${textToShow}</span></div>`;
+                
+                // Schedule next update precisely AFTER the scroll finishes
+                let timerKey = elementId + "_timer";
+                if (window[timerKey]) clearTimeout(window[timerKey]);
+                
+                window[timerKey] = setTimeout(() => {
+                    if (isCenter) centerIdx++;
+                    else if (elementId.includes("left")) leftIdx++;
+                    else if (elementId.includes("right")) rightIdx++;
+                    renderIndependentTickers();
+                }, duration * 1000);
+
             } else {
-                el.innerHTML = newHtml;
+                el.innerHTML = textToShow;
+                let timerKey = elementId + "_timer";
+                if (window[timerKey]) clearTimeout(window[timerKey]);
+
+                window[timerKey] = setTimeout(() => {
+                    if (isCenter) centerIdx++;
+                    else if (elementId.includes("left")) leftIdx++;
+                    else if (elementId.includes("right")) rightIdx++;
+                    renderIndependentTickers();
+                }, 10000); // Static text display duration
             }
+
             el.style.transform = 'translateY(12px)';
             setTimeout(() => { el.style.opacity = 1; el.style.transform = 'translateY(0)'; }, 60);
-        }, 500); 
+        }, 500);
     }
 
-    function renderTickersIndependent() {
+    function renderIndependentTickers() {
         let L = leftItems[leftIdx % leftItems.length];
         let C = centerItems[centerIdx % centerItems.length];
         let R = rightItems[rightIdx % rightItems.length];
 
-        if(hasMatches) {
-            animateIndependent('s1-left', isEnglish ? L.tEn : L.tPa);
-            animateIndependent('s2-left', isEnglish ? L.bEn : L.bPa);
+        if (hasMatches) {
+            runSmartTicker('s1-left', L, false);
+            runSmartTicker('s2-left', { tEn: L.bEn, tPa: L.bPa }, false);
             
             // Match list: Top strictly Punjabi, Bottom strictly English
-            animateIndependent('s1-mid', C.tPa);
-            animateIndependent('s2-mid', C.bEn);
+            runSmartTicker('s1-mid', C, true);
+            runSmartTicker('s2-mid', { tPa: C.bEn }, true);
 
-            animateIndependent('s1-right', isEnglish ? R.tEn : R.tPa);
-            animateIndependent('s2-right', isEnglish ? R.bEn : R.bPa);
+            runSmartTicker('s1-right', R, false);
+            runSmartTicker('s2-right', { tEn: R.bEn, tPa: R.bPa }, false);
         } else {
-            animateIndependent('s1-left', isEnglish ? L.tEn : L.tPa);
-            animateIndependent('s1-mid', isEnglish ? C.tEn : C.tPa);
-            animateIndependent('s1-right', isEnglish ? R.tEn : R.tPa);
+            runSmartTicker('s1-left', L, false);
+            runSmartTicker('s1-mid', C, true);
+            runSmartTicker('s1-right', R, false);
         }
     }
-
-    // INDEPENDENT TIMERS FOR EACH COLUMN WITH LONGER INTERVALS FOR SMOOTH COMPLETION
-    setInterval(() => { leftIdx++; renderTickersIndependent(); }, 16000);
-    setInterval(() => { centerIdx++; renderTickersIndependent(); }, 14000);
-    setInterval(() => { rightIdx++; renderTickersIndependent(); }, 18000);
 
     // GLOBAL LANGUAGE TOGGLE FOR SIDES
     setInterval(() => {
         isEnglish = !isEnglish;
-        renderTickersIndependent();
-    }, 14000);
+        renderIndependentTickers();
+    }, 15000);
 
     // SCOREBOARD SYNC
     setInterval(() => {
