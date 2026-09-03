@@ -182,7 +182,6 @@
                 opacity 0.45s ease;
         }
 
-        /* Normal text: animation starts from the center */
         .anim-wrap.anim-center-in {
             animation: tickerCenterIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
@@ -192,7 +191,6 @@
             100% { opacity: 1; transform: scale(1); }
         }
 
-        /* Long text: scroll from center toward the outside edge and repeat */
         .anim-wrap.marquee-mode {
             justify-content: flex-start;
             overflow: hidden;
@@ -451,7 +449,6 @@
                 centerItems.push({ topText: res.pa, botText: res.en });
             });
         } else {
-            // SINGLE LINE FALLBACK WHEN NO MATCHES EXIST
             centerItems.push({ topText: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ - ਲਾਈਵ ਅੱਪਡੇਟ", botText: "KABADDI TOURNAMENT - LIVE UPDATES" });
         }
 
@@ -476,7 +473,6 @@
             rightItems.push({ topText: "📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ - ਦੇਖਦੇ ਰਹੋ", botText: "📅 UPCOMING EVENTS - STAY TUNED" });
         }
         
-        // Show/Hide bottom strip depending on match availability
         document.getElementById('strip-2').style.display = hasMatches ? 'flex' : 'none';
         renderIndependentTickers();
     }
@@ -489,25 +485,20 @@
         if (el.dataset.currentText === textToShow) return;
         el.dataset.currentText = textToShow;
 
-        // Stop any previous animation cleanly.
         el.classList.remove('marquee-mode', 'anim-center-in', 'anim-out-up', 'anim-in-down');
         el.style.removeProperty('--marquee-duration');
         el.style.removeProperty('--text-width');
         el.innerHTML = '';
 
-        // Keep the text in its own element so its real width can be measured.
         const textNode = document.createElement('span');
         textNode.className = 'ticker-text';
         textNode.innerHTML = textToShow;
         el.appendChild(textNode);
 
-        // Let the browser calculate the actual rendered text width.
         requestAnimationFrame(() => {
             const boxWidth = el.clientWidth;
             const textWidth = textNode.scrollWidth;
 
-            // If text is wider than the ticker box, scroll it horizontally.
-            // Otherwise keep it centered and animate it in from the center.
             if (textWidth > boxWidth - 20) {
                 const extraDistance = textWidth - boxWidth;
                 const duration = Math.max(7, (textWidth + boxWidth) / 120);
@@ -516,7 +507,6 @@
                 el.style.setProperty('--text-width', `${textWidth}px`);
                 el.style.setProperty('--marquee-duration', `${duration}s`);
 
-                // Re-trigger marquee from the center every time the text changes.
                 textNode.style.animation = 'none';
                 void textNode.offsetWidth;
                 textNode.style.animation = `tickerMarquee ${duration}s linear infinite`;
@@ -532,7 +522,6 @@
         let R = rightItems[rightIdx % rightItems.length];
 
         if (hasMatches) {
-            // DOUBLE LINE MODE (When matches exist)
             document.getElementById('strip-2').style.display = 'flex';
             runSmartTicker('s1-left', L.topText);
             runSmartTicker('s1-mid', C.topText);
@@ -542,7 +531,6 @@
             runSmartTicker('s2-mid', C.botText);
             runSmartTicker('s2-right', R.botText);
         } else {
-            // SINGLE LINE FALLBACK MODE (When no matches exist)
             document.getElementById('strip-2').style.display = 'none';
             runSmartTicker('s1-left', L.topText);
             runSmartTicker('s1-mid', C.topText);
@@ -550,7 +538,6 @@
         }
     }
 
-    // Rotate items every 6 seconds smoothly
     setInterval(() => {
         leftIdx++;
         centerIdx++;
@@ -558,7 +545,6 @@
         renderIndependentTickers();
     }, 6000);
 
-    // --- PERIODIC SLOW SPIN ANIMATION FOR LOGO ---
     setInterval(() => {
         const logoBox = document.getElementById('logo-container');
         if (logoBox && !logoBox.classList.contains('hidden')) {
