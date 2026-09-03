@@ -374,11 +374,11 @@
         if(data.upcomingEvents && data.upcomingEvents.length > 0) {
             data.upcomingEvents.forEach(ev => {
                 let d = ev.date ? ` (${ev.date})` : "";
-                rightItems.push({ tEn: " UPCOMING EVENTS", bEn: `${ev.name}${d}`, tPa: "ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ", bPa: `${ev.name_pa || ev.name}${d}` });
+                rightItems.push({ tEn: "UPCOMING EVENTS", bEn: `${ev.name}${d}`, tPa: "ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ", bPa: `${ev.name_pa || ev.name}${d}` });
             });
         }
         if(data.row6Txt || data.row6Txt_pa) {
-            rightItems.push({ tEn: " LIVE TELECAST", bEn: data.row6Txt || "LIVE STREAMING", tPa: "ਲਾਈਵ ਪ੍ਰਸਾਰਣ", bPa: data.row6Txt_pa || data.row6Txt || "ਲਾਈਵ ਪ੍ਰਸਾਰਣ" });
+            rightItems.push({ tEn: "LIVE TELECAST", bEn: data.row6Txt || "LIVE STREAMING", tPa: "ਲਾਈਵ ਪ੍ਰਸਾਰਣ", bPa: data.row6Txt_pa || data.row6Txt || "ਲਾਈਵ ਪ੍ਰਸਾਰਣ" });
         }
         if(rightItems.length === 0) {
             rightItems.push({ tEn: "UPCOMING EVENTS", bEn: "STAY TUNED", tPa: "ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ", bPa: "ਦੇਖਦੇ ਰਹੋ" });
