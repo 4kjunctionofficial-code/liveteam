@@ -22,7 +22,7 @@
             text-transform: uppercase;
         }
 
-        /* --- HD SCOREBOARD (STYLISH & SPACIOUS) --- */
+        /* --- HD SCOREBOARD (WITHOUT VS DIVIDER) --- */
         #top-scoreboard-container {
             position: absolute;
             top: 35px;
@@ -38,7 +38,7 @@
         #main-score-strip {
             display: flex;
             align-items: stretch;
-            height: 75px; /* Thoda wadda height */
+            height: 75px;
             border-radius: 6px;
             overflow: hidden;
             border: 2px solid rgba(255, 255, 255, 0.5);
@@ -63,20 +63,10 @@
             padding: 0 50px; white-space: nowrap; min-width: 180px; letter-spacing: 1px;
         }
 
-        /* GHANTO STYLISH VS DIVIDER */
+        /* Divider without VS text */
         .vs-divider {
-            width: 55px;
+            width: 10px;
             background: #111111;
-            color: #ffcc00;
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 28px;
-            font-weight: 900;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-left: 2px solid #ffcc00;
-            border-right: 2px solid #ffcc00;
-            letter-spacing: 1px;
         }
 
         .team-b-panel {
@@ -106,20 +96,20 @@
             color: #ffffff; opacity: 0.45; letter-spacing: 3px; pointer-events: none;
         }
 
-        /* --- TICKER STRIPS (SPACIOUS & CLEAR) --- */
+        /* --- TICKER STRIPS --- */
         #ticker-wrap {
             position: absolute; bottom: 0; left: 0; width: 1920px; z-index: 9998;
             display: flex; flex-direction: column; transition: opacity 0.5s ease;
         }
         #ticker-wrap.hidden { opacity: 0; }
 
-        .ticker-strip { display: flex; width: 100%; height: 60px; /* Thoda wadda height khullhe dulle akhar lai */ }
+        .ticker-strip { display: flex; width: 100%; height: 60px; }
 
         .strip-top { background: #0b4596; border-bottom: 2px solid rgba(0,0,0,0.5); }
         .strip-bot { background: #121212; border-top: 1px solid rgba(255,255,255,0.15); }
 
         .ticker-col {
-            display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 30px; /* Bigger font */
+            display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 30px;
             color: #ffffff; overflow: hidden; position: relative; letter-spacing: 1.5px; padding: 0 20px;
         }
 
@@ -131,11 +121,10 @@
             transition: opacity 0.6s ease, transform 0.6s ease; opacity: 1;
         }
 
-        /* SLOWER SMART SCROLLING SPEED */
         .scroll-container { width: 100%; overflow: hidden; display: flex; align-items: center; white-space: nowrap; }
         .scroll-text {
             display: inline-block; white-space: nowrap; padding-left: 100%; 
-            animation: scrollMarquee 18s linear forwards; /* Slower speed: 18 seconds */
+            animation: scrollMarquee 18s linear forwards;
         }
         @keyframes scrollMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
@@ -167,7 +156,7 @@
     <div id="main-score-strip">
         <div class="score-a"><div class="unskew" id="sA">0</div></div>
         <div class="team-a-panel"><div class="unskew" id="nA">TEAM 1</div></div>
-        <div class="vs-divider"><div class="unskew">VS</div></div>
+        <div class="vs-divider"><div class="unskew"></div></div>
         <div class="team-b-panel"><div class="unskew" id="nB">TEAM 2</div></div>
         <div class="score-b"><div class="unskew" id="sB">0</div></div>
     </div>
@@ -262,7 +251,6 @@
     }
 
     function processTickerData(data) {
-        // --- LEFT ITEMS (Village & Prizes & Ads) ---
         leftItems = [];
         leftItems.push({
             tEn: "📍 LOCATION", bEn: data.row1Txt || "VILLAGE NAME",
@@ -280,13 +268,12 @@
         if(data.pzWt2) leftItems.push({ tEn: `🏋️ ${wKg} 2ND PRIZE`, bEn: data.pzWt2, tPa: `🏋️ ${wKgPa} ਦੂਜਾ ਇਨਾਮ`, bPa: data.pzWt2 });
         if(data.pzWtBest) leftItems.push({ tEn: `🏅 ${wKg} BEST PLAYER`, bEn: data.pzWtBest, tPa: `🏅 ${wKgPa} ਬੈਸਟ ਖਿਡਾਰੀ`, bPa: data.pzWtBest });
 
-        // Include Commentator, Sound, Tent, Security in Left or Right rotation
         if(data.adComm) leftItems.push({ tEn: "🎙️ COMMENTATOR", bEn: data.adComm, tPa: "🎙️ ਕਮੈਂਟੇਟਰ", bPa: data.adComm });
         if(data.adSound) leftItems.push({ tEn: "🔊 SOUND SERVICE", bEn: data.adSound, tPa: "🔊 ਸਾਊਂਡ ਸਰਵਿਸ", bPa: data.adSound });
         if(data.adTent) leftItems.push({ tEn: "⛺ TENT SERVICE", bEn: data.adTent, tPa: "⛺ ਟੈਂਟ ਪੰਡਾਲ", bPa: data.adTent });
         if(data.adSec) leftItems.push({ tEn: "🛡️ SECURITY", bEn: data.adSec, tPa: "🛡️ ਸਕਿਓਰਿਟੀ", bPa: data.adSec });
 
-        // --- CENTER ITEMS (MATCH LIST) ---
+        // --- CENTER ITEMS (MATCH LIST WITH VS) ---
         centerItems = [];
         let wtMatches = data.nextMatchesWeight || [];
         let opMatches = data.nextMatchesOpen || [];
@@ -323,7 +310,6 @@
             centerItems.push({ tEn: "KABADDI TOURNAMENT", bEn: "LIVE UPDATES", tPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", bPa: "ਲਾਈਵ ਅੱਪਡੇਟ" });
         }
 
-        // --- RIGHT ITEMS (Events & Live Telecast) ---
         rightItems = [];
         if(data.upcomingEvents && data.upcomingEvents.length > 0) {
             data.upcomingEvents.forEach(ev => {
@@ -386,7 +372,6 @@
         }
     }
 
-    // MASTER ANIMATION LOOP (12 SECONDS PER FRAME)
     setInterval(() => {
         if(!isEnglish) { leftIdx++; centerIdx++; rightIdx++; }
         isEnglish = !isEnglish; 
