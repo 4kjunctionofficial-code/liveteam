@@ -146,19 +146,19 @@
 <body>
 
 <div id="logo-container" class="hidden"><img id="main-logo" src="" alt="Logo"></div>
-<div id="single-wm">ਐੱਮ ਲਾਈਵ</div>
+<div id="single-wm">M LIVE</div>
 
 <div id="result-popup">
-    <div class="res-title">🏆 ਮੈਚ ਦਾ ਨਤੀਜਾ</div>
-    <div class="res-text" id="res-msg">ਵਿਨਰ ਨਾਮ</div>
+    <div class="res-title">🏆 MATCH RESULT</div>
+    <div class="res-text" id="res-msg">WINNER NAME</div>
 </div>
 
 <div id="top-scoreboard-container">
     <div id="main-score-strip">
         <div class="score-a"><div class="unskew" id="sA">0</div></div>
-        <div class="team-a-panel"><div class="unskew" id="nA">ਟੀਮ 1</div></div>
+        <div class="team-a-panel"><div class="unskew" id="nA">TEAM 1</div></div>
         <div class="vs-divider"><div class="unskew"></div></div>
-        <div class="team-b-panel"><div class="unskew" id="nB">ਟੀਮ 2</div></div>
+        <div class="team-b-panel"><div class="unskew" id="nB">TEAM 2</div></div>
         <div class="score-b"><div class="unskew" id="sB">0</div></div>
     </div>
     <div id="match-details-strip" class="hidden"><div class="unskew" id="match-round"></div></div>
@@ -166,15 +166,15 @@
 
 <div id="ticker-wrap">
     <div class="ticker-strip strip-top" id="strip-1">
-        <div class="ticker-col w-30"><div id="s1-left" class="anim-wrap">📍 ਸਥਾਨ</div></div>
-        <div class="ticker-col w-40"><div id="s1-mid" class="anim-wrap">ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ</div></div>
-        <div class="ticker-col w-30"><div id="s1-right" class="anim-wrap">📅 ਆਉਣ ਵਾਲੇ ਮੇਲੇ</div></div>
+        <div class="ticker-col w-30"><div id="s1-left" class="anim-wrap">📍 LOCATION</div></div>
+        <div class="ticker-col w-40"><div id="s1-mid" class="anim-wrap">KABADDI TOURNAMENT</div></div>
+        <div class="ticker-col w-30"><div id="s1-right" class="anim-wrap">📅 UPCOMING EVENTS</div></div>
     </div>
     
     <div class="ticker-strip strip-bot" id="strip-2" style="display: none;">
-        <div class="ticker-col w-30"><div id="s2-left" class="anim-wrap">ਪਿੰਡ</div></div>
-        <div class="ticker-col w-40"><div id="s2-mid" class="anim-wrap">ਲਾਈਵ ਮੈਚ</div></div>
-        <div class="ticker-col w-30"><div id="s2-right" class="anim-wrap">ਵੇਰਵਾ</div></div>
+        <div class="ticker-col w-30"><div id="s2-left" class="anim-wrap">VILLAGE NAME</div></div>
+        <div class="ticker-col w-40"><div id="s2-mid" class="anim-wrap">LIVE MATCHES</div></div>
+        <div class="ticker-col w-30"><div id="s2-right" class="anim-wrap">EVENT DETAILS</div></div>
     </div>
 </div>
 
@@ -204,7 +204,7 @@
     userDb.on("value", (snap) => {
         const user = snap.val();
         if (!user || Date.now() > new Date(user.expiryDate).getTime()) {
-            document.body.innerHTML = `<div style="width:100vw; height:100vh; display:flex; justify-content:center; align-items:center; background:black; color:white; font-size:50px; text-align:center;">🛑 ਪਲਾਨ ਖਤਮ ਹੋ ਗਿਆ ਹੈ<br>ਹੈਲਪ ਲਾਈਨ: ਮਨਪ੍ਰੀਤ ਮੁਦਕੀ<br>9115426711</div>`;
+            document.body.innerHTML = `<div style="width:100vw; height:100vh; display:flex; justify-content:center; align-items:center; background:black; color:white; font-size:50px; text-align:center;">🛑 PLAN EXPIRED<br>HELP LINE: MANPREET MUDKI<br>9115426711</div>`;
         }
     });
 
@@ -219,7 +219,7 @@
     let hasMatches = false;
     let lastResult = ""; 
 
-    // Punjabi Dictionary for Rounds, Weights, Open and Kabaddi
+    // Complete Punjabi Dictionary for Rounds, Weights, and OPEN
     const roundDict = {
         "1st Round": "ਪਹਿਲਾ ਰਾਊਂਡ",
         "2nd Round": "ਦੂਜਾ ਰਾਊਂਡ",
@@ -230,8 +230,7 @@
         "Final": "ਫਾਈਨਲ",
         "Pool A Match": "ਪੂਲ ਏ ਮੈਚ",
         "Pool B Match": "ਪੂਲ ਬੀ ਮੈਚ",
-        "Open": "ਓਪਨ",
-        "Kabaddi": "ਕਬੱਡੀ"
+        "Open": "ਓਪਨ"
     };
 
     function translateRound(roundStr) {
@@ -239,6 +238,7 @@
         let cleaned = roundStr.trim();
         let translated = cleaned;
         
+        // Translate known keywords including OPEN
         for (let key in roundDict) {
             let regex = new RegExp(key, 'gi');
             if (regex.test(translated)) {
@@ -246,8 +246,8 @@
             }
         }
         
+        // Replace KG with ਕਿਲੋ
         translated = translated.replace(/KG/gi, "ਕਿਲੋ");
-        translated = translated.replace(/KABADDI/gi, "ਕਬੱਡੀ");
         return translated;
     }
 
@@ -272,12 +272,12 @@
             detailsStrip.classList.add('hidden');
         } else {
             detailsStrip.classList.remove('hidden');
-            document.getElementById('match-round').innerText = translateRound(roundText);
+            document.getElementById('match-round').innerText = roundText;
         }
 
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
-        document.getElementById('single-wm').innerText = data.watermarkTxt || "ਐੱਮ ਲਾਈਵ";
+        document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
 
         if(data.resultText && data.resultText !== "No Result Yet" && data.resultText !== lastResult) {
             lastResult = data.resultText;
@@ -292,7 +292,7 @@
 
     function showResultPopup(text) {
         const popup = document.getElementById('result-popup');
-        document.getElementById('res-msg').innerText = translateRound(text);
+        document.getElementById('res-msg').innerText = text;
         popup.classList.add('show');
         setTimeout(() => { popup.classList.remove('show'); }, 10000); 
     }
@@ -300,26 +300,27 @@
     function processTickerData(data) {
         leftItems = [];
         leftItems.push({
-            tEn: "📍 ਸਥਾਨ", bEn: data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ ਦਾ ਨਾਮ",
-            tPa: "📍 ਸਥਾਨ", bPa: data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ ਦਾ ਨਾਮ"
+            tEn: "📍 LOCATION", bEn: data.row1Txt || "VILLAGE NAME",
+            tPa: "📍 ਸਥਾਨ / ਪਿੰਡ", bPa: data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ ਦਾ ਨਾਮ"
         });
 
-        if(data.pzOp1) leftItems.push({ tEn: "🔥 ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ", bEn: data.pzOp1, tPa: "🔥 ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ", bPa: data.pzOp1 });
-        if(data.pzOp2) leftItems.push({ tEn: "🔥 ਓਪਨ ਦੂਜਾ ਇਨਾਮ", bEn: data.pzOp2, tPa: "🔥 ਓਪਨ ਦੂਜਾ ਇਨਾਮ", bPa: data.pzOp2 });
-        if(data.pzOpBest) leftItems.push({ tEn: "🏅 ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ", bEn: data.pzOpBest, tPa: "🏅 ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ", bPa: data.pzOpBest });
+        if(data.pzOp1) leftItems.push({ tEn: "🔥 OPEN 1ST PRIZE", bEn: data.pzOp1, tPa: "🔥 ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ", bPa: data.pzOp1 });
+        if(data.pzOp2) leftItems.push({ tEn: "🔥 OPEN 2ND PRIZE", bEn: data.pzOp2, tPa: "🔥 ਓਪਨ ਦੂਜਾ ਇਨਾਮ", bPa: data.pzOp2 });
+        if(data.pzOpBest) leftItems.push({ tEn: "🏅 OPEN BEST PLAYER", bEn: data.pzOpBest, tPa: "🏅 ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ", bPa: data.pzOpBest });
 
+        let wKg = data.pzWtKg ? `(${data.pzWtKg})` : "(WEIGHT)";
         let wKgPa = data.pzWtKg ? `(${translateRound(data.pzWtKg)})` : "(ਵਜ਼ਨੀ)";
 
-        if(data.pzWt1) leftItems.push({ tEn: `🏋️ ${wKgPa} ਪਹਿਲਾ ਇਨਾਮ`, bEn: data.pzWt1, tPa: `🏋️ ${wKgPa} ਪਹਿਲਾ ਇਨਾਮ`, bPa: data.pzWt1 });
-        if(data.pzWt2) leftItems.push({ tEn: `🏋️ ${wKgPa} ਦੂਜਾ ਇਨਾਮ`, bEn: data.pzWt2, tPa: `🏋️ ${wKgPa} ਦੂਜਾ ਇਨਾਮ`, bPa: data.pzWt2 });
-        if(data.pzWtBest) leftItems.push({ tEn: `🏅 ${wKgPa} ਬੈਸਟ ਖਿਡਾਰੀ`, bEn: data.pzWtBest, tPa: `🏅 ${wKgPa} ਬੈਸਟ ਖਿਡਾਰੀ`, bPa: data.pzWtBest });
+        if(data.pzWt1) leftItems.push({ tEn: `🏋️ ${wKg} 1ST PRIZE`, bEn: data.pzWt1, tPa: `🏋️ ${wKgPa} ਪਹਿਲਾ ਇਨਾਮ`, bPa: data.pzWt1 });
+        if(data.pzWt2) leftItems.push({ tEn: `🏋️ ${wKg} 2ND PRIZE`, bEn: data.pzWt2, tPa: `🏋️ ${wKgPa} ਦੂਜਾ ਇਨਾਮ`, bPa: data.pzWt2 });
+        if(data.pzWtBest) leftItems.push({ tEn: `🏅 ${wKg} BEST PLAYER`, bEn: data.pzWtBest, tPa: `🏅 ${wKgPa} ਬੈਸਟ ਖਿਡਾਰੀ`, bPa: data.pzWtBest });
 
-        if(data.adComm) leftItems.push({ tEn: "🎙️ ਕਮੈਂਟੇਟਰ", bEn: data.adComm, tPa: "🎙️ ਕਮੈਂਟੇਟਰ", bPa: data.adComm });
-        if(data.adSound) leftItems.push({ tEn: "🔊 ਸਾਊਂਡ ਸਰਵਿਸ", bEn: data.adSound, tPa: "🔊 ਸਾਊਂਡ ਸਰਵਿਸ", bPa: data.adSound });
-        if(data.adTent) leftItems.push({ tEn: "⛺ ਟੈਂਟ ਪੰਡਾਲ", bEn: data.adTent, tPa: "⛺ ਟੈਂਟ ਪੰਡਾਲ", bPa: data.adTent });
-        if(data.adSec) leftItems.push({ tEn: "🛡️ ਸਕਿਓਰਿਟੀ", bEn: data.adSec, tPa: "🛡️ ਸਕਿਓਰਿਟੀ", bPa: data.adSec });
+        if(data.adComm) leftItems.push({ tEn: "🎙️ COMMENTATOR", bEn: data.adComm, tPa: "🎙️ ਕਮੈਂਟੇਟਰ", bPa: data.adComm });
+        if(data.adSound) leftItems.push({ tEn: "🔊 SOUND SERVICE", bEn: data.adSound, tPa: "🔊 ਸਾਊਂਡ ਸਰਵਿਸ", bPa: data.adSound });
+        if(data.adTent) leftItems.push({ tEn: "⛺ TENT SERVICE", bEn: data.adTent, tPa: "⛺ ਟੈਂਟ ਪੰਡਾਲ", bPa: data.adTent });
+        if(data.adSec) leftItems.push({ tEn: "🛡️ SECURITY", bEn: data.adSec, tPa: "🛡️ ਸਕਿਓਰਿਟੀ", bPa: data.adSec });
 
-        // --- CENTER ITEMS: TOP = PUNJABI, BOTTOM = ENGLISH ---
+        // --- CENTER ITEMS: TOP = PUNJABI (WITH OPEN/KG FULLY PUNJABI), BOTTOM = FULL ENGLISH ---
         centerItems = [];
         let matchesList = data.nextMatches || [];
         hasMatches = matchesList.length > 0;
@@ -331,8 +332,8 @@
             if(m.startsWith("(")) {
                 let closeIdx = m.indexOf(")");
                 if(closeIdx !== -1) {
-                    bracketContent = m.substring(1, closeIdx).trim(); 
-                    teamPart = m.substring(closeIdx + 1).trim();     
+                    bracketContent = m.substring(1, closeIdx).trim(); // e.g. "OPEN - Quarter Final" or "50 KG - Final"
+                    teamPart = m.substring(closeIdx + 1).trim();     // e.g. "TeamA = TeamA_Pa VS TeamB = TeamB_Pa"
                 }
             }
 
@@ -346,13 +347,14 @@
             let t2En = t2Full.split("=")[0].trim();
             let t2Pa = t2Full.split("=")[1]?.trim() || t2En;
 
+            // Fully translate bracket content into Punjabi (including OPEN and KG)
             let bracketPa = translateRound(bracketContent);
 
             let tagEn = bracketContent ? `(${bracketContent}) ` : "";
             let tagPa = bracketPa ? `(${bracketPa}) ` : "";
 
             let enStr = `${tagEn}${t1En} VS ${t2En}`;
-            let paStr = `${tagPa}${t1Pa} ਬਨਾਮ ${t2Pa}`;
+            let paStr = `${tagPa}${t1Pa} VS ${t2Pa}`;
 
             return { en: enStr, pa: paStr };
         };
@@ -375,20 +377,18 @@
         if(data.upcomingEvents && data.upcomingEvents.length > 0) {
             data.upcomingEvents.forEach(ev => {
                 let d = ev.date ? ` (${ev.date})` : "";
-                let evNamePa = ev.name_pa || ev.name;
-                rightItems.push({ tEn: `📅 ${evNamePa}${d}`, bEn: `📅 ${ev.name}${d}`, tPa: `📅 ${evNamePa}${d}`, bPa: `📅 ${ev.name}${d}` });
+                rightItems.push({ tEn: "📅 UPCOMING EVENTS", bEn: `${ev.name}${d}`, tPa: "📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ", bPa: `${ev.name_pa || ev.name}${d}` });
             });
         }
         if(data.row6Txt || data.row6Txt_pa) {
-            let teletext = data.row6Txt_pa || data.row6Txt || "ਲਾਈਵ ਪ੍ਰਸਾਰਣ";
-            rightItems.push({ tEn: `📺 ${teletext}`, bEn: `📺 ${data.row6Txt || "LIVE STREAMING"}`, tPa: `📺 ${teletext}`, bPa: `📺 ${data.row6Txt || "LIVE STREAMING"}` });
+            rightItems.push({ tEn: "📺 LIVE TELECAST", bEn: data.row6Txt || "LIVE STREAMING", tPa: "📺 ਲਾਈਵ ਪ੍ਰਸਾਰਣ", bPa: data.row6Txt_pa || data.row6Txt || "ਲਾਈਵ ਪ੍ਰਸਾਰਣ" });
         }
         if(rightItems.length === 0) {
-            rightItems.push({ tEn: "📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ", bEn: "UPCOMING EVENTS", tPa: "📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ", bPa: "UPCOMING EVENTS" });
+            rightItems.push({ tEn: "📅 UPCOMING EVENTS", bEn: "STAY TUNED", tPa: "📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ", bPa: "ਦੇਖਦੇ ਰਹੋ" });
         }
         
         document.getElementById('strip-2').style.display = hasMatches ? 'flex' : 'none';
-        if(document.getElementById('s1-left').innerText === "📍 ਸਥਾਨ") { renderTicker(); }
+        if(document.getElementById('s1-left').innerText === "📍 LOCATION") { renderTicker(); }
     }
 
     function animateText(elementId, newText, isCenter = false) {
@@ -422,26 +422,28 @@
         let R = rightItems[rightIdx % rightItems.length];
 
         if(hasMatches) {
-            animateText('s1-left', L.tPa, false);
-            animateText('s2-left', L.bEn, false);
+            animateText('s1-left', isEnglish ? L.tEn : L.tPa, false);
+            animateText('s2-left', isEnglish ? L.bEn : L.bPa, false);
             animateText('s1-mid', C.tPa, true);
             animateText('s2-mid', C.bEn, true);
-            animateText('s1-right', R.tPa, false);
-            animateText('s2-right', R.bEn, false);
+            animateText('s1-right', isEnglish ? R.tEn : R.tPa, false);
+            animateText('s2-right', isEnglish ? R.bEn : R.bPa, false);
         } else {
-            animateText('s1-left', L.tPa, false);
-            animateText('s1-mid', C.tPa, true);
-            animateText('s1-right', R.tPa, false);
+            animateText('s1-left', isEnglish ? `${L.tEn}: ${L.bEn}` : `${L.tPa}: ${L.bPa}`, false);
+            animateText('s1-mid', isEnglish ? C.tEn : C.tPa, true);
+            animateText('s1-right', isEnglish ? `${R.tEn}: ${R.bEn}` : `${R.tPa}: ${R.bPa}`, false);
         }
     }
 
     setInterval(() => {
-        leftIdx++; rightIdx++; centerIdx++;
+        if(!isEnglish) { leftIdx++; rightIdx++; }
+        centerIdx++; 
+        isEnglish = !isEnglish; 
         
         let d = window.currentData;
         if(d) {
-            document.getElementById('nA').innerText = d.nameA_pa || d.nameA || "ਟੀਮ 1";
-            document.getElementById('nB').innerText = d.nameB_pa || d.nameB || "ਟੀਮ 2";
+            document.getElementById('nA').innerText = (!isEnglish && d.nameA_pa) ? d.nameA_pa : (d.nameA || "TEAM 1");
+            document.getElementById('nB').innerText = (!isEnglish && d.nameB_pa) ? d.nameB_pa : (d.nameB || "TEAM 2");
         }
         renderTicker();
     }, 12000);
