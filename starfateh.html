@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Live Scoreboard Overlay</title>
+    <title>Kabaddi Horizontal Scoreboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@600;700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -17,6 +17,93 @@
             overflow: hidden;
             position: relative;
             user-select: none;
+        }
+
+        /* --- TOP CENTER SCOREBOARD (Wide Strip Style) --- */
+        #top-scoreboard-container {
+            position: absolute;
+            top: 25px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        #top-scoreboard-container.hidden { opacity: 0; }
+
+        /* Patti 1: Match Details (Optional) */
+        #match-details-strip {
+            background: linear-gradient(90deg, #091a2f, #102a45, #091a2f);
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 800;
+            padding: 4px 30px;
+            text-transform: uppercase;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            border: 2px solid #ffcc00;
+            border-bottom: none;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        #match-details-strip.hidden {
+            display: none; /* Hides the upper strip completely if no text */
+        }
+
+        /* Patti 2: Main Score Box */
+        #main-score-strip {
+            display: flex;
+            align-items: stretch;
+            height: 55px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #ffcc00;
+            border-radius: 8px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.7);
+            overflow: hidden;
+            transition: border-radius 0.3s ease;
+        }
+
+        .team-name-panel {
+            background: #111111;
+            color: #ffffff;
+            font-size: 32px;
+            font-weight: 700;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 350px;
+            max-width: 450px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .score-panel {
+            background: #091a2f;
+            color: #ffcc00; /* Yellow Score */
+            font-size: 42px;
+            font-weight: 900;
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 90px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+        }
+
+        .vs-panel {
+            background: #ffcc00;
+            color: #000000;
+            font-size: 22px;
+            font-weight: 900;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1px;
         }
 
         /* Top Left Logo Container */
@@ -55,94 +142,7 @@
             pointer-events: none;
         }
 
-        /* --- EXACT TOP-RIGHT SCOREBOARD (Video Design Match) --- */
-        #scoreboard {
-            position: absolute;
-            top: 25px;
-            right: 35px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            transition: opacity 0.5s ease;
-        }
-        #scoreboard.hidden { opacity: 0; }
-
-        .score-main-bar {
-            display: flex;
-            align-items: center;
-            height: 46px;
-            background: #09182b; /* Dark Navy Blue */
-            border-radius: 5px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        /* Team A Score Box (Light Cyan / Blue) */
-        .score-a {
-            background-color: #4ab3f4;
-            color: #000000;
-            font-size: 28px;
-            font-weight: 900;
-            padding: 0 16px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 55px;
-        }
-
-        /* Team Names Box */
-        .team-box {
-            color: #ffffff;
-            font-size: 24px;
-            font-weight: 700;
-            padding: 0 22px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            white-space: nowrap;
-            letter-spacing: 0.5px;
-        }
-
-        .divider {
-            width: 2px;
-            height: 60%;
-            background-color: rgba(255, 255, 255, 0.3);
-        }
-
-        /* Team B Score Box (Light Grey / White) */
-        .score-b {
-            background-color: #e2e8f0;
-            color: #000000;
-            font-size: 28px;
-            font-weight: 900;
-            padding: 0 16px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 55px;
-        }
-
-        /* Category / Round Strip (Bottom of Scoreboard) */
-        .round-box {
-            margin-top: 4px;
-            background: rgba(0, 0, 0, 0.9);
-            color: #ffffff;
-            font-size: 14px;
-            font-weight: 800;
-            padding: 3px 14px;
-            border-radius: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
-        }
-
-        /* --- BOTTOM TICKER OVERLAY (Kabaddi365 Style) --- */
+        /* --- BOTTOM TICKER OVERLAY --- */
         #ticker-wrap {
             position: absolute;
             bottom: 0;
@@ -236,15 +236,16 @@
 
 <div id="single-wm">M LIVE</div>
 
-<div id="scoreboard">
-    <div class="score-main-bar">
-        <div class="score-a" id="sA">0</div>
-        <div class="team-box" id="nA-container"><span id="nA">ਟੀਮ 1</span></div>
-        <div class="divider"></div>
-        <div class="team-box" id="nB-container"><span id="nB">ਟੀਮ 2</span></div>
-        <div class="score-b" id="sB">0</div>
+<div id="top-scoreboard-container">
+    <div id="match-details-strip" class="hidden"></div>
+    
+    <div id="main-score-strip">
+        <div class="team-name-panel" id="nA-container"><span id="nA">ਟੀਮ 1</span></div>
+        <div class="score-panel" id="sA">0</div>
+        <div class="vs-panel">VS</div>
+        <div class="score-panel" id="sB">0</div>
+        <div class="team-name-panel" id="nB-container"><span id="nB">ਟੀਮ 2</span></div>
     </div>
-    <div class="round-box" id="round-display">72 KG QUARTER FINAL</div>
 </div>
 
 <div id="ticker-wrap">
@@ -283,6 +284,7 @@
         const logoCont = document.getElementById('logo-container');
         const currentId = matchId.trim().toLowerCase();
 
+        // Logo Logic
         if (clientLogos[currentId] && data.logoVisible !== false) {
             document.getElementById('main-logo').src = clientLogos[currentId];
             logoCont.classList.remove('hidden');
@@ -290,9 +292,27 @@
             logoCont.classList.add('hidden');
         }
 
-        document.getElementById('scoreboard').classList.toggle('hidden', data.scoreVisible === false);
+        // Visibility Toggles
+        document.getElementById('top-scoreboard-container').classList.toggle('hidden', data.scoreVisible === false);
         document.getElementById('ticker-wrap').classList.toggle('hidden', data.tickerVisible === false);
         
+        // Dynamic "Do Pattiya / Single" Logic
+        const roundText = data.round || "";
+        const detailsStrip = document.getElementById('match-details-strip');
+        const mainScoreStrip = document.getElementById('main-score-strip');
+        
+        if (roundText.trim() === "") {
+            detailsStrip.classList.add('hidden');
+            mainScoreStrip.style.borderTopLeftRadius = '8px';
+            mainScoreStrip.style.borderTopRightRadius = '8px';
+        } else {
+            detailsStrip.classList.remove('hidden');
+            detailsStrip.innerText = roundText;
+            mainScoreStrip.style.borderTopLeftRadius = '0px';
+            mainScoreStrip.style.borderTopRightRadius = '0px';
+        }
+
+        // Scores and Teams
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
         
@@ -301,9 +321,8 @@
         document.getElementById('nA-container').innerHTML = `<span>${nameA}</span>`;
         document.getElementById('nB-container').innerHTML = `<span>${nameB}</span>`;
         
-        document.getElementById('round-display').innerText = data.round || "LIVE MATCH";
+        // Watermark & Ticker
         document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
-        
         if(data.row1Txt_pa || data.row1Txt) document.getElementById('c1').innerText = data.row1Txt_pa || data.row1Txt;
         if(data.row2Txt_pa || data.row2Txt) document.getElementById('scroller-c2').innerText = data.row2Txt_pa || data.row2Txt;
         if(data.row3Txt_pa || data.row3Txt) document.getElementById('c3').innerText = data.row3Txt_pa || data.row3Txt;
