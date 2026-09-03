@@ -52,6 +52,9 @@ textarea { resize: vertical; overflow-y: auto; min-height: 50px; max-height: 200
 .prize-col label { font-size: 14px; font-weight: bold; color: #1a73e8; margin-bottom: 8px; display: block; border-bottom: 2px solid #1a73e8; padding-bottom: 2px; }
 .prize-col input { font-size: 14px; padding: 8px; margin-bottom: 6px; }
 
+/* SETUP MATCH CARD */
+.setup-box { background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 12px; }
+
 /* MOBILE */
 @media(max-width:768px){
     .controls{ grid-template-columns:repeat(2,1fr); }
@@ -59,6 +62,7 @@ textarea { resize: vertical; overflow-y: auto; min-height: 50px; max-height: 200
     .teams-container { flex-direction: column; }
     .vs-text { padding: 10px 0; }
     .prize-grid { grid-template-columns: 1fr; }
+    .setup-grid { grid-template-columns: 1fr !important; }
 }
 
 .btn-green{background:#28a745;}
@@ -85,7 +89,7 @@ textarea { resize: vertical; overflow-y: auto; min-height: 50px; max-height: 200
     <div class="settings-section" style="display:flex; align-items:center; gap:10px;">
         <span style="font-weight:bold; font-size:16px;">Translate to:</span>
         <select id="targetLang" style="margin-bottom:0; border: 2px solid #fbbc05;">
-            <option value="en">English (ਅੰਗਰੇਜ਼ੀ)</option>
+            <option value="en">English (English)</option>
             <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
             <option value="hi">Hindi (हिन्दी)</option>
             <option value="ur">Urdu (اردو)</option>
@@ -148,9 +152,44 @@ textarea { resize: vertical; overflow-y: auto; min-height: 50px; max-height: 200
 <select id="nextTeamA"><option value="">Select Next Match Team 1</option></select>
 <select id="nextTeamB"><option value="">Select Next Match Team 2</option></select>
 
-<div style="display:flex; gap:10px; margin-bottom:15px;">
-    <button class="btn-full btn-blue" onclick="addNextMatch('weight')" style="height:50px; min-height:50px; font-size:14px;">+ ADD TO WEIGHT LIST</button>
-    <button class="btn-full btn-purple" onclick="addNextMatch('open')" style="height:50px; min-height:50px; font-size:14px;">+ ADD TO OPEN LIST</button>
+<div class="setup-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
+    <div class="setup-box" style="border-top:3px solid #1a73e8;">
+        <label style="font-size:13px; font-weight:bold; color:#1a73e8; display:block; margin-bottom:5px;">🏋️ WEIGHT MATCH CATEGORY</label>
+        <select id="selectWeightKg">
+            <option value="">-- Select Weight KG --</option>
+            <option value="30 KG">30 KG</option>
+            <option value="32 KG">32 KG</option>
+            <option value="35 KG">35 KG</option>
+            <option value="40 KG">40 KG</option>
+            <option value="45 KG">45 KG</option>
+            <option value="47 KG">47 KG</option>
+            <option value="50 KG">50 KG</option>
+            <option value="52 KG">52 KG</option>
+            <option value="55 KG">55 KG</option>
+            <option value="57 KG">57 KG</option>
+            <option value="60 KG">60 KG</option>
+            <option value="62 KG">62 KG</option>
+            <option value="65 KG">65 KG</option>
+            <option value="70 KG">70 KG</option>
+        </select>
+        <input type="text" id="customWeightKg" placeholder="Ya Type Custom KG...">
+        <button class="btn-full btn-blue" onclick="addNextMatch('weight')" style="height:45px; min-height:45px; font-size:13px; margin-top:5px;">+ ADD TO WEIGHT LIST</button>
+    </div>
+
+    <div class="setup-box" style="border-top:3px solid #6f42c1;">
+        <label style="font-size:13px; font-weight:bold; color:#6f42c1; display:block; margin-bottom:5px;">🔥 OPEN MATCH CATEGORY</label>
+        <select id="selectOpenKg">
+            <option value="">-- Select Open Category --</option>
+            <option value="70 KG OPEN">70 KG OPEN</option>
+            <option value="72 KG OPEN">72 KG OPEN</option>
+            <option value="75 KG OPEN">75 KG OPEN</option>
+            <option value="80 KG OPEN">80 KG OPEN</option>
+            <option value="85 KG OPEN">85 KG OPEN</option>
+            <option value="OPEN">OPEN</option>
+        </select>
+        <input type="text" id="customOpenKg" placeholder="Ya Type Custom Category...">
+        <button class="btn-full btn-purple" onclick="addNextMatch('open')" style="height:45px; min-height:45px; font-size:13px; margin-top:5px;">+ ADD TO OPEN LIST</button>
+    </div>
 </div>
 
 <div class="list-header">🏋️ WEIGHT MATCHES (ਵਜ਼ਨੀ)</div>
@@ -176,13 +215,13 @@ textarea { resize: vertical; overflow-y: auto; min-height: 50px; max-height: 200
         <label class="ticker-label">2. Tournament Prizes (Top Center Scrolling)</label>
         <div class="prize-grid">
             <div class="prize-col">
-                <label>🔥 ਓਪਨ ਕਬੱਡੀ (OPEN KABADDI)</label>
+                <label>🔥 OPEN KABADDI</label>
                 <input type="text" id="pzOp1" placeholder="1st Prize (e.g. 1 Lakh)" oninput="updateTicker();">
                 <input type="text" id="pzOp2" placeholder="2nd Prize" oninput="updateTicker();">
                 <input type="text" id="pzOpBest" placeholder="Best Player Prize" oninput="updateTicker();">
             </div>
             <div class="prize-col">
-                <label>🏋️ ਵਜ਼ਨੀ ਕਬੱਡੀ (WEIGHT KABADDI)</label>
+                <label>🏋️ WEIGHT KABADDI</label>
                 <input type="text" id="pzWtKg" placeholder="Kinne KG? (e.g. 72 KG)" style="background:#fff3cd; border-color:#ffecb5; color:#856404;" oninput="updateTicker();">
                 <input type="text" id="pzWt1" placeholder="1st Prize" oninput="updateTicker();">
                 <input type="text" id="pzWt2" placeholder="2nd Prize" oninput="updateTicker();">
@@ -273,7 +312,6 @@ db.on("value",(snap)=>{
         document.getElementById("row6Inp").value = data.row6Txt || "";
         document.getElementById("watermarkInp").value = data.watermarkTxt || "";
 
-        // Load Prize Fields
         document.getElementById("pzOp1").value = data.pzOp1 || "";
         document.getElementById("pzOp2").value = data.pzOp2 || "";
         document.getElementById("pzOpBest").value = data.pzOpBest || "";
@@ -300,7 +338,7 @@ db.on("value",(snap)=>{
     }
 });
 
-/* --- UPCOMING EVENTS LOGIC WITH DATE FORMATTING --- */
+/* --- UPCOMING EVENTS LOGIC --- */
 function addUpcomingEvent() {
     const name = document.getElementById("ueName").value.trim();
     const dateVal = document.getElementById("ueDate").value;
@@ -309,14 +347,13 @@ function addUpcomingEvent() {
     let dateStr = "";
     if(dateVal) {
         const d = new Date(dateVal);
-        // Formats as "15 Sep" or similar
         dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
     }
     
     upcomingEvents.push({ name: name, date: dateStr });
     document.getElementById("ueName").value = "";
     document.getElementById("ueDate").value = "";
-    updateTicker(); // Save to DB & sync string
+    updateTicker();
 }
 
 function deleteUpcomingEvent(index) {
@@ -341,7 +378,7 @@ function renderUpcomingEvents() {
     container.innerHTML = html;
 }
 
-/* --- MATCH LISTS LOGIC --- */
+/* --- MATCH LISTS LOGIC WITH KG PREFIX --- */
 function renderListHTML(list, typeStr) {
     if(list.length === 0) return `<div style="text-align:center; padding:10px; color:#999; font-size:14px;">No Matches Added</div>`;
     let html = "";
@@ -367,23 +404,70 @@ function addNextMatch(type){
     const b = document.getElementById("nextTeamB").value;
     if(a === "" || b === "") return;
     
-    const matchStr = a + " VS " + b;
+    let kgPrefix = "";
+    if(type === 'weight') {
+        const custom = document.getElementById("customWeightKg").value.trim();
+        const sel = document.getElementById("selectWeightKg").value;
+        kgPrefix = custom ? custom : sel;
+    } else {
+        const custom = document.getElementById("customOpenKg").value.trim();
+        const sel = document.getElementById("selectOpenKg").value;
+        kgPrefix = custom ? custom : sel;
+    }
+
+    let matchStr = a + " VS " + b;
+    if(kgPrefix) {
+        matchStr = "(" + kgPrefix + ") " + matchStr;
+    }
+
     if(type === 'weight') nextMatchesWeight.push(matchStr);
     else nextMatchesOpen.push(matchStr);
 
-    document.getElementById("nextTeamA").value = ""; document.getElementById("nextTeamB").value = "";
+    document.getElementById("nextTeamA").value = ""; 
+    document.getElementById("nextTeamB").value = "";
+    document.getElementById("customWeightKg").value = "";
+    document.getElementById("customOpenKg").value = "";
+    document.getElementById("selectWeightKg").value = "";
+    document.getElementById("selectOpenKg").value = "";
+    
     updateTicker();
 }
 
 function startSpecificMatch(index, type) {
-    let matchStr = (type === 'weight') ? nextMatchesWeight[index] : nextMatchesOpen[index];
+    let rawMatchStr = (type === 'weight') ? nextMatchesWeight[index] : nextMatchesOpen[index];
+    
+    let category = "";
+    let matchStr = rawMatchStr;
+    
+    if(rawMatchStr.startsWith("(")) {
+        let parts = rawMatchStr.split(") ");
+        category = parts[0].replace("(", "").trim();
+        matchStr = parts[1] || rawMatchStr;
+    }
+
     let teams = matchStr.split(" VS ");
-    let t1 = teams[0] ? teams[0].trim() : ""; let t2 = teams[1] ? teams[1].trim() : "";
+    let t1 = teams[0] ? teams[0].trim() : ""; 
+    let t2 = teams[1] ? teams[1].trim() : "";
     
     if(type === 'weight') nextMatchesWeight.splice(index, 1);
     else nextMatchesOpen.splice(index, 1);
 
-    db.update({ nameA: t1, nameA_pa: "", nameB: t2, nameB_pa: "", scoreA: 0, scoreB: 0, scoreVisible: true });
+    let updateObj = { 
+        nameA: t1, 
+        nameA_pa: "", 
+        nameB: t2, 
+        nameB_pa: "", 
+        scoreA: 0, 
+        scoreB: 0, 
+        scoreVisible: true 
+    };
+
+    if(category) {
+        updateObj.round = category;
+        document.getElementById("roundInp").value = category;
+    }
+
+    db.update(updateObj);
     updateTicker();
 }
 
@@ -395,22 +479,18 @@ function deleteSpecificMatch(index, type) {
 
 /* --- CORE TICKER SYNC LOGIC --- */
 function updateTicker(){
-    // 1. Build Match List String (Row 5)
     let tickerStr = "";
     if (nextMatchesWeight.length > 0) tickerStr += "ਵਜ਼ਨੀ ਮੈਚ: " + nextMatchesWeight.join(" , ");
     if (nextMatchesWeight.length > 0 && nextMatchesOpen.length > 0) tickerStr += " || ";
     if (nextMatchesOpen.length > 0) tickerStr += "ਓਪਨ ਮੈਚ: " + nextMatchesOpen.join(" , ");
 
-    // 2. Build Upcoming Events String (Row 4)
     let eventsStr = upcomingEvents.map((ev, i) => {
         let d = ev.date ? " (" + ev.date + ")" : "";
         return (i+1) + ". " + ev.name + d;
     }).join(" | ");
     if(eventsStr === "") eventsStr = "UPCOMING EVENTS";
 
-    // 3. Build Prizes String (Row 2) - Updated to 1st, 2nd, Best Format
     let pzArr = [];
-    
     let op1 = document.getElementById("pzOp1").value;
     let op2 = document.getElementById("pzOp2").value;
     let opBest = document.getElementById("pzOpBest").value;
@@ -419,7 +499,7 @@ function updateTicker(){
         if(op1) parts.push("1st: " + op1);
         if(op2) parts.push("2nd: " + op2);
         if(opBest) parts.push("Best: " + opBest);
-        pzArr.push("🔥 ਓਪਨ (OPEN): " + parts.join(" | "));
+        pzArr.push("🔥 OPEN: " + parts.join(" | "));
     }
     
     let wtKgRaw = document.getElementById("pzWtKg").value;
@@ -437,23 +517,19 @@ function updateTicker(){
     }
     let prizeStr = pzArr.join(" 🔴 ");
 
-    // 4. Save Everything
     db.update({
         round: document.getElementById("roundInp").value,
         row1Txt: document.getElementById("row1Inp").value,
         row1Txt_pa: document.getElementById("row1Inp_pa").value,
-        
         row2Txt: prizeStr, 
         row4Txt: eventsStr,
         row5Txt: tickerStr,
-        
         row3Txt: document.getElementById("row3Inp").value,
         row6Txt: document.getElementById("row6Inp").value,
         watermarkTxt: document.getElementById("watermarkInp").value,
 
         pzOp1: op1, pzOp2: op2, pzOpBest: opBest,
         pzWtKg: wtKgRaw, pzWt1: wt1, pzWt2: wt2, pzWtBest: wtBest,
-        
         upcomingEvents: upcomingEvents,
         nextMatchesWeight: nextMatchesWeight,
         nextMatchesOpen: nextMatchesOpen
