@@ -288,30 +288,53 @@
         if(data.adTent) leftItems.push({ tEn: "⛺ TENT SERVICE", bEn: data.adTent, tPa: "⛺ ਟੈਂਟ ਪੰਡਾਲ", bPa: data.adTent });
         if(data.adSec) leftItems.push({ tEn: "🛡️ SECURITY", bEn: data.adSec, tPa: "🛡️ ਸਕਿਓਰਿਟੀ", bPa: data.adSec });
 
-        // --- CENTER ITEMS (TOP = PUNJABI, BOTTOM = ENGLISH STRICTLY) ---
+        // --- CENTER ITEMS: STRICTLY TOP = PUNJABI (ROUND + TEAMS), BOTTOM = ENGLISH (ROUND + TEAMS) ---
         centerItems = [];
         let matchesList = data.nextMatches || [];
         hasMatches = matchesList.length > 0;
         
-        let splitMatch = (m) => {
-            let prefix = ""; let main = m;
-            if(m.startsWith("(")) { let p = m.split(") "); prefix = p[0] + ") "; main = p[1] || m; }
-            let tms = main.split(" VS ");
-            let t1 = (tms[0] || "").split(" / "); let t2 = (tms[1] || "").split(" / ");
-            let en = `${prefix}${t1[0]?.trim() || ""} VS ${t2[0]?.trim() || ""}`;
-            // If Punjabi translation exists, use it. Otherwise fallback to English.
-            let pa = `${prefix}${t1[1]?.trim() || t1[0]?.trim() || ""} VS ${t2[1]?.trim() || t2[0]?.trim() || ""}`;
-            return {en, pa};
+        let parseMatchFull = (m) => {
+            // m format: "(50 KG - Quarter Final) TeamA = TeamA_Pa VS TeamB = TeamB_Pa"
+            let bracketContent = "";
+            let teamPart = m;
+            
+            if(m.startsWith("(")) {
+                let closeIdx = m.indexOf(")");
+                if(closeIdx !== -1) {
+                    bracketContent = m.substring(1, closeIdx).trim(); // e.g. "50 KG - Quarter Final"
+                    teamPart = m.substring(closeIdx + 1).trim();     // e.g. "TeamA = TeamA_Pa VS TeamB = TeamB_Pa"
+                }
+            }
+
+            // Split Teams
+            let tms = teamPart.split(" VS ");
+            let t1Full = (tms[0] || "").trim();
+            let t2Full = (tms[1] || "").trim();
+
+            let t1En = t1Full.split("=")[0].trim();
+            let t1Pa = t1Full.split("=")[1]?.trim() || t1En;
+
+            let t2En = t2Full.split("=")[0].trim();
+            let t2Pa = t2Full.split("=")[1]?.trim() || t2En;
+
+            // Build English & Punjabi strings including the bracket info
+            let tagEn = bracketContent ? `(${bracketContent}) ` : "";
+            let tagPa = bracketContent ? `(${bracketContent}) ` : ""; // Round/KG stays as typed or universal
+
+            let enStr = `${tagEn}${t1En} VS ${t2En}`;
+            let paStr = `${tagPa}${t1Pa} VS ${t2Pa}`;
+
+            return { en: enStr, pa: paStr };
         };
 
         if(hasMatches) {
             matchesList.forEach(mStr => {
-                let m = splitMatch(mStr);
+                let res = parseMatchFull(mStr);
                 centerItems.push({
-                    tEn: `⚔️ ${m.pa}`, // Top strip strictly Punjabi
-                    bEn: `⚔️ ${m.en}`, // Bottom strip strictly English
-                    tPa: `⚔️ ${m.pa}`, 
-                    bPa: `⚔️ ${m.en}`
+                    tEn: `⚔️ ${res.pa}`, // Top strip gets Punjabi
+                    bEn: `⚔️ ${res.en}`, // Bottom strip gets English
+                    tPa: `⚔️ ${res.pa}`, 
+                    bPa: `⚔️ ${res.en}`
                 });
             });
         } else {
