@@ -94,26 +94,25 @@
         }
         #match-details-strip.hidden { display: none; }
 
-        /* --- LOGO & WATERMARK (SPIN & DROP / ZOOM PULSE ANIMATION) --- */
+        /* --- LOGO & WATERMARK (GHAINT SLOW SPIN ANIMATION - NO ZOOM) --- */
         #logo-container { 
             position: absolute; top: 25px; left: 30px; z-index: 9999; 
             display: flex; align-items: center; 
-            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            transition: opacity 0.6s ease, transform 0.6s ease; 
             opacity: 1; transform: scale(1) rotate(0deg);
             will-change: transform;
             filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
         }
         #logo-container.hidden { opacity: 0; transform: scale(0.3) translateY(-40px) rotate(-360deg); }
         
-        /* Spin and Drop Animation Style */
-        #logo-container.animate-zoom-pulse {
-            animation: logoSpinDrop 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        /* Slow and smooth spin animation without zoom */
+        #logo-container.animate-slow-spin {
+            animation: logoSlowSpin 2.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
-        @keyframes logoSpinDrop {
+        @keyframes logoSlowSpin {
             0% { transform: scale(1) rotate(0deg); }
-            35% { transform: scale(1.3) rotate(360deg); filter: drop-shadow(0 0 25px rgba(51, 153, 255, 0.95)); }
-            70% { transform: scale(0.9) rotate(720deg); }
-            100% { transform: scale(1) rotate(720deg); }
+            50% { filter: drop-shadow(0 0 20px rgba(51, 153, 255, 0.9)); }
+            100% { transform: scale(1) rotate(360deg); }
         }
 
         #main-logo { height: 100px; width: auto; object-fit: contain; }
@@ -522,14 +521,14 @@
         renderIndependentTickers();
     }, 16000);
 
-    // --- PERIODIC LOGO SPIN & DROP ANIMATION (हर 15 ਸੈਕਿੰਡ ਬਾਅਦ ਲੋਗੋ ਘੁੰਮ ਕੇ ਡਿੱਗੇਗਾ) ---
+    // --- PERIODIC SLOW SPIN ANIMATION (हर 15 ਸੈਕਿੰਡ ਬਾਅਦ ਲੋਗੋ ਹੌਲੀ ਜਿਹੀ ਘੁੰਮੇਗਾ - ਬਿਨਾਂ ਜ਼ੂਮ ਤੋਂ) ---
     setInterval(() => {
         const logoBox = document.getElementById('logo-container');
         if (logoBox && !logoBox.classList.contains('hidden')) {
-            logoBox.classList.add('animate-zoom-pulse');
+            logoBox.classList.add('animate-slow-spin');
             setTimeout(() => {
-                logoBox.classList.remove('animate-zoom-pulse');
-            }, 1500);
+                logoBox.classList.remove('animate-slow-spin');
+            }, 2200);
         }
     }, 15000);
 
