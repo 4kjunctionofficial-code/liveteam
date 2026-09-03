@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Ultra HD Overlay</title>
+    <title>Kabaddi Ultra HD Dual Ticker</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@500;600;700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@500;600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -21,7 +21,7 @@
             user-select: none;
         }
 
-        /* --- SCOREBOARD (AUTO WIDTH & DUAL COLOR) --- */
+        /* --- HD SCOREBOARD --- */
         #top-scoreboard-container {
             position: absolute;
             top: 35px;
@@ -38,7 +38,7 @@
         #main-score-strip {
             display: flex;
             align-items: stretch;
-            height: 60px;
+            height: 65px;
             border-radius: 8px;
             overflow: hidden;
             border: 2px solid rgba(255, 255, 255, 0.4);
@@ -49,7 +49,7 @@
         .score-a {
             background: #0f3d7a;
             color: #ffcc00;
-            font-size: 44px;
+            font-size: 46px;
             font-weight: 900;
             padding: 0 25px;
             display: flex;
@@ -62,7 +62,7 @@
         .team-a-panel {
             background: #1a5bb8;
             color: #ffffff;
-            font-size: 32px;
+            font-size: 34px;
             font-weight: 800;
             padding: 0 35px;
             display: flex;
@@ -71,18 +71,16 @@
             white-space: nowrap;
             min-width: 150px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            text-transform: uppercase;
         }
 
-        .divider {
-            width: 4px;
-            background-color: #ffcc00;
-        }
+        .divider { width: 4px; background-color: #ffcc00; }
 
         /* Team 2 Side (Dark Charcoal) */
         .team-b-panel {
             background: #2d2d2d;
             color: #ffffff;
-            font-size: 32px;
+            font-size: 34px;
             font-weight: 800;
             padding: 0 35px;
             display: flex;
@@ -91,11 +89,12 @@
             white-space: nowrap;
             min-width: 150px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            text-transform: uppercase;
         }
         .score-b {
             background: #1a1a1a;
             color: #ffcc00;
-            font-size: 44px;
+            font-size: 46px;
             font-weight: 900;
             padding: 0 25px;
             display: flex;
@@ -109,14 +108,15 @@
         #match-details-strip {
             background: rgba(0, 0, 0, 0.85);
             color: #ffffff;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 800;
-            padding: 4px 25px;
-            margin-top: 5px;
+            padding: 5px 30px;
+            margin-top: 6px;
             text-transform: uppercase;
             border-radius: 6px;
             letter-spacing: 1.5px;
             border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.6);
         }
         #match-details-strip.hidden { display: none; }
 
@@ -126,11 +126,11 @@
             display: flex; align-items: center; transition: all 0.5s ease;
         }
         #logo-container.hidden { opacity: 0; transform: scale(0.8); }
-        #main-logo { height: 85px; width: auto; object-fit: contain; filter: drop-shadow(3px 5px 8px rgba(0,0,0,0.6)); }
+        #main-logo { height: 90px; width: auto; object-fit: contain; filter: drop-shadow(3px 5px 8px rgba(0,0,0,0.6)); }
 
         #single-wm {
             position: absolute; left: 300px; top: 300px;
-            font-family: 'Bebas Neue', sans-serif; font-size: 42px; font-weight: bold;
+            font-family: 'Bebas Neue', sans-serif; font-size: 45px; font-weight: bold;
             color: #ffffff; opacity: 0.45; text-transform: uppercase; letter-spacing: 2px;
             text-shadow: 2px 2px 6px rgba(0,0,0,0.9); z-index: 9997; pointer-events: none;
         }
@@ -146,26 +146,27 @@
             flex-direction: column;
             box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.9);
             transition: opacity 0.5s ease;
+            text-transform: uppercase; /* ALL ENGLISH IN CAPS */
         }
         #ticker-wrap.hidden { opacity: 0; }
 
         .ticker-strip { 
             display: flex; 
             width: 100%; 
-            height: 48px;
+            height: 52px;
             transition: all 0.4s ease;
         }
 
-        /* Strip Colors based on 30-40-30 layout */
-        .strip-blue { background: linear-gradient(90deg, #1a5bb8, #236dd9); border-bottom: 2px solid rgba(0,0,0,0.5); }
-        .strip-dark { background: linear-gradient(90deg, #1a1a1a, #2a2a2a); border-top: 1px solid rgba(255,255,255,0.15); }
+        /* Strip 1 (Top) & Strip 2 (Bottom) Colors */
+        .strip-top { background: linear-gradient(90deg, #1a5bb8, #236dd9); border-bottom: 2px solid rgba(0,0,0,0.6); }
+        .strip-bot { background: linear-gradient(90deg, #1a1a1a, #2a2a2a); border-top: 1px solid rgba(255,255,255,0.15); }
 
         .ticker-col {
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 24px;
+            font-size: 25px;
             color: #ffffff;
             white-space: nowrap;
             overflow: hidden;
@@ -173,8 +174,9 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
         }
 
+        /* 30% - 40% - 30% Layout */
         .w-30 { width: 30%; }
-        .w-40 { width: 40%; background: rgba(0, 0, 0, 0.4); border-left: 2px solid rgba(255,255,255,0.2); border-right: 2px solid rgba(255,255,255,0.2); }
+        .w-40 { width: 40%; background: rgba(0, 0, 0, 0.4); border-left: 2px solid rgba(255,255,255,0.25); border-right: 2px solid rgba(255,255,255,0.25); }
         .text-yellow { color: #ffcc00; }
 
         /* Step-by-Step Animation */
@@ -182,7 +184,7 @@
             position: absolute;
             width: 100%;
             text-align: center;
-            transition: opacity 0.5s ease, transform 0.5s ease;
+            transition: opacity 0.6s ease, transform 0.6s ease;
             opacity: 1;
             transform: translateY(0);
         }
@@ -197,28 +199,26 @@
 <div id="top-scoreboard-container">
     <div id="main-score-strip">
         <div class="score-a" id="sA">0</div>
-        <div class="team-a-panel" id="nA-container"><span id="nA">ਟੀਮ 1</span></div>
+        <div class="team-a-panel" id="nA-container"><span id="nA">TEAM 1</span></div>
         <div class="divider"></div>
-        <div class="team-b-panel" id="nB-container"><span id="nB">ਟੀਮ 2</span></div>
+        <div class="team-b-panel" id="nB-container"><span id="nB">TEAM 2</span></div>
         <div class="score-b" id="sB">0</div>
     </div>
     <div id="match-details-strip" class="hidden"></div>
 </div>
 
 <div id="ticker-wrap">
-    
-    <div class="ticker-strip strip-blue" id="strip-1">
-        <div class="ticker-col w-30"><span id="s1-left" class="anim-text">LOCATION</span></div>
+    <div class="ticker-strip strip-top" id="strip-1">
+        <div class="ticker-col w-30"><span id="s1-left" class="anim-text">📍 LOCATION</span></div>
         <div class="ticker-col w-40 text-yellow"><span id="s1-mid" class="anim-text">KABADDI TOURNAMENT</span></div>
-        <div class="ticker-col w-30"><span id="s1-right" class="anim-text">UPDATES</span></div>
+        <div class="ticker-col w-30"><span id="s1-right" class="anim-text">📅 UPCOMING EVENTS</span></div>
     </div>
     
-    <div class="ticker-strip strip-dark" id="strip-2" style="display: none;">
-        <div class="ticker-col w-30"><span id="s2-left" class="anim-text">LIVE MATCHES</span></div>
-        <div class="ticker-col w-40 text-yellow"><span id="s2-mid" class="anim-text">MATCH LIST</span></div>
-        <div class="ticker-col w-30"><span id="s2-right" class="anim-text">UPCOMING EVENTS</span></div>
+    <div class="ticker-strip strip-bot" id="strip-2" style="display: none;">
+        <div class="ticker-col w-30"><span id="s2-left" class="anim-text">VILLAGE NAME</span></div>
+        <div class="ticker-col w-40 text-yellow"><span id="s2-mid" class="anim-text">LIVE MATCHES</span></div>
+        <div class="ticker-col w-30"><span id="s2-right" class="anim-text">EVENT DETAILS</span></div>
     </div>
-
 </div>
 
 <script>
@@ -239,19 +239,16 @@
 
     const clientLogos = { "kabaddi101": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Kabaddi%20101%20logo.png" };
 
-    // Ticker Arrays & Indices
-    let s1LeftArr = []; let s1LeftIdx = 0;
-    let s1MidArr = []; let s1MidIdx = 0;
-    let s1RightArr = []; let s1RightIdx = 0;
+    // Ticker Master Arrays
+    let leftItems = [];
+    let centerItems = [];
+    let rightItems = [];
     
-    let s2LeftArr = []; let s2LeftIdx = 0;
-    let s2MidArr = []; let s2MidIdx = 0;
-    let s2RightArr = []; let s2RightIdx = 0;
-    
-    let isPunjabiScoreboard = true;
+    // Indices & State
+    let leftIdx = 0, centerIdx = 0, rightIdx = 0;
+    let isEnglish = true; 
     let hasMatches = false;
 
-    // Real-time DB Listener
     db.on("value", (snap) => {
         const data = snap.val() || {}; 
         window.currentData = data; 
@@ -288,95 +285,116 @@
     });
 
     function processTickerData(data) {
-        let allMatches = [...(data.nextMatchesWeight || []), ...(data.nextMatchesOpen || [])];
-        hasMatches = allMatches.length > 0;
-
-        // Base Data Collections
-        let villageArr = [];
-        if(data.row1Txt) villageArr.push("📍 " + data.row1Txt);
-        if(data.row1Txt_pa) villageArr.push("📍 " + data.row1Txt_pa);
-        if(villageArr.length === 0) villageArr = ["WELCOME TO LIVE KABADDI"];
-
-        let prizesArr = [];
-        if(data.pzOp1) prizesArr.push("🔥 ਓਪਨ 1st: " + data.pzOp1);
-        if(data.pzOp2) prizesArr.push("🔥 ਓਪਨ 2nd: " + data.pzOp2);
-        if(data.pzOpBest) prizesArr.push("🔥 ਬੈਸਟ (OPEN): " + data.pzOpBest);
-        let wtKg = data.pzWtKg ? data.pzWtKg : "WEIGHT";
-        if(data.pzWt1) prizesArr.push(`🏋️ ${wtKg} 1st: ${data.pzWt1}`);
-        if(data.pzWt2) prizesArr.push(`🏋️ ${wtKg} 2nd: ${data.pzWt2}`);
-        if(data.pzWtBest) prizesArr.push(`🏋️ ਬੈਸਟ (${wtKg}): ${data.pzWtBest}`);
-        if(prizesArr.length === 0) prizesArr = ["🏆 KABADDI PRIZES"];
-
-        let sponsorArr = [];
-        if(data.row2Txt) sponsorArr.push(data.row2Txt);
-        if(data.row2Txt_pa) sponsorArr.push(data.row2Txt_pa);
-        if(sponsorArr.length === 0) sponsorArr = ["KABADDI TOURNAMENT LIVE"];
-
-        let bookingArr = [];
-        if(data.row6Txt) bookingArr.push("📞 " + data.row6Txt);
-        if(bookingArr.length === 0) bookingArr = ["LIKE & SHARE LIVE STREAM"];
-
-        let eventsArr = [];
-        if(data.upcomingEvents && data.upcomingEvents.length > 0) {
-            data.upcomingEvents.forEach((ev, i) => {
-                let dStr = ev.date ? ` (${ev.date})` : "";
-                eventsArr.push(`🗓️ ${i+1}. ${ev.name}${dStr}`);
-                if(ev.name_pa) eventsArr.push(`🗓️ ${i+1}. ${ev.name_pa}${dStr}`);
-            });
-        } else {
-            eventsArr = ["UPCOMING KABADDI EVENTS", "ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ"];
-        }
-
-        let matchDisplayArr = [];
-        allMatches.forEach(m => {
-            let prefix = ""; let mainStr = m;
-            if(m.startsWith("(")) { let pts = m.split(") "); prefix = pts[0] + ") "; mainStr = pts[1] || m; }
-            let teams = mainStr.split(" VS ");
-            let t1 = (teams[0] || "").split(" / "); let t2 = (teams[1] || "").split(" / ");
-            matchDisplayArr.push(`👉 ${prefix}${t1[0]?.trim()} VS ${t2[0]?.trim()}`);
-            if(t1[1] || t2[1]) matchDisplayArr.push(`👉 ${prefix}${t1[1]?.trim() || t1[0]?.trim()} VS ${t2[1]?.trim() || t2[0]?.trim()}`);
+        // --- 1. BUILD LEFT ITEMS (Village & Prizes: Title Top, Value Bottom) ---
+        leftItems = [];
+        
+        // Village Name
+        leftItems.push({
+            tEn: "📍 LOCATION", bEn: data.row1Txt || "VILLAGE NAME",
+            tPa: "📍 ਸਥਾਨ / ਪਿੰਡ", bPa: data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ"
         });
 
-        // --- DYNAMIC TICKER ASSIGNMENT ---
-        const strip2 = document.getElementById('strip-2');
+        // Prize Helper
+        let buildPrizeStr = (op, wt, isPa) => {
+            let p = [];
+            if(op) p.push((isPa ? "ਓਪਨ: " : "OPEN: ") + op);
+            if(wt) p.push((isPa ? "ਵਜ਼ਨੀ: " : "WT: ") + wt);
+            return p.length > 0 ? p.join(" | ") : (isPa ? "ਕੋਈ ਨਹੀਂ" : "N/A");
+        };
 
-        if (hasMatches) {
-            strip2.style.display = 'flex';
-            
-            // STRIP 1 (Double Mode)
-            s1LeftArr = villageArr;
-            s1MidArr = prizesArr;
-            s1RightArr = bookingArr;
-
-            // STRIP 2 (Double Mode)
-            s2LeftArr = ["LIVE MATCHES", "ਲਾਈਵ ਮੈਚ ਅੱਪਡੇਟ"];
-            s2MidArr = matchDisplayArr;
-            s2RightArr = eventsArr;
-            
-        } else {
-            strip2.style.display = 'none';
-            
-            // STRIP 1 (Single Mode)
-            s1LeftArr = [...villageArr, ...prizesArr];
-            s1MidArr = sponsorArr;
-            s1RightArr = [...eventsArr, ...bookingArr];
+        if(data.pzOp1 || data.pzWt1) {
+            leftItems.push({
+                tEn: "🏆 FIRST PRIZE", bEn: buildPrizeStr(data.pzOp1, data.pzWt1, false),
+                tPa: "🏆 ਪਹਿਲਾ ਇਨਾਮ", bPa: buildPrizeStr(data.pzOp1, data.pzWt1, true)
+            });
+        }
+        if(data.pzOp2 || data.pzWt2) {
+            leftItems.push({
+                tEn: "🏆 SECOND PRIZE", bEn: buildPrizeStr(data.pzOp2, data.pzWt2, false),
+                tPa: "🏆 ਦੂਜਾ ਇਨਾਮ", bPa: buildPrizeStr(data.pzOp2, data.pzWt2, true)
+            });
+        }
+        if(data.pzOpBest || data.pzWtBest) {
+            leftItems.push({
+                tEn: "🏅 BEST PLAYER PRIZE", bEn: buildPrizeStr(data.pzOpBest, data.pzWtBest, false),
+                tPa: "🏅 ਬੈਸਟ ਖਿਡਾਰੀਆਂ ਨੂੰ ਇਨਾਮ", bPa: buildPrizeStr(data.pzOpBest, data.pzWtBest, true)
+            });
         }
 
-        // Initialize empty text to avoid blanks
-        if(document.getElementById('s1-left').innerText === "LOCATION") {
-            document.getElementById('s1-left').innerText = s1LeftArr[0];
-            document.getElementById('s1-mid').innerText = s1MidArr[0];
-            document.getElementById('s1-right').innerText = s1RightArr[0];
-            if(hasMatches) {
-                document.getElementById('s2-left').innerText = s2LeftArr[0];
-                document.getElementById('s2-mid').innerText = s2MidArr[0];
-                document.getElementById('s2-right').innerText = s2RightArr[0];
+        // --- 2. BUILD CENTER ITEMS (Weight Match Top, Open Match Bottom) ---
+        centerItems = [];
+        let wtMatches = data.nextMatchesWeight || [];
+        let opMatches = data.nextMatchesOpen || [];
+        let maxM = Math.max(wtMatches.length, opMatches.length);
+        
+        hasMatches = maxM > 0;
+        
+        if(hasMatches) {
+            for(let i=0; i<maxM; i++) {
+                let wt = wtMatches[i % wtMatches.length] || "NO MATCH";
+                let op = opMatches[i % opMatches.length] || "NO MATCH";
+                
+                let splitMatch = (m) => {
+                    if(m === "NO MATCH") return {en: "NO MATCH ADDED", pa: "ਕੋਈ ਮੈਚ ਨਹੀਂ"};
+                    let prefix = ""; let main = m;
+                    if(m.startsWith("(")) { let p = m.split(") "); prefix = p[0] + ") "; main = p[1] || m; }
+                    let tms = main.split(" VS ");
+                    let t1 = (tms[0] || "").split(" / "); let t2 = (tms[1] || "").split(" / ");
+                    let en = `${prefix}${t1[0]?.trim()} VS ${t2[0]?.trim()}`;
+                    let pa = `${prefix}${t1[1]?.trim() || t1[0]?.trim()} VS ${t2[1]?.trim() || t2[0]?.trim()}`;
+                    return {en, pa};
+                };
+                
+                let wM = splitMatch(wt);
+                let oM = splitMatch(op);
+                
+                centerItems.push({
+                    tEn: `🏋️ WEIGHT: ${wM.en}`, bEn: `🔥 OPEN: ${oM.en}`,
+                    tPa: `🏋️ ਵਜ਼ਨੀ: ${wM.pa}`, bPa: `🔥 ਓਪਨ: ${oM.pa}`
+                });
             }
+        } else {
+            // Fallback for Single Strip Mode
+            centerItems.push({
+                tEn: "KABADDI TOURNAMENT", bEn: "LIVE UPDATES",
+                tPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", bPa: "ਲਾਈਵ ਅੱਪਡੇਟ"
+            });
+        }
+
+        // --- 3. BUILD RIGHT ITEMS (Upcoming Events Top, Info Bottom) ---
+        rightItems = [];
+        if(data.upcomingEvents && data.upcomingEvents.length > 0) {
+            data.upcomingEvents.forEach(ev => {
+                let d = ev.date ? ` (${ev.date})` : "";
+                rightItems.push({
+                    tEn: "📅 UPCOMING EVENTS", bEn: `${ev.name}${d}`,
+                    tPa: "📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ", bPa: `${ev.name_pa || ev.name}${d}`
+                });
+            });
+        }
+        if(data.row6Txt || data.row6Txt_pa) {
+            rightItems.push({
+                tEn: "📞 FOR BOOKING & ADS", bEn: data.row6Txt || "CONTACT US",
+                tPa: "📞 ਬੁਕਿੰਗ ਅਤੇ ਐਡ ਲਈ", bPa: data.row6Txt_pa || data.row6Txt || "ਸੰਪਰਕ ਕਰੋ"
+            });
+        }
+        if(rightItems.length === 0) {
+            rightItems.push({
+                tEn: "📅 UPCOMING EVENTS", bEn: "STAY TUNED",
+                tPa: "📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ", bPa: "ਦੇਖਦੇ ਰਹੋ"
+            });
+        }
+        
+        // Layout Toggle
+        document.getElementById('strip-2').style.display = hasMatches ? 'flex' : 'none';
+        
+        // Initial Render
+        if(document.getElementById('s1-left').innerText === "📍 LOCATION") {
+            renderTicker();
         }
     }
 
-    // Animation Function
-    function animateTextChange(elementId, newText) {
+    function animateText(elementId, newText) {
         const el = document.getElementById(elementId);
         if (!el || el.innerText === newText) return; 
         
@@ -386,34 +404,57 @@
         setTimeout(() => {
             el.innerText = newText;
             el.style.transform = 'translateY(15px)'; 
-            setTimeout(() => { el.style.opacity = 1; el.style.transform = 'translateY(0)'; }, 50);
-        }, 400); 
+            setTimeout(() => { el.style.opacity = 1; el.style.transform = 'translateY(0)'; }, 60);
+        }, 450); 
     }
 
-    // Master Animation Loop
-    setInterval(() => {
-        // Scoreboard Bilingual
-        if(window.currentData) {
-            isPunjabiScoreboard = !isPunjabiScoreboard;
-            let d = window.currentData;
-            document.getElementById('nA').innerText = (isPunjabiScoreboard && d.nameA_pa) ? d.nameA_pa : (d.nameA || "TEAM 1");
-            document.getElementById('nB').innerText = (isPunjabiScoreboard && d.nameB_pa) ? d.nameB_pa : (d.nameB || "TEAM 2");
-        }
+    function renderTicker() {
+        let L = leftItems[leftIdx % leftItems.length];
+        let C = centerItems[centerIdx % centerItems.length];
+        let R = rightItems[rightIdx % rightItems.length];
 
-        // Strip 1 Cycle
-        if(s1LeftArr.length > 0) { s1LeftIdx = (s1LeftIdx + 1) % s1LeftArr.length; animateTextChange('s1-left', s1LeftArr[s1LeftIdx]); }
-        if(s1MidArr.length > 0) { s1MidIdx = (s1MidIdx + 1) % s1MidArr.length; animateTextChange('s1-mid', s1MidArr[s1MidIdx]); }
-        if(s1RightArr.length > 0) { s1RightIdx = (s1RightIdx + 1) % s1RightArr.length; animateTextChange('s1-right', s1RightArr[s1RightIdx]); }
-
-        // Strip 2 Cycle
         if(hasMatches) {
-            if(s2LeftArr.length > 0) { s2LeftIdx = (s2LeftIdx + 1) % s2LeftArr.length; animateTextChange('s2-left', s2LeftArr[s2LeftIdx]); }
-            if(s2MidArr.length > 0) { s2MidIdx = (s2MidIdx + 1) % s2MidArr.length; animateTextChange('s2-mid', s2MidArr[s2MidIdx]); }
-            if(s2RightArr.length > 0) { s2RightIdx = (s2RightIdx + 1) % s2RightArr.length; animateTextChange('s2-right', s2RightArr[s2RightIdx]); }
+            // Double Strip Output
+            animateText('s1-left', isEnglish ? L.tEn : L.tPa);
+            animateText('s2-left', isEnglish ? L.bEn : L.bPa);
+            
+            animateText('s1-mid', isEnglish ? C.tEn : C.tPa);
+            animateText('s2-mid', isEnglish ? C.bEn : C.bPa);
+            
+            animateText('s1-right', isEnglish ? R.tEn : R.tPa);
+            animateText('s2-right', isEnglish ? R.bEn : R.bPa);
+        } else {
+            // Single Strip Output (Combined)
+            animateText('s1-left', isEnglish ? `${L.tEn}: ${L.bEn}` : `${L.tPa}: ${L.bPa}`);
+            animateText('s1-mid', isEnglish ? C.tEn : C.tPa);
+            animateText('s1-right', isEnglish ? `${R.tEn}: ${R.bEn}` : `${R.tPa}: ${R.bPa}`);
         }
-    }, 4500);
+    }
 
-    // Watermark
+    // MASTER ANIMATION LOOP (Language Toggle & Step-by-Step Cycle)
+    setInterval(() => {
+        // Only advance the arrays when we switch back to English 
+        // (so each item is shown once in English, then once in Punjabi)
+        if(!isEnglish) {
+            leftIdx++;
+            centerIdx++;
+            rightIdx++;
+        }
+        
+        // Toggle Global Language State
+        isEnglish = !isEnglish; 
+        
+        // Scoreboard Bilingual Sync
+        let d = window.currentData;
+        if(d) {
+            document.getElementById('nA').innerText = (!isEnglish && d.nameA_pa) ? d.nameA_pa : (d.nameA || "TEAM 1");
+            document.getElementById('nB').innerText = (!isEnglish && d.nameB_pa) ? d.nameB_pa : (d.nameB || "TEAM 2");
+        }
+        
+        renderTicker();
+    }, 4500); // 4.5 seconds per language
+
+    // Moving Watermark
     const wm = document.getElementById('single-wm');
     let x = 200, y = 200, dx = 1.8, dy = 1.4;
     function animateWatermark() {
