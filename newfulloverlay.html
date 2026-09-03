@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Ultra HD - Clean Minimalist Overlay</title>
+    <title>Kabaddi Ultra HD - Smart Match List Overlay</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -324,10 +324,11 @@
         if(data.adTent) leftItems.push({ en: "TENT SERVICE: " + data.adTent, pa: "ਟੈਂਟ ਪੰਡਾਲ: " + data.adTent });
         if(data.adSec) leftItems.push({ en: "SECURITY: " + data.adSec, pa: "ਸਕਿਓਰਿਟੀ: " + data.adSec });
 
-        // --- MATCH LIST (TOP = PUNJABI, BOTTOM = ENGLISH AS BEFORE) ---
+        // --- SMART MATCH LIST: DUAL CATEGORY OR SINGLE CATEGORY HANDLING ---
         centerItems = [];
-        let matchesList = data.nextMatches || [];
-        hasMatches = matchesList.length > 0;
+        let wtMatches = data.nextMatchesWeight || [];
+        let opMatches = data.nextMatchesOpen || [];
+        let generalMatches = data.nextMatches || [];
         
         let parseMatchFull = (m, index) => {
             let bracketContent = "";
@@ -362,12 +363,35 @@
             };
         };
 
-        if(hasMatches) {
-            matchesList.forEach((mStr, idx) => {
+        let hasWt = wtMatches.length > 0;
+        let hasOp = opMatches.length > 0;
+
+        if (hasWt && hasOp) {
+            // Dual category: Weight on Top, Open on Bottom
+            hasMatches = true;
+            let maxM = Math.max(wtMatches.length, opMatches.length);
+            for(let i=0; i<maxM; i++) {
+                let wMatch = wtMatches[i % wtMatches.length];
+                let oMatch = opMatches[i % opMatches.length];
+                let resW = parseMatchFull(wMatch, i);
+                let resO = parseMatchFull(oMatch, i);
+                centerItems.push({
+                    tPa: resW.pa, // Weight on top (Punjabi)
+                    bEn: resO.en  // Open on bottom (English)
+                });
+            }
+        } else if (generalMatches.length > 0) {
+            // Single category: Top Punjabi, Bottom English
+            hasMatches = true;
+            generalMatches.forEach((mStr, idx) => {
                 let res = parseMatchFull(mStr, idx);
-                centerItems.push({ tPa: res.pa, bEn: res.en });
+                centerItems.push({
+                    tPa: res.pa, // Top Punjabi
+                    bEn: res.en  // Bottom English
+                });
             });
         } else {
+            hasMatches = false;
             centerItems.push({ tPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", bEn: "KABADDI TOURNAMENT" });
         }
 
@@ -388,7 +412,10 @@
             });
         }
         if(rightItems.length === 0) {
-            rightItems.push({ en: `UPCOMING EVENTS: STAY TUNED`, pa: `ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ: ਦੇਖਦੇ ਰਹੋ` });
+            rightItems.push({ 
+                en: `UPCOMING EVENTS: STAY TUNED`, 
+                pa: `ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ: ਦੇਖਦੇ ਰਹੋ` 
+            });
         }
         
         document.getElementById('strip-2').style.display = hasMatches ? 'flex' : 'none';
@@ -411,7 +438,7 @@
             let length = dummy.innerText.length;
 
             if (length > 25) {
-                let duration = Math.max(32, length * 0.85); 
+                let duration = Math.max(34, length * 0.9); // Extremely smooth and slow
                 el.innerHTML = `<div class="scroll-container"><span class="scroll-text" style="--scroll-duration: ${duration}s;">${textToShow}</span></div>`;
                 
                 let timerKey = elementId + "_timer";
@@ -434,7 +461,7 @@
                     else if (elementId.includes("left")) leftIdx++;
                     else if (elementId.includes("right")) rightIdx++;
                     renderIndependentTickers();
-                }, 12000); 
+                }, 14000); 
             }
 
             el.style.transform = 'translateY(12px)';
@@ -469,7 +496,7 @@
     setInterval(() => {
         isEnglish = !isEnglish;
         renderIndependentTickers();
-    }, 16000);
+    }, 18000);
 
     setInterval(() => {
         let d = window.currentData;
