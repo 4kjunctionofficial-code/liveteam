@@ -287,4 +287,123 @@
         if(data.adComm) leftItems.push({ tEn: "🎙️ COMMENTATOR", bEn: data.adComm, tPa: "🎙️ ਕਮੈਂਟੇਟਰ", bPa: data.adComm });
         if(data.adSound) leftItems.push({ tEn: "🔊 SOUND SERVICE", bEn: data.adSound, tPa: "🔊 ਸਾਊਂਡ ਸਰਵਿਸ", bPa: data.adSound });
         if(data.adTent) leftItems.push({ tEn: "⛺ TENT SERVICE", bEn: data.adTent, tPa: "⛺ ਟੈਂਟ ਪੰਡਾਲ", bPa: data.adTent });
-        if(data.adSec) leftItems.push({ tEn: "🛡️ SECURITY", bEn: data.adSec, tPa
+        if(data.adSec) leftItems.push({ tEn: "🛡️ SECURITY", bEn: data.adSec, tPa: "🛡️ ਸਕਿਓਰਿਟੀ", bPa: data.adSec });
+
+        // --- CENTER ITEMS (PERFECT LANGUAGE SYNC: TOP PUNJABI, BOTTOM ENGLISH) ---
+        centerItems = [];
+        let matchesList = data.nextMatches || [];
+        hasMatches = matchesList.length > 0;
+        
+        let splitMatch = (m) => {
+            let prefix = ""; let main = m;
+            if(m.startsWith("(")) { let p = m.split(") "); prefix = p[0] + ") "; main = p[1] || m; }
+            let tms = main.split(" VS ");
+            let t1 = (tms[0] || "").split(" / "); let t2 = (tms[1] || "").split(" / ");
+            let en = `${prefix}${t1[0]?.trim() || ""} VS ${t2[0]?.trim() || ""}`;
+            let pa = `${prefix}${t1[1]?.trim() || t1[0]?.trim() || ""} VS ${t2[1]?.trim() || t2[0]?.trim() || ""}`;
+            return {en, pa};
+        };
+
+        if(hasMatches) {
+            matchesList.forEach(mStr => {
+                let m = splitMatch(mStr);
+                centerItems.push({
+                    tEn: `⚔️ ${m.pa}`, // English mode vich vi upar Punjabi
+                    bEn: `⚔️ ${m.en}`, // te hethan English
+                    tPa: `⚔️ ${m.pa}`, // Punjabi mode vich vi upar Punjabi
+                    bPa: `⚔️ ${m.en}`  // te hethan English
+                });
+            });
+        } else {
+            centerItems.push({ tEn: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", bEn: "KABADDI TOURNAMENT", tPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", bPa: "KABADDI TOURNAMENT" });
+        }
+
+        rightItems = [];
+        if(data.upcomingEvents && data.upcomingEvents.length > 0) {
+            data.upcomingEvents.forEach(ev => {
+                let d = ev.date ? ` (${ev.date})` : "";
+                rightItems.push({ tEn: "📅 UPCOMING EVENTS", bEn: `${ev.name}${d}`, tPa: "📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ", bPa: `${ev.name_pa || ev.name}${d}` });
+            });
+        }
+        if(data.row6Txt || data.row6Txt_pa) {
+            rightItems.push({ tEn: "📺 LIVE TELECAST", bEn: data.row6Txt || "LIVE STREAMING", tPa: "📺 ਲਾਈਵ ਪ੍ਰਸਾਰਣ", bPa: data.row6Txt_pa || data.row6Txt || "ਲਾਈਵ ਪ੍ਰਸਾਰਣ" });
+        }
+        if(rightItems.length === 0) {
+            rightItems.push({ tEn: "📅 UPCOMING EVENTS", bEn: "STAY TUNED", tPa: "📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ", bPa: "ਦੇਖਦੇ ਰਹੋ" });
+        }
+        
+        document.getElementById('strip-2').style.display = hasMatches ? 'flex' : 'none';
+        if(document.getElementById('s1-left').innerText === "📍 LOCATION") { renderTicker(); }
+    }
+
+    function animateText(elementId, newText, isCenter = false) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        let currentText = el.innerText.trim();
+        if (currentText === newText.trim()) return; 
+
+        el.style.opacity = 0;
+        if(isCenter) { el.style.transform = 'scaleX(0)'; el.style.transformOrigin = 'center'; }
+        else { el.style.transform = 'translateY(-15px)'; }
+        
+        setTimeout(() => {
+            let scrollLimit = isCenter ? 35 : 20; 
+            if(newText.length > scrollLimit) {
+                el.innerHTML = `<div class="scroll-container"><span class="scroll-text">${newText}</span></div>`;
+            } else {
+                el.innerHTML = newText;
+            }
+
+            if(isCenter) { el.style.transform = 'scaleX(1)'; }
+            else { el.style.transform = 'translateY(15px)'; }
+
+            setTimeout(() => { el.style.opacity = 1; if(!isCenter) el.style.transform = 'translateY(0)'; }, 60);
+        }, 500); 
+    }
+
+    function renderTicker() {
+        let L = leftItems[leftIdx % leftItems.length];
+        let C = centerItems[centerIdx % centerItems.length];
+        let R = rightItems[rightIdx % rightItems.length];
+
+        if(hasMatches) {
+            animateText('s1-left', isEnglish ? L.tEn : L.tPa, false);
+            animateText('s2-left', isEnglish ? L.bEn : L.bPa, false);
+            // Match list: Top always Punjabi, Bottom always English
+            animateText('s1-mid', C.tPa, true);
+            animateText('s2-mid', C.bPa, true);
+            animateText('s1-right', isEnglish ? R.tEn : R.tPa, false);
+            animateText('s2-right', isEnglish ? R.bEn : R.bPa, false);
+        } else {
+            animateText('s1-left', isEnglish ? `${L.tEn}: ${L.bEn}` : `${L.tPa}: ${L.bPa}`, false);
+            animateText('s1-mid', isEnglish ? C.tEn : C.tPa, true);
+            animateText('s1-right', isEnglish ? `${R.tEn}: ${R.bEn}` : `${R.tPa}: ${R.bPa}`, false);
+        }
+    }
+
+    setInterval(() => {
+        if(!isEnglish) { leftIdx++; rightIdx++; }
+        centerIdx++; // Match list cycles continuously
+        isEnglish = !isEnglish; 
+        
+        let d = window.currentData;
+        if(d) {
+            document.getElementById('nA').innerText = (!isEnglish && d.nameA_pa) ? d.nameA_pa : (d.nameA || "TEAM 1");
+            document.getElementById('nB').innerText = (!isEnglish && d.nameB_pa) ? d.nameB_pa : (d.nameB || "TEAM 2");
+        }
+        renderTicker();
+    }, 12000);
+
+    const wm = document.getElementById('single-wm');
+    let x = 200, y = 200, dx = 1.8, dy = 1.4;
+    function animateWatermark() {
+        const maxX = 1920 - wm.offsetWidth - 50; const maxY = 950 - wm.offsetHeight;
+        x += dx; y += dy;
+        if (x <= 50 || x >= maxX) dx *= -1; if (y <= 120 || y >= maxY) dy *= -1;
+        wm.style.left = x + 'px'; wm.style.top = y + 'px';
+        requestAnimationFrame(animateWatermark);
+    }
+    animateWatermark();
+</script>
+</body>
+</html>
