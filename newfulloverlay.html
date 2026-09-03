@@ -280,7 +280,7 @@
 
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
-        document.getElementById('single-wm').innerText = data.watermarkTxt || "ਐੱም ਲਾਈਵ";
+        document.getElementById('single-wm').innerText = data.watermarkTxt || "ਐੱਮ ਲਾਈਵ";
 
         if(data.resultText && data.resultText !== "No Result Yet" && data.resultText !== lastResult) {
             lastResult = data.resultText;
@@ -325,7 +325,6 @@
         if(data.adTent) leftItems.push({ hintEn: "⛺ TENT SERVICE", hintPa: "⛺ ਟੈਂਟ ਪੰਡਾਲ", detailEn: data.adTent, detailPa: data.adTent });
         if(data.adSec) leftItems.push({ hintEn: "🛡️ SECURITY", hintPa: "🛡️ ਸਕਿਓਰਿਟੀ", detailEn: data.adSec, detailPa: data.adSec });
 
-        // --- MATCH LIST SETTING (UPDATED HERE) ---
         centerItems = [];
         let matchesList = data.nextMatches || [];
         hasMatches = matchesList.length > 0;
@@ -369,7 +368,7 @@
                 centerItems.push({ 
                     hintPa: "⚔️ ਅਗਲਾ ਮੈਚ (NEXT MATCH)", hintEn: "⚔️ NEXT MATCH",
                     tPa: res.pa, bEn: res.en,
-                    isMultiple: matchesList.length > 1 // Check if multiple matches exist
+                    isMultiple: matchesList.length > 1 
                 });
             });
         } else {
@@ -425,12 +424,16 @@
                 let timerKey = elementId + "_timer";
                 if (window[timerKey]) clearTimeout(window[timerKey]);
                 
+                // --- 80% SCROLL P]=='ON TIME SETTING ---
+                // ਜਦੋਂ ਟਾਈਮ ਦਾ 80% ਹਿੱਸਾ ਪੂਰਾ ਹੋਵੇਗਾ, ਉਸੇ ਸਮੇਂ ਐਨੀਮੇਸ਼ਨ ਨਾਲ ਅਗਲਾ ਮੈਚ ਆ ਜਾਵੇਗਾ
+                let triggerTime = (isCenter && elementId === 's2-mid') ? (duration * 1000 * 0.8) : (duration * 1000);
+
                 window[timerKey] = setTimeout(() => {
                     if (isCenter) centerIdx++;
                     else if (elementId.includes("left")) leftIdx++;
                     else if (elementId.includes("right")) rightIdx++;
                     renderIndependentTickers();
-                }, duration * 1000);
+                }, triggerTime);
 
             } else {
                 el.innerHTML = textToShow;
@@ -459,13 +462,10 @@
             runSmartTicker('s1-left', isEnglish ? L.hintEn : L.hintPa, false);
             runSmartTicker('s1-right', isEnglish ? R.hintEn : R.hintPa, false);
 
-            // Match list display logic based on single or multiple matches
             if (C.isMultiple) {
-                // If multiple matches: Top shows Punjabi, Bottom shows English
                 runSmartTicker('s1-mid', C.tPa, true);
                 runSmartTicker('s2-mid', C.bEn, true);
             } else {
-                // If single match type: Top alternates Punjabi/English, Bottom alternates or stays consistent
                 runSmartTicker('s1-mid', isEnglish ? C.hintEn : C.hintPa, true);
                 runSmartTicker('s2-mid', isEnglish ? C.bEn : C.tPa, true);
             }
