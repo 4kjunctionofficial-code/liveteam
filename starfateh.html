@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Ultra HD - 2 Color Ticker</title>
+    <title>Kabaddi Ultra HD - 2 Color Ticker & Result</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@600;700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -47,168 +47,123 @@
 
         /* Team 1 Side */
         .score-a {
-            background: #0d3b7a;
-            color: #ffcc00;
-            font-size: 48px;
-            font-weight: 900;
-            padding: 0 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 90px;
-            font-family: 'Bebas Neue', sans-serif;
-            text-shadow: 2px 3px 5px rgba(0,0,0,0.9);
+            background: #0d3b7a; color: #ffcc00; font-size: 48px; font-weight: 900;
+            padding: 0 30px; display: flex; align-items: center; justify-content: center;
+            min-width: 90px; font-family: 'Bebas Neue', sans-serif; text-shadow: 2px 3px 5px rgba(0,0,0,0.9);
         }
         .team-a-panel {
-            background: #1a5bb8;
-            color: #ffffff;
-            font-size: 35px;
-            font-weight: 800;
-            padding: 0 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            white-space: nowrap;
-            min-width: 150px;
-            text-shadow: 2px 3px 5px rgba(0,0,0,0.9);
-            text-transform: uppercase;
+            background: #1a5bb8; color: #ffffff; font-size: 35px; font-weight: 800;
+            padding: 0 40px; display: flex; align-items: center; justify-content: center;
+            white-space: nowrap; min-width: 150px; text-shadow: 2px 3px 5px rgba(0,0,0,0.9); text-transform: uppercase;
         }
 
         .divider { width: 5px; background-color: #ffcc00; }
 
         /* Team 2 Side */
         .team-b-panel {
-            background: #242424;
-            color: #ffffff;
-            font-size: 35px;
-            font-weight: 800;
-            padding: 0 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            white-space: nowrap;
-            min-width: 150px;
-            text-shadow: 2px 3px 5px rgba(0,0,0,0.9);
-            text-transform: uppercase;
+            background: #242424; color: #ffffff; font-size: 35px; font-weight: 800;
+            padding: 0 40px; display: flex; align-items: center; justify-content: center;
+            white-space: nowrap; min-width: 150px; text-shadow: 2px 3px 5px rgba(0,0,0,0.9); text-transform: uppercase;
         }
         .score-b {
-            background: #111111;
-            color: #ffcc00;
-            font-size: 48px;
-            font-weight: 900;
-            padding: 0 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 90px;
-            font-family: 'Bebas Neue', sans-serif;
-            text-shadow: 2px 3px 5px rgba(0,0,0,0.9);
+            background: #111111; color: #ffcc00; font-size: 48px; font-weight: 900;
+            padding: 0 30px; display: flex; align-items: center; justify-content: center;
+            min-width: 90px; font-family: 'Bebas Neue', sans-serif; text-shadow: 2px 3px 5px rgba(0,0,0,0.9);
         }
 
         #match-details-strip {
-            background: rgba(0, 0, 0, 0.9);
-            color: #ffffff;
-            font-size: 22px;
-            font-weight: 800;
-            padding: 5px 35px;
-            margin-top: 6px;
-            text-transform: uppercase;
-            border-radius: 6px;
-            letter-spacing: 1.5px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 3px 10px rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.9); color: #ffffff; font-size: 22px; font-weight: 800;
+            padding: 5px 35px; margin-top: 6px; text-transform: uppercase; border-radius: 6px;
+            letter-spacing: 1.5px; border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 3px 10px rgba(0,0,0,0.7);
         }
         #match-details-strip.hidden { display: none; }
 
         /* --- LOGO & WATERMARK --- */
-        #logo-container {
-            position: absolute; top: 25px; left: 30px; z-index: 9999;
-            display: flex; align-items: center; transition: all 0.5s ease;
-        }
+        #logo-container { position: absolute; top: 25px; left: 30px; z-index: 9999; display: flex; align-items: center; transition: all 0.5s ease; }
         #logo-container.hidden { opacity: 0; transform: scale(0.8); }
         #main-logo { height: 95px; width: auto; object-fit: contain; filter: drop-shadow(3px 5px 10px rgba(0,0,0,0.8)); }
 
         #single-wm {
-            position: absolute; left: 300px; top: 300px;
-            font-family: 'Bebas Neue', sans-serif; font-size: 48px; font-weight: bold;
+            position: absolute; left: 300px; top: 300px; font-family: 'Bebas Neue', sans-serif; font-size: 48px; font-weight: bold;
             color: #ffffff; opacity: 0.45; text-transform: uppercase; letter-spacing: 3px;
             text-shadow: 2px 3px 8px rgba(0,0,0,0.9); z-index: 9997; pointer-events: none;
         }
 
         /* --- SOLID 2-COLOR TICKER --- */
         #ticker-wrap {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 1920px;
-            z-index: 9998;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.9);
-            transition: opacity 0.5s ease;
-            text-transform: uppercase;
+            position: absolute; bottom: 0; left: 0; width: 1920px; z-index: 9998;
+            display: flex; flex-direction: column; box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.9);
+            transition: opacity 0.5s ease; text-transform: uppercase;
         }
         #ticker-wrap.hidden { opacity: 0; }
 
-        .ticker-strip { 
-            display: flex; 
-            width: 100%; 
-            height: 55px; /* Increased Height for bigger fonts */
-        }
+        .ticker-strip { display: flex; width: 100%; height: 55px; }
 
-        /* ONE SOLID COLOR PER STRIP */
         .strip-top { background: #0b4596; border-bottom: 2px solid rgba(0,0,0,0.8); }
         .strip-bot { background: #121212; border-top: 1px solid rgba(255,255,255,0.1); }
 
         .ticker-col {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 28px; /* BIGGER FONT */
-            color: #ffffff;
-            overflow: hidden;
-            position: relative;
-            text-shadow: 2px 3px 5px rgba(0,0,0,1);
-            letter-spacing: 1px;
-            padding: 0 15px;
+            display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 28px;
+            color: #ffffff; overflow: hidden; position: relative; text-shadow: 2px 3px 5px rgba(0,0,0,1);
+            letter-spacing: 1px; padding: 0 15px;
         }
 
-        /* Keep widths 30-40-30, separated by thin borders */
         .w-30 { width: 30%; }
         .w-40 { width: 40%; border-left: 2px solid rgba(255,255,255,0.25); border-right: 2px solid rgba(255,255,255,0.25); color: #ffcc00; }
 
-        /* Step-by-Step Base Animation Container */
         .anim-wrap {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.6s ease, transform 0.6s ease;
-            opacity: 1;
+            position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.6s ease, transform 0.6s ease; opacity: 1;
         }
 
-        /* AUTO SCROLL (MARQUEE) LOGIC */
-        .scroll-container {
-            width: 100%;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            white-space: nowrap;
-        }
-        
+        /* SMART SCROLLING LOGIC */
+        .scroll-container { width: 100%; overflow: hidden; display: flex; align-items: center; white-space: nowrap; }
         .scroll-text {
-            display: inline-block;
-            white-space: nowrap;
-            padding-left: 100%; /* Start offscreen right */
-            animation: scrollMarquee 12s linear infinite;
+            display: inline-block; white-space: nowrap;
+            padding-left: 100%; /* Starts outside right edge */
+            animation: scrollMarquee 11s linear forwards; /* 11s gives it time to finish within 11.5s cycle */
         }
-
         @keyframes scrollMarquee {
             0%   { transform: translateX(0); }
             100% { transform: translateX(-100%); }
+        }
+
+        /* --- CENTER RESULT POP-UP BOX --- */
+        #result-popup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: rgba(10, 10, 10, 0.95);
+            border: 6px solid #ffcc00;
+            padding: 50px 100px;
+            border-radius: 20px;
+            color: white;
+            text-align: center;
+            z-index: 100000;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.9);
+            text-transform: uppercase;
+        }
+        #result-popup.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+        .res-title {
+            font-size: 55px;
+            color: #ffcc00;
+            margin-bottom: 25px;
+            font-weight: 900;
+            text-shadow: 2px 3px 5px rgba(0,0,0,1);
+            border-bottom: 3px solid rgba(255, 204, 0, 0.5);
+            padding-bottom: 10px;
+        }
+        .res-text {
+            font-size: 65px;
+            font-weight: 800;
+            text-shadow: 2px 3px 5px rgba(0,0,0,1);
+            line-height: 1.2;
         }
 
     </style>
@@ -217,6 +172,11 @@
 
 <div id="logo-container" class="hidden"><img id="main-logo" src="" alt="Logo"></div>
 <div id="single-wm">M LIVE</div>
+
+<div id="result-popup">
+    <div class="res-title">🏆 MATCH RESULT 🏆</div>
+    <div class="res-text" id="res-msg">WINNER NAME</div>
+</div>
 
 <div id="top-scoreboard-container">
     <div id="main-score-strip">
@@ -268,6 +228,7 @@
     let leftIdx = 0, centerIdx = 0, rightIdx = 0;
     let isEnglish = true; 
     let hasMatches = false;
+    let lastResult = ""; // Track result state
 
     db.on("value", (snap) => {
         const data = snap.val() || {}; 
@@ -297,25 +258,42 @@
         document.getElementById('sB').innerText = data.scoreB ?? "0";
         document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
 
+        // Result Pop-up Logic
+        if(data.resultText && data.resultText !== "No Result Yet" && data.resultText !== lastResult) {
+            lastResult = data.resultText;
+            showResultPopup(data.resultText);
+        }
+        if (!data.resultText || data.resultText === "No Result Yet") {
+            lastResult = ""; // Reset tracker if admin resets
+        }
+
         processTickerData(data);
     });
+
+    function showResultPopup(text) {
+        const popup = document.getElementById('result-popup');
+        document.getElementById('res-msg').innerText = text;
+        popup.classList.add('show');
+        
+        // Hide after 15 seconds
+        setTimeout(() => {
+            popup.classList.remove('show');
+        }, 15000); 
+    }
 
     function processTickerData(data) {
         // --- 1. BUILD LEFT ITEMS (Village & Individual Prizes) ---
         leftItems = [];
         
-        // Village Name
         leftItems.push({
             tEn: "📍 LOCATION", bEn: data.row1Txt || "VILLAGE NAME",
-            tPa: "📍 ਸਥਾਨ / ਪਿੰਡ", bPa: data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ"
+            tPa: "📍 ਸਥਾਨ / ਪਿੰਡ", bPa: data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ ਦਾ ਨਾਮ"
         });
 
-        // Separated Open Prizes
         if(data.pzOp1) leftItems.push({ tEn: "🔥 OPEN 1ST PRIZE", bEn: data.pzOp1, tPa: "🔥 ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ", bPa: data.pzOp1 });
         if(data.pzOp2) leftItems.push({ tEn: "🔥 OPEN 2ND PRIZE", bEn: data.pzOp2, tPa: "🔥 ਓਪਨ ਦੂਜਾ ਇਨਾਮ", bPa: data.pzOp2 });
         if(data.pzOpBest) leftItems.push({ tEn: "🏅 OPEN BEST PLAYER", bEn: data.pzOpBest, tPa: "🏅 ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ", bPa: data.pzOpBest });
 
-        // Separated Weight Prizes (with KG)
         let wKg = data.pzWtKg ? `(${data.pzWtKg})` : "(WEIGHT)";
         let wKgPa = data.pzWtKg ? `(${data.pzWtKg})` : "(ਵਜ਼ਨੀ)";
 
@@ -323,7 +301,7 @@
         if(data.pzWt2) leftItems.push({ tEn: `🏋️ ${wKg} 2ND PRIZE`, bEn: data.pzWt2, tPa: `🏋️ ${wKgPa} ਦੂਜਾ ਇਨਾਮ`, bPa: data.pzWt2 });
         if(data.pzWtBest) leftItems.push({ tEn: `🏅 ${wKg} BEST PLAYER`, bEn: data.pzWtBest, tPa: `🏅 ${wKgPa} ਬੈਸਟ ਖਿਡਾਰੀ`, bPa: data.pzWtBest });
 
-        // --- 2. BUILD CENTER ITEMS (Weight Match Top, Open Match Bottom) ---
+        // --- 2. BUILD CENTER ITEMS (Matches) ---
         centerItems = [];
         let wtMatches = data.nextMatchesWeight || [];
         let opMatches = data.nextMatchesOpen || [];
@@ -390,12 +368,11 @@
         }
     }
 
-    // Advanced Animation (Center Expand / Vertical Slide + Auto Scroll)
+    // Advanced Animation (Center Expand / Vertical Slide + Auto Smart Scroll)
     function animateText(elementId, newText, isCenter = false) {
         const el = document.getElementById(elementId);
         if (!el) return;
         
-        // Extract raw text for comparison
         let currentText = el.innerText.trim();
         if (currentText === newText.trim()) return; 
 
@@ -409,12 +386,14 @@
         }
         
         setTimeout(() => {
-            // SCROLL THRESHOLD (If text is very long, enable scrolling)
-            let scrollLimit = isCenter ? 40 : 25; 
+            // Smart Scroll Logic: Determine if text is too long for the box
+            let scrollLimit = isCenter ? 40 : 22; // Center is 40% width, sides are 30%
             
             if(newText.length > scrollLimit) {
+                // Apply Scrolling
                 el.innerHTML = `<div class="scroll-container"><span class="scroll-text">${newText}</span></div>`;
             } else {
+                // Static Centered
                 el.innerHTML = newText;
             }
 
@@ -440,7 +419,6 @@
             animateText('s1-left', isEnglish ? L.tEn : L.tPa, false);
             animateText('s2-left', isEnglish ? L.bEn : L.bPa, false);
             
-            // Center element uses 'isCenter = true' for ScaleX animation
             animateText('s1-mid', isEnglish ? C.tEn : C.tPa, true);
             animateText('s2-mid', isEnglish ? C.bEn : C.bPa, true);
             
@@ -453,7 +431,7 @@
         }
     }
 
-    // MASTER ANIMATION LOOP (Increased to 7 Seconds)
+    // MASTER ANIMATION LOOP (INCREASED TO 11.5 SECONDS)
     setInterval(() => {
         if(!isEnglish) {
             leftIdx++;
@@ -470,9 +448,9 @@
         }
         
         renderTicker();
-    }, 7000);
+    }, 11500); // 11.5 seconds per frame
 
-    // Watermark
+    // Watermark Animation
     const wm = document.getElementById('single-wm');
     let x = 200, y = 200, dx = 1.8, dy = 1.4;
     function animateWatermark() {
