@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Ultra HD - Bold Alternate Ticker</title>
+    <title>Kabaddi Ultra HD - Clean Text Ticker</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@800;900&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -63,12 +63,10 @@
         .score-a {
             background: linear-gradient(135deg, #0066cc, #0099ff); color: #ffffff; font-size: 58px; font-weight: 900;
             padding: 0 38px; font-family: 'Bebas Neue', sans-serif;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
         .team-a-panel {
             background: linear-gradient(135deg, #1a8cff, #4da6ff); color: #ffffff; font-size: 38px; font-weight: 800;
             padding: 0 50px; white-space: nowrap; min-width: 180px; letter-spacing: 1.5px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
         }
 
         .vs-divider { width: 12px; background: #111111; }
@@ -76,12 +74,10 @@
         .team-b-panel {
             background: linear-gradient(135deg, #1f1f1f, #2e2e2e); color: #ffffff; font-size: 38px; font-weight: 800;
             padding: 0 50px; white-space: nowrap; min-width: 180px; letter-spacing: 1.5px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
         }
         .score-b {
             background: linear-gradient(135deg, #0a0a0a, #1a1a1a); color: #ffcc00; font-size: 58px; font-weight: 900;
             padding: 0 38px; font-family: 'Bebas Neue', sans-serif;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
         }
 
         #match-details-strip {
@@ -90,7 +86,6 @@
             letter-spacing: 2.5px; border: 1.5px solid rgba(255, 204, 0, 0.6);
             transform: skewX(16deg); margin-right: 25px; 
             box-shadow: 0 5px 15px rgba(0,0,0,0.6);
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
         }
         #match-details-strip.hidden { display: none; }
 
@@ -101,7 +96,6 @@
             transition: opacity 0.6s ease, transform 0.6s ease; 
             opacity: 1; transform: scale(1) rotate(0deg);
             will-change: transform;
-            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
         }
         #logo-container.hidden { opacity: 0; transform: scale(0.3) translateY(-40px) rotate(-360deg); }
         
@@ -119,7 +113,6 @@
         #single-wm {
             position: absolute; left: 300px; top: 300px; font-family: 'Bebas Neue', sans-serif; font-size: 50px; font-weight: bold;
             color: #ffffff; opacity: 0.45; letter-spacing: 3px; pointer-events: none;
-            text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
         }
 
         /* --- SINGLE LINE TICKER STRIP --- */
@@ -136,13 +129,14 @@
             display: flex; align-items: center; justify-content: center; 
             font-weight: 900; font-size: 38px; color: #ffffff !important; 
             overflow: hidden; position: relative; letter-spacing: 2.5px; padding: 0 15px;
-            text-shadow: 3px 3px 6px rgba(0,0,0,0.85);
+            /* Outer shadow completely removed for clean ultra HD look */
+            text-shadow: none; 
         }
 
         .w-30 { width: 30%; }
         .w-40 { width: 40%; border-left: 2.5px solid rgba(255,255,255,0.35); border-right: 2.5px solid rgba(255,255,255,0.35); color: #ffffff !important; }
 
-        /* BOLD 3D VS DESIGN IN MATCH LIST */
+        /* CLEAN BOLD VS DESIGN IN MATCH LIST */
         .match-vs-3d {
             color: #ffcc00;
             background: #111;
@@ -152,10 +146,9 @@
             font-family: 'Bebas Neue', sans-serif;
             font-size: 36px;
             letter-spacing: 2px;
-            box-shadow: 0 4px 0 #b38f00, 0 6px 12px rgba(0,0,0,0.7);
             display: inline-block;
             transform: translateY(-2px);
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+            text-shadow: none;
         }
 
         /* --- SLOW & SMOOTH ANIMATIONS --- */
@@ -215,9 +208,9 @@
             opacity: 0; box-shadow: 0 20px 60px rgba(0,0,0,0.95);
         }
         #result-popup.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        .res-title { font-size: 45px; color: #ffcc00; margin-bottom: 15px; font-weight: 900; border-bottom: 2px solid rgba(255, 204, 0, 0.4); padding-bottom: 8px; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
-        .res-text-pa { font-size: 55px; font-weight: 800; line-height: 1.2; color: #ffffff; margin-bottom: 10px; letter-spacing: 1.5px; text-shadow: 2px 2px 5px rgba(0,0,0,0.8); }
-        .res-text-en { font-size: 45px; font-weight: 800; line-height: 1.2; color: #3399ff; letter-spacing: 1.5px; text-shadow: 2px 2px 5px rgba(0,0,0,0.8); }
+        .res-title { font-size: 45px; color: #ffcc00; margin-bottom: 15px; font-weight: 900; border-bottom: 2px solid rgba(255, 204, 0, 0.4); padding-bottom: 8px; letter-spacing: 2px; }
+        .res-text-pa { font-size: 55px; font-weight: 800; line-height: 1.2; color: #ffffff; margin-bottom: 10px; letter-spacing: 1.5px; }
+        .res-text-en { font-size: 45px; font-weight: 800; line-height: 1.2; color: #3399ff; letter-spacing: 1.5px; }
 
     </style>
 </head>
@@ -245,9 +238,9 @@
 
 <div id="ticker-wrap">
     <div class="ticker-strip" id="strip-1">
-        <div class="ticker-col w-30"><div id="s1-left" class="anim-wrap">📍 ਸਥਾਨ</div></div>
+        <div class="ticker-col w-30"><div id="s1-left" class="anim-wrap">ਸਥਾਨ</div></div>
         <div class="ticker-col w-40"><div id="s1-mid" class="anim-wrap">ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ</div></div>
-        <div class="ticker-col w-30"><div id="s1-right" class="anim-wrap">📅 ਆਉਣ ਵਾਲੇ ਮੇਲੇ</div></div>
+        <div class="ticker-col w-30"><div id="s1-right" class="anim-wrap">ਆਉਣ ਵਾਲੇ ਮੇਲੇ</div></div>
     </div>
 </div>
 
@@ -361,27 +354,27 @@
         leftItems = [];
         let vNameEn = data.row1Txt || "VILLAGE NAME";
         let vNamePa = data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ ਦਾ ਨਾਮ";
-        leftItems.push({ pa: `📍 ${vNamePa}`, en: `📍 ${vNameEn}` });
+        leftItems.push({ pa: `${vNamePa}`, en: `${vNameEn}` });
 
-        // --- CENTER COLUMN: Prizes & Match List ---
+        // --- CENTER COLUMN: Prizes & Match List (Icons removed from Open / KG) ---
         centerItems = [];
 
         let prizeList = [];
-        if(data.pzOp1) prizeList.push({ pa: `🔥 ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ: ${data.pzOp1}`, en: `🔥 OPEN 1ST PRIZE: ${data.pzOp1}` });
-        if(data.pzOp2) prizeList.push({ pa: `🔥 ਓਪਨ ਦੂਜਾ ਇਨਾਮ: ${data.pzOp2}`, en: `🔥 OPEN 2ND PRIZE: ${data.pzOp2}` });
-        if(data.pzOpBest) prizeList.push({ pa: `🏅 ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ: ${data.pzOpBest}`, en: `🏅 OPEN BEST PLAYER: ${data.pzOpBest}` });
+        if(data.pzOp1) prizeList.push({ pa: `ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ: ${data.pzOp1}`, en: `OPEN 1ST PRIZE: ${data.pzOp1}` });
+        if(data.pzOp2) prizeList.push({ pa: `ਓਪਨ ਦੂਜਾ ਇਨਾਮ: ${data.pzOp2}`, en: `OPEN 2ND PRIZE: ${data.pzOp2}` });
+        if(data.pzOpBest) prizeList.push({ pa: `ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ: ${data.pzOpBest}`, en: `OPEN BEST PLAYER: ${data.pzOpBest}` });
 
         let wKg = data.pzWtKg ? data.pzWtKg : "WEIGHT";
         let wKgPa = data.pzWtKg ? translateToPunjabi(data.pzWtKg) : "ਵਜ਼ਨੀ";
 
-        if(data.pzWt1) prizeList.push({ pa: `🏋️ (${wKgPa}) ਪਹਿਲਾ ਇਨਾਮ: ${data.pzWt1}`, en: `🏋️ (${wKg}) 1ST PRIZE: ${data.pzWt1}` });
-        if(data.pzWt2) prizeList.push({ pa: `🏋️ (${wKgPa}) ਦੂਜਾ ਇਨਾਮ: ${data.pzWt2}`, en: `🏋️ (${wKg}) 2ND PRIZE: ${data.pzWt2}` });
-        if(data.pzWtBest) prizeList.push({ pa: `🏅 (${wKgPa}) ਬੈਸਟ ਖਿਡਾਰੀ: ${data.pzWtBest}`, en: `🏅 (${wKg}) BEST PLAYER: ${data.pzWtBest}` });
+        if(data.pzWt1) prizeList.push({ pa: `(${wKgPa}) ਪਹਿਲਾ ਇਨਾਮ: ${data.pzWt1}`, en: `(${wKg}) 1ST PRIZE: ${data.pzWt1}` });
+        if(data.pzWt2) prizeList.push({ pa: `(${wKgPa}) ਦੂਜਾ ਇਨਾਮ: ${data.pzWt2}`, en: `(${wKg}) 2ND PRIZE: ${data.pzWt2}` });
+        if(data.pzWtBest) prizeList.push({ pa: `(${wKgPa}) ਬੈਸਟ ਖਿਡਾਰੀ: ${data.pzWtBest}`, en: `(${wKg}) BEST PLAYER: ${data.pzWtBest}` });
 
-        if(data.adComm) prizeList.push({ pa: `🎙️ ਕਮੈਂਟੇਟਰ: ${data.adComm}`, en: `🎙️ COMMENTATOR: ${data.adComm}` });
-        if(data.adSound) prizeList.push({ pa: `🔊 ਸਾਊਂਡ ਸਰਵਿਸ: ${data.adSound}`, en: `🔊 SOUND SERVICE: ${data.adSound}` });
-        if(data.adTent) prizeList.push({ pa: `⛺ ਟੈਂਟ ਪੰਡਾਲ: ${data.adTent}`, en: `⛺ TENT SERVICE: ${data.adTent}` });
-        if(data.adSec) prizeList.push({ pa: `🛡️ ਸਕਿਓਰਿਟੀ: ${data.adSec}`, en: `🛡️ SECURITY: ${data.adSec}` });
+        if(data.adComm) prizeList.push({ pa: `ਕਮੈਂਟੇਟਰ: ${data.adComm}`, en: `COMMENTATOR: ${data.adComm}` });
+        if(data.adSound) prizeList.push({ pa: `ਸਾਊਂਡ ਸਰਵਿਸ: ${data.adSound}`, en: `SOUND SERVICE: ${data.adSound}` });
+        if(data.adTent) prizeList.push({ pa: `ਟੈਂਟ ਪੰਡਾਲ: ${data.adTent}`, en: `TENT SERVICE: ${data.adTent}` });
+        if(data.adSec) prizeList.push({ pa: `ਸਕਿਓਰਿਟੀ: ${data.adSec}`, en: `SECURITY: ${data.adSec}` });
 
         prizeList.forEach(p => { centerItems.push(p); });
 
@@ -436,25 +429,25 @@
             data.upcomingEvents.forEach(ev => {
                 let d = ev.date ? ` (${ev.date})` : "";
                 rightItems.push({ 
-                    pa: `📅 ਆਉਣ ਵਾਲੇ ਮੇਲੇ: ${ev.name_pa || ev.name}${d}`, 
-                    en: `📅 UPCOMING EVENTS: ${ev.name}${d}` 
+                    pa: `ਆਉਣ ਵਾਲੇ ਮੇਲੇ: ${ev.name_pa || ev.name}${d}`, 
+                    en: `UPCOMING EVENTS: ${ev.name}${d}` 
                 });
             });
         }
         if(data.row6Txt || data.row6Txt_pa) {
             rightItems.push({ 
-                pa: `📺 ਲਾਈਵ ਪ੍ਰਸਾਰਣ: ${data.row6Txt_pa || data.row6Txt}`, 
-                en: `📺 LIVE TELECAST: ${data.row6Txt || data.row6Txt_pa}` 
+                pa: `ਲਾਈਵ ਪ੍ਰਸਾਰਣ: ${data.row6Txt_pa || data.row6Txt}`, 
+                en: `LIVE TELECAST: ${data.row6Txt || data.row6Txt_pa}` 
             });
         }
         if(rightItems.length === 0) {
-            rightItems.push({ pa: `📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ - ਦੇਖਦੇ ਰਹੋ`, en: `📅 UPCOMING EVENTS - STAY TUNED` });
+            rightItems.push({ pa: `ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ - ਦੇਖਦੇ ਰਹੋ`, en: `UPCOMING EVENTS - STAY TUNED` });
         }
         
         renderIndependentTickers();
     }
 
-    // --- SMART TICKER WITH BOLD TEXT & SLOW SCROLL ---
+    // --- SMART TICKER ---
     function runSmartTicker(elementId, textToShow) {
         const el = document.getElementById(elementId);
         if (!el) return;
