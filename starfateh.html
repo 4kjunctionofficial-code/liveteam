@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Ultra HD - Slanted Overlay</title>
+    <title>Kabaddi Ultra HD - Match Logic & Result Window</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@600;700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -19,10 +19,10 @@
             overflow: hidden;
             position: relative;
             user-select: none;
-            text-transform: uppercase; /* ALL CAPS */
+            text-transform: uppercase;
         }
 
-        /* --- HD SCOREBOARD (NO BLACK SHADOW) --- */
+        /* --- HD SCOREBOARD --- */
         #top-scoreboard-container {
             position: absolute;
             top: 35px;
@@ -32,11 +32,9 @@
             align-items: flex-end;
             z-index: 9999;
             transition: opacity 0.5s ease;
-            /* Filter drop-shadow completely removed */
         }
         #top-scoreboard-container.hidden { opacity: 0; }
 
-        /* SKewed (Slanted) Main Strip for the '/' effect */
         #main-score-strip {
             display: flex;
             align-items: stretch;
@@ -44,11 +42,9 @@
             border-radius: 4px;
             overflow: hidden;
             border: 2px solid rgba(255, 255, 255, 0.4);
-            transform: skewX(18deg); /* Creates the / slant */
-            /* Box-shadow removed */
+            transform: skewX(18deg); 
         }
 
-        /* Un-skew wrapper to keep text straight */
         .unskew {
             transform: skewX(-18deg);
             display: flex;
@@ -58,7 +54,6 @@
             height: 100%;
         }
 
-        /* Team 1 Side (Royal Blue) */
         .score-a {
             background: #0d3b7a; color: #ffcc00; font-size: 50px; font-weight: 900;
             padding: 0 35px; font-family: 'Bebas Neue', sans-serif;
@@ -68,10 +63,8 @@
             padding: 0 45px; white-space: nowrap; min-width: 150px;
         }
 
-        /* The Slanted Color Divider '/' */
         .divider { width: 6px; background-color: #ffcc00; }
 
-        /* Team 2 Side (Dark Charcoal) */
         .team-b-panel {
             background: #242424; color: #ffffff; font-size: 35px; font-weight: 800;
             padding: 0 45px; white-space: nowrap; min-width: 150px;
@@ -81,13 +74,11 @@
             padding: 0 35px; font-family: 'Bebas Neue', sans-serif;
         }
 
-        /* Match Round Details */
         #match-details-strip {
             background: rgba(0, 0, 0, 0.85); color: #ffcc00; font-size: 22px; font-weight: 800;
             padding: 4px 35px; margin-top: 6px; border-radius: 4px;
             letter-spacing: 1.5px; border: 1px solid rgba(255, 255, 255, 0.3);
-            transform: skewX(18deg); /* Match the slant */
-            margin-right: 25px; /* Alignment fix due to skew */
+            transform: skewX(18deg); margin-right: 25px; 
         }
         #match-details-strip.hidden { display: none; }
 
@@ -101,11 +92,10 @@
             color: #ffffff; opacity: 0.45; letter-spacing: 3px; pointer-events: none;
         }
 
-        /* --- SOLID 2-COLOR TICKER (NO SHADOW) --- */
+        /* --- SOLID 2-COLOR TICKER --- */
         #ticker-wrap {
             position: absolute; bottom: 0; left: 0; width: 1920px; z-index: 9998;
             display: flex; flex-direction: column; transition: opacity 0.5s ease;
-            /* Box-shadow removed */
         }
         #ticker-wrap.hidden { opacity: 0; }
 
@@ -127,27 +117,24 @@
             transition: opacity 0.6s ease, transform 0.6s ease; opacity: 1;
         }
 
-        /* SMART SCROLLING LOGIC */
         .scroll-container { width: 100%; overflow: hidden; display: flex; align-items: center; white-space: nowrap; }
         .scroll-text {
-            display: inline-block; white-space: nowrap;
-            padding-left: 100%; 
+            display: inline-block; white-space: nowrap; padding-left: 100%; 
             animation: scrollMarquee 11s linear forwards; 
         }
         @keyframes scrollMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        /* --- CENTER RESULT WINDOW (POP-UP) - NO HEAVY SHADOW --- */
+        /* --- 10 SECONDS RESULT WINDOW --- */
         #result-popup {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
             background: rgba(15, 15, 15, 0.95); border: 4px solid #ffcc00;
-            padding: 40px 80px; border-radius: 12px; color: white; text-align: center;
+            padding: 50px 90px; border-radius: 12px; color: white; text-align: center;
             z-index: 100000; transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            opacity: 0;
-            /* Box-shadow removed */
+            opacity: 0; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
         }
         #result-popup.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         .res-title { font-size: 45px; color: #ffcc00; margin-bottom: 20px; font-weight: 900; border-bottom: 2px solid rgba(255, 204, 0, 0.4); padding-bottom: 5px; }
-        .res-text { font-size: 60px; font-weight: 800; line-height: 1.2; }
+        .res-text { font-size: 60px; font-weight: 800; line-height: 1.2; color: #ffffff;}
 
     </style>
 </head>
@@ -217,6 +204,7 @@
         const data = snap.val() || {}; 
         window.currentData = data; 
 
+        // Logo Check
         const logoCont = document.getElementById('logo-container');
         if (clientLogos[matchId.trim().toLowerCase()] && data.logoVisible !== false) {
             document.getElementById('main-logo').src = clientLogos[matchId.trim().toLowerCase()];
@@ -225,9 +213,11 @@
             logoCont.classList.add('hidden');
         }
 
+        // Visibility Checks
         document.getElementById('top-scoreboard-container').classList.toggle('hidden', data.scoreVisible === false);
         document.getElementById('ticker-wrap').classList.toggle('hidden', data.tickerVisible === false);
         
+        // Round Details
         const roundText = data.round || "";
         const detailsStrip = document.getElementById('match-details-strip');
         if (roundText.trim() === "") {
@@ -237,11 +227,12 @@
             document.getElementById('match-round').innerText = roundText;
         }
 
+        // Scores
         document.getElementById('sA').innerText = data.scoreA ?? "0";
         document.getElementById('sB').innerText = data.scoreB ?? "0";
         document.getElementById('single-wm').innerText = data.watermarkTxt || "M LIVE";
 
-        // Result Pop-up Logic
+        // Result Pop-up Window (10 SECONDS LOGIC)
         if(data.resultText && data.resultText !== "No Result Yet" && data.resultText !== lastResult) {
             lastResult = data.resultText;
             showResultPopup(data.resultText);
@@ -253,14 +244,20 @@
         processTickerData(data);
     });
 
+    // 10 Seconds Pop-up display function
     function showResultPopup(text) {
         const popup = document.getElementById('result-popup');
         document.getElementById('res-msg').innerText = text;
         popup.classList.add('show');
-        setTimeout(() => { popup.classList.remove('show'); }, 15000); 
+        
+        // Hide strictly after 10 seconds (10000 ms)
+        setTimeout(() => { 
+            popup.classList.remove('show'); 
+        }, 10000); 
     }
 
     function processTickerData(data) {
+        // --- LEFT ITEMS (Village & Prizes) ---
         leftItems = [];
         leftItems.push({
             tEn: "📍 LOCATION", bEn: data.row1Txt || "VILLAGE NAME",
@@ -278,35 +275,57 @@
         if(data.pzWt2) leftItems.push({ tEn: `🏋️ ${wKg} 2ND PRIZE`, bEn: data.pzWt2, tPa: `🏋️ ${wKgPa} ਦੂਜਾ ਇਨਾਮ`, bPa: data.pzWt2 });
         if(data.pzWtBest) leftItems.push({ tEn: `🏅 ${wKg} BEST PLAYER`, bEn: data.pzWtBest, tPa: `🏅 ${wKgPa} ਬੈਸਟ ਖਿਡਾਰੀ`, bPa: data.pzWtBest });
 
+        // --- CENTER ITEMS (MATCH LIST DYNAMIC LOGIC) ---
         centerItems = [];
         let wtMatches = data.nextMatchesWeight || [];
         let opMatches = data.nextMatchesOpen || [];
-        let maxM = Math.max(wtMatches.length, opMatches.length);
-        hasMatches = maxM > 0;
         
-        if(hasMatches) {
+        let hasWt = wtMatches.length > 0;
+        let hasOp = opMatches.length > 0;
+        
+        hasMatches = hasWt || hasOp;
+        
+        let splitMatch = (m) => {
+            let prefix = ""; let main = m;
+            if(m.startsWith("(")) { let p = m.split(") "); prefix = p[0] + ") "; main = p[1] || m; }
+            let tms = main.split(" VS ");
+            let t1 = (tms[0] || "").split(" / "); let t2 = (tms[1] || "").split(" / ");
+            let en = `${prefix}${t1[0]?.trim() || ""} VS ${t2[0]?.trim() || ""}`;
+            let pa = `${prefix}${t1[1]?.trim() || t1[0]?.trim() || ""} VS ${t2[1]?.trim() || t2[0]?.trim() || ""}`;
+            return {en, pa};
+        };
+
+        if(hasWt && hasOp) {
+            // BOTH EXIST: Top = Weight, Bottom = Open (Toggles English/Punjabi globally)
+            let maxM = Math.max(wtMatches.length, opMatches.length);
             for(let i=0; i<maxM; i++) {
-                let wt = wtMatches[i % wtMatches.length] || "NO MATCH";
-                let op = opMatches[i % opMatches.length] || "NO MATCH";
-                
-                let splitMatch = (m) => {
-                    if(m === "NO MATCH") return {en: "NO MATCH ADDED", pa: "ਕੋਈ ਮੈਚ ਨਹੀਂ"};
-                    let prefix = ""; let main = m;
-                    if(m.startsWith("(")) { let p = m.split(") "); prefix = p[0] + ") "; main = p[1] || m; }
-                    let tms = main.split(" VS ");
-                    let t1 = (tms[0] || "").split(" / "); let t2 = (tms[1] || "").split(" / ");
-                    let en = `${prefix}${t1[0]?.trim()} VS ${t2[0]?.trim()}`;
-                    let pa = `${prefix}${t1[1]?.trim() || t1[0]?.trim()} VS ${t2[1]?.trim() || t2[0]?.trim()}`;
-                    return {en, pa};
-                };
-                
-                let wM = splitMatch(wt); let oM = splitMatch(op);
-                centerItems.push({ tEn: `🏋️ ${wM.en}`, bEn: `🔥 ${oM.en}`, tPa: `🏋️ ${wM.pa}`, bPa: `🔥 ${oM.pa}` });
+                let wM = splitMatch(wtMatches[i % wtMatches.length]);
+                let oM = splitMatch(opMatches[i % opMatches.length]);
+                centerItems.push({
+                    tEn: `🏋️ ${wM.en}`, bEn: `🔥 ${oM.en}`,
+                    tPa: `🏋️ ${wM.pa}`, bPa: `🔥 ${oM.pa}`
+                });
+            }
+        } else if (hasWt || hasOp) {
+            // ONLY ONE EXISTS: Top = Punjabi, Bottom = English (Regardless of global toggle)
+            let activeMatches = hasWt ? wtMatches : opMatches;
+            let icon = hasWt ? "🏋️" : "🔥";
+            for(let i=0; i<activeMatches.length; i++) {
+                let m = splitMatch(activeMatches[i]);
+                centerItems.push({
+                    tEn: `${icon} ${m.pa}`, bEn: `${icon} ${m.en}`,
+                    tPa: `${icon} ${m.pa}`, bPa: `${icon} ${m.en}`
+                });
             }
         } else {
-            centerItems.push({ tEn: "KABADDI TOURNAMENT", bEn: "LIVE UPDATES", tPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", bPa: "ਲਾਈਵ ਅੱਪਡੇਟ" });
+            // NO MATCHES
+            centerItems.push({
+                tEn: "KABADDI TOURNAMENT", bEn: "LIVE UPDATES",
+                tPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", bPa: "ਲਾਈਵ ਅੱਪਡੇਟ"
+            });
         }
 
+        // --- RIGHT ITEMS (Events & Booking) ---
         rightItems = [];
         if(data.upcomingEvents && data.upcomingEvents.length > 0) {
             data.upcomingEvents.forEach(ev => {
@@ -322,12 +341,18 @@
         }
         
         document.getElementById('strip-2').style.display = hasMatches ? 'flex' : 'none';
-        if(document.getElementById('s1-left').innerText === "📍 LOCATION") { renderTicker(); }
+        
+        // Run first render if empty
+        if(document.getElementById('s1-left').innerText === "📍 LOCATION") {
+            renderTicker();
+        }
     }
 
+    // Smart Scrolling & Animation Logic
     function animateText(elementId, newText, isCenter = false) {
         const el = document.getElementById(elementId);
         if (!el) return;
+        
         let currentText = el.innerText.trim();
         if (currentText === newText.trim()) return; 
 
@@ -370,8 +395,10 @@
         if(hasMatches) {
             animateText('s1-left', isEnglish ? L.tEn : L.tPa, false);
             animateText('s2-left', isEnglish ? L.bEn : L.bPa, false);
+            
             animateText('s1-mid', isEnglish ? C.tEn : C.tPa, true);
             animateText('s2-mid', isEnglish ? C.bEn : C.bPa, true);
+            
             animateText('s1-right', isEnglish ? R.tEn : R.tPa, false);
             animateText('s2-right', isEnglish ? R.bEn : R.bPa, false);
         } else {
@@ -383,7 +410,12 @@
 
     // MASTER ANIMATION LOOP (11.5 SECONDS)
     setInterval(() => {
-        if(!isEnglish) { leftIdx++; centerIdx++; rightIdx++; }
+        if(!isEnglish) {
+            leftIdx++;
+            centerIdx++;
+            rightIdx++;
+        }
+        
         isEnglish = !isEnglish; 
         
         let d = window.currentData;
@@ -391,16 +423,19 @@
             document.getElementById('nA').innerText = (!isEnglish && d.nameA_pa) ? d.nameA_pa : (d.nameA || "TEAM 1");
             document.getElementById('nB').innerText = (!isEnglish && d.nameB_pa) ? d.nameB_pa : (d.nameB || "TEAM 2");
         }
+        
         renderTicker();
     }, 11500);
 
-    // Watermark
+    // Watermark Animation
     const wm = document.getElementById('single-wm');
     let x = 200, y = 200, dx = 1.8, dy = 1.4;
     function animateWatermark() {
-        const maxX = 1920 - wm.offsetWidth - 50; const maxY = 950 - wm.offsetHeight;
+        const maxX = 1920 - wm.offsetWidth - 50;
+        const maxY = 950 - wm.offsetHeight;
         x += dx; y += dy;
-        if (x <= 50 || x >= maxX) dx *= -1; if (y <= 120 || y >= maxY) dy *= -1;
+        if (x <= 50 || x >= maxX) dx *= -1;
+        if (y <= 120 || y >= maxY) dy *= -1;
         wm.style.left = x + 'px'; wm.style.top = y + 'px';
         requestAnimationFrame(animateWatermark);
     }
