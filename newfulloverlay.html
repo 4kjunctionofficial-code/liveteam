@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Ultra HD - Exact Punjabi & English Match List</title>
+    <title>Kabaddi Ultra HD - Perfect Round & Match List</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -219,6 +219,30 @@
     let hasMatches = false;
     let lastResult = ""; 
 
+    // Punjabi Dictionary for Rounds and Categories
+    const roundDict = {
+        "1st Round": "ਪਹਿਲਾ ਰਾਊਂਡ",
+        "2nd Round": "ਦੂਜਾ ਰਾਊਂਡ",
+        "3rd Round": "ਤੀਜਾ ਰਾਊਂਡ",
+        "4th Round": "ਚੌਥਾ ਰਾਊਂਡ",
+        "Quarter Final": "ਕੁਆਰਟਰ ਫਾਈਨਲ",
+        "Semi Final": "ਸੈਮੀ ਫਾਈਨਲ",
+        "Final": "ਫਾਈਨਲ",
+        "Pool A Match": "ਪੂਲ ਏ ਮੈਚ",
+        "Pool B Match": "ਪੂਲ ਬੀ ਮੈਚ",
+        "Open": "ਓਪਨ"
+    };
+
+    function translateRound(roundStr) {
+        if(!roundStr) return "";
+        let cleaned = roundStr.trim();
+        // Check exact match or replace parts
+        let translated = roundDict[cleaned] || cleaned;
+        // Handle KG suffix if present e.g. "50 KG" -> "50 ਕਿਲੋ" or keep "50 KG"
+        translated = translated.replace(/KG/gi, "ਕਿਲੋ");
+        return translated;
+    }
+
     db.on("value", (snap) => {
         const data = snap.val() || {}; 
         window.currentData = data; 
@@ -288,13 +312,12 @@
         if(data.adTent) leftItems.push({ tEn: "⛺ TENT SERVICE", bEn: data.adTent, tPa: "⛺ ਟੈਂਟ ਪੰਡਾਲ", bPa: data.adTent });
         if(data.adSec) leftItems.push({ tEn: "🛡️ SECURITY", bEn: data.adSec, tPa: "🛡️ ਸਕਿਓਰਿਟੀ", bPa: data.adSec });
 
-        // --- CENTER ITEMS: STRICTLY TOP = PUNJABI (ROUND + TEAMS), BOTTOM = ENGLISH (ROUND + TEAMS) ---
+        // --- CENTER ITEMS: EXACT TRANSLATED ROUND + TEAMS FOR TOP (PUNJABI) & BOTTOM (ENGLISH) ---
         centerItems = [];
         let matchesList = data.nextMatches || [];
         hasMatches = matchesList.length > 0;
         
         let parseMatchFull = (m) => {
-            // m format: "(50 KG - Quarter Final) TeamA = TeamA_Pa VS TeamB = TeamB_Pa"
             let bracketContent = "";
             let teamPart = m;
             
@@ -306,7 +329,6 @@
                 }
             }
 
-            // Split Teams
             let tms = teamPart.split(" VS ");
             let t1Full = (tms[0] || "").trim();
             let t2Full = (tms[1] || "").trim();
@@ -317,9 +339,12 @@
             let t2En = t2Full.split("=")[0].trim();
             let t2Pa = t2Full.split("=")[1]?.trim() || t2En;
 
-            // Build English & Punjabi strings including the bracket info
+            // Translate bracket content (Round / KG) into Punjabi
+            let bracketPaParts = bracketContent.split(" - ").map(part => translateRound(part.trim()));
+            let bracketPa = bracketPaParts.join(" - ");
+
             let tagEn = bracketContent ? `(${bracketContent}) ` : "";
-            let tagPa = bracketContent ? `(${bracketContent}) ` : ""; // Round/KG stays as typed or universal
+            let tagPa = bracketPa ? `(${bracketPa}) ` : "";
 
             let enStr = `${tagEn}${t1En} VS ${t2En}`;
             let paStr = `${tagPa}${t1Pa} VS ${t2Pa}`;
@@ -331,8 +356,8 @@
             matchesList.forEach(mStr => {
                 let res = parseMatchFull(mStr);
                 centerItems.push({
-                    tEn: `⚔️ ${res.pa}`, // Top strip gets Punjabi
-                    bEn: `⚔️ ${res.en}`, // Bottom strip gets English
+                    tEn: `⚔️ ${res.pa}`,
+                    bEn: `⚔️ ${res.en}`,
                     tPa: `⚔️ ${res.pa}`, 
                     bPa: `⚔️ ${res.en}`
                 });
