@@ -255,9 +255,9 @@
     </div>
     
     <div class="ticker-strip strip-bot" id="strip-2" style="display: none;">
-        <div class="ticker-col w-30"><div id="s2-left" class="anim-wrap">ਇਨਾਮ</div></div>
+        <div class="ticker-col w-30"><div id="s2-left" class="anim-wrap">ਪਿੰਡ ਵੇਰਵਾ</div></div>
         <div class="ticker-col w-40"><div id="s2-mid" class="anim-wrap">ਲਾਈਵ ਮੈਚ</div></div>
-        <div class="ticker-col w-30"><div id="s2-right" class="anim-wrap">ਲਾਈਵ ਪ੍ਰਸਾਰਣ</div></div>
+        <div class="ticker-col w-30"><div id="s2-right" class="anim-wrap">ਵੇਰਵਾ</div></div>
     </div>
 </div>
 
@@ -377,8 +377,10 @@
             pa: `📍 ${vNamePa}`, en: `📍 ${vNameEn}`
         }];
 
-        // --- 2. CENTER BOX: MATCH LIST, LAST RESULT, PRIZES ---
+        // --- 2. CENTER BOX: PRIZES, RESULTS & MATCH LIST ---
         centerItems = [];
+        
+        // Add Prizes & Results to center items rotation
         if (data.resultText && data.resultText !== "No Result Yet") {
             let resText = data.resultText;
             centerItems.push({
@@ -388,6 +390,15 @@
                 isMultiple: false
             });
         }
+        if(data.pzOp1) centerItems.push({ hintEn: `OPEN 1ST PRIZE: ${data.pzOp1}`, hintPa: `ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ: ${data.pzOp1}`, tPa: `ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ: ${data.pzOp1}`, bEn: `OPEN 1ST PRIZE: ${data.pzOp1}`, pa: `ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ: ${data.pzOp1}`, en: `OPEN 1ST PRIZE: ${data.pzOp1}`, isMultiple: false });
+        if(data.pzOp2) centerItems.push({ hintEn: `OPEN 2ND PRIZE: ${data.pzOp2}`, hintPa: `ਓਪਨ ਦੂਜਾ ਇਨਾਮ: ${data.pzOp2}`, tPa: `ਓਪਨ ਦੂਜਾ ਇਨਾਮ: ${data.pzOp2}`, bEn: `OPEN 2ND PRIZE: ${data.pzOp2}`, pa: `ਓਪਨ ਦੂਜਾ ਇਨਾਮ: ${data.pzOp2}`, en: `OPEN 2ND PRIZE: ${data.pzOp2}`, isMultiple: false });
+        if(data.pzOpBest) centerItems.push({ hintEn: `OPEN BEST PLAYER: ${data.pzOpBest}`, hintPa: `ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ: ${data.pzOpBest}`, tPa: `ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ: ${data.pzOpBest}`, bEn: `OPEN BEST PLAYER: ${data.pzOpBest}`, pa: `ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ: ${data.pzOpBest}`, en: `OPEN BEST PLAYER: ${data.pzOpBest}`, isMultiple: false });
+
+        let wKg = data.pzWtKg ? data.pzWtKg : "WEIGHT";
+        let wKgPa = data.pzWtKg ? translateToPunjabi(data.pzWtKg) : "ਵਜ਼ਨੀ";
+
+        if(data.pzWt1) centerItems.push({ hintEn: `(${wKg}) 1ST PRIZE: ${data.pzWt1}`, hintPa: `(${wKgPa}) ਪਹਿਲਾ ਇਨਾਮ: ${data.pzWt1}`, tPa: `(${wKgPa}) ਪਹਿਲਾ ਇਨਾਮ: ${data.pzWt1}`, bEn: `(${wKg}) 1ST PRIZE: ${data.pzWt1}`, pa: `(${wKgPa}) ਪਹਿਲਾ ਇਨਾਮ: ${data.pzWt1}`, en: `(${wKg}) 1ST PRIZE: ${data.pzWt1}`, isMultiple: false });
+        if(data.pzWt2) centerItems.push({ hintEn: `(${wKg}) 2ND PRIZE: ${data.pzWt2}`, hintPa: `(${wKgPa}) ਦੂਜਾ ਇਨਾਮ: ${data.pzWt2}`, tPa: `(${wKgPa}) ਦੂਜਾ ਇਨਾਮ: ${data.pzWt2}`, bEn: `(${wKg}) 2ND PRIZE: ${data.pzWt2}`, pa: `(${wKgPa}) ਦੂਜਾ ਇਨਾਮ: ${data.pzWt2}`, en: `(${wKg}) 2ND PRIZE: ${data.pzWt2}`, isMultiple: false });
 
         let matchesList = data.nextMatches || [];
         hasMatches = matchesList.length > 0;
@@ -438,26 +449,17 @@
         }
 
         if(centerItems.length === 0) {
+            // When single line and no match list, show just the location icon and village name in center box
             centerItems.push({ 
-                hintPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", hintEn: "KABADDI TOURNAMENT", 
-                tPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ - ਲਾਈਵ ਅੱਪਡੇਟ", bEn: "KABADDI TOURNAMENT - LIVE UPDATES", 
-                pa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ - ਲਾਈਵ ਅੱਪਡੇਟ", en: "KABADDI TOURNAMENT - LIVE UPDATES", 
+                hintPa: `📍 ${vNamePa}`, hintEn: `📍 ${vNameEn}`, 
+                tPa: `📍 ${vNamePa}`, bEn: `📍 ${vNameEn}`, 
+                pa: `📍 ${vNamePa}`, en: `📍 ${vNameEn}`, 
                 isMultiple: false 
             });
         }
 
         // --- 3. LAST BOX (RIGHT): UPCOMING EVENTS & LIVE TELECAST ---
         rightItems = [];
-        if(data.pzOp1) rightItems.push({ hintEn: `OPEN 1ST PRIZE: ${data.pzOp1}`, hintPa: `ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ: ${data.pzOp1}`, detailEn: data.pzOp1, detailPa: data.pzOp1, pa: `ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ: ${data.pzOp1}`, en: `OPEN 1ST PRIZE: ${data.pzOp1}` });
-        if(data.pzOp2) rightItems.push({ hintEn: `OPEN 2ND PRIZE: ${data.pzOp2}`, hintPa: `ਓਪਨ ਦੂਜਾ ਇਨਾਮ: ${data.pzOp2}`, detailEn: data.pzOp2, detailPa: data.pzOp2, pa: `ਓਪਨ ਦੂਜਾ ਇਨਾਮ: ${data.pzOp2}`, en: `OPEN 2ND PRIZE: ${data.pzOp2}` });
-        if(data.pzOpBest) rightItems.push({ hintEn: `OPEN BEST PLAYER: ${data.pzOpBest}`, hintPa: `ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ: ${data.pzOpBest}`, detailEn: data.pzOpBest, detailPa: data.pzOpBest, pa: `ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ: ${data.pzOpBest}`, en: `OPEN BEST PLAYER: ${data.pzOpBest}` });
-
-        let wKg = data.pzWtKg ? data.pzWtKg : "WEIGHT";
-        let wKgPa = data.pzWtKg ? translateToPunjabi(data.pzWtKg) : "ਵਜ਼ਨੀ";
-
-        if(data.pzWt1) rightItems.push({ hintEn: `(${wKg}) 1ST PRIZE: ${data.pzWt1}`, hintPa: `(${wKgPa}) ਪਹਿਲਾ ਇਨਾਮ: ${data.pzWt1}`, detailEn: data.pzWt1, detailPa: data.pzWt1, pa: `(${wKgPa}) ਪਹਿਲਾ ਇਨਾਮ: ${data.pzWt1}`, en: `(${wKg}) 1ST PRIZE: ${data.pzWt1}` });
-        if(data.pzWt2) rightItems.push({ hintEn: `(${wKg}) 2ND PRIZE: ${data.pzWt2}`, hintPa: `(${wKgPa}) ਦੂਜਾ ਇਨਾਮ: ${data.pzWt2}`, detailEn: data.pzWt2, detailPa: data.pzWt2, pa: `(${wKgPa}) ਦੂਜਾ ਇਨਾਮ: ${data.pzWt2}`, en: `(${wKg}) 2ND PRIZE: ${data.pzWt2}` });
-
         if(data.upcomingEvents && data.upcomingEvents.length > 0) {
             data.upcomingEvents.forEach(ev => {
                 let d = ev.date ? ` (${ev.date})` : "";
@@ -509,7 +511,7 @@
         }, 400);
     }
 
-    // --- ANIMATION FOR SINGLE MODE ---
+    // --- ANIMATION FOR SINGLE MODE & MARQUEE CHECK ---
     function runSingleTicker(elementId, textToShow) {
         const el = document.getElementById(elementId);
         if (!el) return;
