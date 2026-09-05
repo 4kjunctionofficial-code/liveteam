@@ -175,28 +175,40 @@ textarea { resize: vertical; overflow-y: auto; min-height: 50px; max-height: 200
         <label class="ticker-label">1. Village / Location Name</label>
         <div class="team-inputs-wrap">
             <div class="team-input-row">
-                <input type="text" id="row1Inp" class="team-input" placeholder="e.g. MAHLA, NEAR GORAYA" oninput="syncField('row1Txt', this.value)">
-                <button class="trans-btn" onclick="translateAndSync('row1Inp', 'row1Inp_pa', 'row1Txt_pa')">⇄</button>
+                <input type="text" id="row1Inp" class="team-input" placeholder="e.g. MAHLA, NEAR GORAYA">
+                <button class="trans-btn" onclick="translateToInput('row1Inp', 'row1Inp_pa')">⇄</button>
             </div>
-            <input type="text" id="row1Inp_pa" class="team-input" placeholder="Translated Village" oninput="syncField('row1Inp_pa', this.value)">
+            <input type="text" id="row1Inp_pa" class="team-input" placeholder="Translated Village">
+        </div>
+
+        <label class="ticker-label">🏟️ Program & Match Categories (e.g. Pind War Open, All Open, Multiple Weights)</label>
+        <div class="team-inputs-wrap" style="margin-bottom:10px;">
+            <div class="team-input-row">
+                <input type="text" id="programInp" class="team-input" placeholder="e.g. PIND WAR OPEN & 72 KG WEIGHT">
+                <button class="trans-btn" onclick="translateToInput('programInp', 'programInp_pa')">⇄</button>
+            </div>
+            <input type="text" id="programInp_pa" class="team-input" placeholder="ਪ੍ਰੋਗਰਾਮ ਪੰਜਾਬੀ ਵਿੱਚ (ਜਿਵੇਂ: ਪਿੰਡ ਵਾਰ ਓਪਨ ਅਤੇ 72 ਕਿਲੋ)">
         </div>
 
         <label class="ticker-label">2. Tournament Prizes</label>
         <div class="prize-grid">
             <div class="prize-col">
                 <label>🔥 OPEN KABADDI</label>
-                <input type="text" id="pzOp1" placeholder="1st Prize" oninput="syncPrizeField('pzOp1', this.value)">
-                <input type="text" id="pzOp2" placeholder="2nd Prize" oninput="syncPrizeField('pzOp2', this.value)">
-                <input type="text" id="pzOpBest" placeholder="Best Player Prize" oninput="syncPrizeField('pzOpBest', this.value)">
+                <input type="text" id="pzOp1" placeholder="1st Prize">
+                <input type="text" id="pzOp2" placeholder="2nd Prize">
+                <input type="text" id="pzOpBest" placeholder="Best Player Prize">
             </div>
             <div class="prize-col">
                 <label>🏋️ WEIGHT KABADDI</label>
-                <input type="text" id="pzWtKg" placeholder="Kinne KG? (e.g. 72 KG)" style="background:#fff3cd; border-color:#ffecb5; color:#856404;" oninput="syncPrizeField('pzWtKg', this.value)">
-                <input type="text" id="pzWt1" placeholder="1st Prize" oninput="syncPrizeField('pzWt1', this.value)">
-                <input type="text" id="pzWt2" placeholder="2nd Prize" oninput="syncPrizeField('pzWt2', this.value)">
-                <input type="text" id="pzWtBest" placeholder="Best Player Prize" oninput="syncPrizeField('pzWtBest', this.value)">
+                <input type="text" id="pzWtKg" placeholder="Kinne KG? (e.g. 72 KG)" style="background:#fff3cd; border-color:#ffecb5; color:#856404;">
+                <input type="text" id="pzWt1" placeholder="1st Prize">
+                <input type="text" id="pzWt2" placeholder="2nd Prize">
+                <input type="text" id="pzWtBest" placeholder="Best Player Prize">
             </div>
         </div>
+
+        <!-- ਸਾਰਿਆਂ ਲਈ ਇਕੱਠਾ ਅੱਪਡੇਟ ਕਰਨ ਵਾਲਾ ਬਟਨ -->
+        <button class="btn-full btn-green" onclick="updateAllTickerDetails()" style="height:52px; min-height:52px; font-size:16px; margin-top:15px; margin-bottom:15px;">💾 UPDATE ALL TICKER DETAILS</button>
 
         <label class="ticker-label">3. Special Ads & Services (Commentator, Sound, Tent, Security)</label>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
@@ -289,26 +301,53 @@ function syncAds() {
     db.update({ adsText: adsArr.join(" | ") });
 }
 
-function syncPrizeField(key, val) {
-    db.update({ [key]: val }).then(() => recalcPrizesString());
-}
+// ਸਾਰੀਆਂ ਟਿਕਰ ਡਿਟੇਲਜ਼ (ਵਿਲੇਜ, ਪ੍ਰੋਗਰਾਮ ਅਤੇ ਪ੍ਰਾਈਜ਼) ਨੂੰ ਇੱਕੋ ਵਾਰ ਅੱਪਡੇਟ ਕਰਨ ਵਾਲਾ ਫੰਕਸ਼ਨ
+function updateAllTickerDetails() {
+    let row1Txt = document.getElementById("row1Inp").value.trim();
+    let row1Txt_pa = document.getElementById("row1Inp_pa").value.trim();
+    let programTxt = document.getElementById("programInp").value.trim();
+    let programTxt_pa = document.getElementById("programInp_pa").value.trim();
 
-function recalcPrizesString() {
+    let pzOp1 = document.getElementById("pzOp1").value;
+    let pzOp2 = document.getElementById("pzOp2").value;
+    let pzOpBest = document.getElementById("pzOpBest").value;
+    let pzWtKg = document.getElementById("pzWtKg").value;
+    let pzWt1 = document.getElementById("pzWt1").value;
+    let pzWt2 = document.getElementById("pzWt2").value;
+    let pzWtBest = document.getElementById("pzWtBest").value;
+
     let pzArr = [];
-    let op1 = document.getElementById("pzOp1").value; let op2 = document.getElementById("pzOp2").value; let opBest = document.getElementById("pzOpBest").value;
-    if(op1 || op2 || opBest) {
+    if(pzOp1 || pzOp2 || pzOpBest) {
         let parts = [];
-        if(op1) parts.push("1st: " + op1); if(op2) parts.push("2nd: " + op2); if(opBest) parts.push("Best: " + opBest);
+        if(pzOp1) parts.push("1st: " + pzOp1); if(pzOp2) parts.push("2nd: " + pzOp2); if(pzOpBest) parts.push("Best: " + pzOpBest);
         pzArr.push("🔥 OPEN: " + parts.join(" | "));
     }
-    let wtKgRaw = document.getElementById("pzWtKg").value; let wtKgDisplay = wtKgRaw ? wtKgRaw : "WEIGHT";
-    let wt1 = document.getElementById("pzWt1").value; let wt2 = document.getElementById("pzWt2").value; let wtBest = document.getElementById("pzWtBest").value;
-    if(wt1 || wt2 || wtBest) {
+    let wtKgDisplay = pzWtKg ? pzWtKg : "WEIGHT";
+    if(pzWt1 || pzWt2 || pzWtBest) {
         let parts = [];
-        if(wt1) parts.push("1st: " + wt1); if(wt2) parts.push("2nd: " + wt2); if(wtBest) parts.push("Best: " + wtBest);
+        if(pzWt1) parts.push("1st: " + pzWt1); if(pzWt2) parts.push("2nd: " + pzWt2); if(pzWtBest) parts.push("Best: " + pzWtBest);
         pzArr.push("🏋️ " + wtKgDisplay + ": " + parts.join(" | "));
     }
-    db.update({ row2Txt: pzArr.join(" 🔴 ") });
+    let row2Txt = pzArr.join(" 🔴 ");
+
+    db.update({
+        row1Txt: row1Txt,
+        row1Txt_pa: row1Txt_pa,
+        programTxt: programTxt,
+        programTxt_pa: programTxt_pa,
+        pzOp1: pzOp1,
+        pzOp2: pzOp2,
+        pzOpBest: pzOpBest,
+        pzWtKg: pzWtKg,
+        pzWt1: pzWt1,
+        pzWt2: pzWt2,
+        pzWtBest: pzWtBest,
+        row2Txt: row2Txt
+    }).then(() => {
+        alert("ਸਾਰੇ ਵੇਰਵੇ (ਪਿੰਡ, ਪ੍ਰੋਗਰਾਮ ਅਤੇ ਇਨਾਮ) ਸਫਲਤਾਪੂਰਵਕ ਅੱਪਡੇਟ ਹੋ ਗਏ ਹਨ!");
+    }).catch((error) => {
+        alert("ਅੱਪਡੇਟ ਕਰਨ ਵਿੱਚ ਗਲਤੀ ਆਈ: " + error.message);
+    });
 }
 
 async function translateToInput(sourceId, targetId) {
@@ -359,6 +398,7 @@ db.on("value", (snap) => {
         setSafely("nameB", data.nameB); setSafely("nameB_pa", data.nameB_pa);
         setSafely("roundInp", data.round);
         setSafely("row1Inp", data.row1Txt); setSafely("row1Inp_pa", data.row1Txt_pa);
+        setSafely("programInp", data.programTxt); setSafely("programInp_pa", data.programTxt_pa);
         setSafely("row3Inp", data.row3Txt); setSafely("row6Inp", data.row6Txt);
         setSafely("watermarkInp", data.watermarkTxt);
         setSafely("pzOp1", data.pzOp1); setSafely("pzOp2", data.pzOp2); setSafely("pzOpBest", data.pzOpBest);
