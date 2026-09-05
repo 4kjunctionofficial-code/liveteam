@@ -138,11 +138,12 @@
         .w-40 { width: 40%; border-left: 2.5px solid rgba(255,255,255,0.35); border-right: 2.5px solid rgba(255,255,255,0.35); color: #ffffff !important; }
 
         .map-pin-icon {
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             object-fit: contain;
             vertical-align: middle;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+            margin-right: 8px;
         }
 
         /* CLEAN VS DESIGN IN MATCH LIST */
@@ -257,8 +258,8 @@
 
 <div id="ticker-wrap">
     <div class="ticker-strip strip-top" id="strip-1">
-        <div class="ticker-col w-30"><div id="s1-left" class="anim-wrap"><img src="https://i.ibb.co/68v8gG5/map-pin.png" class="map-pin-icon" alt="📍"></div></div>
-        <div class="ticker-col w-40"><div id="s1-mid" class="anim-wrap">ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ</div></div>
+        <div class="ticker-col w-30"><div id="s1-left" class="anim-wrap">📍</div></div>
+        <div class="ticker-col w-40"><div id="s1-mid" class="anim-wrap">ਪ੍ਰਾਈਜ਼</div></div>
         <div class="ticker-col w-30"><div id="s1-right" class="anim-wrap">ਆਉਣ ਵਾਲੇ ਮੇਲੇ</div></div>
     </div>
     
@@ -310,7 +311,7 @@
     let hasMatches = false;
     let lastResult = ""; 
 
-    const mapPinHtml = `<img src="https://i.ibb.co/68v8gG5/map-pin.png" class="map-pin-icon" style="margin-right:8px;" alt="📍">`;
+    const mapPinHtml = `<img src="https://i.ibb.co/68v8gG5/map-pin.png" class="map-pin-icon" alt="📍">`;
 
     const dict = {
         "Kabaddi": "ਕਬੱਡੀ", "Open": "ਓਪਨ", "Quarter Final": "ਕੁਆਰਟਰ ਫਾਈਨਲ",
@@ -375,7 +376,7 @@
     }
 
     function processTickerData(data) {
-        // --- 1. LEFT BOX: TOP LINE = ONLY MAP PIN ICON, BOTTOM LINE = VILLAGE NAME ---
+        // --- 1. LEFT BOX: TOP LINE = MAP PIN ICON, BOTTOM LINE = VILLAGE NAME ---
         let vNameEn = data.row1Txt || "VILLAGE NAME";
         let vNamePa = data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ ਦਾ ਨਾਮ";
         leftItems = [{
@@ -384,12 +385,11 @@
             singleEn: `${mapPinHtml} ${vNameEn}`, singlePa: `${mapPinHtml} ${vNamePa}`
         }];
 
-        // --- 2. CENTER BOX: PRIZES ON TOP, MATCH LIST ON BOTTOM ---
+        // --- 2. CENTER BOX: PRIZES ON TOP STRIP, MATCH LIST ON BOTTOM STRIP ---
         centerItems = [];
         let matchesList = data.nextMatches || [];
         hasMatches = matchesList.length > 0;
 
-        // Prizes for top row when double line active
         let prizeItemsList = [];
         if (data.resultText && data.resultText !== "No Result Yet") {
             let resText = data.resultText;
@@ -404,6 +404,7 @@
 
         if(data.pzWt1) prizeItemsList.push({ topPa: `(${wKgPa}) ਪਹਿਲਾ ਇਨਾਮ`, topEn: `(${wKg}) 1ST PRIZE`, botPa: data.pzWt1, botEn: data.pzWt1 });
         if(data.pzWt2) prizeItemsList.push({ topPa: `(${wKgPa}) ਦੂਜਾ ਇਨਾਮ`, topEn: `(${wKg}) 2ND PRIZE`, botPa: data.pzWt2, botEn: data.pzWt2 });
+        if(data.pzWtBest) prizeItemsList.push({ topPa: `(${wKgPa}) ਬੈਸਟ ਖਿਡਾਰੀ`, topEn: `(${wKg}) BEST PLAYER`, botPa: data.pzWtBest, botEn: data.pzWtBest });
 
         if(prizeItemsList.length === 0) {
             prizeItemsList.push({ topPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", topEn: "KABADDI TOURNAMENT", botPa: "ਲਾਈਵ ਅੱਪਡੇਟ", botEn: "LIVE UPDATES" });
@@ -442,24 +443,29 @@
             };
         };
 
-        // Build synchronized center elements
         if(hasMatches) {
             matchesList.forEach((mStr, idx) => {
                 let res = parseMatchFull(mStr, idx);
                 let prizePair = prizeItemsList[idx % prizeItemsList.length];
                 centerItems.push({ 
-                    topPa: prizePair.topPa, topEn: prizePair.topEn,
-                    botPa: res.pa, botEn: res.en,
-                    singlePa: res.pa, singleEn: res.en,
+                    topPa: `${prizePair.topPa}: ${prizePair.botPa}`, 
+                    topEn: `${prizePair.topEn}: ${prizePair.botEn}`,
+                    botPa: res.pa, 
+                    botEn: res.en,
+                    singlePa: res.pa, 
+                    singleEn: res.en,
                     isMatch: true 
                 });
             });
         } else {
             let prizePair = prizeItemsList[0];
             centerItems.push({ 
-                topPa: prizePair.topPa, topEn: prizePair.topEn,
-                botPa: prizePair.botPa, botEn: prizePair.botEn,
-                singlePa: `${prizePair.topPa}: ${prizePair.botPa}`, singleEn: `${prizePair.topEn}: ${prizePair.botEn}`,
+                topPa: prizePair.topPa, 
+                topEn: prizePair.topEn,
+                botPa: prizePair.botPa, 
+                botEn: prizePair.botEn,
+                singlePa: `${prizePair.topPa}: ${prizePair.botPa}`, 
+                singleEn: `${prizePair.topEn}: ${prizePair.botEn}`,
                 isMatch: false 
             });
         }
