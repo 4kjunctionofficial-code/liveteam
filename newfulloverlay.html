@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Ultra HD - Perfect Event Program Ticker</title>
+    <title>Kabaddi Ultra HD - Event Program & Marquee Ticker</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -16,7 +16,7 @@
             height: 1080px;
             background: transparent;
             font-family: 'Noto Sans Gurmukhi', 'Mukta', Arial, sans-serif;
-            overflow: hidden;av
+            overflow: hidden;
             position: absolute;
             top: 0;
             left: 0;
@@ -180,7 +180,7 @@
         .anim-wrap-marquee .marquee-text {
             display: inline-block;
             will-change: transform;
-            animation: tickerMarquee var(--marquee-duration, 16s) linear infinite;
+            animation: tickerMarquee var(--marquee-duration, 18s) linear infinite;
         }
         @keyframes tickerMarquee {
             0% { transform: translateX(0%); }
@@ -362,10 +362,10 @@
         if(data.pzWt1) leftItems.push({ hintEn: `🏋️ (${wKg}) 1ST PRIZE`, hintPa: `🏋️ (${wKgPa}) ਪਹਿਲਾ ਇਨਾਮ`, detailEn: data.pzWt1, detailPa: data.pzWt1 });
         if(data.pzWt2) leftItems.push({ hintEn: `🏋️ (${wKg}) 2ND PRIZE`, hintPa: `🏋️ (${wKgPa}) ਦੂਜਾ ਇਨਾਮ`, detailEn: data.pzWt2, detailPa: data.pzWt2 });
 
-        // 2nd Column: Event Details & Program / Match List
+        // 2nd Column: Event Program / Tournament Name (Fixed to read programTxt & programTxt_pa correctly)
         centerItems = [];
-        let eventProgEn = data.eventProgram || data.row2Txt || "KABADDI TOURNAMENT";
-        let eventProgPa = data.eventProgram_pa || data.row2Txt_pa || eventProgEn;
+        let eventProgEn = data.programTxt || "KABADDI TOURNAMENT";
+        let eventProgPa = data.programTxt_pa || data.programTxt || "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ";
 
         let matchesList = data.nextMatches || [];
         hasMatches = matchesList.length > 0;
@@ -414,7 +414,7 @@
             });
         } else {
             centerItems.push({ 
-                hintPa: `🏟️ ਇਵੈਂਟ ਪ੍ਰੋਗਰਾਮ`, hintEn: `🏟️ EVENT PROGRAM`, 
+                hintPa: `🏟️ ${eventProgPa}`, hintEn: `🏟️ ${eventProgEn}`, 
                 tPa: eventProgPa, bEn: eventProgEn, 
                 isMultiple: false 
             });
@@ -453,7 +453,7 @@
         const el = document.getElementById(elementId);
         if (!el) return;
 
-        if (el.dataset.currentText === textToShow) return;
+        if (el.dataset.currentText === textToShow && !el.classList.contains('anim-wrap-marquee')) return;
         el.dataset.currentText = textToShow;
 
         el.classList.remove('anim-out-up', 'anim-in-down', 'anim-wrap-marquee');
@@ -467,7 +467,7 @@
             requestAnimationFrame(() => {
                 el.classList.remove('anim-in-down');
                 
-                // Check overflow for long text marquee scroll in any box
+                // If text is long and overflows box width, switch to smooth marquee scroll
                 if (el.scrollWidth > el.clientWidth) {
                     el.className = 'anim-wrap-marquee';
                     el.innerHTML = `<span class="marquee-text">${textToShow}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${textToShow}</span>`;
