@@ -497,14 +497,14 @@
 
 
         /* =========================================================
-            MAP PIN
+            MAP PIN ICON (Clean & Guaranteed SVG / Image)
         ========================================================= */
 
         .map-pin-icon {
 
-            width: 34px;
+            width: 32px;
 
-            height: 34px;
+            height: 32px;
 
             object-fit: contain;
 
@@ -1165,16 +1165,13 @@ let lastTickerSignature = "";
 
 
 /* =========================================================
-   MAP PIN
+   MAP PIN (Using Reliable Embedded SVG Icon)
 ========================================================= */
 
 const mapPinHtml = `
-    <img
-        src="https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/map-pin.png"
-        class="map-pin-icon"
-        alt="📍"
-        onerror="this.onerror=null; this.src='https://i.ibb.co/68v8gG5/map-pin.png';"
-    >
+    <svg class="map-pin-icon" viewBox="0 0 24 24" width="32" height="32" fill="#ff3333">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+    </svg>
 `;
 
 
@@ -1661,10 +1658,6 @@ function processTickerData(data) {
         });
     }
 
-
-    /* =====================================================
-       RESULT (Added directly into Ticker sequence if available)
-    ===================================================== */
 
     if (
         data.resultText &&
