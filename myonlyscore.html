@@ -259,7 +259,7 @@
 <div id="ticker-wrap">
     <div class="ticker-strip strip-top" id="strip-1">
         <div class="ticker-col w-30"><div id="s1-left" class="anim-wrap">📍</div></div>
-        <div class="ticker-col w-40"><div id="s1-mid" class="anim-wrap">ਪ੍ਰਾਈਜ਼</div></div>
+        <div class="ticker-col w-40"><div id="s1-mid" class="anim-wrap">ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ</div></div>
         <div class="ticker-col w-30"><div id="s1-right" class="anim-wrap">ਆਉਣ ਵਾਲੇ ਮੇਲੇ</div></div>
     </div>
     
@@ -386,8 +386,11 @@
             singleEn: `${mapPinHtml} ${vNameEn}`, singlePa: `${mapPinHtml} ${vNamePa}`
         }];
 
-        // --- 2. TOP CENTER: ALL PRIZES ROTATING ---
-        topCenterItems = [];
+        // --- 2. TOP CENTER: KABADDI TOURNAMENT & SEPARATE PRIZES ROTATING ---
+        topCenterItems = [
+            { pa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", en: "KABADDI TOURNAMENT" }
+        ];
+
         if (data.resultText && data.resultText !== "No Result Yet") {
             let resText = data.resultText;
             topCenterItems.push({ pa: `ਪਿਛਲਾ ਨਤੀਜਾ: ${translateToPunjabi(resText)}`, en: `LAST RESULT: ${resText}` });
@@ -402,10 +405,6 @@
         if(data.pzWt1) topCenterItems.push({ pa: `(${wKgPa}) ਪਹਿਲਾ ਇਨਾਮ: ${data.pzWt1}`, en: `(${wKg}) 1ST PRIZE: ${data.pzWt1}` });
         if(data.pzWt2) topCenterItems.push({ pa: `(${wKgPa}) ਦੂਜਾ ਇਨਾਮ: ${data.pzWt2}`, en: `(${wKg}) 2ND PRIZE: ${data.pzWt2}` });
         if(data.pzWtBest) topCenterItems.push({ pa: `(${wKgPa}) ਬੈਸਟ ਖਿਡਾਰੀ: ${data.pzWtBest}`, en: `(${wKg}) BEST PLAYER: ${data.pzWtBest}` });
-
-        if(topCenterItems.length === 0) {
-            topCenterItems.push({ pa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ - ਲਾਈਵ ਅੱਪਡੇਟ", en: "KABADDI TOURNAMENT - LIVE UPDATES" });
-        }
 
         // --- 3. BOTTOM CENTER: MATCH LIST ---
         bottomCenterItems = [];
@@ -548,7 +547,7 @@
             document.getElementById('strip-2').style.display = 'flex';
             
             runDoubleTicker('s1-left', isEnglish ? L.topEn : L.topPa);
-            runDoubleTicker('s1-mid', isEnglish ? TC.en : TC.pa);
+            runSingleTicker('s1-mid', isEnglish ? TC.en : TC.pa);
             runDoubleTicker('s1-right', isEnglish ? R.topEn : R.topPa);
 
             runDoubleTicker('s2-left', isEnglish ? L.botEn : L.botPa);
