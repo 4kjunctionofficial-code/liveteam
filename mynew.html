@@ -375,6 +375,116 @@
 
 
         /* =========================================================
+            RESULT POPUP (5 Seconds View)
+        ========================================================= */
+
+        #result-popup {
+
+            position: absolute;
+
+            top: 50%;
+            left: 50%;
+
+            transform:
+                translate(-50%,-50%)
+                scale(0);
+
+            background:
+                rgba(15,15,15,0.98);
+
+            border:
+                6px solid
+                #ffcc00;
+
+            padding:
+                50px 80px;
+
+            border-radius: 18px;
+
+            color: white;
+
+            text-align: center;
+
+            z-index: 100000;
+
+            transition:
+                all 0.6s
+                cubic-bezier(
+                    0.175,
+                    0.885,
+                    0.32,
+                    1.275
+                );
+
+            opacity: 0;
+
+            box-shadow:
+                0 20px 60px
+                rgba(0,0,0,0.95);
+        }
+
+
+        #result-popup.show {
+
+            transform:
+                translate(-50%,-50%)
+                scale(1);
+
+            opacity: 1;
+        }
+
+
+        .res-title {
+
+            font-size: 45px;
+
+            color: #ffcc00;
+
+            margin-bottom: 15px;
+
+            font-weight: 900;
+
+            border-bottom:
+                2px solid
+                rgba(255,204,0,0.4);
+
+            padding-bottom: 8px;
+
+            letter-spacing: 2px;
+        }
+
+
+        .res-text-pa {
+
+            font-size: 55px;
+
+            font-weight: 800;
+
+            line-height: 1.2;
+
+            color: #ffffff;
+
+            margin-bottom: 10px;
+
+            letter-spacing: 1.5px;
+        }
+
+
+        .res-text-en {
+
+            font-size: 45px;
+
+            font-weight: 800;
+
+            line-height: 1.2;
+
+            color: #3399ff;
+
+            letter-spacing: 1.5px;
+        }
+
+
+        /* =========================================================
             TICKER WRAP
         ========================================================= */
 
@@ -591,24 +701,6 @@
         }
 
 
-        .anim-out-up {
-
-            opacity: 0;
-
-            transform:
-                translateY(-25px);
-        }
-
-
-        .anim-in-down {
-
-            opacity: 0;
-
-            transform:
-                translateY(25px);
-        }
-
-
         /* =========================================================
             CENTER NORMAL
         ========================================================= */
@@ -684,7 +776,7 @@
 
 
         /* =========================================================
-            SAME MARQUEE FOR EVERY LINE
+            CENTER TO OUTSIDE SLOW MARQUEE (ਸੈਂਟਰ ਤੋਂ ਬਾਹਰ ਵੱਲ ਹੌਲੀ ਸਕ੍ਰੋਲ)
         ========================================================= */
 
         .anim-wrap.marquee-mode,
@@ -702,7 +794,8 @@
 
             align-items: center;
 
-            justify-content: flex-start;
+            /* Center point start */
+            justify-content: center;
 
             overflow: hidden;
 
@@ -736,39 +829,26 @@
         .anim-wrap-single.marquee-mode .ticker-text {
 
             animation:
-                tickerMarquee
-                var(--marquee-duration,18s)
+                tickerCenterToOutside
+                var(--marquee-duration,22s)
                 linear
                 infinite;
         }
 
 
-        @keyframes tickerMarquee {
+        @keyframes tickerCenterToOutside {
 
             0% {
-
-                transform:
-                    translateX(0);
+                transform: translateX(0);
             }
-
-            8% {
-
-                transform:
-                    translateX(0);
+            15% {
+                transform: translateX(0);
             }
-
+            85% {
+                transform: translateX(var(--scroll-distance, 150px));
+            }
             100% {
-
-                transform:
-                    translateX(
-                        calc(
-                            -1 *
-                            var(
-                                --scroll-distance,
-                                100px
-                            )
-                        )
-                    );
+                transform: translateX(0);
             }
         }
 
@@ -800,6 +880,33 @@
 
 <div id="single-wm">
     ਐੱਮ ਲਾਈਵ
+</div>
+
+
+<!-- =========================================================
+     RESULT POPUP (5 Seconds View)
+========================================================= -->
+
+<div id="result-popup">
+
+    <div class="res-title">
+        🏆 ਮੈਚ ਨਤੀਜਾ / MATCH RESULT
+    </div>
+
+    <div
+        class="res-text-pa"
+        id="res-msg-pa"
+    >
+        ਵਿਨਰ ਨਾਮ
+    </div>
+
+    <div
+        class="res-text-en"
+        id="res-msg-en"
+    >
+        WINNER NAME
+    </div>
+
 </div>
 
 
@@ -1134,7 +1241,7 @@ const clientLogos = {
 
 
 /* =========================================================
-   GLOBAL VARIABLES (First Language Punjabi, then English)
+   GLOBAL VARIABLES (Punjabi first, then English)
 ========================================================= */
 
 let leftItems = [];
@@ -1155,10 +1262,11 @@ let bottomCenterIdx = 0;
 let rightIdx = 0;
 
 
-// Start with false so the first language shown is Punjabi
 let isEnglish = false;
 
 let hasMatches = false;
+
+let lastResult = "";
 
 let lastTickerSignature = "";
 
@@ -1566,12 +1674,77 @@ db.on(
             "ਐੱਮ ਲਾਈਵ";
 
 
+        /* ================================================
+           RESULT POPUP (5 Seconds view trigger)
+        ================================================ */
+
+        if (
+            data.resultText &&
+            data.resultText !==
+                "No Result Yet" &&
+            data.resultText !==
+                lastResult
+        ) {
+
+            lastResult =
+                data.resultText;
+
+            showResultPopup(
+                data.resultText
+            );
+        }
+
+
         processTickerData(
             data
         );
 
     }
 );
+
+
+/* =========================================================
+   RESULT POPUP (5 Sec Duration)
+========================================================= */
+
+function showResultPopup(text) {
+
+    const popup =
+        document.getElementById(
+            'result-popup'
+        );
+
+
+    document.getElementById(
+        'res-msg-pa'
+    ).innerText =
+        translateToPunjabi(
+            text
+        );
+
+
+    document.getElementById(
+        'res-msg-en'
+    ).innerText =
+        text;
+
+
+    popup.classList.add(
+        'show'
+    );
+
+
+    setTimeout(
+        () => {
+
+            popup.classList.remove(
+                'show'
+            );
+
+        },
+        5000
+    );
+}
 
 
 /* =========================================================
@@ -1685,9 +1858,6 @@ function processTickerData(data) {
     }
 
 
-    /* =====================================================
-       Helpline & Scoreboard promotion item (8699640061)
-    ===================================================== */
     topCenterItems.push({
         pa: "ਸਕੋਰਬੋਰਡ ਬਣਵਾਉਣ ਲਈ ਸੰਪਰਕ ਕਰੋ: 8699640061",
         en: "FOR SCOREBOARD CONTACT: 8699640061"
@@ -2109,9 +2279,6 @@ function processTickerData(data) {
     }
 
 
-    /* =====================================================
-       Helpline in Right items as well
-    ===================================================== */
     rightItems.push({
         topPa: "ਸਕੋਰਬੋਰਡ ਹੈਲਪਲਾਈਨ",
         topEn: "SCOREBOARD HELPLINE",
@@ -2366,13 +2533,13 @@ function runDoubleTicker(
                 const distance =
                     textWidth -
                     boxWidth +
-                    30;
+                    40;
 
 
                 const duration =
                     Math.max(
-                        10,
-                        distance / 50 + 2
+                        14,
+                        distance / 45 + 3
                     );
 
 
@@ -2401,7 +2568,7 @@ function runDoubleTicker(
 
 
                 textNode.style.animation =
-                    `tickerMarquee ${duration}s linear infinite`;
+                    `tickerCenterToOutside ${duration}s linear infinite`;
 
             } else {
 
@@ -2509,13 +2676,13 @@ function runSingleTicker(
                 const distance =
                     textWidth -
                     boxWidth +
-                    30;
+                    40;
 
 
                 const duration =
                     Math.max(
-                        10,
-                        distance / 50 + 2
+                        14,
+                        distance / 45 + 3
                     );
 
 
@@ -2544,7 +2711,7 @@ function runSingleTicker(
 
 
                 textNode.style.animation =
-                    `tickerMarquee ${duration}s linear infinite`;
+                    `tickerCenterToOutside ${duration}s linear infinite`;
 
             } else {
 
@@ -2718,7 +2885,7 @@ setInterval(
 
 
 /* =========================================================
-   PUNJABI / ENGLISH (18 seconds) - First Punjabi, then English
+   PUNJABI / ENGLISH (18 seconds)
 ========================================================= */
 
 setInterval(
@@ -2802,7 +2969,7 @@ setInterval(
 
 
 /* =========================================================
-   SCOREBOARD TEAM NAMES (Punjabi first, then English)
+   SCOREBOARD TEAM NAMES
 ========================================================= */
 
 setInterval(
