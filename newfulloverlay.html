@@ -1,210 +1,411 @@
+```html
 <!DOCTYPE html>
 <html lang="pa">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Ultra HD - Event Program Ticker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@700;800&display=swap" rel="stylesheet">
-    
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            width: 1920px;
-            height: 1080px;
-            background: transparent;
-            font-family: 'Noto Sans Gurmukhi', 'Mukta', Arial, sans-serif;
-            overflow: hidden;
-            position: absolute;
-            top: 0;
-            left: 0;
-            user-select: none;
-            text-transform: uppercase;
-            transform-origin: top left;
-            -webkit-font-smoothing: antialiased;
-            text-rendering: optimizeLegibility;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        /* --- ULTRA HD SCOREBOARD (SKY BLUE THEME) --- */
-        #top-scoreboard-container {
-            position: absolute;
-            top: 35px;
-            right: 45px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            z-index: 9999;
-            transition: opacity 0.5s ease;
-        }
-        #top-scoreboard-container.hidden { opacity: 0; }
+<title>Kabaddi Ultra HD - Event Program Ticker</title>
 
-        #main-score-strip {
-            display: flex;
-            align-items: stretch;
-            height: 75px;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 2.5px solid rgba(255, 255, 255, 0.9);
-            transform: skewX(16deg); 
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
-        }
+<link href="https://fonts.googleapis.com/css2?family=Mukta:wght@700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@700;800&display=swap" rel="stylesheet">
 
-        .unskew {
-            transform: skewX(-16deg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-        }
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
-        .score-a {
-            background: linear-gradient(135deg, #0066cc, #0099ff); color: #ffffff; font-size: 58px; font-weight: 900;
-            padding: 0 38px; font-family: 'Bebas Neue', sans-serif;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-        .team-a-panel {
-            background: linear-gradient(135deg, #1a8cff, #4da6ff); color: #ffffff; font-size: 38px; font-weight: 800;
-            padding: 0 50px; white-space: nowrap; min-width: 180px; letter-spacing: 1.5px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-        }
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
 
-        .vs-divider { width: 12px; background: #111111; }
+body{
+    width:1920px;
+    height:1080px;
+    background:transparent;
+    font-family:'Noto Sans Gurmukhi','Mukta',Arial,sans-serif;
+    overflow:hidden;
+    position:absolute;
+    top:0;
+    left:0;
+    user-select:none;
+    text-transform:uppercase;
+    transform-origin:top left;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+}
 
-        .team-b-panel {
-            background: linear-gradient(135deg, #1f1f1f, #2e2e2e); color: #ffffff; font-size: 38px; font-weight: 800;
-            padding: 0 50px; white-space: nowrap; min-width: 180px; letter-spacing: 1.5px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-        }
-        .score-b {
-            background: linear-gradient(135deg, #0a0a0a, #1a1a1a); color: #ffcc00; font-size: 58px; font-weight: 900;
-            padding: 0 38px; font-family: 'Bebas Neue', sans-serif;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-        }
+/* =========================================================
+   SCOREBOARD
+========================================================= */
 
-        #match-details-strip {
-            background: rgba(0, 0, 0, 0.95); color: #ffcc00; font-size: 24px; font-weight: 800;
-            padding: 6px 40px; margin-top: 8px; border-radius: 6px;
-            letter-spacing: 2.5px; border: 1.5px solid rgba(255, 204, 0, 0.6);
-            transform: skewX(16deg); margin-right: 25px; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.6);
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-        }
-        #match-details-strip.hidden { display: none; }
+#top-scoreboard-container{
+    position:absolute;
+    top:35px;
+    right:45px;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    z-index:9999;
+    transition:opacity .5s ease;
+}
 
-        /* --- LOGO & WATERMARK --- */
-        #logo-container { 
-            position: absolute; top: 25px; left: 30px; z-index: 9999; 
-            display: flex; align-items: center; 
-            transition: opacity 0.6s ease, transform 0.6s ease; 
-            opacity: 1; transform: scale(1) rotate(0deg);
-            will-change: transform;
-            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
-        }
-        #logo-container.hidden { opacity: 0; transform: scale(0.3) translateY(-40px) rotate(-360deg); }
-        
-        #logo-container.animate-slow-spin {
-            animation: logoSlowSpin 2.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-        @keyframes logoSlowSpin {
-            0% { transform: scale(1) rotate(0deg); }
-            50% { filter: drop-shadow(0 0 20px rgba(51, 153, 255, 0.9)); }
-            100% { transform: scale(1) rotate(360deg); }
-        }
+#top-scoreboard-container.hidden{
+    opacity:0;
+}
 
-        #main-logo { height: 100px; width: auto; object-fit: contain; }
+#main-score-strip{
+    display:flex;
+    align-items:stretch;
+    height:75px;
+    border-radius:8px;
+    overflow:hidden;
+    border:2.5px solid rgba(255,255,255,.9);
+    transform:skewX(16deg);
+    box-shadow:0 8px 25px rgba(0,0,0,.7);
+}
 
-        #single-wm {
-            position: absolute; left: 300px; top: 300px; font-family: 'Bebas Neue', sans-serif; font-size: 50px; font-weight: bold;
-            color: #ffffff; opacity: 0.45; letter-spacing: 3px; pointer-events: none;
-            text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
-        }
+.unskew{
+    transform:skewX(-16deg);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    height:100%;
+}
 
-        /* --- TICKER STRIPS --- */
-        #ticker-wrap {
-            position: absolute; bottom: 0; left: 0; width: 1920px; z-index: 9998;
-            display: flex; flex-direction: column; transition: opacity 0.5s ease;
-            box-shadow: 0 -5px 25px rgba(0,0,0,0.8);
-        }
-        #ticker-wrap.hidden { opacity: 0; }
+.score-a{
+    background:linear-gradient(135deg,#0066cc,#0099ff);
+    color:#fff;
+    font-size:58px;
+    font-weight:900;
+    padding:0 38px;
+    font-family:'Bebas Neue',sans-serif;
+    text-shadow:2px 2px 4px rgba(0,0,0,.5);
+}
 
-        .ticker-strip { display: flex; width: 100%; height: 60px; }
+.team-a-panel{
+    background:linear-gradient(135deg,#1a8cff,#4da6ff);
+    color:#fff;
+    font-size:38px;
+    font-weight:800;
+    padding:0 50px;
+    white-space:nowrap;
+    min-width:180px;
+    letter-spacing:1.5px;
+    text-shadow:1px 1px 3px rgba(0,0,0,.5);
+}
 
-        .strip-top { background: linear-gradient(90deg, #1a8cff, #3399ff, #1a8cff); border-bottom: 2.5px solid rgba(0,0,0,0.6); }
-        .strip-bot { background: linear-gradient(90deg, #0d0d0d, #1a1a1a, #0d0d0d); border-top: 1.5px solid rgba(255,255,255,0.25); }
+.vs-divider{
+    width:12px;
+    background:#111;
+}
 
-        .ticker-col {
-            display: flex; align-items: center; justify-content: center; 
-            font-weight: 900; font-size: 33px; color: #ffffff !important; 
-            overflow: hidden; position: relative; letter-spacing: 2px; padding: 0 15px;
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.8);
-        }
+.team-b-panel{
+    background:linear-gradient(135deg,#1f1f1f,#2e2e2e);
+    color:#fff;
+    font-size:38px;
+    font-weight:800;
+    padding:0 50px;
+    white-space:nowrap;
+    min-width:180px;
+    letter-spacing:1.5px;
+    text-shadow:1px 1px 3px rgba(0,0,0,.5);
+}
 
-        .w-30 { width: 30%; }
-        .w-40 { width: 40%; border-left: 2.5px solid rgba(255,255,255,0.35); border-right: 2.5px solid rgba(255,255,255,0.35); color: #ffffff !important; }
+.score-b{
+    background:linear-gradient(135deg,#0a0a0a,#1a1a1a);
+    color:#ffcc00;
+    font-size:58px;
+    font-weight:900;
+    padding:0 38px;
+    font-family:'Bebas Neue',sans-serif;
+    text-shadow:2px 2px 4px rgba(0,0,0,.8);
+}
 
-        /* 3D VS DESIGN IN MATCH LIST */
-        .match-vs-3d {
-            color: #ffcc00;
-            background: #111;
-            padding: 2px 12px;
-            border-radius: 6px;
-            margin: 0 10px;
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 32px;
-            letter-spacing: 2px;
-            box-shadow: 0 4px 0 #b38f00, 0 6px 12px rgba(0,0,0,0.7);
-            display: inline-block;
-            transform: translateY(-2px);
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
-        }
+#match-details-strip{
+    background:rgba(0,0,0,.95);
+    color:#ffcc00;
+    font-size:24px;
+    font-weight:800;
+    padding:6px 40px;
+    margin-top:8px;
+    border-radius:6px;
+    letter-spacing:2.5px;
+    border:1.5px solid rgba(255,204,0,.6);
+    transform:skewX(16deg);
+    margin-right:25px;
+    box-shadow:0 5px 15px rgba(0,0,0,.6);
+    text-shadow:1px 1px 3px rgba(0,0,0,.8);
+}
 
-        /* --- VERTICAL SLIDE ANIMATION --- */
-        .anim-wrap {
-            position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
-            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
-            opacity: 1; transform: translateY(0);
-            will-change: transform, opacity;
-        }
-        .anim-out-up { opacity: 0; transform: translateY(-25px); }
-        .anim-in-down { opacity: 0; transform: translateY(25px); }
+#match-details-strip.hidden{
+    display:none;
+}
 
-        /* --- MARQUEE SCROLL ANIMATION FOR LONG TEXT --- */
-        .anim-wrap-marquee {
-            position: absolute; left: 0; top: 0; width: 100%; height: 100%;
-            display: flex; align-items: center; justify-content: flex-start;
-            white-space: nowrap; overflow: hidden;
-        }
-        .anim-wrap-marquee .marquee-text {
-            display: inline-block;
-            will-change: transform;
-            animation: tickerMarquee var(--marquee-duration, 16s) linear infinite;
-        }
-        @keyframes tickerMarquee {
-            0% { transform: translateX(0%); }
-            100% { transform: translateX(-50%); }
-        }
+/* =========================================================
+   LOGO
+========================================================= */
 
-        /* --- RESULT POPUP --- */
-        #result-popup {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
-            background: rgba(15, 15, 15, 0.98); border: 6px solid #ffcc00;
-            padding: 50px 80px; border-radius: 18px; color: white; text-align: center;
-            z-index: 100000; transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            opacity: 0; box-shadow: 0 20px 60px rgba(0,0,0,0.95);
-        }
-        #result-popup.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        .res-title { font-size: 45px; color: #ffcc00; margin-bottom: 15px; font-weight: 900; border-bottom: 2px solid rgba(255, 204, 0, 0.4); padding-bottom: 8px; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
-        .res-text-pa { font-size: 55px; font-weight: 800; line-height: 1.2; color: #ffffff; margin-bottom: 10px; letter-spacing: 1.5px; text-shadow: 2px 2px 5px rgba(0,0,0,0.8); }
-        .res-text-en { font-size: 45px; font-weight: 800; line-height: 1.2; color: #3399ff; letter-spacing: 1.5px; text-shadow: 2px 2px 5px rgba(0,0,0,0.8); }
+#logo-container{
+    position:absolute;
+    top:25px;
+    left:30px;
+    z-index:9999;
+    display:flex;
+    align-items:center;
+    transition:opacity .6s ease,transform .6s ease;
+    opacity:1;
+    transform:scale(1) rotate(0deg);
+    will-change:transform;
+    filter:drop-shadow(0 5px 15px rgba(0,0,0,.5));
+}
 
-    </style>
+#logo-container.hidden{
+    opacity:0;
+    transform:scale(.3) translateY(-40px) rotate(-360deg);
+}
+
+#logo-container.animate-slow-spin{
+    animation:logoSlowSpin 2.2s cubic-bezier(.4,0,.2,1) forwards;
+}
+
+@keyframes logoSlowSpin{
+    0%{transform:scale(1) rotate(0deg);}
+    50%{filter:drop-shadow(0 0 20px rgba(51,153,255,.9));}
+    100%{transform:scale(1) rotate(360deg);}
+}
+
+#main-logo{
+    height:100px;
+    width:auto;
+    object-fit:contain;
+}
+
+/* =========================================================
+   WATERMARK
+========================================================= */
+
+#single-wm{
+    position:absolute;
+    left:300px;
+    top:300px;
+    font-family:'Bebas Neue',sans-serif;
+    font-size:50px;
+    font-weight:bold;
+    color:#fff;
+    opacity:.45;
+    letter-spacing:3px;
+    pointer-events:none;
+    text-shadow:2px 2px 6px rgba(0,0,0,.8);
+}
+
+/* =========================================================
+   TICKER
+========================================================= */
+
+#ticker-wrap{
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:1920px;
+    z-index:9998;
+    display:flex;
+    flex-direction:column;
+    transition:opacity .5s ease;
+    box-shadow:0 -5px 25px rgba(0,0,0,.8);
+}
+
+#ticker-wrap.hidden{
+    opacity:0;
+}
+
+.ticker-strip{
+    display:flex;
+    width:100%;
+    height:60px;
+}
+
+.strip-top{
+    background:linear-gradient(90deg,#1a8cff,#3399ff,#1a8cff);
+    border-bottom:2.5px solid rgba(0,0,0,.6);
+}
+
+.strip-bot{
+    background:linear-gradient(90deg,#0d0d0d,#1a1a1a,#0d0d0d);
+    border-top:1.5px solid rgba(255,255,255,.25);
+}
+
+.ticker-col{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+    font-size:33px;
+    color:#fff !important;
+    overflow:hidden;
+    position:relative;
+    letter-spacing:2px;
+    padding:0 15px;
+    white-space:nowrap;
+}
+
+.w-30{
+    width:30%;
+}
+
+.w-40{
+    width:40%;
+    border-left:2.5px solid rgba(255,255,255,.35);
+    border-right:2.5px solid rgba(255,255,255,.35);
+}
+
+/* =========================================================
+   NEW SINGLE LINE ANIMATION SYSTEM
+========================================================= */
+
+.ticker-viewport{
+    position:relative;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    white-space:nowrap;
+}
+
+.ticker-text{
+    display:inline-block;
+    white-space:nowrap;
+    position:relative;
+    transform:translateX(0);
+    will-change:transform;
+}
+
+/* Normal short text */
+.ticker-text.center-mode{
+    animation:none !important;
+    transform:translateX(0);
+}
+
+/* Single-line slow scroll */
+.ticker-text.scroll-mode{
+    animation-name:singleLineScroll;
+    animation-timing-function:linear;
+    animation-iteration-count:infinite;
+}
+
+@keyframes singleLineScroll{
+    0%{
+        transform:translateX(var(--start-x));
+    }
+
+    100%{
+        transform:translateX(var(--end-x));
+    }
+}
+
+/* Soft text change */
+.ticker-text.fade-change{
+    animation:
+        tickerFadeOut .25s ease forwards;
+}
+
+@keyframes tickerFadeOut{
+    from{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+    to{
+        opacity:0;
+        transform:translateY(-8px);
+    }
+}
+
+/* =========================================================
+   MATCH VS
+========================================================= */
+
+.match-vs-3d{
+    color:#ffcc00;
+    background:#111;
+    padding:2px 12px;
+    border-radius:6px;
+    margin:0 10px;
+    font-family:'Bebas Neue',sans-serif;
+    font-size:32px;
+    letter-spacing:2px;
+    box-shadow:
+        0 4px 0 #b38f00,
+        0 6px 12px rgba(0,0,0,.7);
+    display:inline-block;
+    transform:translateY(-2px);
+    text-shadow:1px 1px 3px rgba(0,0,0,.9);
+}
+
+/* =========================================================
+   RESULT POPUP
+========================================================= */
+
+#result-popup{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%) scale(0);
+    background:rgba(15,15,15,.98);
+    border:6px solid #ffcc00;
+    padding:50px 80px;
+    border-radius:18px;
+    color:#fff;
+    text-align:center;
+    z-index:100000;
+    transition:all .6s cubic-bezier(.175,.885,.32,1.275);
+    opacity:0;
+    box-shadow:0 20px 60px rgba(0,0,0,.95);
+}
+
+#result-popup.show{
+    transform:translate(-50%,-50%) scale(1);
+    opacity:1;
+}
+
+.res-title{
+    font-size:45px;
+    color:#ffcc00;
+    margin-bottom:15px;
+    font-weight:900;
+    border-bottom:2px solid rgba(255,204,0,.4);
+    padding-bottom:8px;
+    letter-spacing:2px;
+}
+
+.res-text-pa{
+    font-size:55px;
+    font-weight:800;
+    line-height:1.2;
+    color:#fff;
+    margin-bottom:10px;
+    letter-spacing:1.5px;
+}
+
+.res-text-en{
+    font-size:45px;
+    font-weight:800;
+    line-height:1.2;
+    color:#3399ff;
+    letter-spacing:1.5px;
+}
+</style>
 </head>
+
 <body>
 
-<div id="logo-container" class="hidden"><img id="main-logo" src="" alt="Logo"></div>
+<div id="logo-container" class="hidden">
+    <img id="main-logo" src="" alt="Logo">
+</div>
+
 <div id="single-wm">ਐੱਮ ਲਾਈਵ</div>
 
 <div id="result-popup">
@@ -213,342 +414,1339 @@
     <div class="res-text-en" id="res-msg-en">WINNER NAME</div>
 </div>
 
+<!-- SCOREBOARD -->
+
 <div id="top-scoreboard-container">
+
     <div id="main-score-strip">
-        <div class="score-a"><div class="unskew" id="sA">0</div></div>
-        <div class="team-a-panel"><div class="unskew" id="nA">ਟੀਮ 1</div></div>
-        <div class="vs-divider"><div class="unskew"></div></div>
-        <div class="team-b-panel"><div class="unskew" id="nB">ਟੀਮ 2</div></div>
-        <div class="score-b"><div class="unskew" id="sB">0</div></div>
+
+        <div class="score-a">
+            <div class="unskew" id="sA">0</div>
+        </div>
+
+        <div class="team-a-panel">
+            <div class="unskew" id="nA">ਟੀਮ 1</div>
+        </div>
+
+        <div class="vs-divider">
+            <div class="unskew"></div>
+        </div>
+
+        <div class="team-b-panel">
+            <div class="unskew" id="nB">ਟੀਮ 2</div>
+        </div>
+
+        <div class="score-b">
+            <div class="unskew" id="sB">0</div>
+        </div>
+
     </div>
-    <div id="match-details-strip" class="hidden"><div class="unskew" id="match-round"></div></div>
+
+    <div id="match-details-strip" class="hidden">
+        <div class="unskew" id="match-round"></div>
+    </div>
+
 </div>
 
+<!-- TICKER -->
+
 <div id="ticker-wrap">
+
     <div class="ticker-strip strip-top" id="strip-1">
-        <div class="ticker-col w-30"><div id="s1-left" class="anim-wrap">📍 ਸਥਾਨ</div></div>
-        <div class="ticker-col w-40"><div id="s1-mid" class="anim-wrap">🏟️ ਇਵੈਂਟ ਪ੍ਰੋਗਰਾਮ</div></div>
-        <div class="ticker-col w-30"><div id="s1-right" class="anim-wrap">📅 ਆਉਣ ਵਾਲੇ ਮੇਲੇ</div></div>
+
+        <div class="ticker-col w-30">
+            <div class="ticker-viewport">
+                <div id="s1-left" class="ticker-text">📍 ਸਥਾਨ</div>
+            </div>
+        </div>
+
+        <div class="ticker-col w-40">
+            <div class="ticker-viewport">
+                <div id="s1-mid" class="ticker-text">🏟️ ਇਵੈਂਟ ਪ੍ਰੋਗਰਾਮ</div>
+            </div>
+        </div>
+
+        <div class="ticker-col w-30">
+            <div class="ticker-viewport">
+                <div id="s1-right" class="ticker-text">📅 ਆਉਣ ਵਾਲੇ ਮੇਲੇ</div>
+            </div>
+        </div>
+
     </div>
-    
-    <div class="ticker-strip strip-bot" id="strip-2" style="display: none;">
-        <div class="ticker-col w-30"><div id="s2-left" class="anim-wrap">ਪਿੰਡ</div></div>
-        <div class="ticker-col w-40"><div id="s2-mid" class="anim-wrap">ਲਾਈਵ ਮੈਚ</div></div>
-        <div class="ticker-col w-30"><div id="s2-right" class="anim-wrap">ਵੇਰਵਾ</div></div>
+
+    <div class="ticker-strip strip-bot" id="strip-2" style="display:none;">
+
+        <div class="ticker-col w-30">
+            <div class="ticker-viewport">
+                <div id="s2-left" class="ticker-text">ਪਿੰਡ</div>
+            </div>
+        </div>
+
+        <div class="ticker-col w-40">
+            <div class="ticker-viewport">
+                <div id="s2-mid" class="ticker-text">ਲਾਈਵ ਮੈਚ</div>
+            </div>
+        </div>
+
+        <div class="ticker-col w-30">
+            <div class="ticker-viewport">
+                <div id="s2-right" class="ticker-text">ਵੇਰਵਾ</div>
+            </div>
+        </div>
+
     </div>
+
 </div>
 
 <script>
-    function autoResizeOverlay() {
-        const baseWidth = 1920;
-        const baseHeight = 1080;
-        const scaleX = window.innerWidth / baseWidth;
-        const scaleY = window.innerHeight / baseHeight;
-        const scale = Math.min(scaleX, scaleY);
-        document.body.style.transform = `scale(${scale})`;
-        document.body.style.width = `${baseWidth}px`;
-        document.body.style.height = `${baseHeight}px`;
+
+/* =========================================================
+   OVERLAY SCALE
+========================================================= */
+
+function autoResizeOverlay(){
+
+    const baseWidth = 1920;
+    const baseHeight = 1080;
+
+    const scaleX = window.innerWidth / baseWidth;
+    const scaleY = window.innerHeight / baseHeight;
+
+    const scale = Math.min(scaleX,scaleY);
+
+    document.body.style.transform = `scale(${scale})`;
+    document.body.style.width = `${baseWidth}px`;
+    document.body.style.height = `${baseHeight}px`;
+}
+
+window.addEventListener('resize',autoResizeOverlay);
+window.addEventListener('load',autoResizeOverlay);
+
+autoResizeOverlay();
+
+
+/* =========================================================
+   FIREBASE
+========================================================= */
+
+const firebaseConfig = {
+    databaseURL:"https://my-scorebord-default-rtdb.firebaseio.com/"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const urlParams = new URLSearchParams(window.location.search);
+
+const matchId =
+    urlParams.get('id') ||
+    'defaultMatch';
+
+const db =
+    firebase.database().ref("matchData/" + matchId);
+
+const userDb =
+    firebase.database().ref("users/" + matchId);
+
+
+/* =========================================================
+   PLAN CHECK
+========================================================= */
+
+userDb.on("value",(snap)=>{
+
+    const user = snap.val();
+
+    if(
+        !user ||
+        Date.now() > new Date(user.expiryDate).getTime()
+    ){
+
+        document.body.innerHTML = `
+        <div style="
+            width:100vw;
+            height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            background:black;
+            color:white;
+            font-size:50px;
+            text-align:center;
+        ">
+        🛑 ਪਲਾਨ ਖਤਮ ਹੋ ਗਿਆ ਹੈ
+        <br>
+        ਹੈਲਪ ਲਾਈਨ: ਮਨਪ੍ਰੀਤ ਮੁਦਕੀ
+        <br>
+        9115426711
+        </div>`;
+
     }
-    window.addEventListener('resize', autoResizeOverlay);
-    window.addEventListener('load', autoResizeOverlay);
-    autoResizeOverlay();
 
-    const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
-    firebase.initializeApp(firebaseConfig);
+});
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const matchId = urlParams.get('id') || 'defaultMatch';
-    const db = firebase.database().ref("matchData/" + matchId);
-    const userDb = firebase.database().ref("users/" + matchId);
 
-    userDb.on("value", (snap) => {
-        const user = snap.val();
-        if (!user || Date.now() > new Date(user.expiryDate).getTime()) {
-            document.body.innerHTML = `<div style="width:100vw; height:100vh; display:flex; justify-content:center; align-items:center; background:black; color:white; font-size:50px; text-align:center;">🛑 ਪਲਾਨ ਖਤਮ ਹੋ ਗਿਆ ਹੈ<br>ਹੈਲਪ ਲਾਈਨ: ਮਨਪ੍ਰੀਤ ਮੁਦਕੀ<br>9115426711</div>`;
-        }
+/* =========================================================
+   LOGO
+========================================================= */
+
+const clientLogos = {
+    "gurujastv":
+    "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/kabaddisports1.png"
+};
+
+
+/* =========================================================
+   DATA
+========================================================= */
+
+let leftItems = [];
+let centerItems = [];
+let rightItems = [];
+
+let leftIdx = 0;
+let centerIdx = 0;
+let rightIdx = 0;
+
+let isEnglish = false;
+let hasMatches = false;
+let lastResult = "";
+
+
+/* =========================================================
+   PUNJABI DICTIONARY
+========================================================= */
+
+const dict = {
+
+    "Kabaddi":"ਕਬੱਡੀ",
+    "Open":"ਓਪਨ",
+    "Quarter Final":"ਕੁਆਰਟਰ ਫਾਈਨਲ",
+    "Semi Final":"ਸੈਮੀ ਫਾਈਨਲ",
+    "Final":"ਫਾਈਨਲ",
+    "1st Round":"ਪਹਿਲਾ ਰਾਊਂਡ",
+    "2nd Round":"ਦੂਜਾ ਰਾਊਂਡ",
+    "3rd Round":"ਤੀਜਾ ਰਾਊਂਡ",
+    "4th Round":"ਚੌਥਾ ਰਾਊਂਡ",
+    "Pool A":"ਪੂਲ ਏ",
+    "Pool B":"ਪੂਲ ਬੀ"
+
+};
+
+
+function translateToPunjabi(text){
+
+    if(!text) return "";
+
+    let translated = text.trim();
+
+    for(let key in dict){
+
+        let regex =
+            new RegExp(
+                key.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),
+                'gi'
+            );
+
+        translated =
+            translated.replace(regex,dict[key]);
+
+    }
+
+    translated =
+        translated.replace(/KG/gi,"ਕਿਲੋ");
+
+    return translated;
+}
+
+
+/* =========================================================
+   FIREBASE LIVE DATA
+========================================================= */
+
+db.on("value",(snap)=>{
+
+    const data = snap.val() || {};
+
+    window.currentData = data;
+
+
+    /* LOGO */
+
+    const logoCont =
+        document.getElementById('logo-container');
+
+    const logoKey =
+        matchId.trim().toLowerCase();
+
+    if(
+        clientLogos[logoKey] &&
+        data.logoVisible !== false
+    ){
+
+        document.getElementById('main-logo').src =
+            clientLogos[logoKey];
+
+        logoCont.classList.remove('hidden');
+
+    }else{
+
+        logoCont.classList.add('hidden');
+
+    }
+
+
+    /* VISIBILITY */
+
+    document
+        .getElementById('top-scoreboard-container')
+        .classList
+        .toggle(
+            'hidden',
+            data.scoreVisible === false
+        );
+
+    document
+        .getElementById('ticker-wrap')
+        .classList
+        .toggle(
+            'hidden',
+            data.tickerVisible === false
+        );
+
+
+    /* ROUND */
+
+    const roundText =
+        data.round || "";
+
+    const detailsStrip =
+        document.getElementById(
+            'match-details-strip'
+        );
+
+    if(roundText.trim()===""){
+
+        detailsStrip.classList.add('hidden');
+
+    }else{
+
+        detailsStrip.classList.remove('hidden');
+
+        document.getElementById('match-round')
+            .innerText =
+            translateToPunjabi(roundText);
+
+    }
+
+
+    /* SCORE */
+
+    document.getElementById('sA').innerText =
+        data.scoreA ?? "0";
+
+    document.getElementById('sB').innerText =
+        data.scoreB ?? "0";
+
+
+    /* WATERMARK */
+
+    document.getElementById('single-wm').innerText =
+        data.watermarkTxt || "ਐੱਮ ਲਾਈਵ";
+
+
+    /* RESULT */
+
+    if(
+        data.resultText &&
+        data.resultText !== "No Result Yet" &&
+        data.resultText !== lastResult
+    ){
+
+        lastResult = data.resultText;
+
+        showResultPopup(data.resultText);
+
+    }
+
+    if(
+        !data.resultText ||
+        data.resultText === "No Result Yet"
+    ){
+
+        lastResult = "";
+
+    }
+
+
+    /* TICKER */
+
+    processTickerData(data);
+
+});
+
+
+/* =========================================================
+   RESULT POPUP
+========================================================= */
+
+function showResultPopup(text){
+
+    const popup =
+        document.getElementById('result-popup');
+
+    document.getElementById('res-msg-pa')
+        .innerText =
+        translateToPunjabi(text);
+
+    document.getElementById('res-msg-en')
+        .innerText =
+        text;
+
+    popup.classList.add('show');
+
+    setTimeout(()=>{
+        popup.classList.remove('show');
+    },10000);
+
+}
+
+
+/* =========================================================
+   TICKER DATA
+========================================================= */
+
+function processTickerData(data){
+
+    /* ---------------------------------------------
+       LEFT COLUMN
+    --------------------------------------------- */
+
+    leftItems = [];
+
+    const vNameEn =
+        data.row1Txt || "VILLAGE NAME";
+
+    const vNamePa =
+        data.row1Txt_pa ||
+        data.row1Txt ||
+        "ਪਿੰਡ ਦਾ ਨਾਮ";
+
+    leftItems.push({
+
+        hintEn:"📍 LOCATION",
+        hintPa:"📍 ਸਥਾਨ",
+
+        detailEn:vNameEn,
+        detailPa:vNamePa
+
     });
 
-    const clientLogos = { "gurujastv": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/kabaddisports1.png" };
 
-    let leftItems = [];
-    let centerItems = [];
-    let rightItems = [];
-    
-    let leftIdx = 0, centerIdx = 0, rightIdx = 0;
-    let isEnglish = false; 
-    let hasMatches = false;
-    let lastResult = ""; 
+    if(data.pzOp1){
 
-    const dict = {
-        "Kabaddi": "ਕਬੱਡੀ", "Open": "ਓਪਨ", "Quarter Final": "ਕੁਆਰਟਰ ਫਾਈਨਲ",
-        "Semi Final": "ਸੈਮੀ ਫਾਈਨਲ", "Final": "ਫਾਈਨਲ", "1st Round": "ਪਹਿਲਾ ਰਾਊਂਡ",
-        "2nd Round": "ਦੂਜਾ ਰਾਊਂਡ", "3rd Round": "ਤੀਜਾ ਰਾਊਂਡ", "4th Round": "ਚੌਥਾ ਰਾਊਂਡ",
-        "Pool A": "ਪੂਲ ਏ", "Pool B": "ਪੂਲ ਬੀ"
-    };
+        leftItems.push({
 
-    function translateToPunjabi(text) {
-        if(!text) return "";
-        let translated = text.trim();
-        for (let key in dict) {
-            let regex = new RegExp(key, 'gi');
-            translated = translated.replace(regex, dict[key]);
-        }
-        translated = translated.replace(/KG/gi, "ਕਿਲੋ");
-        return translated;
+            hintEn:"🔥 OPEN 1ST PRIZE",
+            hintPa:"🔥 ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ",
+
+            detailEn:data.pzOp1,
+            detailPa:data.pzOp1
+
+        });
+
     }
 
-    db.on("value", (snap) => {
-        const data = snap.val() || {}; 
-        window.currentData = data; 
 
-        const logoCont = document.getElementById('logo-container');
-        if (clientLogos[matchId.trim().toLowerCase()] && data.logoVisible !== false) {
-            document.getElementById('main-logo').src = clientLogos[matchId.trim().toLowerCase()];
-            logoCont.classList.remove('hidden');
-        } else {
-            logoCont.classList.add('hidden');
-        }
+    if(data.pzOp2){
 
-        document.getElementById('top-scoreboard-container').classList.toggle('hidden', data.scoreVisible === false);
-        document.getElementById('ticker-wrap').classList.toggle('hidden', data.tickerVisible === false);
-        
-        const roundText = data.round || "";
-        const detailsStrip = document.getElementById('match-details-strip');
-        if (roundText.trim() === "") {
-            detailsStrip.classList.add('hidden');
-        } else {
-            detailsStrip.classList.remove('hidden');
-            document.getElementById('match-round').innerText = translateToPunjabi(roundText);
-        }
+        leftItems.push({
 
-        document.getElementById('sA').innerText = data.scoreA ?? "0";
-        document.getElementById('sB').innerText = data.scoreB ?? "0";
-        document.getElementById('single-wm').innerText = data.watermarkTxt || "ਐੱਮ ਲਾਈਵ";
+            hintEn:"🔥 OPEN 2ND PRIZE",
+            hintPa:"🔥 ਓਪਨ ਦੂਜਾ ਇਨਾਮ",
 
-        if(data.resultText && data.resultText !== "No Result Yet" && data.resultText !== lastResult) {
-            lastResult = data.resultText;
-            showResultPopup(data.resultText);
-        }
-        if (!data.resultText || data.resultText === "No Result Yet") {
-            lastResult = ""; 
-        }
+            detailEn:data.pzOp2,
+            detailPa:data.pzOp2
 
-        processTickerData(data);
-    });
+        });
 
-    function showResultPopup(text) {
-        const popup = document.getElementById('result-popup');
-        document.getElementById('res-msg-pa').innerText = translateToPunjabi(text);
-        document.getElementById('res-msg-en').innerText = text;
-        popup.classList.add('show');
-        setTimeout(() => { popup.classList.remove('show'); }, 10000); 
     }
 
-    function processTickerData(data) {
-        leftItems = [];
-        
-        // 1st Column: Village Name
-        let vNameEn = data.row1Txt || "VILLAGE NAME";
-        let vNamePa = data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ ਦਾ ਨਾਮ";
-        leftItems.push({ hintEn: "📍 LOCATION", hintPa: "📍 ਸਥਾਨ", detailEn: vNameEn, detailPa: vNamePa });
 
-        if(data.pzOp1) leftItems.push({ hintEn: "🔥 OPEN 1ST PRIZE", hintPa: "🔥 ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ", detailEn: data.pzOp1, detailPa: data.pzOp1 });
-        if(data.pzOp2) leftItems.push({ hintEn: "🔥 OPEN 2ND PRIZE", hintPa: "🔥 ਓਪਨ ਦੂਜਾ ਇਨਾਮ", detailEn: data.pzOp2, detailPa: data.pzOp2 });
-        if(data.pzOpBest) leftItems.push({ hintEn: "🏅 OPEN BEST PLAYER", hintPa: "🏅 ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ", detailEn: data.pzOpBest, detailPa: data.pzOpBest });
+    if(data.pzOpBest){
 
-        let wKg = data.pzWtKg ? data.pzWtKg : "WEIGHT";
-        let wKgPa = data.pzWtKg ? translateToPunjabi(data.pzWtKg) : "ਵਜ਼ਨੀ";
+        leftItems.push({
 
-        if(data.pzWt1) leftItems.push({ hintEn: `🏋️ (${wKg}) 1ST PRIZE`, hintPa: `🏋️ (${wKgPa}) ਪਹਿਲਾ ਇਨਾਮ`, detailEn: data.pzWt1, detailPa: data.pzWt1 });
-        if(data.pzWt2) leftItems.push({ hintEn: `🏋️ (${wKg}) 2ND PRIZE`, hintPa: `🏋️ (${wKgPa}) ਦੂਜਾ ਇਨਾਮ`, detailEn: data.pzWt2, detailPa: data.pzWt2 });
+            hintEn:"🏅 OPEN BEST PLAYER",
+            hintPa:"🏅 ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ",
 
-        // 2nd Column: Event Program / Tournament Name (Fixed to read programTxt & programTxt_pa correctly)
-        centerItems = [];
-        let eventProgEn = data.programTxt || "KABADDI TOURNAMENT";
-        let eventProgPa = data.programTxt_pa || data.programTxt || "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ";
+            detailEn:data.pzOpBest,
+            detailPa:data.pzOpBest
 
-        let matchesList = data.nextMatches || [];
-        hasMatches = matchesList.length > 0;
-        
-        let parseMatchFull = (m, index) => {
-            let bracketContent = "";
-            let teamPart = m;
-            if(m.startsWith("(")) {
-                let closeIdx = m.indexOf(")");
-                if(closeIdx !== -1) {
-                    bracketContent = m.substring(1, closeIdx).trim(); 
-                    teamPart = m.substring(closeIdx + 1).trim();     
-                }
+        });
+
+    }
+
+
+    const wKg =
+        data.pzTitle2 ||
+        data.pzWtKg ||
+        "WEIGHT";
+
+    const wKgPa =
+        data.pzTitle2
+        ? translateToPunjabi(data.pzTitle2)
+        : "ਵਜ਼ਨੀ";
+
+
+    if(data.pzWt1){
+
+        leftItems.push({
+
+            hintEn:`🏋️ (${wKg}) 1ST PRIZE`,
+            hintPa:`🏋️ (${wKgPa}) ਪਹਿਲਾ ਇਨਾਮ`,
+
+            detailEn:data.pzWt1,
+            detailPa:data.pzWt1
+
+        });
+
+    }
+
+
+    if(data.pzWt2){
+
+        leftItems.push({
+
+            hintEn:`🏋️ (${wKg}) 2ND PRIZE`,
+            hintPa:`🏋️ (${wKgPa}) ਦੂਜਾ ਇਨਾਮ`,
+
+            detailEn:data.pzWt2,
+            detailPa:data.pzWt2
+
+        });
+
+    }
+
+
+    /* ---------------------------------------------
+       CENTER / EVENT
+    --------------------------------------------- */
+
+    centerItems = [];
+
+
+    /*
+       IMPORTANT FIX:
+
+       Admin writes:
+       programTxt
+       programTxt_pa
+
+       These are now the PRIMARY event fields.
+
+       Also supports old/alternate fields if present.
+    */
+
+    const eventProgEn =
+        cleanEventText(
+            data.programTxt,
+            data.eventName,
+            data.eventTitle,
+            data.eventTxt,
+            data.eventProgram
+        );
+
+    const eventProgPa =
+        cleanEventText(
+            data.programTxt_pa,
+            data.eventName_pa,
+            data.eventTitle_pa,
+            data.eventTxt_pa,
+            data.eventProgram_pa
+        );
+
+
+    const finalEventEn =
+        eventProgEn || "";
+
+    const finalEventPa =
+        eventProgPa ||
+        (finalEventEn
+            ? translateToPunjabi(finalEventEn)
+            : "");
+
+
+    const matchesList =
+        Array.isArray(data.nextMatches)
+        ? data.nextMatches
+        : [];
+
+    hasMatches =
+        matchesList.length > 0;
+
+
+    function parseMatchFull(m,index){
+
+        let bracketContent = "";
+        let teamPart = m;
+
+
+        if(m.startsWith("(")){
+
+            const closeIdx =
+                m.indexOf(")");
+
+            if(closeIdx !== -1){
+
+                bracketContent =
+                    m.substring(
+                        1,
+                        closeIdx
+                    ).trim();
+
+                teamPart =
+                    m.substring(
+                        closeIdx + 1
+                    ).trim();
+
             }
 
-            let tms = teamPart.split(" VS ");
-            let t1Full = (tms[0] || "").trim();
-            let t2Full = (tms[1] || "").trim();
-            let t1En = t1Full.split("=")[0].trim();
-            let t1Pa = t1Full.split("=")[1]?.trim() || t1En;
-            let t2En = t2Full.split("=")[0].trim();
-            let t2Pa = t2Full.split("=")[1]?.trim() || t2En;
+        }
 
-            let bracketPa = translateToPunjabi(bracketContent);
-            let tagPa = bracketPa ? `(${bracketPa}) ` : "";
-            let tagEn = bracketContent ? `(${bracketContent}) ` : "";
-            let numTag = `${index + 1}. `;
 
-            let vsHtmlPa = ` <span class="match-vs-3d">ਬਨਾਮ</span> `;
-            let vsHtmlEn = ` <span class="match-vs-3d">VS</span> `;
+        const tms =
+            teamPart.split(" VS ");
 
-            return { 
-                pa: `${numTag}${tagPa}${t1Pa}${vsHtmlPa}${t2Pa}`, 
-                en: `${numTag}${tagEn}${t1En}${vsHtmlEn}${t2En}` 
-            };
+
+        const t1Full =
+            (tms[0] || "").trim();
+
+        const t2Full =
+            (tms[1] || "").trim();
+
+
+        const t1Split =
+            t1Full.split("=");
+
+        const t2Split =
+            t2Full.split("=");
+
+
+        const t1En =
+            t1Split[0].trim();
+
+        const t1Pa =
+            t1Split[1]?.trim() || t1En;
+
+
+        const t2En =
+            t2Split[0].trim();
+
+        const t2Pa =
+            t2Split[1]?.trim() || t2En;
+
+
+        const bracketPa =
+            translateToPunjabi(
+                bracketContent
+            );
+
+
+        const tagPa =
+            bracketPa
+            ? `(${bracketPa}) `
+            : "";
+
+        const tagEn =
+            bracketContent
+            ? `(${bracketContent}) `
+            : "";
+
+
+        const numTag =
+            `${index + 1}. `;
+
+
+        const vsHtmlPa =
+            `<span class="match-vs-3d">ਬਨਾਮ</span>`;
+
+        const vsHtmlEn =
+            `<span class="match-vs-3d">VS</span>`;
+
+
+        return {
+
+            pa:
+                `${numTag}${tagPa}${t1Pa}${vsHtmlPa}${t2Pa}`,
+
+            en:
+                `${numTag}${tagEn}${t1En}${vsHtmlEn}${t2En}`
+
         };
 
-        if(hasMatches) {
-            matchesList.forEach((mStr, idx) => {
-                let res = parseMatchFull(mStr, idx);
-                centerItems.push({ 
-                    hintPa: `🏟️ ${translateToPunjabi(eventProgPa)}`, hintEn: `🏟️ ${eventProgEn}`,
-                    tPa: res.pa, bEn: res.en,
-                    isMultiple: matchesList.length > 1 
-                });
-            });
-        } else {
-            centerItems.push({ 
-                hintPa: `🏟️ ${eventProgPa}`, hintEn: `🏟️ ${eventProgEn}`, 
-                tPa: eventProgPa, bEn: eventProgEn, 
-                isMultiple: false 
-            });
-        }
-
-        // 3rd Column: Upcoming Events & Live Telecast
-        rightItems = [];
-        if(data.upcomingEvents && data.upcomingEvents.length > 0) {
-            data.upcomingEvents.forEach(ev => {
-                let d = ev.date ? ` (${ev.date})` : "";
-                rightItems.push({ 
-                    hintEn: "📅 UPCOMING EVENTS", hintPa: "📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ",
-                    detailEn: `${ev.name}${d}`, detailPa: `${ev.name_pa || ev.name}${d}` 
-                });
-            });
-        }
-        if(data.row6Txt || data.row6Txt_pa) {
-            rightItems.push({ 
-                hintEn: "📺 LIVE TELECAST", hintPa: "📺 ਲਾਈਵ ਪ੍ਰਸਾਰਣ",
-                detailEn: data.row6Txt || "LIVE STREAMING", detailPa: data.row6Txt_pa || data.row6Txt || "ਲਾਈਵ ਪ੍ਰਸਾਰਣ" 
-            });
-        }
-        if(rightItems.length === 0) {
-            rightItems.push({ 
-                hintEn: "📅 UPCOMING EVENTS", hintPa: "📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ",
-                detailEn: "STAY TUNED", detailPa: "ਦੇਖਦੇ ਰਹੋ" 
-            });
-        }
-        
-        document.getElementById('strip-2').style.display = hasMatches ? 'flex' : 'none';
-        renderIndependentTickers();
     }
 
-    // --- SMOOTH VERTICAL SLIDE TICKER WITH AUTOMATIC MARQUEE SCROLL ---
-    function runSmartTicker(elementId, textToShow) {
-        const el = document.getElementById(elementId);
-        if (!el) return;
 
-        if (el.dataset.currentText === textToShow && !el.classList.contains('anim-wrap-marquee')) return;
-        el.dataset.currentText = textToShow;
+    if(hasMatches){
 
-        el.classList.remove('anim-out-up', 'anim-in-down', 'anim-wrap-marquee');
-        el.className = 'anim-wrap anim-out-up';
+        matchesList.forEach((mStr,idx)=>{
 
-        setTimeout(() => {
-            el.innerHTML = textToShow;
-            el.classList.remove('anim-out-up');
-            el.classList.add('anim-in-down');
+            const res =
+                parseMatchFull(
+                    mStr,
+                    idx
+                );
 
-            requestAnimationFrame(() => {
-                el.classList.remove('anim-in-down');
-                
-                // If text is long and overflows box width, switch to smooth marquee scroll
-                if (el.scrollWidth > el.clientWidth) {
-                    el.className = 'anim-wrap-marquee';
-                    el.innerHTML = `<span class="marquee-text">${textToShow}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${textToShow}</span>`;
-                }
+
+            centerItems.push({
+
+                hintPa:
+                    finalEventPa
+                    ? `🏟️ ${finalEventPa}`
+                    : "🏟️ ਇਵੈਂਟ",
+
+                hintEn:
+                    finalEventEn
+                    ? `🏟️ ${finalEventEn}`
+                    : "🏟️ EVENT",
+
+                tPa:res.pa,
+                bEn:res.en,
+
+                isMultiple:
+                    matchesList.length > 1
+
             });
-        }, 400);
+
+        });
+
+    }else{
+
+        /*
+           IMPORTANT:
+           No hardcoded KABADDI TOURNAMENT.
+        */
+
+        centerItems.push({
+
+            hintPa:
+                finalEventPa
+                ? `🏟️ ${finalEventPa}`
+                : "🏟️ ਇਵੈਂਟ ਪ੍ਰੋਗਰਾਮ",
+
+            hintEn:
+                finalEventEn
+                ? `🏟️ ${finalEventEn}`
+                : "🏟️ EVENT PROGRAM",
+
+            tPa:
+                finalEventPa ||
+                "ਇਵੈਂਟ ਪ੍ਰੋਗਰਾਮ",
+
+            bEn:
+                finalEventEn ||
+                "EVENT PROGRAM",
+
+            isMultiple:false
+
+        });
+
     }
 
-    function renderIndependentTickers() {
-        let L = leftItems[leftIdx % leftItems.length];
-        let C = centerItems[centerIdx % centerItems.length];
-        let R = rightItems[rightIdx % rightItems.length];
 
-        if (hasMatches) {
-            runSmartTicker('s1-left', isEnglish ? L.hintEn : L.hintPa);
-            runSmartTicker('s1-right', isEnglish ? R.hintEn : R.hintPa);
+    /* ---------------------------------------------
+       RIGHT COLUMN
+    --------------------------------------------- */
 
-            if (C.isMultiple) {
-                runSmartTicker('s1-mid', C.tPa);
-                runSmartTicker('s2-mid', C.bEn);
-            } else {
-                runSmartTicker('s1-mid', isEnglish ? C.hintEn : C.hintPa);
-                runSmartTicker('s2-mid', isEnglish ? C.bEn : C.tPa);
+    rightItems = [];
+
+
+    if(
+        Array.isArray(data.upcomingEvents) &&
+        data.upcomingEvents.length > 0
+    ){
+
+        data.upcomingEvents.forEach(ev=>{
+
+            const d =
+                ev.date
+                ? ` (${ev.date})`
+                : "";
+
+
+            rightItems.push({
+
+                hintEn:
+                    "📅 UPCOMING EVENTS",
+
+                hintPa:
+                    "📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ",
+
+                detailEn:
+                    `${ev.name || ""}${d}`,
+
+                detailPa:
+                    `${ev.name_pa || ev.name || ""}${d}`
+
+            });
+
+        });
+
+    }
+
+
+    if(data.row6Txt || data.row6Txt_pa){
+
+        rightItems.push({
+
+            hintEn:"📺 LIVE TELECAST",
+            hintPa:"📺 ਲਾਈਵ ਪ੍ਰਸਾਰਣ",
+
+            detailEn:
+                data.row6Txt ||
+                "LIVE STREAMING",
+
+            detailPa:
+                data.row6Txt_pa ||
+                data.row6Txt ||
+                "ਲਾਈਵ ਪ੍ਰਸਾਰਣ"
+
+        });
+
+    }
+
+
+    if(rightItems.length===0){
+
+        rightItems.push({
+
+            hintEn:"📅 UPCOMING EVENTS",
+            hintPa:"📅 ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ",
+
+            detailEn:"STAY TUNED",
+            detailPa:"ਦੇਖਦੇ ਰਹੋ"
+
+        });
+
+    }
+
+
+    document.getElementById('strip-2')
+        .style.display =
+        hasMatches
+        ? 'flex'
+        : 'none';
+
+
+    renderIndependentTickers();
+
+}
+
+
+/* =========================================================
+   CLEAN EVENT TEXT
+========================================================= */
+
+function cleanEventText(...values){
+
+    for(const value of values){
+
+        if(
+            value !== undefined &&
+            value !== null
+        ){
+
+            const text =
+                String(value).trim();
+
+            if(
+                text !== "" &&
+                text.toLowerCase() !==
+                "kabaddi tournament"
+            ){
+
+                return text;
+
             }
 
-            runSmartTicker('s2-left', isEnglish ? L.detailEn : L.detailPa);
-            runSmartTicker('s2-right', isEnglish ? R.detailEn : R.detailPa);
-        } else {
-            runSmartTicker('s1-left', isEnglish ? L.hintEn : L.hintPa);
-            runSmartTicker('s1-mid', isEnglish ? C.hintEn : C.hintPa);
-            runSmartTicker('s1-right', isEnglish ? R.hintEn : R.hintPa);
-
-            runSmartTicker('s2-left', isEnglish ? L.detailEn : L.detailPa);
-            runSmartTicker('s2-mid', C.bEn);
-            runSmartTicker('s2-right', isEnglish ? R.detailEn : R.detailPa);
         }
+
     }
 
-    // Rotate items every 6 seconds smoothly
-    setInterval(() => {
-        leftIdx++;
-        centerIdx++;
-        rightIdx++;
-        renderIndependentTickers();
-    }, 6000);
+    return "";
 
-    // Toggle Language every 16 seconds
-    setInterval(() => {
-        isEnglish = !isEnglish;
-        renderIndependentTickers();
-    }, 16000);
+}
 
-    // --- PERIODIC SLOW SPIN ANIMATION FOR LOGO ---
-    setInterval(() => {
-        const logoBox = document.getElementById('logo-container');
-        if (logoBox && !logoBox.classList.contains('hidden')) {
-            logoBox.classList.add('animate-slow-spin');
-            setTimeout(() => {
-                logoBox.classList.remove('animate-slow-spin');
-            }, 2200);
-        }
-    }, 15000);
 
-    setInterval(() => {
-        let d = window.currentData;
-        if(d) {
-            document.getElementById('nA').innerText = (!isEnglish && d.nameA_pa) ? d.nameA_pa : (d.nameA || "ਟੀਮ 1");
-            document.getElementById('nB').innerText = (!isEnglish && d.nameB_pa) ? d.nameB_pa : (d.nameB || "ਟੀਮ 2");
-        }
-    }, 2000);
+/* =========================================================
+   SINGLE LINE SMART SCROLL
+========================================================= */
 
-    const wm = document.getElementById('single-wm');
-    let x = 200, y = 200, dx = 1.8, dy = 1.4;
-    function animateWatermark() {
-        const maxX = 1920 - wm.offsetWidth - 50; const maxY = 950 - wm.offsetHeight;
-        x += dx; y += dy;
-        if (x <= 50 || x >= maxX) dx *= -1; if (y <= 120 || y >= maxY) dy *= -1;
-        wm.style.left = x + 'px'; wm.style.top = y + 'px';
-        requestAnimationFrame(animateWatermark);
+const SCROLL_SPEED = 120;
+
+
+/*
+   Every ticker is independently animated.
+
+   Short text:
+   stays centered.
+
+   Long text:
+   scrolls in ONE SINGLE LINE.
+
+   No duplicated HTML.
+   No -50%.
+   No vertical animation conflict.
+*/
+
+function runSmartTicker(elementId,textToShow){
+
+    const el =
+        document.getElementById(elementId);
+
+    if(!el) return;
+
+
+    textToShow =
+        String(textToShow || "").trim();
+
+
+    if(!textToShow){
+
+        textToShow = " ";
+
     }
-    animateWatermark();
+
+
+    const oldText =
+        el.dataset.currentText || "";
+
+
+    /*
+       Same text = do not restart animation.
+    */
+
+    if(oldText === textToShow){
+
+        return;
+
+    }
+
+
+    el.dataset.currentText =
+        textToShow;
+
+
+    /*
+       Stop previous animation completely.
+    */
+
+    el.style.animation = "none";
+    el.classList.remove(
+        "scroll-mode",
+        "center-mode",
+        "fade-change"
+    );
+
+
+    /*
+       Reset transform.
+    */
+
+    el.style.transform =
+        "translateX(0)";
+
+
+    /*
+       Set text.
+    */
+
+    el.innerHTML =
+        textToShow;
+
+
+    /*
+       Force browser layout.
+    */
+
+    void el.offsetWidth;
+
+
+    const viewport =
+        el.parentElement;
+
+
+    const viewportWidth =
+        viewport.clientWidth;
+
+
+    const textWidth =
+        el.scrollWidth;
+
+
+    /*
+       SHORT TEXT
+    */
+
+    if(textWidth <= viewportWidth){
+
+        el.classList.add(
+            "center-mode"
+        );
+
+        el.style.transform =
+            "translateX(0)";
+
+        return;
+
+    }
+
+
+    /*
+       LONG TEXT
+       Start completely outside right.
+    */
+
+    const startX =
+        viewportWidth;
+
+    /*
+       End completely outside left.
+    */
+
+    const endX =
+        -textWidth;
+
+
+    const totalDistance =
+        startX - endX;
+
+
+    /*
+       Same pixel-per-second speed
+       for every text length.
+    */
+
+    const duration =
+        Math.max(
+            5,
+            totalDistance / SCROLL_SPEED
+        );
+
+
+    el.style.setProperty(
+        "--start-x",
+        `${startX}px`
+    );
+
+    el.style.setProperty(
+        "--end-x",
+        `${endX}px`
+    );
+
+
+    el.style.animation =
+        `singleLineScroll ${duration}s linear infinite`;
+
+    el.classList.add(
+        "scroll-mode"
+    );
+
+}
+
+
+/* =========================================================
+   RENDER TICKERS
+========================================================= */
+
+function renderIndependentTickers(){
+
+    if(
+        !leftItems.length ||
+        !centerItems.length ||
+        !rightItems.length
+    ){
+
+        return;
+
+    }
+
+
+    const L =
+        leftItems[
+            leftIdx % leftItems.length
+        ];
+
+    const C =
+        centerItems[
+            centerIdx % centerItems.length
+        ];
+
+    const R =
+        rightItems[
+            rightIdx % rightItems.length
+        ];
+
+
+    /* LEFT TOP */
+
+    runSmartTicker(
+        's1-left',
+        isEnglish
+        ? L.hintEn
+        : L.hintPa
+    );
+
+
+    /* RIGHT TOP */
+
+    runSmartTicker(
+        's1-right',
+        isEnglish
+        ? R.hintEn
+        : R.hintPa
+    );
+
+
+    /*
+       CENTER
+    */
+
+    if(hasMatches){
+
+        if(C.isMultiple){
+
+            /*
+               TOP = Punjabi match
+               BOTTOM = English match
+            */
+
+            runSmartTicker(
+                's1-mid',
+                C.tPa
+            );
+
+            runSmartTicker(
+                's2-mid',
+                C.bEn
+            );
+
+        }else{
+
+            runSmartTicker(
+                's1-mid',
+                isEnglish
+                ? C.hintEn
+                : C.hintPa
+            );
+
+            runSmartTicker(
+                's2-mid',
+                isEnglish
+                ? C.bEn
+                : C.tPa
+            );
+
+        }
+
+    }else{
+
+        runSmartTicker(
+            's1-mid',
+            isEnglish
+            ? C.hintEn
+            : C.hintPa
+        );
+
+        runSmartTicker(
+            's2-mid',
+            isEnglish
+            ? C.bEn
+            : C.tPa
+        );
+
+    }
+
+
+    /* BOTTOM LEFT */
+
+    runSmartTicker(
+        's2-left',
+        isEnglish
+        ? L.detailEn
+        : L.detailPa
+    );
+
+
+    /* BOTTOM RIGHT */
+
+    runSmartTicker(
+        's2-right',
+        isEnglish
+        ? R.detailEn
+        : R.detailPa
+    );
+
+}
+
+
+/* =========================================================
+   ITEM ROTATION
+========================================================= */
+
+setInterval(()=>{
+
+    leftIdx++;
+    centerIdx++;
+    rightIdx++;
+
+    renderIndependentTickers();
+
+},6000);
+
+
+/* =========================================================
+   LANGUAGE
+========================================================= */
+
+setInterval(()=>{
+
+    isEnglish =
+        !isEnglish;
+
+    renderIndependentTickers();
+
+},16000);
+
+
+/* =========================================================
+   LOGO ANIMATION
+========================================================= */
+
+setInterval(()=>{
+
+    const logoBox =
+        document.getElementById(
+            'logo-container'
+        );
+
+    if(
+        logoBox &&
+        !logoBox.classList.contains('hidden')
+    ){
+
+        logoBox.classList.add(
+            'animate-slow-spin'
+        );
+
+        setTimeout(()=>{
+
+            logoBox.classList.remove(
+                'animate-slow-spin'
+            );
+
+        },2200);
+
+    }
+
+},15000);
+
+
+/* =========================================================
+   TEAM NAMES
+========================================================= */
+
+setInterval(()=>{
+
+    const d =
+        window.currentData;
+
+    if(!d) return;
+
+
+    document.getElementById('nA')
+        .innerText =
+        (!isEnglish && d.nameA_pa)
+        ? d.nameA_pa
+        : (d.nameA || "ਟੀਮ 1");
+
+
+    document.getElementById('nB')
+        .innerText =
+        (!isEnglish && d.nameB_pa)
+        ? d.nameB_pa
+        : (d.nameB || "ਟੀਮ 2");
+
+},2000);
+
+
+/* =========================================================
+   WATERMARK MOVEMENT
+========================================================= */
+
+const wm =
+    document.getElementById('single-wm');
+
+let x = 200;
+let y = 200;
+
+let dx = 1.8;
+let dy = 1.4;
+
+
+function animateWatermark(){
+
+    const maxX =
+        1920 -
+        wm.offsetWidth -
+        50;
+
+    const maxY =
+        950 -
+        wm.offsetHeight;
+
+
+    x += dx;
+    y += dy;
+
+
+    if(
+        x <= 50 ||
+        x >= maxX
+    ){
+
+        dx *= -1;
+
+    }
+
+
+    if(
+        y <= 120 ||
+        y >= maxY
+    ){
+
+        dy *= -1;
+
+    }
+
+
+    wm.style.left =
+        x + 'px';
+
+    wm.style.top =
+        y + 'px';
+
+
+    requestAnimationFrame(
+        animateWatermark
+    );
+
+}
+
+animateWatermark();
+
 </script>
+
 </body>
 </html>
+```
