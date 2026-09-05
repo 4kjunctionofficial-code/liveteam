@@ -303,10 +303,11 @@
     const clientLogos = { "gurujastv": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/kabaddisports1.png" };
 
     let leftItems = [];
-    let centerItems = [];
+    let topCenterItems = [];
+    let bottomCenterItems = [];
     let rightItems = [];
     
-    let leftIdx = 0, centerIdx = 0, rightIdx = 0;
+    let leftIdx = 0, topCenterIdx = 0, bottomCenterIdx = 0, rightIdx = 0;
     let isEnglish = false; 
     let hasMatches = false;
     let lastResult = ""; 
@@ -376,7 +377,7 @@
     }
 
     function processTickerData(data) {
-        // --- 1. LEFT BOX: TOP LINE = MAP PIN ICON, BOTTOM LINE = VILLAGE NAME ---
+        // --- 1. LEFT BOX: TOP = MAP ICON, BOTTOM = VILLAGE NAME ---
         let vNameEn = data.row1Txt || "VILLAGE NAME";
         let vNamePa = data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ ਦਾ ਨਾਮ";
         leftItems = [{
@@ -385,30 +386,31 @@
             singleEn: `${mapPinHtml} ${vNameEn}`, singlePa: `${mapPinHtml} ${vNamePa}`
         }];
 
-        // --- 2. CENTER BOX: PRIZES ON TOP STRIP, MATCH LIST ON BOTTOM STRIP ---
-        centerItems = [];
-        let matchesList = data.nextMatches || [];
-        hasMatches = matchesList.length > 0;
-
-        let prizeItemsList = [];
+        // --- 2. TOP CENTER: ALL PRIZES ROTATING ---
+        topCenterItems = [];
         if (data.resultText && data.resultText !== "No Result Yet") {
             let resText = data.resultText;
-            prizeItemsList.push({ topPa: "ਪਿਛਲਾ ਨਤੀਜਾ", topEn: "LAST RESULT", botPa: translateToPunjabi(resText), botEn: resText });
+            topCenterItems.push({ pa: `ਪਿਛਲਾ ਨਤੀਜਾ: ${translateToPunjabi(resText)}`, en: `LAST RESULT: ${resText}` });
         }
-        if(data.pzOp1) prizeItemsList.push({ topPa: "ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ", topEn: "OPEN 1ST PRIZE", botPa: data.pzOp1, botEn: data.pzOp1 });
-        if(data.pzOp2) prizeItemsList.push({ topPa: "ਓਪਨ ਦੂਜਾ ਇਨਾਮ", topEn: "OPEN 2ND PRIZE", botPa: data.pzOp2, botEn: data.pzOp2 });
-        if(data.pzOpBest) prizeItemsList.push({ topPa: "ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ", topEn: "OPEN BEST PLAYER", botPa: data.pzOpBest, botEn: data.pzOpBest });
+        if(data.pzOp1) topCenterItems.push({ pa: `ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ: ${data.pzOp1}`, en: `OPEN 1ST PRIZE: ${data.pzOp1}` });
+        if(data.pzOp2) topCenterItems.push({ pa: `ਓਪਨ ਦੂਜਾ ਇਨਾਮ: ${data.pzOp2}`, en: `OPEN 2ND PRIZE: ${data.pzOp2}` });
+        if(data.pzOpBest) topCenterItems.push({ pa: `ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ: ${data.pzOpBest}`, en: `OPEN BEST PLAYER: ${data.pzOpBest}` });
 
         let wKg = data.pzWtKg ? data.pzWtKg : "WEIGHT";
         let wKgPa = data.pzWtKg ? translateToPunjabi(data.pzWtKg) : "ਵਜ਼ਨੀ";
 
-        if(data.pzWt1) prizeItemsList.push({ topPa: `(${wKgPa}) ਪਹਿਲਾ ਇਨਾਮ`, topEn: `(${wKg}) 1ST PRIZE`, botPa: data.pzWt1, botEn: data.pzWt1 });
-        if(data.pzWt2) prizeItemsList.push({ topPa: `(${wKgPa}) ਦੂਜਾ ਇਨਾਮ`, topEn: `(${wKg}) 2ND PRIZE`, botPa: data.pzWt2, botEn: data.pzWt2 });
-        if(data.pzWtBest) prizeItemsList.push({ topPa: `(${wKgPa}) ਬੈਸਟ ਖਿਡਾਰੀ`, topEn: `(${wKg}) BEST PLAYER`, botPa: data.pzWtBest, botEn: data.pzWtBest });
+        if(data.pzWt1) topCenterItems.push({ pa: `(${wKgPa}) ਪਹਿਲਾ ਇਨਾਮ: ${data.pzWt1}`, en: `(${wKg}) 1ST PRIZE: ${data.pzWt1}` });
+        if(data.pzWt2) topCenterItems.push({ pa: `(${wKgPa}) ਦੂਜਾ ਇਨਾਮ: ${data.pzWt2}`, en: `(${wKg}) 2ND PRIZE: ${data.pzWt2}` });
+        if(data.pzWtBest) topCenterItems.push({ pa: `(${wKgPa}) ਬੈਸਟ ਖਿਡਾਰੀ: ${data.pzWtBest}`, en: `(${wKg}) BEST PLAYER: ${data.pzWtBest}` });
 
-        if(prizeItemsList.length === 0) {
-            prizeItemsList.push({ topPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", topEn: "KABADDI TOURNAMENT", botPa: "ਲਾਈਵ ਅੱਪਡੇਟ", botEn: "LIVE UPDATES" });
+        if(topCenterItems.length === 0) {
+            topCenterItems.push({ pa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ - ਲਾਈਵ ਅੱਪਡੇਟ", en: "KABADDI TOURNAMENT - LIVE UPDATES" });
         }
+
+        // --- 3. BOTTOM CENTER: MATCH LIST ---
+        bottomCenterItems = [];
+        let matchesList = data.nextMatches || [];
+        hasMatches = matchesList.length > 0;
 
         let parseMatchFull = (m, index) => {
             let bracketContent = "";
@@ -446,31 +448,13 @@
         if(hasMatches) {
             matchesList.forEach((mStr, idx) => {
                 let res = parseMatchFull(mStr, idx);
-                let prizePair = prizeItemsList[idx % prizeItemsList.length];
-                centerItems.push({ 
-                    topPa: `${prizePair.topPa}: ${prizePair.botPa}`, 
-                    topEn: `${prizePair.topEn}: ${prizePair.botEn}`,
-                    botPa: res.pa, 
-                    botEn: res.en,
-                    singlePa: res.pa, 
-                    singleEn: res.en,
-                    isMatch: true 
-                });
+                bottomCenterItems.push({ pa: res.pa, en: res.en });
             });
         } else {
-            let prizePair = prizeItemsList[0];
-            centerItems.push({ 
-                topPa: prizePair.topPa, 
-                topEn: prizePair.topEn,
-                botPa: prizePair.botPa, 
-                botEn: prizePair.botEn,
-                singlePa: `${prizePair.topPa}: ${prizePair.botPa}`, 
-                singleEn: `${prizePair.topEn}: ${prizePair.botEn}`,
-                isMatch: false 
-            });
+            bottomCenterItems.push({ pa: `📍 ${vNamePa}`, en: `📍 ${vNameEn}` });
         }
 
-        // --- 3. RIGHT BOX: UPCOMING EVENTS & LIVE TELECAST ---
+        // --- 4. RIGHT BOX: UPCOMING EVENTS & LIVE TELECAST ---
         rightItems = [];
         if(data.upcomingEvents && data.upcomingEvents.length > 0) {
             data.upcomingEvents.forEach(ev => {
@@ -556,31 +540,33 @@
 
     function renderIndependentTickers() {
         let L = leftItems[leftIdx % leftItems.length];
-        let C = centerItems[centerIdx % centerItems.length];
+        let TC = topCenterItems[topCenterIdx % topCenterItems.length];
+        let BC = bottomCenterItems[bottomCenterIdx % bottomCenterItems.length];
         let R = rightItems[rightIdx % rightItems.length];
 
         if (hasMatches) {
             document.getElementById('strip-2').style.display = 'flex';
             
             runDoubleTicker('s1-left', isEnglish ? L.topEn : L.topPa);
-            runDoubleTicker('s1-mid', isEnglish ? C.topEn : C.topPa);
+            runDoubleTicker('s1-mid', isEnglish ? TC.en : TC.pa);
             runDoubleTicker('s1-right', isEnglish ? R.topEn : R.topPa);
 
             runDoubleTicker('s2-left', isEnglish ? L.botEn : L.botPa);
-            runDoubleTicker('s2-mid', isEnglish ? C.botEn : C.botPa);
+            runDoubleTicker('s2-mid', isEnglish ? BC.en : BC.pa);
             runDoubleTicker('s2-right', isEnglish ? R.botEn : R.botPa);
         } else {
             document.getElementById('strip-2').style.display = 'none';
             
             runSingleTicker('s1-left', isEnglish ? L.singleEn : L.singlePa);
-            runSingleTicker('s1-mid', isEnglish ? C.singleEn : C.singlePa);
+            runSingleTicker('s1-mid', isEnglish ? TC.en : TC.pa);
             runSingleTicker('s1-right', isEnglish ? R.singleEn : R.singlePa);
         }
     }
 
     setInterval(() => {
         leftIdx++;
-        centerIdx++;
+        topCenterIdx++;
+        bottomCenterIdx++;
         rightIdx++;
         renderIndependentTickers();
     }, 8000);
