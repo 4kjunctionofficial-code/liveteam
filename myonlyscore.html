@@ -497,7 +497,7 @@
 
 
         /* =========================================================
-            MAP PIN ICON (Clean & Guaranteed SVG / Image)
+            MAP PIN ICON
         ========================================================= */
 
         .map-pin-icon {
@@ -963,7 +963,6 @@
 
         </div>
 
-
         <div class="ticker-col w-30">
 
             <div
@@ -1165,7 +1164,7 @@ let lastTickerSignature = "";
 
 
 /* =========================================================
-   MAP PIN (Using Reliable Embedded SVG Icon)
+   MAP PIN ICON
 ========================================================= */
 
 const mapPinHtml = `
@@ -1797,7 +1796,7 @@ function processTickerData(data) {
     ) {
 
         m =
-            String(m || "");
+            String(m || "").trim();
 
 
         let bracketContent = "";
@@ -1856,17 +1855,11 @@ function processTickerData(data) {
             t2Full.split("=");
 
 
+        // English Side Parts
         const t1En =
             (
                 t1Parts[0] ||
                 ""
-            ).trim();
-
-
-        const t1Pa =
-            (
-                t1Parts[1] ||
-                t1En
             ).trim();
 
 
@@ -1877,13 +1870,36 @@ function processTickerData(data) {
             ).trim();
 
 
-        const t2Pa =
+        // Punjabi Side Parts with smart fallback & auto-translation
+        const t1PaRaw =
             (
-                t2Parts[1] ||
-                t2En
+                t1Parts[1] ||
+                t1Parts[0] ||
+                ""
             ).trim();
 
 
+        const t2PaRaw =
+            (
+                t2Parts[1] ||
+                t2Parts[0] ||
+                ""
+            ).trim();
+
+
+        const t1Pa =
+            translateToPunjabi(
+                t1PaRaw
+            );
+
+
+        const t2Pa =
+            translateToPunjabi(
+                t2PaRaw
+            );
+
+
+        // Clean and ensure round/bracket is translated fully for Punjabi mode
         const bracketPa =
             translateToPunjabi(
                 bracketContent
@@ -2004,7 +2020,7 @@ function processTickerData(data) {
             const namePa =
                 ev.name_pa ||
                 ev.eventName_pa ||
-                nameEn;
+                translateToPunjabi(nameEn);
 
 
             const d =
@@ -2058,7 +2074,7 @@ function processTickerData(data) {
 
         const livePa =
             data.row6Txt_pa ||
-            data.row6Txt ||
+            translateToPunjabi(data.row6Txt) ||
             "ਲਾਈਵ ਪ੍ਰਸਾਰਣ";
 
 
