@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Ultra HD - Hint Top & Detail Bottom Overlay</title>
+    <title>Kabaddi Ultra HD - Perfect Event Program Ticker</title>
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@700;800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -145,7 +145,7 @@
         .w-30 { width: 30%; }
         .w-40 { width: 40%; border-left: 2.5px solid rgba(255,255,255,0.35); border-right: 2.5px solid rgba(255,255,255,0.35); color: #ffffff !important; }
 
-        /* 3D GHAIENT VS DESIGN IN MATCH LIST */
+        /* 3D VS DESIGN IN MATCH LIST */
         .match-vs-3d {
             color: #ffcc00;
             background: #111;
@@ -170,6 +170,22 @@
         }
         .anim-out-up { opacity: 0; transform: translateY(-25px); }
         .anim-in-down { opacity: 0; transform: translateY(25px); }
+
+        /* --- MARQUEE SCROLL ANIMATION FOR LONG TEXT --- */
+        .anim-wrap-marquee {
+            position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: flex-start;
+            white-space: nowrap; overflow: hidden;
+        }
+        .anim-wrap-marquee .marquee-text {
+            display: inline-block;
+            will-change: transform;
+            animation: tickerMarquee var(--marquee-duration, 16s) linear infinite;
+        }
+        @keyframes tickerMarquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+        }
 
         /* --- RESULT POPUP --- */
         #result-popup {
@@ -211,7 +227,7 @@
 <div id="ticker-wrap">
     <div class="ticker-strip strip-top" id="strip-1">
         <div class="ticker-col w-30"><div id="s1-left" class="anim-wrap">📍 ਸਥਾਨ</div></div>
-        <div class="ticker-col w-40"><div id="s1-mid" class="anim-wrap">ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ</div></div>
+        <div class="ticker-col w-40"><div id="s1-mid" class="anim-wrap">🏟️ ਇਵੈਂਟ ਪ੍ਰੋਗਰਾਮ</div></div>
         <div class="ticker-col w-30"><div id="s1-right" class="anim-wrap">📅 ਆਉਣ ਵਾਲੇ ਮੇਲੇ</div></div>
     </div>
     
@@ -320,10 +336,18 @@
         processTickerData(data);
     });
 
+    function showResultPopup(text) {
+        const popup = document.getElementById('result-popup');
+        document.getElementById('res-msg-pa').innerText = translateToPunjabi(text);
+        document.getElementById('res-msg-en').innerText = text;
+        popup.classList.add('show');
+        setTimeout(() => { popup.classList.remove('show'); }, 10000); 
+    }
+
     function processTickerData(data) {
         leftItems = [];
         
-        // 1st Column Items: Village & Prizes
+        // 1st Column: Village Name
         let vNameEn = data.row1Txt || "VILLAGE NAME";
         let vNamePa = data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ ਦਾ ਨਾਮ";
         leftItems.push({ hintEn: "📍 LOCATION", hintPa: "📍 ਸਥਾਨ", detailEn: vNameEn, detailPa: vNamePa });
@@ -337,15 +361,12 @@
 
         if(data.pzWt1) leftItems.push({ hintEn: `🏋️ (${wKg}) 1ST PRIZE`, hintPa: `🏋️ (${wKgPa}) ਪਹਿਲਾ ਇਨਾਮ`, detailEn: data.pzWt1, detailPa: data.pzWt1 });
         if(data.pzWt2) leftItems.push({ hintEn: `🏋️ (${wKg}) 2ND PRIZE`, hintPa: `🏋️ (${wKgPa}) ਦੂਜਾ ਇਨਾਮ`, detailEn: data.pzWt2, detailPa: data.pzWt2 });
-        if(data.pzWtBest) leftItems.push({ hintEn: `🏅 (${wKg}) BEST PLAYER`, hintPa: `🏅 (${wKgPa}) ਬੈਸਟ ਖਿਡਾਰੀ`, detailEn: data.pzWtBest, detailPa: data.pzWtBest });
 
-        if(data.adComm) leftItems.push({ hintEn: "🎙️ COMMENTATOR", hintPa: "🎙️ ਕਮੈਂਟੇਟਰ", detailEn: data.adComm, detailPa: data.adComm });
-        if(data.adSound) leftItems.push({ hintEn: "🔊 SOUND SERVICE", hintPa: "🔊 ਸਾਊਂਡ ਸਰਵਿਸ", detailEn: data.adSound, detailPa: data.adSound });
-        if(data.adTent) leftItems.push({ hintEn: "⛺ TENT SERVICE", hintPa: "⛺ ਟੈਂਟ ਪੰਡਾਲ", detailEn: data.adTent, detailPa: data.adTent });
-        if(data.adSec) leftItems.push({ hintEn: "🛡️ SECURITY", hintPa: "🛡️ ਸਕਿਓਰਿਟੀ", detailEn: data.adSec, detailPa: data.adSec });
-
-        // 2nd Column Items: Match List
+        // 2nd Column: Event Details & Program / Match List
         centerItems = [];
+        let eventProgEn = data.eventProgram || data.row2Txt || "KABADDI TOURNAMENT";
+        let eventProgPa = data.eventProgram_pa || data.row2Txt_pa || eventProgEn;
+
         let matchesList = data.nextMatches || [];
         hasMatches = matchesList.length > 0;
         
@@ -386,16 +407,20 @@
             matchesList.forEach((mStr, idx) => {
                 let res = parseMatchFull(mStr, idx);
                 centerItems.push({ 
-                    hintPa: "⚔️ ਅਗਲਾ ਮੈਚ (NEXT MATCH)", hintEn: "⚔️ NEXT MATCH",
+                    hintPa: `🏟️ ${translateToPunjabi(eventProgPa)}`, hintEn: `🏟️ ${eventProgEn}`,
                     tPa: res.pa, bEn: res.en,
                     isMultiple: matchesList.length > 1 
                 });
             });
         } else {
-            centerItems.push({ hintPa: "⚔️ ਮੈਚ ਲਿਸਟ", hintEn: "⚔️ MATCH LIST", tPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", bEn: "KABADDI TOURNAMENT", isMultiple: false });
+            centerItems.push({ 
+                hintPa: `🏟️ ਇਵੈਂਟ ਪ੍ਰੋਗਰਾਮ`, hintEn: `🏟️ EVENT PROGRAM`, 
+                tPa: eventProgPa, bEn: eventProgEn, 
+                isMultiple: false 
+            });
         }
 
-        // 3rd Column Items: Upcoming Events & Live Telecast
+        // 3rd Column: Upcoming Events & Live Telecast
         rightItems = [];
         if(data.upcomingEvents && data.upcomingEvents.length > 0) {
             data.upcomingEvents.forEach(ev => {
@@ -423,7 +448,7 @@
         renderIndependentTickers();
     }
 
-    // --- SMOOTH VERTICAL SLIDE TICKER FUNCTION ---
+    // --- SMOOTH VERTICAL SLIDE TICKER WITH AUTOMATIC MARQUEE SCROLL ---
     function runSmartTicker(elementId, textToShow) {
         const el = document.getElementById(elementId);
         if (!el) return;
@@ -431,7 +456,8 @@
         if (el.dataset.currentText === textToShow) return;
         el.dataset.currentText = textToShow;
 
-        el.classList.add('anim-out-up');
+        el.classList.remove('anim-out-up', 'anim-in-down', 'anim-wrap-marquee');
+        el.className = 'anim-wrap anim-out-up';
 
         setTimeout(() => {
             el.innerHTML = textToShow;
@@ -440,6 +466,12 @@
 
             requestAnimationFrame(() => {
                 el.classList.remove('anim-in-down');
+                
+                // Check overflow for long text marquee scroll in any box
+                if (el.scrollWidth > el.clientWidth) {
+                    el.className = 'anim-wrap-marquee';
+                    el.innerHTML = `<span class="marquee-text">${textToShow}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${textToShow}</span>`;
+                }
             });
         }, 400);
     }
@@ -465,7 +497,7 @@
             runSmartTicker('s2-right', isEnglish ? R.detailEn : R.detailPa);
         } else {
             runSmartTicker('s1-left', isEnglish ? L.hintEn : L.hintPa);
-            runSmartTicker('s1-mid', C.hintPa);
+            runSmartTicker('s1-mid', isEnglish ? C.hintEn : C.hintPa);
             runSmartTicker('s1-right', isEnglish ? R.hintEn : R.hintPa);
 
             runSmartTicker('s2-left', isEnglish ? L.detailEn : L.detailPa);
