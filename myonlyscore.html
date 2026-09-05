@@ -353,7 +353,7 @@
             showResultPopup(data.resultText);
         }
         if (!data.resultText || data.resultText === "No Result Yet") {
-            lastResult = ""; 
+            // Keep lastResult persistent in loop ticker until next override if available, or maintain state
         }
 
         processTickerData(data);
@@ -368,12 +368,44 @@
     }
 
     function processTickerData(data) {
-        leftItems = [];
-        
+        // --- RIGHT SIDE: VILLAGE NAME / EVENT INFO ---
+        rightItems = [];
         let vNameEn = data.row1Txt || "VILLAGE NAME";
         let vNamePa = data.row1Txt_pa || data.row1Txt || "ਪਿੰਡ ਦਾ ਨਾਮ";
-        leftItems.push({ hintEn: vNameEn, hintPa: vNamePa, detailEn: vNameEn, detailPa: vNamePa, pa: vNamePa, en: vNameEn });
+        rightItems.push({ 
+            hintEn: vNameEn, hintPa: vNamePa, 
+            detailEn: vNameEn, detailPa: vNamePa, 
+            pa: vNamePa, en: vNameEn 
+        });
 
+        if(data.upcomingEvents && data.upcomingEvents.length > 0) {
+            data.upcomingEvents.forEach(ev => {
+                let d = ev.date ? ` (${ev.date})` : "";
+                rightItems.push({ 
+                    hintEn: "UPCOMING EVENTS", hintPa: "ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ",
+                    detailEn: `${ev.name}${d}`, detailPa: `${ev.name_pa || ev.name}${d}`,
+                    pa: `ਆਉਣ ਵਾਲੇ ਮੇਲੇ: ${ev.name_pa || ev.name}${d}`, en: `UPCOMING EVENTS: ${ev.name}${d}`
+                });
+            });
+        }
+        if(data.row6Txt || data.row6Txt_pa) {
+            rightItems.push({ 
+                hintEn: "LIVE TELECAST", hintPa: "ਲਾਈਵ ਪ੍ਰਸਾਰਣ",
+                detailEn: data.row6Txt || "LIVE STREAMING", detailPa: data.row6Txt_pa || data.row6Txt || "ਲਾਈਵ ਪ੍ਰਸਾਰਣ",
+                pa: `ਲਾਈਵ ਪ੍ਰਸਾਰਣ: ${data.row6Txt_pa || data.row6Txt}`, en: `LIVE TELECAST: ${data.row6Txt || data.row6Txt_pa}`
+            });
+        }
+
+        // --- LEFT SIDE: PRIZES / DETAILS / LAST MATCH RESULT ---
+        leftItems = [];
+        if (data.resultText && data.resultText !== "No Result Yet") {
+            let resText = data.resultText;
+            leftItems.push({
+                hintEn: `LAST RESULT: ${resText}`, hintPa: `ਪਿਛਲਾ ਨਤੀਜਾ: ${translateToPunjabi(resText)}`,
+                detailEn: resText, detailPa: translateToPunjabi(resText),
+                pa: `ਪਿਛਲਾ ਨਤੀਜਾ: ${translateToPunjabi(resText)}`, en: `LAST RESULT: ${resText}`
+            });
+        }
         if(data.pzOp1) leftItems.push({ hintEn: `OPEN 1ST PRIZE: ${data.pzOp1}`, hintPa: `ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ: ${data.pzOp1}`, detailEn: data.pzOp1, detailPa: data.pzOp1, pa: `ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ: ${data.pzOp1}`, en: `OPEN 1ST PRIZE: ${data.pzOp1}` });
         if(data.pzOp2) leftItems.push({ hintEn: `OPEN 2ND PRIZE: ${data.pzOp2}`, hintPa: `ਓਪਨ ਦੂਜਾ ਇਨਾਮ: ${data.pzOp2}`, detailEn: data.pzOp2, detailPa: data.pzOp2, pa: `ਓਪਨ ਦੂਜਾ ਇਨਾਮ: ${data.pzOp2}`, en: `OPEN 2ND PRIZE: ${data.pzOp2}` });
         if(data.pzOpBest) leftItems.push({ hintEn: `OPEN BEST PLAYER: ${data.pzOpBest}`, hintPa: `ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ: ${data.pzOpBest}`, detailEn: data.pzOpBest, detailPa: data.pzOpBest, pa: `ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ: ${data.pzOpBest}`, en: `OPEN BEST PLAYER: ${data.pzOpBest}` });
@@ -386,10 +418,11 @@
         if(data.pzWtBest) leftItems.push({ hintEn: `(${wKg}) BEST PLAYER: ${data.pzWtBest}`, hintPa: `(${wKgPa}) ਬੈਸਟ ਖਿਡਾਰੀ: ${data.pzWtBest}`, detailEn: data.pzWtBest, detailPa: data.pzWtBest, pa: `(${wKgPa}) ਬੈਸਟ ਖਿਡਾਰੀ: ${data.pzWtBest}`, en: `(${wKg}) BEST PLAYER: ${data.pzWtBest}` });
 
         if(data.adComm) leftItems.push({ hintEn: `COMMENTATOR: ${data.adComm}`, hintPa: `ਕਮੈਂਟੇਟਰ: ${data.adComm}`, detailEn: data.adComm, detailPa: data.adComm, pa: `ਕਮੈਂਟੇਟਰ: ${data.adComm}`, en: `COMMENTATOR: ${data.adComm}` });
-        if(data.adSound) leftItems.push({ hintEn: `SOUND SERVICE: ${data.adSound}`, hintPa: `ਸਾਊਂਡ ਸਰਵਿਸ: ${data.adSound}`, detailEn: data.adSound, detailPa: data.adSound, pa: `ਸਾਊਂਡ ਸਰਵਿਸ: ${data.adSound}`, en: `SOUND SERVICE: ${data.adSound}` });
-        if(data.adTent) leftItems.push({ hintEn: `TENT SERVICE: ${data.adTent}`, hintPa: `ਟੈਂਟ ਪੰਡਾਲ: ${data.adTent}`, detailEn: data.adTent, detailPa: data.adTent, pa: `ਟੈਂਟ ਪੰਡਾਲ: ${data.adTent}`, en: `TENT SERVICE: ${data.adTent}` });
-        if(data.adSec) leftItems.push({ hintEn: `SECURITY: ${data.adSec}`, hintPa: `ਸਕਿਓਰਿਟੀ: ${data.adSec}`, detailEn: data.adSec, detailPa: data.adSec, pa: `ਸਕਿਓਰਿਟੀ: ${data.adSec}`, en: `SECURITY: ${data.adSec}` });
+        if(leftItems.length === 0) {
+            leftItems.push({ hintEn: "KABADDI TOURNAMENT", hintPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", detailEn: "KABADDI", detailPa: "ਕਬੱਡੀ", pa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", en: "KABADDI TOURNAMENT" });
+        }
 
+        // --- CENTER: MATCH LIST ---
         centerItems = [];
         let matchesList = data.nextMatches || [];
         hasMatches = matchesList.length > 0;
@@ -438,32 +471,11 @@
                 });
             });
         } else {
-            centerItems.push({ hintPa: "ਮੈਚ ਲਿਸਟ", hintEn: "MATCH LIST", tPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", bEn: "KABADDI TOURNAMENT", pa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ - ਲਾਈਵ ਅੱਪਡੇਟ", en: "KABADDI TOURNAMENT - LIVE UPDATES", isMultiple: false });
-        }
-
-        rightItems = [];
-        if(data.upcomingEvents && data.upcomingEvents.length > 0) {
-            data.upcomingEvents.forEach(ev => {
-                let d = ev.date ? ` (${ev.date})` : "";
-                rightItems.push({ 
-                    hintEn: "UPCOMING EVENTS", hintPa: "ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ",
-                    detailEn: `${ev.name}${d}`, detailPa: `${ev.name_pa || ev.name}${d}`,
-                    pa: `ਆਉਣ ਵਾਲੇ ਮੇਲੇ: ${ev.name_pa || ev.name}${d}`, en: `UPCOMING EVENTS: ${ev.name}${d}`
-                });
-            });
-        }
-        if(data.row6Txt || data.row6Txt_pa) {
-            rightItems.push({ 
-                hintEn: "LIVE TELECAST", hintPa: "ਲਾਈਵ ਪ੍ਰਸਾਰਣ",
-                detailEn: data.row6Txt || "LIVE STREAMING", detailPa: data.row6Txt_pa || data.row6Txt || "ਲਾਈਵ ਪ੍ਰਸਾਰਣ",
-                pa: `ਲਾਈਵ ਪ੍ਰਸਾਰਣ: ${data.row6Txt_pa || data.row6Txt}`, en: `LIVE TELECAST: ${data.row6Txt || data.row6Txt_pa}`
-            });
-        }
-        if(rightItems.length === 0) {
-            rightItems.push({ 
-                hintEn: "UPCOMING EVENTS", hintPa: "ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ",
-                detailEn: "STAY TUNED", detailPa: "ਦੇਖਦੇ ਰਹੋ",
-                pa: `ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ - ਦੇਖਦੇ ਰਹੋ`, en: `UPCOMING EVENTS - STAY TUNED`
+            centerItems.push({ 
+                hintPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ", hintEn: "KABADDI TOURNAMENT", 
+                tPa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ - ਲਾਈਵ ਅੱਪਡੇਟ", bEn: "KABADDI TOURNAMENT - LIVE UPDATES", 
+                pa: "ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ - ਲਾਈਵ ਅੱਪਡੇਟ", en: "KABADDI TOURNAMENT - LIVE UPDATES", 
+                isMultiple: false 
             });
         }
         
@@ -540,6 +552,8 @@
         if (hasMatches) {
             // --- DOUBLE LINE MODE (WHEN MATCH LIST EXISTS) ---
             document.getElementById('strip-2').style.display = 'flex';
+            
+            // Top Line: Left = Prizes/Headers, Middle = Match Tag/Title, Right = Village Name / Telecast
             runDoubleTicker('s1-left', isEnglish ? L.hintEn : L.hintPa);
             runDoubleTicker('s1-right', isEnglish ? R.hintEn : R.hintPa);
 
@@ -551,11 +565,14 @@
                 runDoubleTicker('s2-mid', isEnglish ? C.bEn : C.tPa);
             }
 
+            // Bottom Line: Left = Details, Right = Village Details
             runDoubleTicker('s2-left', isEnglish ? L.detailEn : L.detailPa);
             runDoubleTicker('s2-right', isEnglish ? R.detailEn : R.detailPa);
         } else {
             // --- SINGLE LINE MODE (WHEN NO MATCH LIST) ---
             document.getElementById('strip-2').style.display = 'none';
+            
+            // Single Strip Layout: Left = Prizes/Info, Middle = Tournament Info, Right = Village Name
             runSingleTicker('s1-left', isEnglish ? L.en : L.pa);
             runSingleTicker('s1-mid', isEnglish ? C.en : C.pa);
             runSingleTicker('s1-right', isEnglish ? R.en : R.pa);
