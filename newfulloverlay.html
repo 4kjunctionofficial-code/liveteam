@@ -1,26 +1,2774 @@
-function runSingleTicker(elementId, textToShow) {
+<!DOCTYPE html>
+<html lang="pa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    const el =
-        document.getElementById(elementId);
+    <title>Ultra HD - Smart Auto Switch Ticker</title>
 
-    if (!el) return;
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@800;900&display=swap" rel="stylesheet">
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            width: 1920px;
+            height: 1080px;
+            background: transparent;
+
+            font-family:
+                'Noto Sans Gurmukhi',
+                'Mukta',
+                Arial,
+                sans-serif;
+
+            overflow: hidden;
+            position: absolute;
+
+            top: 0;
+            left: 0;
+
+            user-select: none;
+
+            text-transform: uppercase;
+
+            transform-origin: top left;
+
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+
+
+        /* =========================================================
+           SCOREBOARD
+        ========================================================= */
+
+        #top-scoreboard-container {
+
+            position: absolute;
+
+            top: 35px;
+            right: 45px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: flex-end;
+
+            z-index: 9999;
+
+            transition:
+                opacity 0.5s ease;
+        }
+
+        #top-scoreboard-container.hidden {
+            opacity: 0;
+        }
+
+
+        #main-score-strip {
+
+            display: flex;
+
+            align-items: stretch;
+
+            height: 75px;
+
+            border-radius: 8px;
+
+            overflow: hidden;
+
+            border:
+                2.5px solid
+                rgba(255,255,255,0.9);
+
+            transform:
+                skewX(16deg);
+
+            box-shadow:
+                0 8px 25px
+                rgba(0,0,0,0.7);
+        }
+
+
+        .unskew {
+
+            transform:
+                skewX(-16deg);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            width: 100%;
+            height: 100%;
+        }
+
+
+        .score-a {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #0066cc,
+                    #0099ff
+                );
+
+            color: #ffffff;
+
+            font-size: 58px;
+
+            font-weight: 900;
+
+            padding: 0 38px;
+
+            font-family:
+                'Bebas Neue',
+                sans-serif;
+        }
+
+
+        .team-a-panel {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #1a8cff,
+                    #4da6ff
+                );
+
+            color: #ffffff;
+
+            font-size: 38px;
+
+            font-weight: 800;
+
+            padding: 0 50px;
+
+            white-space: nowrap;
+
+            min-width: 180px;
+
+            letter-spacing: 1.5px;
+        }
+
+
+        .vs-divider {
+
+            width: 12px;
+
+            background: #111111;
+        }
+
+
+        .team-b-panel {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #1f1f1f,
+                    #2e2e2e
+                );
+
+            color: #ffffff;
+
+            font-size: 38px;
+
+            font-weight: 800;
+
+            padding: 0 50px;
+
+            white-space: nowrap;
+
+            min-width: 180px;
+
+            letter-spacing: 1.5px;
+        }
+
+
+        .score-b {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #0a0a0a,
+                    #1a1a1a
+                );
+
+            color: #ffcc00;
+
+            font-size: 58px;
+
+            font-weight: 900;
+
+            padding: 0 38px;
+
+            font-family:
+                'Bebas Neue',
+                sans-serif;
+        }
+
+
+        #match-details-strip {
+
+            background:
+                rgba(0,0,0,0.95);
+
+            color: #ffcc00;
+
+            font-size: 24px;
+
+            font-weight: 800;
+
+            padding: 6px 40px;
+
+            margin-top: 8px;
+
+            border-radius: 6px;
+
+            letter-spacing: 2.5px;
+
+            border:
+                1.5px solid
+                rgba(255,204,0,0.6);
+
+            transform:
+                skewX(16deg);
+
+            margin-right: 25px;
+
+            box-shadow:
+                0 5px 15px
+                rgba(0,0,0,0.6);
+        }
+
+
+        #match-details-strip.hidden {
+            display: none;
+        }
+
+
+        /* =========================================================
+           LOGO
+        ========================================================= */
+
+        #logo-container {
+
+            position: absolute;
+
+            top: 25px;
+            left: 30px;
+
+            z-index: 9999;
+
+            display: flex;
+
+            align-items: center;
+
+            transition:
+                opacity 0.6s ease,
+                transform 0.6s ease;
+
+            opacity: 1;
+
+            transform:
+                scale(1)
+                rotate(0deg);
+
+            will-change: transform;
+        }
+
+
+        #logo-container.hidden {
+
+            opacity: 0;
+
+            transform:
+                scale(0.3)
+                translateY(-40px)
+                rotate(-360deg);
+        }
+
+
+        #logo-container.animate-slow-spin {
+
+            animation:
+                logoSlowSpin
+                2.2s
+                cubic-bezier(0.4,0,0.2,1)
+                forwards;
+        }
+
+
+        @keyframes logoSlowSpin {
+
+            0% {
+                transform:
+                    scale(1)
+                    rotate(0deg);
+            }
+
+            50% {
+                filter:
+                    drop-shadow(
+                        0 0 20px
+                        rgba(51,153,255,0.9)
+                    );
+            }
+
+            100% {
+                transform:
+                    scale(1)
+                    rotate(360deg);
+            }
+        }
+
+
+        #main-logo {
+
+            height: 100px;
+
+            width: auto;
+
+            object-fit: contain;
+        }
+
+
+        /* =========================================================
+           WATERMARK
+        ========================================================= */
+
+        #single-wm {
+
+            position: absolute;
+
+            left: 300px;
+            top: 300px;
+
+            font-family:
+                'Bebas Neue',
+                sans-serif;
+
+            font-size: 50px;
+
+            font-weight: bold;
+
+            color: #ffffff;
+
+            opacity: 0.45;
+
+            letter-spacing: 3px;
+
+            pointer-events: none;
+        }
+
+
+        /* =========================================================
+           TICKER WRAP
+        ========================================================= */
+
+        #ticker-wrap {
+
+            position: absolute;
+
+            bottom: 0;
+            left: 0;
+
+            width: 1920px;
+
+            z-index: 9998;
+
+            display: flex;
+
+            flex-direction: column;
+
+            transition:
+                opacity 0.5s ease;
+
+            box-shadow:
+                0 -5px 25px
+                rgba(0,0,0,0.8);
+        }
+
+
+        #ticker-wrap.hidden {
+            opacity: 0;
+        }
+
+
+        .ticker-strip {
+
+            display: flex;
+
+            width: 100%;
+
+            height: 60px;
+        }
+
+
+        .strip-top {
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #1a8cff,
+                    #3399ff,
+                    #1a8cff
+                );
+
+            border-bottom:
+                2.5px solid
+                rgba(0,0,0,0.6);
+        }
+
+
+        .strip-bot {
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #0d0d0d,
+                    #1a1a1a,
+                    #0d0d0d
+                );
+
+            border-top:
+                1.5px solid
+                rgba(255,255,255,0.25);
+        }
+
+
+        .ticker-col {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-weight: 900;
+
+            font-size: 33px;
+
+            color: #ffffff !important;
+
+            overflow: hidden;
+
+            position: relative;
+
+            letter-spacing: 2px;
+
+            padding: 0 15px;
+
+            white-space: nowrap;
+        }
+
+
+        .w-30 {
+            width: 30%;
+        }
+
+
+        .w-40 {
+
+            width: 40%;
+
+            border-left:
+                2.5px solid
+                rgba(255,255,255,0.35);
+
+            border-right:
+                2.5px solid
+                rgba(255,255,255,0.35);
+
+            color: #ffffff !important;
+        }
+
+
+        /* =========================================================
+           MAP PIN
+        ========================================================= */
+
+        .map-pin-icon {
+
+            width: 32px;
+
+            height: 32px;
+
+            object-fit: contain;
+
+            vertical-align: middle;
+
+            filter:
+                drop-shadow(
+                    0 2px 4px
+                    rgba(0,0,0,0.4)
+                );
+
+            margin-right: 8px;
+        }
+
+
+        /* =========================================================
+           VS BADGE
+        ========================================================= */
+
+        .match-vs-3d {
+
+            color: #ffcc00;
+
+            background: #111111;
+
+            padding: 2px 12px;
+
+            border-radius: 6px;
+
+            margin: 0 10px;
+
+            font-family:
+                'Bebas Neue',
+                sans-serif;
+
+            font-size: 32px;
+
+            letter-spacing: 2px;
+
+            display: inline-block;
+
+            transform:
+                translateY(-2px);
+
+            text-shadow: none;
+        }
+
+
+        /* =========================================================
+           NORMAL VERTICAL ANIMATION
+        ========================================================= */
+
+        .anim-wrap {
+
+            position: absolute;
+
+            width: 100%;
+            height: 100%;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            transition:
+                transform 0.4s
+                cubic-bezier(0.25,1,0.5,1),
+
+                opacity 0.4s ease;
+
+            opacity: 1;
+
+            transform:
+                translateY(0);
+
+            will-change:
+                transform,
+                opacity;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+        }
+
+
+        .anim-out-up {
+
+            opacity: 0;
+
+            transform:
+                translateY(-25px);
+        }
+
+
+        .anim-in-down {
+
+            opacity: 0;
+
+            transform:
+                translateY(25px);
+        }
+
+
+        /* =========================================================
+           CENTER NORMAL
+        ========================================================= */
+
+        .anim-wrap-single {
+
+            position: absolute;
+
+            left: 0;
+            top: 0;
+
+            width: 100%;
+            height: 100%;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+
+            opacity: 1;
+
+            transform:
+                scale(1);
+
+            transform-origin:
+                center center;
+
+            will-change:
+                transform,
+                opacity;
+
+            transition:
+                transform 0.45s
+                cubic-bezier(0.25,1,0.5,1),
+
+                opacity 0.45s ease;
+        }
+
+
+        .anim-center-in {
+
+            animation:
+                tickerCenterIn
+                0.55s
+                cubic-bezier(0.22,1,0.36,1)
+                both;
+        }
+
+
+        @keyframes tickerCenterIn {
+
+            0% {
+
+                opacity: 0;
+
+                transform:
+                    scale(0.55);
+            }
+
+            100% {
+
+                opacity: 1;
+
+                transform:
+                    scale(1);
+            }
+        }
+
+
+        /* =========================================================
+           SAME MARQUEE FOR EVERY LINE
+        ========================================================= */
+
+        .anim-wrap.marquee-mode,
+        .anim-wrap-single.marquee-mode {
+
+            position: absolute;
+
+            left: 0;
+            top: 0;
+
+            width: 100%;
+            height: 100%;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: flex-start;
+
+            overflow: hidden;
+
+            white-space: nowrap;
+
+            opacity: 1;
+        }
+
+
+        .anim-wrap.marquee-mode .ticker-text,
+        .anim-wrap-single.marquee-mode .ticker-text {
+
+            display: inline-block;
+
+            flex: 0 0 auto;
+
+            width: max-content;
+
+            max-width: none;
+
+            white-space: nowrap;
+
+            transform:
+                translateX(0);
+
+            will-change: transform;
+        }
+
+
+        .anim-wrap.marquee-mode .ticker-text,
+        .anim-wrap-single.marquee-mode .ticker-text {
+
+            animation:
+                tickerMarquee
+                var(--marquee-duration,18s)
+                linear
+                infinite;
+        }
+
+
+        /*
+           0-8% = starting text fully visible/still
+           then slow scroll
+        */
+
+        @keyframes tickerMarquee {
+
+            0% {
+
+                transform:
+                    translateX(0);
+            }
+
+            8% {
+
+                transform:
+                    translateX(0);
+            }
+
+            100% {
+
+                transform:
+                    translateX(
+                        calc(
+                            -1 *
+                            var(
+                                --scroll-distance,
+                                100px
+                            )
+                        )
+                    );
+            }
+        }
+
+
+        /* =========================================================
+           RESULT POPUP
+        ========================================================= */
+
+        #result-popup {
+
+            position: absolute;
+
+            top: 50%;
+            left: 50%;
+
+            transform:
+                translate(-50%,-50%)
+                scale(0);
+
+            background:
+                rgba(15,15,15,0.98);
+
+            border:
+                6px solid
+                #ffcc00;
+
+            padding:
+                50px 80px;
+
+            border-radius: 18px;
+
+            color: white;
+
+            text-align: center;
+
+            z-index: 100000;
+
+            transition:
+                all 0.6s
+                cubic-bezier(
+                    0.175,
+                    0.885,
+                    0.32,
+                    1.275
+                );
+
+            opacity: 0;
+
+            box-shadow:
+                0 20px 60px
+                rgba(0,0,0,0.95);
+        }
+
+
+        #result-popup.show {
+
+            transform:
+                translate(-50%,-50%)
+                scale(1);
+
+            opacity: 1;
+        }
+
+
+        .res-title {
+
+            font-size: 45px;
+
+            color: #ffcc00;
+
+            margin-bottom: 15px;
+
+            font-weight: 900;
+
+            border-bottom:
+                2px solid
+                rgba(255,204,0,0.4);
+
+            padding-bottom: 8px;
+
+            letter-spacing: 2px;
+        }
+
+
+        .res-text-pa {
+
+            font-size: 55px;
+
+            font-weight: 800;
+
+            line-height: 1.2;
+
+            color: #ffffff;
+
+            margin-bottom: 10px;
+
+            letter-spacing: 1.5px;
+        }
+
+
+        .res-text-en {
+
+            font-size: 45px;
+
+            font-weight: 800;
+
+            line-height: 1.2;
+
+            color: #3399ff;
+
+            letter-spacing: 1.5px;
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     LOGO
+========================================================= -->
+
+<div id="logo-container" class="hidden">
+
+    <img
+        id="main-logo"
+        src=""
+        alt="Logo"
+    >
+
+</div>
+
+
+<!-- =========================================================
+     WATERMARK
+========================================================= -->
+
+<div id="single-wm">
+    ਐੱਮ ਲਾਈਵ
+</div>
+
+
+<!-- =========================================================
+     RESULT POPUP
+========================================================= -->
+
+<div id="result-popup">
+
+    <div class="res-title">
+        🏆 ਮੈਚ ਨਤੀਜਾ / MATCH RESULT
+    </div>
+
+    <div
+        class="res-text-pa"
+        id="res-msg-pa"
+    >
+        ਵਿਨਰ ਨਾਮ
+    </div>
+
+    <div
+        class="res-text-en"
+        id="res-msg-en"
+    >
+        WINNER NAME
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     SCOREBOARD
+========================================================= -->
+
+<div id="top-scoreboard-container">
+
+    <div id="main-score-strip">
+
+        <div class="score-a">
+            <div
+                class="unskew"
+                id="sA"
+            >
+                0
+            </div>
+        </div>
+
+
+        <div class="team-a-panel">
+
+            <div
+                class="unskew"
+                id="nA"
+            >
+                ਟੀਮ 1
+            </div>
+
+        </div>
+
+
+        <div class="vs-divider">
+
+            <div class="unskew"></div>
+
+        </div>
+
+
+        <div class="team-b-panel">
+
+            <div
+                class="unskew"
+                id="nB"
+            >
+                ਟੀਮ 2
+            </div>
+
+        </div>
+
+
+        <div class="score-b">
+
+            <div
+                class="unskew"
+                id="sB"
+            >
+                0
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="match-details-strip"
+        class="hidden"
+    >
+
+        <div
+            class="unskew"
+            id="match-round"
+        ></div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     TICKER
+========================================================= -->
+
+<div id="ticker-wrap">
+
+
+    <!-- TOP STRIP -->
+
+    <div
+        class="ticker-strip strip-top"
+        id="strip-1"
+    >
+
+        <div class="ticker-col w-30">
+
+            <div
+                id="s1-left"
+                class="anim-wrap"
+            >
+                📍
+            </div>
+
+        </div>
+
+
+        <div class="ticker-col w-40">
+
+            <div
+                id="s1-mid"
+                class="anim-wrap"
+            >
+                ਇਵੈਂਟ
+            </div>
+
+        </div>
+
+
+        <div class="ticker-col w-30">
+
+            <div
+                id="s1-right"
+                class="anim-wrap"
+            >
+                ਆਉਣ ਵਾਲੇ ਮੇਲੇ
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- BOTTOM STRIP -->
+
+    <div
+        class="ticker-strip strip-bot"
+        id="strip-2"
+        style="display:none;"
+    >
+
+        <div class="ticker-col w-30">
+
+            <div
+                id="s2-left"
+                class="anim-wrap"
+            >
+                ਪਿੰਡ
+            </div>
+
+        </div>
+
+
+        <div class="ticker-col w-40">
+
+            <div
+                id="s2-mid"
+                class="anim-wrap"
+            >
+                ਲਾਈਵ ਮੈਚ
+            </div>
+
+        </div>
+
+
+        <div class="ticker-col w-30">
+
+            <div
+                id="s2-right"
+                class="anim-wrap"
+            >
+                ਵੇਰਵਾ
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+
+/* =========================================================
+   AUTO RESIZE
+========================================================= */
+
+function autoResizeOverlay() {
+
+    const baseWidth = 1920;
+    const baseHeight = 1080;
+
+    const scaleX =
+        window.innerWidth /
+        baseWidth;
+
+    const scaleY =
+        window.innerHeight /
+        baseHeight;
+
+    const scale =
+        Math.min(
+            scaleX,
+            scaleY
+        );
+
+    document.body.style.transform =
+        `scale(${scale})`;
+
+    document.body.style.width =
+        `${baseWidth}px`;
+
+    document.body.style.height =
+        `${baseHeight}px`;
+}
+
+
+window.addEventListener(
+    'resize',
+    autoResizeOverlay
+);
+
+window.addEventListener(
+    'load',
+    autoResizeOverlay
+);
+
+autoResizeOverlay();
+
+
+/* =========================================================
+   FIREBASE
+========================================================= */
+
+const firebaseConfig = {
+
+    databaseURL:
+        "https://my-scorebord-default-rtdb.firebaseio.com/"
+};
+
+
+firebase.initializeApp(
+    firebaseConfig
+);
+
+
+const urlParams =
+    new URLSearchParams(
+        window.location.search
+    );
+
+
+const matchId =
+    urlParams.get('id') ||
+    'defaultMatch';
+
+
+const db =
+    firebase
+        .database()
+        .ref(
+            "matchData/" +
+            matchId
+        );
+
+
+const userDb =
+    firebase
+        .database()
+        .ref(
+            "users/" +
+            matchId
+        );
+
+
+/* =========================================================
+   PLAN CHECK
+========================================================= */
+
+userDb.on(
+    "value",
+    (snap) => {
+
+        const user =
+            snap.val();
+
+        if (
+            !user ||
+            Date.now() >
+            new Date(
+                user.expiryDate
+            ).getTime()
+        ) {
+
+            document.body.innerHTML = `
+
+                <div style="
+                    width:100vw;
+                    height:100vh;
+                    display:flex;
+                    justify-content:center;
+                    align-items:center;
+                    background:black;
+                    color:white;
+                    font-size:50px;
+                    text-align:center;
+                ">
+
+                    🛑 ਪਲਾਨ ਖਤਮ ਹੋ ਗਿਆ ਹੈ
+                    <br>
+                    ਹੈਲਪ ਲਾਈਨ:
+                    ਮਨਪ੍ਰੀਤ ਮੁਦਕੀ
+                    <br>
+                    9115426711
+
+                </div>
+            `;
+        }
+
+    }
+);
+
+
+/* =========================================================
+   LOGO
+========================================================= */
+
+const clientLogos = {
+
+    "gurujastv":
+        "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/kabaddisports1.png"
+
+};
+
+
+/* =========================================================
+   GLOBAL VARIABLES
+========================================================= */
+
+let leftItems = [];
+
+let topCenterItems = [];
+
+let bottomCenterItems = [];
+
+let rightItems = [];
+
+
+let leftIdx = 0;
+
+let topCenterIdx = 0;
+
+let bottomCenterIdx = 0;
+
+let rightIdx = 0;
+
+
+let isEnglish = false;
+
+let hasMatches = false;
+
+let lastResult = "";
+
+let lastTickerSignature = "";
+
+
+/* =========================================================
+   MAP PIN
+========================================================= */
+
+const mapPinHtml = `
+
+    <img
+        src="https://i.ibb.co/68v8gG5/map-pin.png"
+        class="map-pin-icon"
+        alt="📍"
+    >
+
+`;
+
+
+/* =========================================================
+   TRANSLATION DICTIONARY
+========================================================= */
+
+const dict = {
+
+    "Kabaddi":
+        "ਕਬੱਡੀ",
+
+    "Open":
+        "ਓਪਨ",
+
+    "Quarter Final":
+        "ਕੁਆਰਟਰ ਫਾਈਨਲ",
+
+    "Semi Final":
+        "ਸੈਮੀ ਫਾਈਨਲ",
+
+    "Final":
+        "ਫਾਈਨਲ",
+
+    "1st Round":
+        "ਪਹਿਲਾ ਰਾਊਂਡ",
+
+    "2nd Round":
+        "ਦੂਜਾ ਰਾਊਂਡ",
+
+    "3rd Round":
+        "ਤੀਜਾ ਰਾਊਂਡ",
+
+    "4th Round":
+        "ਚੌਥਾ ਰਾਊਂਡ",
+
+    "Pool A":
+        "ਪੂਲ ਏ",
+
+    "Pool B":
+        "ਪੂਲ ਬੀ"
+
+};
+
+
+/* =========================================================
+   TRANSLATE
+========================================================= */
+
+function translateToPunjabi(text) {
+
+    if (!text)
+        return "";
+
+    let translated =
+        String(text).trim();
+
+
+    for (
+        let key in dict
+    ) {
+
+        let regex =
+            new RegExp(
+                key,
+                'gi'
+            );
+
+        translated =
+            translated.replace(
+                regex,
+                dict[key]
+            );
+    }
+
+
+    translated =
+        translated.replace(
+            /KG/gi,
+            "ਕਿਲੋ"
+        );
+
+
+    return translated;
+}
+
+
+/* =========================================================
+   ARRAY NORMALIZER
+========================================================= */
+
+function normalizeArray(value) {
+
+    if (Array.isArray(value)) {
+
+        return value.filter(
+            item =>
+                item !== null &&
+                item !== undefined &&
+                item !== ""
+        );
+    }
+
 
     if (
-        el.dataset.currentText === textToShow &&
-        el.dataset.language === String(isEnglish)
+        value &&
+        typeof value === "object"
     ) {
+
+        return Object.values(value)
+            .filter(
+                item =>
+                    item !== null &&
+                    item !== undefined &&
+                    item !== ""
+            );
+    }
+
+
+    return [];
+}
+
+
+/* =========================================================
+   GET EVENT DETAILS
+   ADMIN PANEL DE MULTIPLE FIELD SUPPORT
+========================================================= */
+
+function getEventDetails(data) {
+
+    let eventEn = "";
+
+    let eventPa = "";
+
+
+    /*
+       PRIMARY
+    */
+
+    if (data.programTxt) {
+
+        eventEn =
+            String(
+                data.programTxt
+            ).trim();
+    }
+
+
+    if (data.programTxt_pa) {
+
+        eventPa =
+            String(
+                data.programTxt_pa
+            ).trim();
+    }
+
+
+    /*
+       BACKUP
+    */
+
+    if (
+        !eventEn &&
+        data.eventName
+    ) {
+
+        eventEn =
+            String(
+                data.eventName
+            ).trim();
+    }
+
+
+    if (
+        !eventPa &&
+        data.eventName_pa
+    ) {
+
+        eventPa =
+            String(
+                data.eventName_pa
+            ).trim();
+    }
+
+
+    if (
+        !eventEn &&
+        data.eventTitle
+    ) {
+
+        eventEn =
+            String(
+                data.eventTitle
+            ).trim();
+    }
+
+
+    if (
+        !eventPa &&
+        data.eventTitle_pa
+    ) {
+
+        eventPa =
+            String(
+                data.eventTitle_pa
+            ).trim();
+    }
+
+
+    /*
+       NESTED EVENT OBJECT
+    */
+
+    if (
+        data.event &&
+        typeof data.event === "object"
+    ) {
+
+        if (
+            !eventEn &&
+            data.event.name
+        ) {
+
+            eventEn =
+                String(
+                    data.event.name
+                ).trim();
+        }
+
+
+        if (
+            !eventPa &&
+            data.event.name_pa
+        ) {
+
+            eventPa =
+                String(
+                    data.event.name_pa
+                ).trim();
+        }
+
+
+        if (
+            !eventEn &&
+            data.event.title
+        ) {
+
+            eventEn =
+                String(
+                    data.event.title
+                ).trim();
+        }
+
+
+        if (
+            !eventPa &&
+            data.event.title_pa
+        ) {
+
+            eventPa =
+                String(
+                    data.event.title_pa
+                ).trim();
+        }
+    }
+
+
+    /*
+       LANGUAGE FALLBACK
+    */
+
+    if (!eventPa)
+        eventPa = eventEn;
+
+    if (!eventEn)
+        eventEn = eventPa;
+
+
+    return {
+
+        en: eventEn,
+
+        pa: eventPa
+    };
+}
+
+
+/* =========================================================
+   FIREBASE REALTIME DATA
+========================================================= */
+
+db.on(
+    "value",
+    (snap) => {
+
+        const data =
+            snap.val() || {};
+
+
+        window.currentData =
+            data;
+
+
+        /* ================================================
+           LOGO
+        ================================================ */
+
+        const logoCont =
+            document.getElementById(
+                'logo-container'
+            );
+
+
+        const logoKey =
+            matchId
+                .trim()
+                .toLowerCase();
+
+
+        if (
+            clientLogos[logoKey] &&
+            data.logoVisible !== false
+        ) {
+
+            document.getElementById(
+                'main-logo'
+            ).src =
+                clientLogos[logoKey];
+
+
+            logoCont.classList.remove(
+                'hidden'
+            );
+
+        } else {
+
+            logoCont.classList.add(
+                'hidden'
+            );
+        }
+
+
+        /* ================================================
+           SCOREBOARD VISIBILITY
+        ================================================ */
+
+        document
+            .getElementById(
+                'top-scoreboard-container'
+            )
+            .classList.toggle(
+                'hidden',
+                data.scoreVisible === false
+            );
+
+
+        document
+            .getElementById(
+                'ticker-wrap'
+            )
+            .classList.toggle(
+                'hidden',
+                data.tickerVisible === false
+            );
+
+
+        /* ================================================
+           ROUND
+        ================================================ */
+
+        const roundText =
+            data.round || "";
+
+
+        const detailsStrip =
+            document.getElementById(
+                'match-details-strip'
+            );
+
+
+        if (
+            String(roundText)
+                .trim() === ""
+        ) {
+
+            detailsStrip.classList.add(
+                'hidden'
+            );
+
+        } else {
+
+            detailsStrip.classList.remove(
+                'hidden'
+            );
+
+
+            document.getElementById(
+                'match-round'
+            ).innerText =
+                translateToPunjabi(
+                    roundText
+                );
+        }
+
+
+        /* ================================================
+           SCORE
+        ================================================ */
+
+        document.getElementById(
+            'sA'
+        ).innerText =
+            data.scoreA ?? "0";
+
+
+        document.getElementById(
+            'sB'
+        ).innerText =
+            data.scoreB ?? "0";
+
+
+        /* ================================================
+           WATERMARK
+        ================================================ */
+
+        document.getElementById(
+            'single-wm'
+        ).innerText =
+            data.watermarkTxt ||
+            "ਐੱਮ ਲਾਈਵ";
+
+
+        /* ================================================
+           RESULT
+        ================================================ */
+
+        if (
+            data.resultText &&
+            data.resultText !==
+                "No Result Yet" &&
+            data.resultText !==
+                lastResult
+        ) {
+
+            lastResult =
+                data.resultText;
+
+            showResultPopup(
+                data.resultText
+            );
+        }
+
+
+        /* ================================================
+           TICKER
+        ================================================ */
+
+        processTickerData(
+            data
+        );
+
+    }
+);
+
+
+/* =========================================================
+   RESULT POPUP
+========================================================= */
+
+function showResultPopup(text) {
+
+    const popup =
+        document.getElementById(
+            'result-popup'
+        );
+
+
+    document.getElementById(
+        'res-msg-pa'
+    ).innerText =
+        translateToPunjabi(
+            text
+        );
+
+
+    document.getElementById(
+        'res-msg-en'
+    ).innerText =
+        text;
+
+
+    popup.classList.add(
+        'show'
+    );
+
+
+    setTimeout(
+        () => {
+
+            popup.classList.remove(
+                'show'
+            );
+
+        },
+        10000
+    );
+}
+
+
+/* =========================================================
+   PROCESS TICKER DATA
+========================================================= */
+
+function processTickerData(data) {
+
+
+    /* =====================================================
+       EVENT
+    ===================================================== */
+
+    const event =
+        getEventDetails(
+            data
+        );
+
+
+    /* =====================================================
+       LOCATION
+    ===================================================== */
+
+    const vNameEn =
+        data.row1Txt ||
+        data.location ||
+        data.villageName ||
+        "";
+
+
+    const vNamePa =
+        data.row1Txt_pa ||
+        data.location_pa ||
+        data.villageName_pa ||
+        vNameEn ||
+        "";
+
+
+    leftItems = [
+
+        {
+
+            topEn:
+                mapPinHtml,
+
+            topPa:
+                mapPinHtml,
+
+            botEn:
+                vNameEn,
+
+            botPa:
+                vNamePa,
+
+            singleEn:
+                `${mapPinHtml} ${vNameEn}`,
+
+            singlePa:
+                `${mapPinHtml} ${vNamePa}`
+        }
+
+    ];
+
+
+    /* =====================================================
+       TOP CENTER
+       EVENT DETAILS FROM ADMIN
+    ===================================================== */
+
+    topCenterItems = [];
+
+
+    if (
+        event.en ||
+        event.pa
+    ) {
+
+        topCenterItems.push({
+
+            pa:
+                `🏟️ ${event.pa}`,
+
+            en:
+                `🏟️ ${event.en}`
+        });
+
+    } else {
+
+        /*
+           EVENT DELETE HON TE
+           KABADDI TOURNAMENT NAHI AAVEGA
+        */
+
+        topCenterItems.push({
+
+            pa:
+                "🏟️ ਇਵੈਂਟ ਸੈੱਟ ਨਹੀਂ",
+
+            en:
+                "🏟️ EVENT NOT SET"
+        });
+    }
+
+
+    /* =====================================================
+       RESULT
+    ===================================================== */
+
+    if (
+        data.resultText &&
+        data.resultText !==
+            "No Result Yet"
+    ) {
+
+        const resText =
+            String(
+                data.resultText
+            );
+
+
+        topCenterItems.push({
+
+            pa:
+                `ਪਿਛਲਾ ਨਤੀਜਾ: ${
+                    translateToPunjabi(
+                        resText
+                    )
+                }`,
+
+            en:
+                `LAST RESULT: ${resText}`
+        });
+    }
+
+
+    /* =====================================================
+       OPEN PRIZES
+    ===================================================== */
+
+    if (data.pzOp1) {
+
+        topCenterItems.push({
+
+            pa:
+                `ਓਪਨ ਪਹਿਲਾ ਇਨਾਮ: ${data.pzOp1}`,
+
+            en:
+                `OPEN 1ST PRIZE: ${data.pzOp1}`
+        });
+    }
+
+
+    if (data.pzOp2) {
+
+        topCenterItems.push({
+
+            pa:
+                `ਓਪਨ ਦੂਜਾ ਇਨਾਮ: ${data.pzOp2}`,
+
+            en:
+                `OPEN 2ND PRIZE: ${data.pzOp2}`
+        });
+    }
+
+
+    if (data.pzOpBest) {
+
+        topCenterItems.push({
+
+            pa:
+                `ਓਪਨ ਬੈਸਟ ਖਿਡਾਰੀ: ${data.pzOpBest}`,
+
+            en:
+                `OPEN BEST PLAYER: ${data.pzOpBest}`
+        });
+    }
+
+
+    /* =====================================================
+       WEIGHT
+    ===================================================== */
+
+    const wKg =
+        data.pzWtKg
+            ? String(data.pzWtKg)
+            : "WEIGHT";
+
+
+    const wKgPa =
+        data.pzWtKg
+            ? translateToPunjabi(
+                String(data.pzWtKg)
+            )
+            : "ਵਜ਼ਨੀ";
+
+
+    if (data.pzWt1) {
+
+        topCenterItems.push({
+
+            pa:
+                `(${wKgPa}) ਪਹਿਲਾ ਇਨਾਮ: ${data.pzWt1}`,
+
+            en:
+                `(${wKg}) 1ST PRIZE: ${data.pzWt1}`
+        });
+    }
+
+
+    if (data.pzWt2) {
+
+        topCenterItems.push({
+
+            pa:
+                `(${wKgPa}) ਦੂਜਾ ਇਨਾਮ: ${data.pzWt2}`,
+
+            en:
+                `(${wKg}) 2ND PRIZE: ${data.pzWt2}`
+        });
+    }
+
+
+    if (data.pzWtBest) {
+
+        topCenterItems.push({
+
+            pa:
+                `(${wKgPa}) ਬੈਸਟ ਖਿਡਾਰੀ: ${data.pzWtBest}`,
+
+            en:
+                `(${wKg}) BEST PLAYER: ${data.pzWtBest}`
+        });
+    }
+
+
+    /* =====================================================
+       MATCH LIST
+    ===================================================== */
+
+    bottomCenterItems = [];
+
+
+    const matchesList =
+        normalizeArray(
+            data.nextMatches
+        );
+
+
+    hasMatches =
+        matchesList.length > 0;
+
+
+    function parseMatchFull(
+        m,
+        index
+    ) {
+
+        m =
+            String(m || "");
+
+
+        let bracketContent = "";
+
+        let teamPart = m;
+
+
+        if (
+            m.startsWith("(")
+        ) {
+
+            const closeIdx =
+                m.indexOf(")");
+
+
+            if (
+                closeIdx !== -1
+            ) {
+
+                bracketContent =
+                    m.substring(
+                        1,
+                        closeIdx
+                    ).trim();
+
+
+                teamPart =
+                    m.substring(
+                        closeIdx + 1
+                    ).trim();
+            }
+        }
+
+
+        const tms =
+            teamPart.split(
+                /\s+VS\s+/i
+            );
+
+
+        const t1Full =
+            (tms[0] || "")
+                .trim();
+
+
+        const t2Full =
+            (tms[1] || "")
+                .trim();
+
+
+        const t1Parts =
+            t1Full.split("=");
+
+
+        const t2Parts =
+            t2Full.split("=");
+
+
+        const t1En =
+            (
+                t1Parts[0] ||
+                ""
+            ).trim();
+
+
+        const t1Pa =
+            (
+                t1Parts[1] ||
+                t1En
+            ).trim();
+
+
+        const t2En =
+            (
+                t2Parts[0] ||
+                ""
+            ).trim();
+
+
+        const t2Pa =
+            (
+                t2Parts[1] ||
+                t2En
+            ).trim();
+
+
+        const bracketPa =
+            translateToPunjabi(
+                bracketContent
+            );
+
+
+        const tagPa =
+            bracketPa
+                ? `(${bracketPa}) `
+                : "";
+
+
+        const tagEn =
+            bracketContent
+                ? `(${bracketContent}) `
+                : "";
+
+
+        const numTag =
+            `${index + 1}. `;
+
+
+        const vsHtmlPa =
+            `
+            <span class="match-vs-3d">
+                ਬਨਾਮ
+            </span>
+            `;
+
+
+        const vsHtmlEn =
+            `
+            <span class="match-vs-3d">
+                VS
+            </span>
+            `;
+
+
+        return {
+
+            pa:
+                `${numTag}${tagPa}${t1Pa}${vsHtmlPa}${t2Pa}`,
+
+            en:
+                `${numTag}${tagEn}${t1En}${vsHtmlEn}${t2En}`
+        };
+    }
+
+
+    if (
+        hasMatches
+    ) {
+
+        matchesList.forEach(
+            (
+                mStr,
+                idx
+            ) => {
+
+                const res =
+                    parseMatchFull(
+                        mStr,
+                        idx
+                    );
+
+
+                bottomCenterItems.push({
+
+                    pa:
+                        res.pa,
+
+                    en:
+                        res.en
+                });
+
+            }
+        );
+
+    } else {
+
+        bottomCenterItems.push({
+
+            pa:
+                vNamePa
+                    ? `📍 ${vNamePa}`
+                    : "ਲਾਈਵ ਮੈਚ",
+
+            en:
+                vNameEn
+                    ? `📍 ${vNameEn}`
+                    : "LIVE MATCH"
+        });
+    }
+
+
+    /* =====================================================
+       UPCOMING EVENTS
+    ===================================================== */
+
+    rightItems = [];
+
+
+    const upcoming =
+        normalizeArray(
+            data.upcomingEvents
+        );
+
+
+    upcoming.forEach(
+        ev => {
+
+            if (!ev)
+                return;
+
+
+            const nameEn =
+                ev.name ||
+                ev.eventName ||
+                "";
+
+
+            const namePa =
+                ev.name_pa ||
+                ev.eventName_pa ||
+                nameEn;
+
+
+            const d =
+                ev.date
+                    ? ` (${ev.date})`
+                    : "";
+
+
+            if (
+                nameEn ||
+                namePa
+            ) {
+
+                rightItems.push({
+
+                    topPa:
+                        "ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ",
+
+                    topEn:
+                        "UPCOMING EVENTS",
+
+
+                    botPa:
+                        `${namePa}${d}`,
+
+                    botEn:
+                        `${nameEn}${d}`,
+
+
+                    singlePa:
+                        `ਆਉਣ ਵਾਲੇ ਮੇਲੇ: ${namePa}${d}`,
+
+                    singleEn:
+                        `UPCOMING EVENTS: ${nameEn}${d}`
+                });
+            }
+
+        }
+    );
+
+
+    /* =====================================================
+       LIVE TELECAST
+    ===================================================== */
+
+    if (
+        data.row6Txt ||
+        data.row6Txt_pa
+    ) {
+
+        const liveEn =
+            data.row6Txt ||
+            "LIVE STREAMING";
+
+
+        const livePa =
+            data.row6Txt_pa ||
+            data.row6Txt ||
+            "ਲਾਈਵ ਪ੍ਰਸਾਰਣ";
+
+
+        rightItems.push({
+
+            topPa:
+                "ਲਾਈਵ ਪ੍ਰਸਾਰਣ",
+
+            topEn:
+                "LIVE TELECAST",
+
+
+            botPa:
+                livePa,
+
+            botEn:
+                liveEn,
+
+
+            singlePa:
+                `ਲਾਈਵ ਪ੍ਰਸਾਰਣ: ${livePa}`,
+
+            singleEn:
+                `LIVE TELECAST: ${liveEn}`
+        });
+    }
+
+
+    /* =====================================================
+       DEFAULT RIGHT
+    ===================================================== */
+
+    if (
+        rightItems.length === 0
+    ) {
+
+        rightItems.push({
+
+            topPa:
+                "ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ",
+
+            topEn:
+                "UPCOMING EVENTS",
+
+
+            botPa:
+                "ਦੇਖਦੇ ਰਹੋ",
+
+            botEn:
+                "STAY TUNED",
+
+
+            singlePa:
+                "ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ - ਦੇਖਦੇ ਰਹੋ",
+
+            singleEn:
+                "UPCOMING EVENTS - STAY TUNED"
+        });
+    }
+
+
+    /* =====================================================
+       RESET INDEX ON REAL DATA CHANGE
+    ===================================================== */
+
+    const signature =
+        JSON.stringify({
+
+            eventEn:
+                event.en,
+
+            eventPa:
+                event.pa,
+
+            locationEn:
+                vNameEn,
+
+            locationPa:
+                vNamePa,
+
+            matches:
+                matchesList,
+
+            upcoming:
+                upcoming,
+
+            row6:
+                data.row6Txt,
+
+            row6pa:
+                data.row6Txt_pa,
+
+            prizes: [
+
+                data.pzOp1,
+                data.pzOp2,
+                data.pzOpBest,
+
+                data.pzWt1,
+                data.pzWt2,
+                data.pzWtBest
+            ]
+
+        });
+
+
+    if (
+        signature !==
+        lastTickerSignature
+    ) {
+
+        lastTickerSignature =
+            signature;
+
+
+        leftIdx = 0;
+
+        topCenterIdx = 0;
+
+        bottomCenterIdx = 0;
+
+        rightIdx = 0;
+
+
+        clearTickerElements();
+    }
+
+
+    /* =====================================================
+       STRIP 2
+    ===================================================== */
+
+    document
+        .getElementById(
+            'strip-2'
+        )
+        .style.display =
+            hasMatches
+                ? 'flex'
+                : 'none';
+
+
+    renderIndependentTickers();
+}
+
+
+/* =========================================================
+   CLEAR OLD TICKER
+========================================================= */
+
+function clearTickerElements() {
+
+    const ids = [
+
+        's1-left',
+        's1-mid',
+        's1-right',
+
+        's2-left',
+        's2-mid',
+        's2-right'
+
+    ];
+
+
+    ids.forEach(
+        id => {
+
+            const el =
+                document.getElementById(
+                    id
+                );
+
+
+            if (!el)
+                return;
+
+
+            el.dataset.currentText =
+                "";
+
+            el.dataset.language =
+                "";
+
+            el.innerHTML =
+                "";
+
+            el.className =
+                "anim-wrap";
+
+
+            el.style.removeProperty(
+                "--marquee-duration"
+            );
+
+
+            el.style.removeProperty(
+                "--scroll-distance"
+            );
+        }
+    );
+}
+
+
+/* =========================================================
+   DOUBLE TICKER
+   SAME ANIMATION AS SINGLE
+========================================================= */
+
+function runDoubleTicker(
+    elementId,
+    textToShow
+) {
+
+    const el =
+        document.getElementById(
+            elementId
+        );
+
+
+    if (!el)
+        return;
+
+
+    const languageKey =
+        String(isEnglish);
+
+
+    if (
+        el.dataset.currentText ===
+            textToShow &&
+
+        el.dataset.language ===
+            languageKey
+    ) {
+
         return;
     }
 
-    el.dataset.currentText = textToShow;
-    el.dataset.language = String(isEnglish);
 
-    el.className = "anim-wrap-single";
-    el.innerHTML = "";
+    el.dataset.currentText =
+        textToShow;
+
+    el.dataset.language =
+        languageKey;
+
+
+    el.className =
+        "anim-wrap";
+
+
+    el.innerHTML =
+        "";
+
+
+    const textNode =
+        document.createElement(
+            "span"
+        );
+
+
+    textNode.className =
+        "ticker-text";
+
+
+    /*
+       VS badge / map pin HTML support
+    */
+
+    textNode.innerHTML =
+        textToShow;
+
+
+    el.appendChild(
+        textNode
+    );
+
+
+    requestAnimationFrame(
+        () => {
+
+            const boxWidth =
+                el.clientWidth;
+
+
+            const textWidth =
+                textNode.scrollWidth;
+
+
+            /*
+               LONG TEXT
+            */
+
+            if (
+                textWidth >
+                boxWidth - 20
+            ) {
+
+                const distance =
+                    textWidth -
+                    boxWidth +
+                    30;
+
+
+                /*
+                   SLOW SPEED
+                   75 PX / SECOND
+                */
+
+                const duration =
+                    Math.max(
+                        12,
+                        distance / 75 + 2
+                    );
+
+
+                el.classList.add(
+                    "marquee-mode"
+                );
+
+
+                el.style.setProperty(
+                    "--scroll-distance",
+                    `${distance}px`
+                );
+
+
+                el.style.setProperty(
+                    "--marquee-duration",
+                    `${duration}s`
+                );
+
+
+                textNode.style.animation =
+                    "none";
+
+
+                void textNode.offsetWidth;
+
+
+                textNode.style.animation =
+                    `tickerMarquee ${duration}s linear infinite`;
+
+            } else {
+
+                /*
+                   SHORT TEXT
+                */
+
+                el.classList.add(
+                    "anim-center-in"
+                );
+            }
+
+        }
+    );
+}
+
+
+/* =========================================================
+   SINGLE TICKER
+========================================================= */
+
+function runSingleTicker(
+    elementId,
+    textToShow
+) {
+
+    const el =
+        document.getElementById(
+            elementId
+        );
+
+
+    if (!el)
+        return;
+
+
+    const languageKey =
+        String(isEnglish);
+
+
+    if (
+        el.dataset.currentText ===
+            textToShow &&
+
+        el.dataset.language ===
+            languageKey
+    ) {
+
+        return;
+    }
+
+
+    el.dataset.currentText =
+        textToShow;
+
+    el.dataset.language =
+        languageKey;
+
+
+    el.className =
+        "anim-wrap-single";
+
+
+    el.innerHTML =
+        "";
+
 
     el.style.removeProperty(
         "--marquee-duration"
     );
+
 
     el.style.removeProperty(
         "--scroll-distance"
@@ -28,65 +2776,496 @@ function runSingleTicker(elementId, textToShow) {
 
 
     const textNode =
-        document.createElement("span");
+        document.createElement(
+            "span"
+        );
+
 
     textNode.className =
         "ticker-text";
 
+
     textNode.innerHTML =
         textToShow;
 
-    el.appendChild(textNode);
+
+    el.appendChild(
+        textNode
+    );
 
 
-    requestAnimationFrame(() => {
+    requestAnimationFrame(
+        () => {
 
-        const boxWidth =
-            el.clientWidth;
-
-        const textWidth =
-            textNode.scrollWidth;
+            const boxWidth =
+                el.clientWidth;
 
 
-        if (textWidth > boxWidth - 20) {
+            const textWidth =
+                textNode.scrollWidth;
 
-            const distance =
-                textWidth - boxWidth + 30;
 
-            const duration =
-                Math.max(
-                    12,
-                    distance / 75 + 2
+            /*
+               LONG TEXT
+            */
+
+            if (
+                textWidth >
+                boxWidth - 20
+            ) {
+
+                const distance =
+                    textWidth -
+                    boxWidth +
+                    30;
+
+
+                const duration =
+                    Math.max(
+                        12,
+                        distance / 75 + 2
+                    );
+
+
+                el.classList.add(
+                    "marquee-mode"
                 );
 
 
-            el.classList.add(
-                "marquee-mode"
+                el.style.setProperty(
+                    "--scroll-distance",
+                    `${distance}px`
+                );
+
+
+                el.style.setProperty(
+                    "--marquee-duration",
+                    `${duration}s`
+                );
+
+
+                textNode.style.animation =
+                    "none";
+
+
+                void textNode.offsetWidth;
+
+
+                textNode.style.animation =
+                    `tickerMarquee ${duration}s linear infinite`;
+
+            } else {
+
+                /*
+                   SHORT TEXT
+                */
+
+                el.classList.add(
+                    "anim-center-in"
+                );
+            }
+
+        }
+    );
+}
+
+
+/* =========================================================
+   RENDER ALL TICKERS
+   EACH LINE INDEPENDENT
+========================================================= */
+
+function renderIndependentTickers() {
+
+    if (
+        !leftItems.length ||
+        !topCenterItems.length ||
+        !bottomCenterItems.length ||
+        !rightItems.length
+    ) {
+
+        return;
+    }
+
+
+    const L =
+        leftItems[
+            leftIdx %
+            leftItems.length
+        ];
+
+
+    const TC =
+        topCenterItems[
+            topCenterIdx %
+            topCenterItems.length
+        ];
+
+
+    const BC =
+        bottomCenterItems[
+            bottomCenterIdx %
+            bottomCenterItems.length
+        ];
+
+
+    const R =
+        rightItems[
+            rightIdx %
+            rightItems.length
+        ];
+
+
+    /* =====================================================
+       TWO STRIPS
+    ===================================================== */
+
+    if (hasMatches) {
+
+        document
+            .getElementById(
+                'strip-2'
+            )
+            .style.display =
+                'flex';
+
+
+        /*
+           TOP
+        */
+
+        runDoubleTicker(
+            's1-left',
+            isEnglish
+                ? L.topEn
+                : L.topPa
+        );
+
+
+        runSingleTicker(
+            's1-mid',
+            isEnglish
+                ? TC.en
+                : TC.pa
+        );
+
+
+        runDoubleTicker(
+            's1-right',
+            isEnglish
+                ? R.topEn
+                : R.topPa
+        );
+
+
+        /*
+           BOTTOM
+        */
+
+        runDoubleTicker(
+            's2-left',
+            isEnglish
+                ? L.botEn
+                : L.botPa
+        );
+
+
+        runDoubleTicker(
+            's2-mid',
+            isEnglish
+                ? BC.en
+                : BC.pa
+        );
+
+
+        runDoubleTicker(
+            's2-right',
+            isEnglish
+                ? R.botEn
+                : R.botPa
+        );
+
+
+    } else {
+
+
+        /*
+           ONLY TOP STRIP
+        */
+
+        document
+            .getElementById(
+                'strip-2'
+            )
+            .style.display =
+                'none';
+
+
+        runSingleTicker(
+            's1-left',
+            isEnglish
+                ? L.singleEn
+                : L.singlePa
+        );
+
+
+        runSingleTicker(
+            's1-mid',
+            isEnglish
+                ? TC.en
+                : TC.pa
+        );
+
+
+        runSingleTicker(
+            's1-right',
+            isEnglish
+                ? R.singleEn
+                : R.singlePa
+        );
+    }
+}
+
+
+/* =========================================================
+   ITEM CHANGE
+   EVERY LINE HAS ITS OWN INDEX
+========================================================= */
+
+setInterval(
+    () => {
+
+        leftIdx++;
+
+        topCenterIdx++;
+
+        bottomCenterIdx++;
+
+        rightIdx++;
+
+
+        renderIndependentTickers();
+
+    },
+    8000
+);
+
+
+/* =========================================================
+   PUNJABI / ENGLISH
+========================================================= */
+
+setInterval(
+    () => {
+
+        isEnglish =
+            !isEnglish;
+
+
+        /*
+           Language change te
+           har ticker apni animation restart kare
+        */
+
+        [
+            's1-left',
+            's1-mid',
+            's1-right',
+            's2-left',
+            's2-mid',
+            's2-right'
+        ].forEach(
+            id => {
+
+                const el =
+                    document.getElementById(
+                        id
+                    );
+
+                if (el) {
+
+                    el.dataset.language =
+                        "";
+                }
+            }
+        );
+
+
+        renderIndependentTickers();
+
+    },
+    14000
+);
+
+
+/* =========================================================
+   LOGO ANIMATION
+========================================================= */
+
+setInterval(
+    () => {
+
+        const logoBox =
+            document.getElementById(
+                'logo-container'
             );
 
-            el.style.setProperty(
-                "--scroll-distance",
-                `${distance}px`
+
+        if (
+            logoBox &&
+            !logoBox.classList.contains(
+                'hidden'
+            )
+        ) {
+
+            logoBox.classList.add(
+                'animate-slow-spin'
             );
 
-            el.style.setProperty(
-                "--marquee-duration",
-                `${duration}s`
-            );
 
+            setTimeout(
+                () => {
 
-            textNode.style.animation = "none";
+                    logoBox.classList.remove(
+                        'animate-slow-spin'
+                    );
 
-            void textNode.offsetWidth;
-
-            textNode.style.animation =
-                `tickerMarquee ${duration}s linear infinite`;
-
-        } else {
-
-            el.classList.add(
-                "anim-center-in"
+                },
+                2200
             );
         }
-    });
+
+    },
+    15000
+);
+
+
+/* =========================================================
+   SCOREBOARD TEAM NAMES
+========================================================= */
+
+setInterval(
+    () => {
+
+        const d =
+            window.currentData;
+
+
+        if (!d)
+            return;
+
+
+        document.getElementById(
+            'nA'
+        ).innerText =
+
+            (
+                !isEnglish &&
+                d.nameA_pa
+            )
+
+                ? d.nameA_pa
+
+                : (
+                    d.nameA ||
+                    "ਟੀਮ 1"
+                );
+
+
+        document.getElementById(
+            'nB'
+        ).innerText =
+
+            (
+                !isEnglish &&
+                d.nameB_pa
+            )
+
+                ? d.nameB_pa
+
+                : (
+                    d.nameB ||
+                    "ਟੀਮ 2"
+                );
+
+    },
+    2000
+);
+
+
+/* =========================================================
+   MOVING WATERMARK
+========================================================= */
+
+const wm =
+    document.getElementById(
+        'single-wm'
+    );
+
+
+let x = 200;
+
+let y = 200;
+
+let dx = 1.8;
+
+let dy = 1.4;
+
+
+function animateWatermark() {
+
+    const maxX =
+        1920 -
+        wm.offsetWidth -
+        50;
+
+
+    const maxY =
+        950 -
+        wm.offsetHeight;
+
+
+    x += dx;
+
+    y += dy;
+
+
+    if (
+        x <= 50 ||
+        x >= maxX
+    ) {
+
+        dx *= -1;
+    }
+
+
+    if (
+        y <= 120 ||
+        y >= maxY
+    ) {
+
+        dy *= -1;
+    }
+
+
+    wm.style.left =
+        x + 'px';
+
+
+    wm.style.top =
+        y + 'px';
+
+
+    requestAnimationFrame(
+        animateWatermark
+    );
 }
+
+
+animateWatermark();
+
+
+</script>
+
+</body>
+</html>
