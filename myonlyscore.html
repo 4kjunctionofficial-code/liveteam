@@ -502,9 +502,9 @@
 
         .map-pin-icon {
 
-            width: 32px;
+            width: 34px;
 
-            height: 32px;
+            height: 34px;
 
             object-fit: contain;
 
@@ -513,10 +513,10 @@
             filter:
                 drop-shadow(
                     0 2px 4px
-                    rgba(0,0,0,0.4)
+                    rgba(0,0,0,0.5)
                 );
 
-            margin-right: 8px;
+            margin-right: 10px;
         }
 
 
@@ -772,116 +772,6 @@
             }
         }
 
-
-        /* =========================================================
-            RESULT POPUP
-        ========================================================= */
-
-        #result-popup {
-
-            position: absolute;
-
-            top: 50%;
-            left: 50%;
-
-            transform:
-                translate(-50%,-50%)
-                scale(0);
-
-            background:
-                rgba(15,15,15,0.98);
-
-            border:
-                6px solid
-                #ffcc00;
-
-            padding:
-                50px 80px;
-
-            border-radius: 18px;
-
-            color: white;
-
-            text-align: center;
-
-            z-index: 100000;
-
-            transition:
-                all 0.6s
-                cubic-bezier(
-                    0.175,
-                    0.885,
-                    0.32,
-                    1.275
-                );
-
-            opacity: 0;
-
-            box-shadow:
-                0 20px 60px
-                rgba(0,0,0,0.95);
-        }
-
-
-        #result-popup.show {
-
-            transform:
-                translate(-50%,-50%)
-                scale(1);
-
-            opacity: 1;
-        }
-
-
-        .res-title {
-
-            font-size: 45px;
-
-            color: #ffcc00;
-
-            margin-bottom: 15px;
-
-            font-weight: 900;
-
-            border-bottom:
-                2px solid
-                rgba(255,204,0,0.4);
-
-            padding-bottom: 8px;
-
-            letter-spacing: 2px;
-        }
-
-
-        .res-text-pa {
-
-            font-size: 55px;
-
-            font-weight: 800;
-
-            line-height: 1.2;
-
-            color: #ffffff;
-
-            margin-bottom: 10px;
-
-            letter-spacing: 1.5px;
-        }
-
-
-        .res-text-en {
-
-            font-size: 45px;
-
-            font-weight: 800;
-
-            line-height: 1.2;
-
-            color: #3399ff;
-
-            letter-spacing: 1.5px;
-        }
-
     </style>
 </head>
 
@@ -910,33 +800,6 @@
 
 <div id="single-wm">
     ਐੱਮ ਲਾਈਵ
-</div>
-
-
-<!-- =========================================================
-     RESULT POPUP
-========================================================= -->
-
-<div id="result-popup">
-
-    <div class="res-title">
-        🏆 ਮੈਚ ਨਤੀਜਾ / MATCH RESULT
-    </div>
-
-    <div
-        class="res-text-pa"
-        id="res-msg-pa"
-    >
-        ਵਿਨਰ ਨਾਮ
-    </div>
-
-    <div
-        class="res-text-en"
-        id="res-msg-en"
-    >
-        WINNER NAME
-    </div>
-
 </div>
 
 
@@ -1038,7 +901,6 @@
                 id="s1-left"
                 class="anim-wrap"
             >
-                📍
             </div>
 
         </div>
@@ -1299,23 +1161,20 @@ let isEnglish = false;
 
 let hasMatches = false;
 
-let lastResult = "";
-
 let lastTickerSignature = "";
 
 
 /* =========================================================
-   MAP PIN (Updated with your custom icon)
+   MAP PIN
 ========================================================= */
 
 const mapPinHtml = `
-
     <img
-        src="https://i.ibb.co/68v8gG5/map-pin.png"
+        src="https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/map-pin.png"
         class="map-pin-icon"
         alt="📍"
+        onerror="this.onerror=null; this.src='https://i.ibb.co/68v8gG5/map-pin.png';"
     >
-
 `;
 
 
@@ -1711,73 +1570,12 @@ db.on(
             "ਐੱਮ ਲਾਈਵ";
 
 
-        if (
-            data.resultText &&
-            data.resultText !==
-                "No Result Yet" &&
-            data.resultText !==
-                lastResult
-        ) {
-
-            lastResult =
-                data.resultText;
-
-            showResultPopup(
-                data.resultText
-            );
-        }
-
-
         processTickerData(
             data
         );
 
     }
 );
-
-
-/* =========================================================
-   RESULT POPUP
-========================================================= */
-
-function showResultPopup(text) {
-
-    const popup =
-        document.getElementById(
-            'result-popup'
-        );
-
-
-    document.getElementById(
-        'res-msg-pa'
-    ).innerText =
-        translateToPunjabi(
-            text
-        );
-
-
-    document.getElementById(
-        'res-msg-en'
-    ).innerText =
-        text;
-
-
-    popup.classList.add(
-        'show'
-    );
-
-
-    setTimeout(
-        () => {
-
-            popup.classList.remove(
-                'show'
-            );
-
-        },
-        10000
-    );
-}
 
 
 /* =========================================================
@@ -1813,10 +1611,10 @@ function processTickerData(data) {
         {
 
             topEn:
-                mapPinHtml,
+                `${mapPinHtml}`,
 
             topPa:
-                mapPinHtml,
+                `${mapPinHtml}`,
 
             botEn:
                 vNameEn,
@@ -1864,6 +1662,10 @@ function processTickerData(data) {
     }
 
 
+    /* =====================================================
+       RESULT (Added directly into Ticker sequence if available)
+    ===================================================== */
+
     if (
         data.resultText &&
         data.resultText !==
@@ -1879,14 +1681,14 @@ function processTickerData(data) {
         topCenterItems.push({
 
             pa:
-                `ਪਿਛਲਾ ਨਤੀਜਾ: ${
+                `ਨਤੀਜਾ: ${
                     translateToPunjabi(
                         resText
                     )
                 }`,
 
             en:
-                `LAST RESULT: ${resText}`
+                `RESULT: ${resText}`
         });
     }
 
@@ -2130,10 +1932,10 @@ function processTickerData(data) {
         return {
 
             pa:
-                `${numTag}${tagPa}${t1Pa}${vsHtmlPa}${t2Pa}`,
+                `${numTag}${tagPa}${t1Pa} ${vsHtmlPa} ${t2Pa}`,
 
             en:
-                `${numTag}${tagEn}${t1En}${vsHtmlEn}${t2En}`
+                `${numTag}${tagEn}${t1En} ${vsHtmlEn} ${t2En}`
         };
     }
 
@@ -2865,7 +2667,7 @@ function renderIndependentTickers() {
 
 
 /* =========================================================
-   ITEM CHANGE TIMING (Slower interval: 12 seconds)
+   ITEM CHANGE TIMING (12 seconds)
 ========================================================= */
 
 setInterval(
