@@ -47,7 +47,6 @@ textarea { resize: vertical; overflow-y: auto; min-height: 50px; max-height: 200
 .list-header { font-size: 15px; font-weight: 900; padding: 5px 0; border-bottom: 2px solid #ddd; margin-bottom: 10px; color: #444; }
 
 .prize-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #ddd; }
-.prize-col label { font-size: 14px; font-weight: bold; color: #1a73e8; margin-bottom: 8px; display: block; border-bottom: 2px solid #1a73e8; padding-bottom: 2px; }
 .prize-col input { font-size: 14px; padding: 8px; margin-bottom: 6px; }
 .setup-box { background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
 
@@ -181,26 +180,25 @@ textarea { resize: vertical; overflow-y: auto; min-height: 50px; max-height: 200
             <input type="text" id="row1Inp_pa" class="team-input" placeholder="Translated Village">
         </div>
 
-        <label class="ticker-label">🏟️ Program & Match Categories (e.g. Pind War Open, All Open, Multiple Weights)</label>
+        <label class="ticker-label">🏟️ Event Details & Program (e.g. Kabaddi Cup, Show Match, Tournament)</label>
         <div class="team-inputs-wrap" style="margin-bottom:10px;">
             <div class="team-input-row">
-                <input type="text" id="programInp" class="team-input" placeholder="e.g. PIND WAR OPEN & 72 KG WEIGHT">
+                <input type="text" id="programInp" class="team-input" placeholder="e.g. KABADDI CUP / SHOW MATCH">
                 <button class="trans-btn" onclick="translateToInput('programInp', 'programInp_pa')">⇄</button>
             </div>
-            <input type="text" id="programInp_pa" class="team-input" placeholder="ਪ੍ਰੋਗਰਾਮ ਪੰਜਾਬੀ ਵਿੱਚ (ਜਿਵੇਂ: ਪਿੰਡ ਵਾਰ ਓਪਨ ਅਤੇ 72 ਕਿਲੋ)">
+            <input type="text" id="programInp_pa" class="team-input" placeholder="ਪ੍ਰੋਗਰਾਮ ਜਾਂ ਕੱਪ ਪੰਜਾਬੀ ਵਿੱਚ (ਜਿਵੇਂ: ਕਬੱਡੀ ਕੱਪ / ਸ਼ੋਅ ਮੈਚ)">
         </div>
 
-        <label class="ticker-label">2. Tournament Prizes</label>
+        <label class="ticker-label">2. Tournament Prizes (Enter Match/Category Names freely)</label>
         <div class="prize-grid">
             <div class="prize-col">
-                <label>🔥 OPEN KABADDI</label>
+                <input type="text" id="pzTitle1" placeholder="Match/Category 1 (e.g. PIND WAR OPEN)" style="background:#fff3cd; border-color:#ffecb5; color:#856404; font-weight:bold;">
                 <input type="text" id="pzOp1" placeholder="1st Prize">
                 <input type="text" id="pzOp2" placeholder="2nd Prize">
                 <input type="text" id="pzOpBest" placeholder="Best Player Prize">
             </div>
             <div class="prize-col">
-                <label>🏋️ WEIGHT KABADDI</label>
-                <input type="text" id="pzWtKg" placeholder="Kinne KG? (e.g. 72 KG)" style="background:#fff3cd; border-color:#ffecb5; color:#856404;">
+                <input type="text" id="pzTitle2" placeholder="Match/Category 2 (e.g. 72 KG WEIGHT)" style="background:#fff3cd; border-color:#ffecb5; color:#856404; font-weight:bold;">
                 <input type="text" id="pzWt1" placeholder="1st Prize">
                 <input type="text" id="pzWt2" placeholder="2nd Prize">
                 <input type="text" id="pzWtBest" placeholder="Best Player Prize">
@@ -301,32 +299,40 @@ function syncAds() {
     db.update({ adsText: adsArr.join(" | ") });
 }
 
-// ਸਾਰੀਆਂ ਟਿਕਰ ਡਿਟੇਲਜ਼ (ਵਿਲੇਜ, ਪ੍ਰੋਗਰਾਮ ਅਤੇ ਪ੍ਰਾਈਜ਼) ਨੂੰ ਇੱਕੋ ਵਾਰ ਅੱਪਡੇਟ ਕਰਨ ਵਾਲਾ ਫੰਕਸ਼ਨ
+// ਸਾਰੀਆਂ ਟਿਕਰ ਡਿਟੇਲਜ਼ (ਵਿਲੇਜ, ਪ੍ਰੋਗਰਾਮ/ਕੱਪ ਅਤੇ ਕਸਟਮ ਪ੍ਰਾਈਜ਼ ਕੈਟੇਗਰੀਆਂ) ਨੂੰ ਇੱਕੋ ਵਾਰ ਅੱਪਡੇਟ ਕਰਨ ਵਾਲਾ ਫੰਕਸ਼ਨ
 function updateAllTickerDetails() {
     let row1Txt = document.getElementById("row1Inp").value.trim();
     let row1Txt_pa = document.getElementById("row1Inp_pa").value.trim();
     let programTxt = document.getElementById("programInp").value.trim();
     let programTxt_pa = document.getElementById("programInp_pa").value.trim();
 
+    let pzTitle1 = document.getElementById("pzTitle1").value.trim();
     let pzOp1 = document.getElementById("pzOp1").value;
     let pzOp2 = document.getElementById("pzOp2").value;
     let pzOpBest = document.getElementById("pzOpBest").value;
-    let pzWtKg = document.getElementById("pzWtKg").value;
+
+    let pzTitle2 = document.getElementById("pzTitle2").value.trim();
     let pzWt1 = document.getElementById("pzWt1").value;
     let pzWt2 = document.getElementById("pzWt2").value;
     let pzWtBest = document.getElementById("pzWtBest").value;
 
     let pzArr = [];
-    if(pzOp1 || pzOp2 || pzOpBest) {
+    if(pzOp1 || pzOp2 || pzOpBest || pzTitle1) {
+        let title1 = pzTitle1 ? pzTitle1 : "CATEGORY 1";
         let parts = [];
-        if(pzOp1) parts.push("1st: " + pzOp1); if(pzOp2) parts.push("2nd: " + pzOp2); if(pzOpBest) parts.push("Best: " + pzOpBest);
-        pzArr.push("🔥 OPEN: " + parts.join(" | "));
+        if(pzOp1) parts.push("1st: " + pzOp1); 
+        if(pzOp2) parts.push("2nd: " + pzOp2); 
+        if(pzOpBest) parts.push("Best: " + pzOpBest);
+        pzArr.push("🔥 " + title1 + ": " + (parts.length > 0 ? parts.join(" | ") : ""));
     }
-    let wtKgDisplay = pzWtKg ? pzWtKg : "WEIGHT";
-    if(pzWt1 || pzWt2 || pzWtBest) {
+
+    if(pzWt1 || pzWt2 || pzWtBest || pzTitle2) {
+        let title2 = pzTitle2 ? pzTitle2 : "CATEGORY 2";
         let parts = [];
-        if(pzWt1) parts.push("1st: " + pzWt1); if(pzWt2) parts.push("2nd: " + pzWt2); if(pzWtBest) parts.push("Best: " + pzWtBest);
-        pzArr.push("🏋️ " + wtKgDisplay + ": " + parts.join(" | "));
+        if(pzWt1) parts.push("1st: " + pzWt1); 
+        if(pzWt2) parts.push("2nd: " + pzWt2); 
+        if(pzWtBest) parts.push("Best: " + pzWtBest);
+        pzArr.push("🏋️ " + title2 + ": " + (parts.length > 0 ? parts.join(" | ") : ""));
     }
     let row2Txt = pzArr.join(" 🔴 ");
 
@@ -335,10 +341,11 @@ function updateAllTickerDetails() {
         row1Txt_pa: row1Txt_pa,
         programTxt: programTxt,
         programTxt_pa: programTxt_pa,
+        pzTitle1: pzTitle1,
         pzOp1: pzOp1,
         pzOp2: pzOp2,
         pzOpBest: pzOpBest,
-        pzWtKg: pzWtKg,
+        pzTitle2: pzTitle2,
         pzWt1: pzWt1,
         pzWt2: pzWt2,
         pzWtBest: pzWtBest,
@@ -372,20 +379,6 @@ async function translateBatchTeams() {
     } catch(e) { alert("Translation error! Check internet."); }
 }
 
-async function translateAndSync(sourceId, targetId, overrideKey = null) {
-    const text = document.getElementById(sourceId).value;
-    const targetLang = document.getElementById("targetLang").value; 
-    if(!text) return;
-    try {
-        const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`);
-        const data = await res.json();
-        const translated = data[0][0][0];
-        document.getElementById(targetId).value = translated;
-        let dbKey = overrideKey ? overrideKey : targetId;
-        db.update({ [dbKey]: translated });
-    } catch(e) { alert("Translation error! Check internet."); }
-}
-
 db.on("value", (snap) => {
     const data = snap.val();
     if(data) {
@@ -401,8 +394,11 @@ db.on("value", (snap) => {
         setSafely("programInp", data.programTxt); setSafely("programInp_pa", data.programTxt_pa);
         setSafely("row3Inp", data.row3Txt); setSafely("row6Inp", data.row6Txt);
         setSafely("watermarkInp", data.watermarkTxt);
+        
+        setSafely("pzTitle1", data.pzTitle1);
         setSafely("pzOp1", data.pzOp1); setSafely("pzOp2", data.pzOp2); setSafely("pzOpBest", data.pzOpBest);
-        setSafely("pzWtKg", data.pzWtKg); setSafely("pzWt1", data.pzWt1); setSafely("pzWt2", data.pzWt2); setSafely("pzWtBest", data.pzWtBest);
+        setSafely("pzTitle2", data.pzTitle2);
+        setSafely("pzWt1", data.pzWt1); setSafely("pzWt2", data.pzWt2); setSafely("pzWtBest", data.pzWtBest);
         setSafely("allTeamsInp", allTeams.join("\n"));
 
         setSafely("adComm", data.adComm); setSafely("adSound", data.adSound); setSafely("adTent", data.adTent); setSafely("adSec", data.adSec);
