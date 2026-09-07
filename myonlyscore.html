@@ -31,27 +31,31 @@
         .unskew { transform: skewX(-16deg); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; overflow: hidden; position: relative; }
         
         .score-a { background: linear-gradient(135deg, #0066cc, #0099ff); color: #ffffff; font-size: 58px; font-weight: 900; padding: 0 38px; font-family: 'Bebas Neue', sans-serif; }
-        .team-a-panel { background: linear-gradient(135deg, #1a8cff, #4da6ff); color: #ffffff; font-size: 38px; font-weight: 800; padding: 0 30px; white-space: nowrap; min-width: 180px; max-width: 280px; letter-spacing: 1.5px; overflow: hidden; position: relative; }
+        .team-a-panel { background: linear-gradient(135deg, #1a8cff, #4da6ff); color: #ffffff; font-size: 38px; font-weight: 800; padding: 0 30px; white-space: nowrap; min-width: 180px; max-width: 320px; letter-spacing: 1.5px; overflow: hidden; position: relative; }
         .vs-divider { width: 12px; background: #111111; flex-shrink: 0; }
-        .team-b-panel { background: linear-gradient(135deg, #1f1f1f, #2e2e2e); color: #ffffff; font-size: 38px; font-weight: 800; padding: 0 30px; white-space: nowrap; min-width: 180px; max-width: 280px; letter-spacing: 1.5px; overflow: hidden; position: relative; }
+        .team-b-panel { background: linear-gradient(135deg, #1f1f1f, #2e2e2e); color: #ffffff; font-size: 38px; font-weight: 800; padding: 0 30px; white-space: nowrap; min-width: 180px; max-width: 320px; letter-spacing: 1.5px; overflow: hidden; position: relative; }
         .score-b { background: linear-gradient(135deg, #0a0a0a, #1a1a1a); color: #ffcc00; font-size: 58px; font-weight: 900; padding: 0 38px; font-family: 'Bebas Neue', sans-serif; }
 
-        /* Proper Smooth Marquee for Scoreboard Panels */
+        /* Fixed Speed Smooth Marquee */
         .panel-text {
             display: inline-block;
             white-space: nowrap;
             will-change: transform;
             position: absolute;
-            left: 10%;
+            left: 50%;
+            transform: translateX(-50%);
         }
         .panel-scroll {
-            animation: teamProperMarquee var(--panel-duration, 12s) linear infinite;
+            position: absolute;
+            left: 10%;
+            transform: translateX(0%);
+            animation: teamFixedMarquee 14s linear infinite;
         }
-        @keyframes teamProperMarquee {
+        @keyframes teamFixedMarquee {
             0% { transform: translateX(10%); }
             10% { transform: translateX(0%); }
-            90% { transform: translateX(calc(-1 * var(--panel-distance, 100px) - 10%)); }
-            100% { transform: translateX(calc(-1 * var(--panel-distance, 100px))); }
+            90% { transform: translateX(calc(-1 * var(--panel-distance, 150px) - 10%)); }
+            100% { transform: translateX(calc(-1 * var(--panel-distance, 150px))); }
         }
 
         #match-details-strip {
@@ -121,7 +125,6 @@
             animation: slowForwardMarquee var(--marquee-duration, 25s) linear infinite;
         }
 
-        /* 10% Start & 10% End Buffer for Tickers */
         @keyframes slowForwardMarquee {
             0% { transform: translateX(10%); }
             10% { transform: translateX(0%); }
@@ -447,7 +450,7 @@ setInterval(() => {
     const logoBox = document.getElementById('logo-container');
     if (logoBox && !logoBox.classList.contains('hidden')) {
         logoBox.classList.add('animate-slow-spin');
-        setTimeout(() => { logoBox.classList.remove('animate-slow-spin'); }, 2200);
+        setTimeout(() => { logoBox.classList.remove('logo-container'); logoBox.classList.remove('animate-slow-spin'); }, 2200);
     }
 }, 15000);
 
@@ -466,7 +469,8 @@ setInterval(() => {
 
     setTimeout(() => {
         const parentAWidth = teamAEl.parentElement.clientWidth;
-        if(teamAEl.scrollWidth > parentAWidth - 20) {
+        // Triggers scroll only if text length exceeds 60% of the panel width
+        if(teamAEl.scrollWidth > parentAWidth * 0.6) {
             const distanceA = teamAEl.scrollWidth - parentAWidth + 40;
             teamAEl.style.setProperty("--panel-distance", `${distanceA}px`);
             teamAEl.classList.add('panel-scroll');
@@ -475,7 +479,7 @@ setInterval(() => {
         }
 
         const parentBWidth = teamBEl.parentElement.clientWidth;
-        if(teamBEl.scrollWidth > parentBWidth - 20) {
+        if(teamBEl.scrollWidth > parentBWidth * 0.6) {
             const distanceB = teamBEl.scrollWidth - parentBWidth + 40;
             teamBEl.style.setProperty("--panel-distance", `${distanceB}px`);
             teamBEl.classList.add('panel-scroll');
