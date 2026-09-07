@@ -53,14 +53,12 @@
         
         .ticker-strip { display: flex; width: 100%; height: 75px; }
         
-        /* Top Strip - Sky Blue Gradient & Height 75px with Double Borders (No Shadow) */
         .strip-top {
             background: linear-gradient(90deg, #00b4db, #0083b0, #00b4db);
             border-top: 4px double rgba(255,255,255,0.35);
             border-bottom: 4px double rgba(255,255,255,0.35);
         }
         
-        /* Bottom Strip - Blackish Gray & Height 75px with Double Borders (No Shadow) */
         .strip-bot {
             background: linear-gradient(90deg, #0d0d0d, #1a1a1a, #0d0d0d);
             border-top: 4px double rgba(255,255,255,0.25);
@@ -92,7 +90,7 @@
         .anim-wrap.marquee-mode .ticker-text, .anim-wrap-single.marquee-mode .ticker-text { display: inline-block; flex: 0 0 auto; width: max-content; max-width: none; white-space: nowrap; transform: translateX(0); will-change: transform; animation: tickerMarquee var(--marquee-duration,18s) linear infinite; }
         @keyframes tickerMarquee {
             0% { transform: translateX(0); }
-            8% { transform: translateX(0); }
+            10% { transform: translateX(0); }
             100% { transform: translateX(calc(-1 * var(--scroll-distance, 100px))); }
         }
     </style>
@@ -357,8 +355,8 @@ function runDoubleTicker(elementId, textToShow) {
     requestAnimationFrame(() => {
         const boxWidth = el.clientWidth, textWidth = textNode.scrollWidth;
         if (textWidth > boxWidth - 20) {
-            const distance = textWidth - boxWidth + 30;
-            const duration = Math.max(10, distance / 50 + 2);
+            const distance = textWidth - boxWidth + 80; // ਥੋੜ੍ਹਾ ਪਿੱਛੋਂ ਸਟਾਰਟ ਹੋਣ ਲਈ
+            const duration = Math.max(10, distance / 45 + 2);
             el.classList.add("marquee-mode");
             el.style.setProperty("--scroll-distance", `${distance}px`);
             el.style.setProperty("--marquee-duration", `${duration}s`);
@@ -384,8 +382,8 @@ function runSingleTicker(elementId, textToShow) {
     requestAnimationFrame(() => {
         const boxWidth = el.clientWidth, textWidth = textNode.scrollWidth;
         if (textWidth > boxWidth - 20) {
-            const distance = textWidth - boxWidth + 30;
-            const duration = Math.max(10, distance / 50 + 2);
+            const distance = textWidth - boxWidth + 80; // ਥੋੜ੍ਹਾ ਪਿੱਛੋਂ ਸਟਾਰਟ ਹੋਣ ਲਈ
+            const duration = Math.max(10, distance / 45 + 2);
             el.classList.add("marquee-mode");
             el.style.setProperty("--scroll-distance", `${distance}px`);
             el.style.setProperty("--marquee-duration", `${duration}s`);
@@ -421,7 +419,7 @@ function renderIndependentTickers() {
     }
 }
 
-setInterval(() => { leftIdx++; topCenterIdx++; bottomCenterIdx++; rightIdx++; renderIndependentTickers(); }, 12000);
+setInterval(() => { leftIdx++; topCenterIdx++; bottomCenterIdx++; rightIdx++; renderIndependentTickers(); }, 14000);
 setInterval(() => {
     isEnglish = !isEnglish;
     ['s1-left', 's1-mid', 's1-right', 's2-left', 's2-mid', 's2-right'].forEach(id => {
@@ -429,7 +427,7 @@ setInterval(() => {
         if (el) el.dataset.language = "";
     });
     renderIndependentTickers();
-}, 18000);
+}, 20000);
 
 setInterval(() => {
     const logoBox = document.getElementById('logo-container');
