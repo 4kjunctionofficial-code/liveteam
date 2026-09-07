@@ -19,12 +19,13 @@
 
         #top-scoreboard-container {
             position: absolute; top: 35px; right: 45px; display: flex; flex-direction: column; align-items: flex-end; z-index: 9999; transition: opacity 0.5s ease;
-            max-width: 60%; /* ਸਕੋਰਬੋਰਡ 60% ਤੋਂ ਜ਼ਿਆਦਾ ਨਹੀਂ ਹੋਵੇਗਾ */
+            max-width: 60%;
         }
         #top-scoreboard-container.hidden { opacity: 0; }
         #main-score-strip {
             display: flex; align-items: stretch; height: 75px; border-radius: 8px; overflow: hidden;
-            border: 2.5px solid rgba(255,255,255,0.9); transform: skewX(16deg); box-shadow: 0 8px 25px rgba(0,0,0,0.7);
+            border: 2.5px solid rgba(255,255,255,0.9); transform: skewX(16deg);
+            box-shadow: none; /* ਸ਼ੈਡੋ ਹਟਾ ਦਿੱਤੀ ਗਈ ਹੈ */
             max-width: 100%;
         }
         .unskew { transform: skewX(-16deg); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; overflow: hidden; position: relative; }
@@ -35,7 +36,6 @@
         .team-b-panel { background: linear-gradient(135deg, #1f1f1f, #2e2e2e); color: #ffffff; font-size: 38px; font-weight: 800; padding: 0 30px; white-space: nowrap; min-width: 150px; letter-spacing: 1.5px; overflow: hidden; }
         .score-b { background: linear-gradient(135deg, #0a0a0a, #1a1a1a); color: #ffcc00; font-size: 58px; font-weight: 900; padding: 0 38px; font-family: 'Bebas Neue', sans-serif; }
 
-        /* Team name scroll support if text is long */
         .panel-text {
             display: inline-block;
             white-space: nowrap;
@@ -51,7 +51,8 @@
         }
 
         #match-details-strip {
-            background: rgba(0,0,0,0.95); color: #ffcc00; font-size: 24px; font-weight: 800; padding: 6px 40px; margin-top: 8px; border-radius: 6px; letter-spacing: 2.5px; border: 1.5px solid rgba(255,204,0,0.6); transform: skewX(16deg); margin-right: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.95); color: #ffcc00; font-size: 24px; font-weight: 800; padding: 6px 40px; margin-top: 8px; border-radius: 6px; letter-spacing: 2.5px; border: 1.5px solid rgba(255,204,0,0.6); transform: skewX(16deg); margin-right: 25px;
+            box-shadow: none; /* ਸ਼ੈਡੋ ਹਟਾ ਦਿੱਤੀ ਗਈ ਹੈ */
         }
         #match-details-strip.hidden { display: none; }
 
@@ -62,7 +63,7 @@
         #logo-container.animate-slow-spin { animation: logoSlowSpin 2.2s cubic-bezier(0.4,0,0.2,1) forwards; }
         @keyframes logoSlowSpin {
             0% { transform: scale(1) rotate(0deg); }
-            50% { filter: drop-shadow(0 0 20px rgba(51,153,255,0.9)); }
+            50% { filter: none; }
             100% { transform: scale(1) rotate(360deg); }
         }
         #main-logo { height: 100px; width: auto; object-fit: contain; }
@@ -72,7 +73,8 @@
         }
 
         #ticker-wrap {
-            position: absolute; bottom: 0; left: 0; width: 1920px; z-index: 9998; display: flex; flex-direction: column; transition: opacity 0.5s ease; box-shadow: 0 -5px 25px rgba(0,0,0,0.8);
+            position: absolute; bottom: 0; left: 0; width: 1920px; z-index: 9998; display: flex; flex-direction: column; transition: opacity 0.5s ease;
+            box-shadow: none; /* ਸ਼ੈਡੋ ਹਟਾ ਦਿੱਤੀ ਗਈ ਹੈ */
         }
         #ticker-wrap.hidden { opacity: 0; }
 
@@ -90,10 +92,9 @@
         .w-30 { width: 30%; }
         .w-40 { width: 40%; border-left: 2.5px solid rgba(255,255,255,0.35); border-right: 2.5px solid rgba(255,255,255,0.35); color: #ffffff !important; }
 
-        .map-pin-icon { width: 32px; height: 32px; object-fit: contain; vertical-align: middle; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); margin-right: 10px; }
+        .map-pin-icon { width: 32px; height: 32px; object-fit: contain; vertical-align: middle; filter: none; margin-right: 10px; }
         .match-vs-3d { color: #ffcc00; background: #111111; padding: 2px 12px; border-radius: 6px; margin: 0 10px; font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 2px; display: inline-block; transform: translateY(-2px); text-shadow: none; }
 
-        /* Slow Center-Out Animation */
         .anim-wrap, .anim-wrap-single {
             position: absolute; left: 0; top: 0; width: 100%; height: 100%;
             display: flex; align-items: center; justify-content: center;
@@ -107,7 +108,6 @@
             100% { opacity: 1; transform: scaleX(1); }
         }
 
-        /* Forward-only Slow Marquee */
         .anim-wrap.marquee-mode, .anim-wrap-single.marquee-mode {
             justify-content: flex-start;
         }
@@ -457,7 +457,6 @@ setInterval(() => {
     teamAEl.innerText = textA;
     teamBEl.innerText = textB;
 
-    // Check if team names overflow panel width, add scroll class if needed
     setTimeout(() => {
         if(teamAEl.scrollWidth > teamAEl.parentElement.clientWidth) {
             teamAEl.classList.add('panel-scroll');
