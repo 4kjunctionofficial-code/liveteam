@@ -19,18 +19,37 @@
 
         #top-scoreboard-container {
             position: absolute; top: 35px; right: 45px; display: flex; flex-direction: column; align-items: flex-end; z-index: 9999; transition: opacity 0.5s ease;
+            max-width: 60%; /* ਸਕੋਰਬੋਰਡ 60% ਤੋਂ ਜ਼ਿਆਦਾ ਨਹੀਂ ਹੋਵੇਗਾ */
         }
         #top-scoreboard-container.hidden { opacity: 0; }
         #main-score-strip {
             display: flex; align-items: stretch; height: 75px; border-radius: 8px; overflow: hidden;
             border: 2.5px solid rgba(255,255,255,0.9); transform: skewX(16deg); box-shadow: 0 8px 25px rgba(0,0,0,0.7);
+            max-width: 100%;
         }
-        .unskew { transform: skewX(-16deg); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+        .unskew { transform: skewX(-16deg); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; overflow: hidden; position: relative; }
+        
         .score-a { background: linear-gradient(135deg, #0066cc, #0099ff); color: #ffffff; font-size: 58px; font-weight: 900; padding: 0 38px; font-family: 'Bebas Neue', sans-serif; }
-        .team-a-panel { background: linear-gradient(135deg, #1a8cff, #4da6ff); color: #ffffff; font-size: 38px; font-weight: 800; padding: 0 50px; white-space: nowrap; min-width: 180px; letter-spacing: 1.5px; }
-        .vs-divider { width: 12px; background: #111111; }
-        .team-b-panel { background: linear-gradient(135deg, #1f1f1f, #2e2e2e); color: #ffffff; font-size: 38px; font-weight: 800; padding: 0 50px; white-space: nowrap; min-width: 180px; letter-spacing: 1.5px; }
+        .team-a-panel { background: linear-gradient(135deg, #1a8cff, #4da6ff); color: #ffffff; font-size: 38px; font-weight: 800; padding: 0 30px; white-space: nowrap; min-width: 150px; letter-spacing: 1.5px; overflow: hidden; }
+        .vs-divider { width: 12px; background: #111111; flex-shrink: 0; }
+        .team-b-panel { background: linear-gradient(135deg, #1f1f1f, #2e2e2e); color: #ffffff; font-size: 38px; font-weight: 800; padding: 0 30px; white-space: nowrap; min-width: 150px; letter-spacing: 1.5px; overflow: hidden; }
         .score-b { background: linear-gradient(135deg, #0a0a0a, #1a1a1a); color: #ffcc00; font-size: 58px; font-weight: 900; padding: 0 38px; font-family: 'Bebas Neue', sans-serif; }
+
+        /* Team name scroll support if text is long */
+        .panel-text {
+            display: inline-block;
+            white-space: nowrap;
+            will-change: transform;
+        }
+        .panel-scroll {
+            animation: teamMarquee 10s linear infinite;
+        }
+        @keyframes teamMarquee {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-30px); }
+            100% { transform: translateX(0); }
+        }
+
         #match-details-strip {
             background: rgba(0,0,0,0.95); color: #ffcc00; font-size: 24px; font-weight: 800; padding: 6px 40px; margin-top: 8px; border-radius: 6px; letter-spacing: 2.5px; border: 1.5px solid rgba(255,204,0,0.6); transform: skewX(16deg); margin-right: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.6);
         }
@@ -112,9 +131,9 @@
 <div id="top-scoreboard-container">
     <div id="main-score-strip">
         <div class="score-a"><div class="unskew" id="sA">0</div></div>
-        <div class="team-a-panel"><div class="unskew" id="nA">ਟੀਮ 1</div></div>
+        <div class="team-a-panel"><div class="unskew"><span class="panel-text" id="nA">ਟੀਮ 1</span></div></div>
         <div class="vs-divider"><div class="unskew"></div></div>
-        <div class="team-b-panel"><div class="unskew" id="nB">ਟੀਮ 2</div></div>
+        <div class="team-b-panel"><div class="unskew"><span class="panel-text" id="nB">ਟੀਮ 2</span></div></div>
         <div class="score-b"><div class="unskew" id="sB">0</div></div>
     </div>
     <div id="match-details-strip" class="hidden"><div class="unskew" id="match-round"></div></div>
@@ -371,7 +390,7 @@ function runTicker(elementId, textToShow) {
         const boxWidth = el.clientWidth, textWidth = textNode.scrollWidth;
         if (textWidth > boxWidth - 20) {
             const distance = textWidth - boxWidth + 40;
-            const duration = Math.max(15, distance / 35 + 3); // Slower speed
+            const duration = Math.max(15, distance / 35 + 3);
             el.classList.add("marquee-mode");
             el.style.setProperty("--scroll-distance", `${distance}px`);
             el.style.setProperty("--marquee-duration", `${duration}s`);
@@ -428,8 +447,30 @@ setInterval(() => {
 setInterval(() => {
     const d = window.currentData;
     if (!d) return;
-    document.getElementById('nA').innerText = (!isEnglish && d.nameA_pa) ? d.nameA_pa : (d.nameA || "ਟੀਮ 1");
-    document.getElementById('nB').innerText = (!isEnglish && d.nameB_pa) ? d.nameB_pa : (d.nameB || "ਟੀਮ 2");
+    
+    const teamAEl = document.getElementById('nA');
+    const teamBEl = document.getElementById('nB');
+    
+    const textA = (!isEnglish && d.nameA_pa) ? d.nameA_pa : (d.nameA || "ਟੀਮ 1");
+    const textB = (!isEnglish && d.nameB_pa) ? d.nameB_pa : (d.nameB || "ਟੀਮ 2");
+    
+    teamAEl.innerText = textA;
+    teamBEl.innerText = textB;
+
+    // Check if team names overflow panel width, add scroll class if needed
+    setTimeout(() => {
+        if(teamAEl.scrollWidth > teamAEl.parentElement.clientWidth) {
+            teamAEl.classList.add('panel-scroll');
+        } else {
+            teamAEl.classList.remove('panel-scroll');
+        }
+        if(teamBEl.scrollWidth > teamBEl.parentElement.clientWidth) {
+            teamBEl.classList.add('panel-scroll');
+        } else {
+            teamBEl.classList.remove('panel-scroll');
+        }
+    }, 100);
+
 }, 2000);
 
 const wm = document.getElementById('single-wm');
