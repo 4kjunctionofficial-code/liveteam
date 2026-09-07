@@ -25,34 +25,38 @@
         #main-score-strip {
             display: flex; align-items: stretch; height: 75px; border-radius: 8px; overflow: hidden;
             border: 2.5px solid rgba(255,255,255,0.9); transform: skewX(16deg);
-            box-shadow: none; /* ਸ਼ੈਡੋ ਹਟਾ ਦਿੱਤੀ ਗਈ ਹੈ */
+            box-shadow: none;
             max-width: 100%;
         }
         .unskew { transform: skewX(-16deg); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; overflow: hidden; position: relative; }
         
         .score-a { background: linear-gradient(135deg, #0066cc, #0099ff); color: #ffffff; font-size: 58px; font-weight: 900; padding: 0 38px; font-family: 'Bebas Neue', sans-serif; }
-        .team-a-panel { background: linear-gradient(135deg, #1a8cff, #4da6ff); color: #ffffff; font-size: 38px; font-weight: 800; padding: 0 30px; white-space: nowrap; min-width: 150px; letter-spacing: 1.5px; overflow: hidden; }
+        .team-a-panel { background: linear-gradient(135deg, #1a8cff, #4da6ff); color: #ffffff; font-size: 38px; font-weight: 800; padding: 0 30px; white-space: nowrap; min-width: 180px; max-width: 280px; letter-spacing: 1.5px; overflow: hidden; position: relative; }
         .vs-divider { width: 12px; background: #111111; flex-shrink: 0; }
-        .team-b-panel { background: linear-gradient(135deg, #1f1f1f, #2e2e2e); color: #ffffff; font-size: 38px; font-weight: 800; padding: 0 30px; white-space: nowrap; min-width: 150px; letter-spacing: 1.5px; overflow: hidden; }
+        .team-b-panel { background: linear-gradient(135deg, #1f1f1f, #2e2e2e); color: #ffffff; font-size: 38px; font-weight: 800; padding: 0 30px; white-space: nowrap; min-width: 180px; max-width: 280px; letter-spacing: 1.5px; overflow: hidden; position: relative; }
         .score-b { background: linear-gradient(135deg, #0a0a0a, #1a1a1a); color: #ffcc00; font-size: 58px; font-weight: 900; padding: 0 38px; font-family: 'Bebas Neue', sans-serif; }
 
+        /* Proper Smooth Marquee for Scoreboard Panels */
         .panel-text {
             display: inline-block;
             white-space: nowrap;
             will-change: transform;
+            position: absolute;
+            left: 10%;
         }
         .panel-scroll {
-            animation: teamMarquee 10s linear infinite;
+            animation: teamProperMarquee var(--panel-duration, 12s) linear infinite;
         }
-        @keyframes teamMarquee {
-            0% { transform: translateX(0); }
-            50% { transform: translateX(-30px); }
-            100% { transform: translateX(0); }
+        @keyframes teamProperMarquee {
+            0% { transform: translateX(10%); }
+            10% { transform: translateX(0%); }
+            90% { transform: translateX(calc(-1 * var(--panel-distance, 100px) - 10%)); }
+            100% { transform: translateX(calc(-1 * var(--panel-distance, 100px))); }
         }
 
         #match-details-strip {
             background: rgba(0,0,0,0.95); color: #ffcc00; font-size: 24px; font-weight: 800; padding: 6px 40px; margin-top: 8px; border-radius: 6px; letter-spacing: 2.5px; border: 1.5px solid rgba(255,204,0,0.6); transform: skewX(16deg); margin-right: 25px;
-            box-shadow: none; /* ਸ਼ੈਡੋ ਹਟਾ ਦਿੱਤੀ ਗਈ ਹੈ */
+            box-shadow: none;
         }
         #match-details-strip.hidden { display: none; }
 
@@ -74,7 +78,7 @@
 
         #ticker-wrap {
             position: absolute; bottom: 0; left: 0; width: 1920px; z-index: 9998; display: flex; flex-direction: column; transition: opacity 0.5s ease;
-            box-shadow: none; /* ਸ਼ੈਡੋ ਹਟਾ ਦਿੱਤੀ ਗਈ ਹੈ */
+            box-shadow: none;
         }
         #ticker-wrap.hidden { opacity: 0; }
 
@@ -117,8 +121,11 @@
             animation: slowForwardMarquee var(--marquee-duration, 25s) linear infinite;
         }
 
+        /* 10% Start & 10% End Buffer for Tickers */
         @keyframes slowForwardMarquee {
-            0% { transform: translateX(20px); }
+            0% { transform: translateX(10%); }
+            10% { transform: translateX(0%); }
+            90% { transform: translateX(calc(-1 * var(--scroll-distance, 100px) - 10%)); }
             100% { transform: translateX(calc(-1 * var(--scroll-distance, 100px))); }
         }
     </style>
@@ -458,12 +465,19 @@ setInterval(() => {
     teamBEl.innerText = textB;
 
     setTimeout(() => {
-        if(teamAEl.scrollWidth > teamAEl.parentElement.clientWidth) {
+        const parentAWidth = teamAEl.parentElement.clientWidth;
+        if(teamAEl.scrollWidth > parentAWidth - 20) {
+            const distanceA = teamAEl.scrollWidth - parentAWidth + 40;
+            teamAEl.style.setProperty("--panel-distance", `${distanceA}px`);
             teamAEl.classList.add('panel-scroll');
         } else {
             teamAEl.classList.remove('panel-scroll');
         }
-        if(teamBEl.scrollWidth > teamBEl.parentElement.clientWidth) {
+
+        const parentBWidth = teamBEl.parentElement.clientWidth;
+        if(teamBEl.scrollWidth > parentBWidth - 20) {
+            const distanceB = teamBEl.scrollWidth - parentBWidth + 40;
+            teamBEl.style.setProperty("--panel-distance", `${distanceB}px`);
             teamBEl.classList.add('panel-scroll');
         } else {
             teamBEl.classList.remove('panel-scroll');
