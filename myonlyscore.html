@@ -20,7 +20,7 @@
         #top-scoreboard-container {
             position: absolute; top: 35px; right: 45px; display: flex; flex-direction: column; align-items: flex-end; z-index: 9999; transition: opacity 0.5s ease;
             width: auto;
-            max-width: 60%; /* ਸਕੋਰਬੋਰਡ ਸਕ੍ਰੀਨ ਦੇ 60% ਤੋਂ ਜ਼ਿਆਦਾ ਨਹੀਂ ਹੋਵੇਗਾ */
+            max-width: 75%; /* ਸਕੋਰਬੋਰਡ ਦਾ ਸਾਈਜ਼ ਵਧਾ ਦਿੱਤਾ ਗਿਆ ਹੈ */
         }
         #top-scoreboard-container.hidden { opacity: 0; }
         #main-score-strip {
@@ -32,9 +32,9 @@
         .unskew { transform: skewX(-16deg); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; overflow: hidden; position: relative; }
         
         .score-a { background: linear-gradient(135deg, #0066cc, #0099ff); color: #ffffff; font-size: 58px; font-weight: 900; padding: 0 38px; font-family: 'Bebas Neue', sans-serif; flex-shrink: 0; }
-        .team-a-panel { background: linear-gradient(135deg, #1a8cff, #4da6ff); color: #ffffff; font-size: 38px; font-weight: 800; padding: 0 30px; white-space: nowrap; min-width: 180px; max-width: 400px; letter-spacing: 1.5px; overflow: hidden; position: relative; }
+        .team-a-panel { background: linear-gradient(135deg, #1a8cff, #4da6ff); color: #ffffff; font-size: 38px; font-weight: 800; padding: 0 40px; white-space: nowrap; min-width: 240px; max-width: 500px; letter-spacing: 1.5px; overflow: hidden; position: relative; }
         .vs-divider { width: 12px; background: #111111; flex-shrink: 0; }
-        .team-b-panel { background: linear-gradient(135deg, #1f1f1f, #2e2e2e); color: #ffffff; font-size: 38px; font-weight: 800; padding: 0 30px; white-space: nowrap; min-width: 180px; max-width: 400px; letter-spacing: 1.5px; overflow: hidden; position: relative; }
+        .team-b-panel { background: linear-gradient(135deg, #1f1f1f, #2e2e2e); color: #ffffff; font-size: 38px; font-weight: 800; padding: 0 40px; white-space: nowrap; min-width: 240px; max-width: 500px; letter-spacing: 1.5px; overflow: hidden; position: relative; }
         .score-b { background: linear-gradient(135deg, #0a0a0a, #1a1a1a); color: #ffcc00; font-size: 58px; font-weight: 900; padding: 0 38px; font-family: 'Bebas Neue', sans-serif; flex-shrink: 0; }
 
         /* Fixed Speed Smooth Marquee */
@@ -470,7 +470,6 @@ setInterval(() => {
 
     setTimeout(() => {
         const parentAWidth = teamAEl.parentElement.clientWidth;
-        // Text scrolls only if it exceeds 60% of the container width
         if(teamAEl.scrollWidth > parentAWidth * 0.6) {
             const distanceA = teamAEl.scrollWidth - parentAWidth + 40;
             teamAEl.style.setProperty("--panel-distance", `${distanceA}px`);
