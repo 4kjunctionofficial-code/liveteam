@@ -74,25 +74,32 @@
         .map-pin-icon { width: 32px; height: 32px; object-fit: contain; vertical-align: middle; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); margin-right: 10px; }
         .match-vs-3d { color: #ffcc00; background: #111111; padding: 2px 12px; border-radius: 6px; margin: 0 10px; font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 2px; display: inline-block; transform: translateY(-2px); text-shadow: none; }
 
-        .anim-wrap { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: transform 0.4s cubic-bezier(0.25,1,0.5,1), opacity 0.4s ease; opacity: 1; transform: translateY(0); will-change: transform, opacity; white-space: nowrap; overflow: hidden; }
-        .anim-out-up { opacity: 0; transform: translateY(-25px); }
-        .anim-in-down { opacity: 0; transform: translateY(25px); }
-
-        .anim-wrap-single { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; white-space: nowrap; overflow: hidden; opacity: 1; transform: scale(1); transform-origin: center center; will-change: transform, opacity; transition: transform 0.45s cubic-bezier(0.25,1,0.5,1), opacity 0.45s ease; }
-        .anim-center-in { animation: tickerCenterIn 0.55s cubic-bezier(0.22,1,0.36,1) both; }
-        @keyframes tickerCenterIn {
-            0% { opacity: 0; transform: scale(0.55); }
-            100% { opacity: 1; transform: scale(1); }
+        /* Slow Center-Out Animation */
+        .anim-wrap, .anim-wrap-single {
+            position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            white-space: nowrap; overflow: hidden; opacity: 1;
+            transform-origin: center center; will-change: transform, opacity;
+            animation: slowCenterExpand 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
         }
 
-        /* Improved Marquee Scroll */
-        .anim-wrap.marquee-mode, .anim-wrap-single.marquee-mode { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: flex-start; overflow: hidden; white-space: nowrap; opacity: 1; }
-        .anim-wrap.marquee-mode .ticker-text, .anim-wrap-single.marquee-mode .ticker-text { display: inline-block; flex: 0 0 auto; width: max-content; max-width: none; white-space: nowrap; transform: translateX(0); will-change: transform; animation: tickerMarquee var(--marquee-duration,18s) linear infinite; }
+        @keyframes slowCenterExpand {
+            0% { opacity: 0; transform: scaleX(0); }
+            100% { opacity: 1; transform: scaleX(1); }
+        }
 
-        @keyframes tickerMarquee {
-            0% { transform: translateX(35px); }
-            8% { transform: translateX(15px); }
-            90% { transform: translateX(calc(-1 * var(--scroll-distance, 100px) - 10%)); }
+        /* Forward-only Slow Marquee */
+        .anim-wrap.marquee-mode, .anim-wrap-single.marquee-mode {
+            justify-content: flex-start;
+        }
+        .anim-wrap.marquee-mode .ticker-text, .anim-wrap-single.marquee-mode .ticker-text {
+            display: inline-block; flex: 0 0 auto; width: max-content; max-width: none; white-space: nowrap;
+            will-change: transform;
+            animation: slowForwardMarquee var(--marquee-duration, 25s) linear infinite;
+        }
+
+        @keyframes slowForwardMarquee {
+            0% { transform: translateX(20px); }
             100% { transform: translateX(calc(-1 * var(--scroll-distance, 100px))); }
         }
     </style>
@@ -341,60 +348,37 @@ function clearTickerElements() {
     ['s1-left', 's1-mid', 's1-right', 's2-left', 's2-mid', 's2-right'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
-        el.dataset.currentText = ""; el.dataset.language = ""; el.innerHTML = ""; el.className = "anim-wrap";
+        el.dataset.currentText = ""; el.dataset.language = ""; el.innerHTML = "";
         el.style.removeProperty("--marquee-duration"); el.style.removeProperty("--scroll-distance");
     });
 }
 
-function runDoubleTicker(elementId, textToShow) {
+function runTicker(elementId, textToShow) {
     const el = document.getElementById(elementId);
     if (!el) return;
     const languageKey = String(isEnglish);
     if (el.dataset.currentText === textToShow && el.dataset.language === languageKey) return;
     el.dataset.currentText = textToShow; el.dataset.language = languageKey;
-    el.className = "anim-wrap"; el.innerHTML = "";
-    const textNode = document.createElement("span");
-    textNode.className = "ticker-text"; textNode.innerHTML = textToShow;
-    el.appendChild(textNode);
-    requestAnimationFrame(() => {
-        const boxWidth = el.clientWidth, textWidth = textNode.scrollWidth;
-        if (textWidth > boxWidth - 20) {
-            const distance = textWidth - boxWidth + 40;
-            const duration = Math.max(10, distance / 45 + 2);
-            el.classList.add("marquee-mode");
-            el.style.setProperty("--scroll-distance", `${distance}px`);
-            el.style.setProperty("--marquee-duration", `${duration}s`);
-            textNode.style.animation = "none"; void textNode.offsetWidth;
-            textNode.style.animation = `tickerMarquee ${duration}s linear infinite`;
-        } else {
-            el.classList.add("anim-center-in");
-        }
-    });
-}
-
-function runSingleTicker(elementId, textToShow) {
-    const el = document.getElementById(elementId);
-    if (!el) return;
-    const languageKey = String(isEnglish);
-    if (el.dataset.currentText === textToShow && el.dataset.language === languageKey) return;
-    el.dataset.currentText = textToShow; el.dataset.language = languageKey;
-    el.className = "anim-wrap-single"; el.innerHTML = "";
+    el.innerHTML = "";
     el.style.removeProperty("--marquee-duration"); el.style.removeProperty("--scroll-distance");
+
     const textNode = document.createElement("span");
-    textNode.className = "ticker-text"; textNode.innerHTML = textToShow;
+    textNode.className = "ticker-text";
+    textNode.innerHTML = textToShow;
     el.appendChild(textNode);
+
     requestAnimationFrame(() => {
         const boxWidth = el.clientWidth, textWidth = textNode.scrollWidth;
         if (textWidth > boxWidth - 20) {
             const distance = textWidth - boxWidth + 40;
-            const duration = Math.max(10, distance / 45 + 2);
+            const duration = Math.max(15, distance / 35 + 3); // Slower speed
             el.classList.add("marquee-mode");
             el.style.setProperty("--scroll-distance", `${distance}px`);
             el.style.setProperty("--marquee-duration", `${duration}s`);
             textNode.style.animation = "none"; void textNode.offsetWidth;
-            textNode.style.animation = `tickerMarquee ${duration}s linear infinite`;
+            textNode.style.animation = `slowForwardMarquee ${duration}s linear infinite`;
         } else {
-            el.classList.add("anim-center-in");
+            el.classList.remove("marquee-mode");
         }
     });
 }
@@ -408,22 +392,22 @@ function renderIndependentTickers() {
 
     if (hasMatches) {
         document.getElementById('strip-2').style.display = 'flex';
-        runDoubleTicker('s1-left', isEnglish ? L.topEn : L.topPa);
-        runSingleTicker('s1-mid', isEnglish ? TC.en : TC.pa);
-        runDoubleTicker('s1-right', isEnglish ? R.topEn : R.topPa);
+        runTicker('s1-left', isEnglish ? L.topEn : L.topPa);
+        runTicker('s1-mid', isEnglish ? TC.en : TC.pa);
+        runTicker('s1-right', isEnglish ? R.topEn : R.topPa);
         
-        runDoubleTicker('s2-left', isEnglish ? L.botEn : L.botPa);
-        runDoubleTicker('s2-mid', isEnglish ? BC.en : BC.pa);
-        runDoubleTicker('s2-right', isEnglish ? R.botEn : R.botPa);
+        runTicker('s2-left', isEnglish ? L.botEn : L.botPa);
+        runTicker('s2-mid', isEnglish ? BC.en : BC.pa);
+        runTicker('s2-right', isEnglish ? R.botEn : R.botPa);
     } else {
         document.getElementById('strip-2').style.display = 'none';
-        runSingleTicker('s1-left', isEnglish ? L.singleEn : L.singlePa);
-        runSingleTicker('s1-mid', isEnglish ? TC.en : TC.pa);
-        runSingleTicker('s1-right', isEnglish ? R.singleEn : R.singlePa);
+        runTicker('s1-left', isEnglish ? L.singleEn : L.singlePa);
+        runTicker('s1-mid', isEnglish ? TC.en : TC.pa);
+        runTicker('s1-right', isEnglish ? R.singleEn : R.singlePa);
     }
 }
 
-setInterval(() => { leftIdx++; topCenterIdx++; bottomCenterIdx++; rightIdx++; renderIndependentTickers(); }, 12000);
+setInterval(() => { leftIdx++; topCenterIdx++; bottomCenterIdx++; rightIdx++; renderIndependentTickers(); }, 14000);
 setInterval(() => {
     isEnglish = !isEnglish;
     ['s1-left', 's1-mid', 's1-right', 's2-left', 's2-mid', 's2-right'].forEach(id => {
@@ -431,7 +415,7 @@ setInterval(() => {
         if (el) el.dataset.language = "";
     });
     renderIndependentTickers();
-}, 18000);
+}, 20000);
 
 setInterval(() => {
     const logoBox = document.getElementById('logo-container');
