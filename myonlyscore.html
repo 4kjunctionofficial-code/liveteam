@@ -36,6 +36,20 @@
         }
         #match-details-strip.hidden { display: none; }
 
+        /* RESULT POPUP BOX */
+        #result-popup-container {
+            position: absolute; top: 135px; right: 45px; background: linear-gradient(135deg, rgba(0,0,0,0.95), rgba(20,20,20,0.95));
+            color: #ffcc00; font-size: 30px; font-weight: 900; padding: 12px 35px; border-radius: 8px;
+            border: 2.5px solid #ffcc00; transform: skewX(16deg); z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            display: flex; align-items: center; justify-content: center; transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            opacity: 0; transform: translateY(-20px) skewX(16deg); pointer-events: none;
+        }
+        #result-popup-container.show {
+            opacity: 1; transform: translateY(0) skewX(16deg); pointer-events: auto;
+        }
+        .result-unskew { transform: skewX(-16deg); display: flex; align-items: center; gap: 15px; }
+        .result-badge { background: #ffcc00; color: #000; padding: 2px 10px; border-radius: 4px; font-size: 22px; font-family: 'Bebas Neue', sans-serif; }
+
         #logo-container {
             position: absolute; top: 25px; left: 30px; z-index: 9999; display: flex; align-items: center; transition: opacity 0.6s ease, transform 0.6s ease; opacity: 1; transform: scale(1) rotate(0deg); will-change: transform;
         }
@@ -109,6 +123,14 @@
 <div id="logo-container" class="hidden"><img id="main-logo" src="" alt="Logo"></div>
 <div id="single-wm">ਐੱਮ ਲਾਈਵ</div>
 
+<!-- RESULT POPUP BOX -->
+<div id="result-popup-container">
+    <div class="result-unskew">
+        <span class="result-badge">ਨਤੀਜਾ (RESULT)</span>
+        <span id="result-popup-text">MUDKI (5.5 WIN) VS GILL (4)</span>
+    </div>
+</div>
+
 <div id="top-scoreboard-container">
     <div id="main-score-strip">
         <div class="score-a"><div class="unskew" id="sA">0</div></div>
@@ -164,6 +186,8 @@ const clientLogos = { "mudki1": "https://raw.githubusercontent.com/4kjunctionoff
 let leftItems = [], topCenterItems = [], bottomCenterItems = [], rightItems = [];
 let leftIdx = 0, topCenterIdx = 0, bottomCenterIdx = 0, rightIdx = 0;
 let isEnglish = false, hasMatches = false, lastTickerSignature = "";
+let lastResultText = "";
+let resultPopupTimer = null;
 
 const mapPinHtml = `<svg class="map-pin-icon" viewBox="0 0 24 24" width="32" height="32" fill="#ff3333"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`;
 const dict = { "Kabaddi": "ਕਬੱਡੀ", "Open": "ਓਪਨ", "Quarter Final": "ਕੁਆਰਟਰ ਫਾਈਨਲ", "Semi Final": "ਸੈਮੀ ਫਾਈਨਲ", "Final": "ਫਾਈਨਲ", "1st Round": "ਪਹਿਲਾ ਰਾਊਂਡ", "2nd Round": "ਦੂਜਾ ਰਾਊਂਡ", "3rd Round": "ਤੀਜਾ ਰਾਊਂਡ", "4th Round": "ਚੌਥਾ ਰਾਊਂਡ", "Pool A": "ਪੂਲ ਏ", "Pool B": "ਪੂਲ ਬੀ" };
@@ -229,8 +253,29 @@ db.on("value", (snap) => {
     document.getElementById('sA').innerText = data.scoreA ?? "0";
     document.getElementById('sB').innerText = data.scoreB ?? "0";
     document.getElementById('single-wm').innerText = data.watermarkTxt || "ਐੱਮ ਲਾਈਵ";
+
+    // Result Popup Logic (Shows for 5 seconds when resultText changes)
+    const currentResult = String(data.resultText || "").trim();
+    if (currentResult && currentResult !== "No Result Yet" && currentResult !== lastResultText) {
+        lastResultText = currentResult;
+        showResultPopup(currentResult);
+    } else if (!currentResult || currentResult === "No Result Yet") {
+        lastResultText = "";
+    }
+
     processTickerData(data);
 });
+
+function showResultPopup(text) {
+    const popup = document.getElementById('result-popup-container');
+    document.getElementById('result-popup-text').innerText = text;
+    popup.classList.add('show');
+
+    if (resultPopupTimer) clearTimeout(resultPopupTimer);
+    resultPopupTimer = setTimeout(() => {
+        popup.classList.remove('show');
+    }, 5000); // Hide after 5 seconds
+}
 
 function processTickerData(data) {
     const event = getEventDetails(data);
@@ -371,7 +416,7 @@ function runTicker(elementId, textToShow) {
         const boxWidth = el.clientWidth, textWidth = textNode.scrollWidth;
         if (textWidth > boxWidth - 20) {
             const distance = textWidth - boxWidth + 40;
-            const duration = Math.max(15, distance / 35 + 3); // Slower speed
+            const duration = Math.max(15, distance / 35 + 3);
             el.classList.add("marquee-mode");
             el.style.setProperty("--scroll-distance", `${distance}px`);
             el.style.setProperty("--marquee-duration", `${duration}s`);
