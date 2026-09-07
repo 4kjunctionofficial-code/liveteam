@@ -497,7 +497,7 @@
 
 
         /* =========================================================
-            MAP PIN ICON
+            MAP PIN ICON & CALENDAR BADGE STYLES
         ========================================================= */
 
         .map-pin-icon {
@@ -517,6 +517,62 @@
                 );
 
             margin-right: 10px;
+        }
+
+        /* Upcoming Event Custom Design Badge */
+        .upcoming-card-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            height: 100%;
+            padding: 0 20px;
+        }
+
+        .upcoming-date-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0055ff, #0088ff);
+            border: 2px solid #ffffff;
+            border-radius: 6px;
+            padding: 2px 10px;
+            min-width: 65px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+            font-family: 'Bebas Neue', sans-serif;
+            line-height: 1.1;
+        }
+
+        .upcoming-date-badge .month {
+            font-size: 16px;
+            letter-spacing: 1px;
+            color: #ffcc00;
+        }
+
+        .upcoming-date-badge .day {
+            font-size: 26px;
+            font-weight: 900;
+            color: #ffffff;
+        }
+
+        .upcoming-name-mid {
+            font-size: 30px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-align: center;
+            flex: 1;
+            padding: 0 15px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .upcoming-loc-right {
+            display: flex;
+            align-items: center;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
         }
 
 
@@ -2022,11 +2078,43 @@ function processTickerData(data) {
                 ev.eventName_pa ||
                 translateToPunjabi(nameEn);
 
+            // Date formatting for the new custom badge layout
+            const rawDate = ev.date || "OCT 11";
+            let monthStr = "OCT";
+            let dayStr = "11";
 
-            const d =
-                ev.date
-                    ? ` (${ev.date})`
-                    : "";
+            const dateParts = rawDate.split(/[\s-]+/);
+            if(dateParts.length >= 2) {
+                monthStr = dateParts[0].toUpperCase();
+                dayStr = dateParts[1];
+            } else {
+                dayStr = rawDate;
+            }
+
+            const locEn = ev.location || ev.place || "";
+            const locPa = ev.location_pa || ev.place_pa || translateToPunjabi(locEn);
+
+            const customCardHtml = `
+                <div class="upcoming-card-container">
+                    <div class="upcoming-date-badge">
+                        <span class="month">${monthStr}</span>
+                        <span class="day">${dayStr}</span>
+                    </div>
+                    <div class="upcoming-name-mid">${nameEn}</div>
+                    <div class="upcoming-loc-right">${mapPinHtml} ${locEn}</div>
+                </div>
+            `;
+
+            const customCardHtmlPa = `
+                <div class="upcoming-card-container">
+                    <div class="upcoming-date-badge">
+                        <span class="month">${monthStr}</span>
+                        <span class="day">${dayStr}</span>
+                    </div>
+                    <div class="upcoming-name-mid">${namePa}</div>
+                    <div class="upcoming-loc-right">${mapPinHtml} ${locPa}</div>
+                </div>
+            `;
 
 
             if (
@@ -2044,17 +2132,17 @@ function processTickerData(data) {
 
 
                     botPa:
-                        `${namePa}${d}`,
+                        `${namePa} (${rawDate})`,
 
                     botEn:
-                        `${nameEn}${d}`,
+                        `${nameEn} (${rawDate})`,
 
 
                     singlePa:
-                        `ਆਉਣ ਵਾਲੇ ਮੇਲੇ: ${namePa}${d}`,
+                        customCardHtmlPa,
 
                     singleEn:
-                        `UPCOMING EVENTS: ${nameEn}${d}`
+                        customCardHtml
                 });
             }
 
