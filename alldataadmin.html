@@ -2136,55 +2136,33 @@ function toggleCameraView(){
 
 function showResultLayer(){
 
-    if(curA===0&&curB===0){
-
+    if(curA === 0 && curB === 0){
         alert("Score 0-0 hai.");
-
         return;
     }
-
 
     if(!confirm("Result update karna chahunde ho?")){
-
         return;
-
     }
 
+    const teamA = document.getElementById("nameA").value;
+    const teamB = document.getElementById("nameB").value;
 
-    const teamA=document.getElementById("nameA").value;
+    let winner = "";
+    let loser = "";
 
-    const teamB=document.getElementById("nameB").value;
-
-
-    let winner="";
-
-    let loser="";
-
-
-    if(curA>curB){
-
-        winner=teamA;
-
-        loser=teamB;
-
+    if(curA > curB){
+        winner = teamA;
+        loser = teamB;
     }
-
-    else if(curB>curA){
-
-        winner=teamB;
-
-        loser=teamA;
-
+    else if(curB > curA){
+        winner = teamB;
+        loser = teamA;
     }
-
     else{
-
-        winner="TIE";
-
-        loser="";
-
+        winner = "TIE";
+        loser = "";
     }
-
 
     saveResult(
         winner,
@@ -2192,10 +2170,30 @@ function showResultLayer(){
         curA,
         curB,
         "NORMAL"
-    );
+    ).then(() => {
 
+        /*
+         * RESULT WINDOW ON
+         * SCOREBOARD OFF
+         */
+        db.update({
+            resultVisible: true,
+            scoreVisible: false
+        });
+
+        /*
+         * 5 SECOND BAAD RESULT AUTO HIDE
+         */
+        setTimeout(() => {
+
+            db.update({
+                resultVisible: false
+            });
+
+        }, 5000);
+
+    });
 }
-
 
 function saveResult(winner,loser,scoreA,scoreB,type){
 
