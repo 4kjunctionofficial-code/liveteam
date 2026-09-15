@@ -287,6 +287,33 @@ textarea{
     text-align:center;
     margin-bottom:8px;
 }
+
+/* NEW BEST PRIZE BOX */
+.best-prize-box{
+    margin-top:8px;
+    padding:10px;
+    background:#fff;
+    border:2px solid #ff9800;
+    border-radius:8px;
+}
+.best-prize-title{
+    font-size:13px;
+    font-weight:900;
+    color:#e65100;
+    margin-bottom:7px;
+}
+.save-mini{
+    width:100%;
+    border:none;
+    border-radius:7px;
+    padding:10px;
+    color:white;
+    background:#1a73e8;
+    font-weight:900;
+    cursor:pointer;
+    margin-top:3px;
+}
+
 .result-history{
     background:#f8f9fa;
     border:1px solid #ddd;
@@ -318,20 +345,25 @@ textarea{
     .controls{
         grid-template-columns:repeat(2,1fr);
     }
+
     .btn-full{
         font-size:16px;
         height:68px;
     }
+
     .teams-container{
         flex-direction:column;
     }
+
     .vs-text{
         padding:10px 0;
     }
+
     .prize-grid,
     .stats-grid{
         grid-template-columns:1fr;
     }
+
     .visibility-grid{
         grid-template-columns:1fr 1fr;
     }
@@ -349,16 +381,23 @@ textarea{
 LANGUAGE TRANSLATION SETTINGS
 </div>
 
-<div class="settings-section" style="display:flex;align-items:center;gap:10px;">
-<span style="font-weight:bold;font-size:16px;">Translate to:</span>
+<div class="settings-section"
+style="display:flex;align-items:center;gap:10px;">
+
+<span style="font-weight:bold;font-size:16px;">
+Translate to:
+</span>
 
 <select id="targetLang"
 style="margin-bottom:0;border:2px solid #fbbc05;">
+
 <option value="en">English</option>
 <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
 <option value="hi">Hindi (हिन्दी)</option>
 <option value="ur">Urdu (اردو)</option>
+
 </select>
+
 </div>
 </div>
 
@@ -366,13 +405,17 @@ style="margin-bottom:0;border:2px solid #fbbc05;">
 <!-- SCOREBOARD -->
 <div class="card">
 
-<div class="header">LIVE SCORE BOARD</div>
+<div class="header">
+LIVE SCORE BOARD
+</div>
 
 <div class="teams-container" id="teamWrap">
 
+<!-- TEAM A -->
 <div class="team-box">
 
-<select id="teamSelectA" onchange="selectTeamA(this.value)">
+<select id="teamSelectA"
+onchange="selectTeamA(this.value)">
 <option value="">Select Team A</option>
 </select>
 
@@ -405,6 +448,7 @@ placeholder="Team 1 Punjabi"
 oninput="syncField('nameA_pa',this.value)">
 
 </div>
+
 </div>
 
 <div class="score-val" id="dispA">0</div>
@@ -428,12 +472,16 @@ onclick="changeScore('scoreA',1)">
 </div>
 
 
-<div class="vs-text">VS</div>
+<div class="vs-text">
+VS
+</div>
 
 
+<!-- TEAM B -->
 <div class="team-box">
 
-<select id="teamSelectB" onchange="selectTeamB(this.value)">
+<select id="teamSelectB"
+onchange="selectTeamB(this.value)">
 <option value="">Select Team B</option>
 </select>
 
@@ -466,6 +514,7 @@ placeholder="Team 2 Punjabi"
 oninput="syncField('nameB_pa',this.value)">
 
 </div>
+
 </div>
 
 <div class="score-val" id="dispB">0</div>
@@ -493,6 +542,7 @@ onclick="changeScore('scoreB',1)">
 
 <div class="controls">
 
+<!-- RESULT IS THE ONLY RESULT SHOW BUTTON -->
 <button
 class="btn-full btn-green"
 onclick="showResultLayer()">
@@ -569,14 +619,33 @@ style="border-top:3px solid #1a73e8;">
 
 <div style="display:flex;gap:10px;margin-bottom:8px;">
 
-<select id="matchRoundSelect" style="flex:1;">
+<select
+id="matchRoundSelect"
+style="flex:1;">
 
-<option value="">-- Select Round --</option>
-<option value="1st Round">1st Round</option>
-<option value="2nd Round">2nd Round</option>
-<option value="Quarter Final">Quarter Final</option>
-<option value="Semi Final">Semi Final</option>
-<option value="Final">Final</option>
+<option value="">
+-- Select Round --
+</option>
+
+<option value="1st Round">
+1st Round
+</option>
+
+<option value="2nd Round">
+2nd Round
+</option>
+
+<option value="Quarter Final">
+Quarter Final
+</option>
+
+<option value="Semi Final">
+Semi Final
+</option>
+
+<option value="Final">
+Final
+</option>
 
 </select>
 
@@ -611,7 +680,8 @@ style="height:48px;min-height:48px;font-size:15px;margin-top:5px;">
 <!-- DISPLAY CONTROLS -->
 <div class="card">
 
-<div class="header" style="background:#6f42c1;">
+<div class="header"
+style="background:#6f42c1;">
 OVERLAY WINDOW SHOW / HIDE CONTROL
 </div>
 
@@ -619,6 +689,7 @@ OVERLAY WINDOW SHOW / HIDE CONTROL
 
 <div class="visibility-grid">
 
+<!-- MATCH LIST -->
 <div class="visibility-card">
 
 <b>📋 Match List</b>
@@ -631,32 +702,16 @@ style="margin-top:8px;">
 SHOW MATCH LIST
 </button>
 
-<div id="matchListStatus" class="status">
+<div
+id="matchListStatus"
+class="status">
 HIDDEN
 </div>
 
 </div>
 
 
-<div class="visibility-card">
-
-<b>🏆 Result Window</b>
-
-<button
-id="resultBtn"
-onclick="toggleVisibility('resultVisible')"
-class="btn-green"
-style="margin-top:8px;">
-SHOW RESULT
-</button>
-
-<div id="resultStatus" class="status">
-HIDDEN
-</div>
-
-</div>
-
-
+<!-- ALL TEAMS -->
 <div class="visibility-card">
 
 <b>👥 All Teams</b>
@@ -669,13 +724,16 @@ style="margin-top:8px;">
 SHOW TEAMS
 </button>
 
-<div id="teamsStatus" class="status">
+<div
+id="teamsStatus"
+class="status">
 HIDDEN
 </div>
 
 </div>
 
 
+<!-- VILLAGE -->
 <div class="visibility-card">
 
 <b>📍 Village Name</b>
@@ -688,13 +746,16 @@ style="margin-top:8px;">
 SHOW VILLAGE
 </button>
 
-<div id="villageStatus" class="status">
+<div
+id="villageStatus"
+class="status">
 HIDDEN
 </div>
 
 </div>
 
 
+<!-- PRIZES -->
 <div class="visibility-card">
 
 <b>🏆 Prizes</b>
@@ -707,16 +768,19 @@ style="margin-top:8px;">
 SHOW PRIZES
 </button>
 
-<div id="prizesStatus" class="status">
+<div
+id="prizesStatus"
+class="status">
 HIDDEN
 </div>
 
 </div>
 
 
+<!-- BEST PLAYER -->
 <div class="visibility-card">
 
-<b>⭐ Best Player</b>
+<b>⭐ Best Raider / Jaffi</b>
 
 <button
 id="bestPlayerBtn"
@@ -726,11 +790,29 @@ style="margin-top:8px;">
 SHOW BEST PLAYER
 </button>
 
-<div id="bestPlayerStatus" class="status">
+<div
+id="bestPlayerStatus"
+class="status">
 HIDDEN
 </div>
 
 </div>
+
+</div>
+
+<div style="
+margin-top:12px;
+background:#fff3cd;
+border:1px solid #ffc107;
+padding:10px;
+border-radius:8px;
+font-size:13px;
+font-weight:bold;
+">
+
+🏆 RESULT WINDOW:
+RESULT button dabao → Result 5 seconds show → automatically hide.
+Dubara show karna hove → RESULT button dubara dabao.
 
 </div>
 
@@ -741,14 +823,16 @@ HIDDEN
 <!-- BEST PLAYER -->
 <div class="card">
 
-<div class="header" style="background:#ff9800;">
-🏆 BEST PLAYER / PLAYER STATISTICS
+<div class="header"
+style="background:#ff9800;">
+🏆 BEST RAIDER / BEST JAFFI / PRIZE
 </div>
 
 <div class="settings-section">
 
 <div class="stats-grid">
 
+<!-- BEST RAIDER -->
 <div class="stats-box">
 
 <div class="stats-title">
@@ -764,61 +848,136 @@ oninput="syncField('bestRaiderName',this.value)">
 <input
 type="number"
 id="bestRaiderTouches"
-placeholder="Touches"
+placeholder="Raider Touch"
 min="0"
 oninput="syncField('bestRaiderTouches',this.value)">
 
 <input
 type="number"
 id="bestRaiderPoints"
-placeholder="Points"
+placeholder="Raider Points"
 min="0"
 oninput="syncField('bestRaiderPoints',this.value)">
 
+
+<!-- RAIDER PRIZE BOX -->
+<div class="best-prize-box">
+
+<div class="best-prize-title">
+🎁 BEST RAIDER PRIZE
+</div>
+
 <select
 id="bestRaiderPrize"
-onchange="syncBestPrize('bestRaiderPrize','bestRaiderPrizeCustom')">
+onchange="syncBestPrize(
+'bestRaiderPrize',
+'bestRaiderPrizeCustom'
+)">
 
-<option value="">-- Raider Prize --</option>
-<option>Motorcycle</option>
-<option>Bullet Motorcycle</option>
-<option>Harley</option>
-<option>Electric Scooter</option>
-<option>Car</option>
-<option>Land Rover</option>
-<option>Jeep</option>
-<option>Scorpio</option>
-<option>Thar</option>
-<option>Combine</option>
-<option>Ford Tractor</option>
-<option>Swaraj 855</option>
-<option>Tractor</option>
-<option>₹5,100</option>
-<option>₹11,000</option>
-<option>₹15,000</option>
-<option>₹21,000</option>
-<option>₹31,000</option>
-<option value="OTHER">Other</option>
+<option value="">
+-- Select Prize --
+</option>
+
+<option value="Motorcycle">
+Motorcycle
+</option>
+
+<option value="Bullet Motorcycle">
+Bullet Motorcycle
+</option>
+
+<option value="Harley">
+Harley
+</option>
+
+<option value="Electric Scooter">
+Electric Scooter
+</option>
+
+<option value="Car">
+Car
+</option>
+
+<option value="Land Cruiser">
+Land Cruiser
+</option>
+
+<option value="Jeep">
+Jeep
+</option>
+
+<option value="Scorpio">
+Scorpio
+</option>
+
+<option value="Thar">
+Thar
+</option>
+
+<option value="Combine">
+Combine
+</option>
+
+<option value="Ford Tractor">
+Ford Tractor
+</option>
+
+<option value="Swaraj 855">
+Swaraj 855
+</option>
+
+<option value="Tractor">
+Tractor
+</option>
+
+<option value="₹5,100">
+₹5,100
+</option>
+
+<option value="₹11,000">
+₹11,000
+</option>
+
+<option value="₹15,000">
+₹15,000
+</option>
+
+<option value="₹21,000">
+₹21,000
+</option>
+
+<option value="₹31,000">
+₹31,000
+</option>
+
+<option value="OTHER">
+Other / Custom
+</option>
 
 </select>
 
 <input
 type="text"
 id="bestRaiderPrizeCustom"
-placeholder="Custom Prize"
+placeholder="Custom Raider Prize"
 style="display:none;"
-oninput="syncField('bestRaiderPrizeCustom',this.value)">
+oninput="syncField(
+'bestRaiderPrizeCustom',
+this.value
+)">
+
+</div>
 
 <button
-class="btn-full btn-blue"
-onclick="saveBestPlayerData()"
-style="height:45px;min-height:45px;font-size:14px;">
-SAVE RAIDER
+class="save-mini"
+onclick="saveBestPlayerData()">
+💾 SAVE RAIDER
 </button>
 
 </div>
 
 
+<!-- BEST JAFFI -->
 <div class="stats-box">
 
 <div class="stats-title">
@@ -834,56 +993,130 @@ oninput="syncField('bestJaffiName',this.value)">
 <input
 type="number"
 id="bestJaffiTouches"
-placeholder="Touches"
+placeholder="Jaffi Touch"
 min="0"
 oninput="syncField('bestJaffiTouches',this.value)">
 
 <input
 type="number"
 id="bestJaffiJaffe"
-placeholder="Jaffe"
+placeholder="Successful Jaffe"
 min="0"
 oninput="syncField('bestJaffiJaffe',this.value)">
 
+
+<!-- JAFFI PRIZE BOX -->
+<div class="best-prize-box">
+
+<div class="best-prize-title">
+🎁 BEST JAFFI PRIZE
+</div>
+
 <select
 id="bestJaffiPrize"
-onchange="syncBestPrize('bestJaffiPrize','bestJaffiPrizeCustom')">
+onchange="syncBestPrize(
+'bestJaffiPrize',
+'bestJaffiPrizeCustom'
+)">
 
-<option value="">-- Jaffi Prize --</option>
-<option>Motorcycle</option>
-<option>Bullet Motorcycle</option>
-<option>Harley</option>
-<option>Electric Scooter</option>
-<option>Car</option>
-<option>Land Rover</option>
-<option>Jeep</option>
-<option>Scorpio</option>
-<option>Thar</option>
-<option>Combine</option>
-<option>Ford Tractor</option>
-<option>Swaraj 855</option>
-<option>Tractor</option>
-<option>₹5,100</option>
-<option>₹11,000</option>
-<option>₹15,000</option>
-<option>₹21,000</option>
-<option>₹31,000</option>
-<option value="OTHER">Other</option>
+<option value="">
+-- Select Prize --
+</option>
+
+<option value="Motorcycle">
+Motorcycle
+</option>
+
+<option value="Bullet Motorcycle">
+Bullet Motorcycle
+</option>
+
+<option value="Harley">
+Harley
+</option>
+
+<option value="Electric Scooter">
+Electric Scooter
+</option>
+
+<option value="Car">
+Car
+</option>
+
+<option value="Land Cruiser">
+Land Cruiser
+</option>
+
+<option value="Jeep">
+Jeep
+</option>
+
+<option value="Scorpio">
+Scorpio
+</option>
+
+<option value="Thar">
+Thar
+</option>
+
+<option value="Combine">
+Combine
+</option>
+
+<option value="Ford Tractor">
+Ford Tractor
+</option>
+
+<option value="Swaraj 855">
+Swaraj 855
+</option>
+
+<option value="Tractor">
+Tractor
+</option>
+
+<option value="₹5,100">
+₹5,100
+</option>
+
+<option value="₹11,000">
+₹11,000
+</option>
+
+<option value="₹15,000">
+₹15,000
+</option>
+
+<option value="₹21,000">
+₹21,000
+</option>
+
+<option value="₹31,000">
+₹31,000
+</option>
+
+<option value="OTHER">
+Other / Custom
+</option>
 
 </select>
 
 <input
 type="text"
 id="bestJaffiPrizeCustom"
-placeholder="Custom Prize"
+placeholder="Custom Jaffi Prize"
 style="display:none;"
-oninput="syncField('bestJaffiPrizeCustom',this.value)">
+oninput="syncField(
+'bestJaffiPrizeCustom',
+this.value
+)">
+
+</div>
 
 <button
-class="btn-full btn-blue"
-onclick="saveBestPlayerData()"
-style="height:45px;min-height:45px;font-size:14px;">
-SAVE JAFFI
+class="save-mini"
+onclick="saveBestPlayerData()">
+💾 SAVE JAFFI
 </button>
 
 </div>
@@ -897,7 +1130,8 @@ SAVE JAFFI
 <!-- TICKER -->
 <div class="card">
 
-<div class="header" style="background:#0066cc;">
+<div class="header"
+style="background:#0066cc;">
 TICKER SETTINGS & ADS
 </div>
 
@@ -919,7 +1153,10 @@ placeholder="MAHLA, NEAR GORAYA">
 
 <button
 class="trans-btn"
-onclick="translateToInput('row1Inp','row1Inp_pa')">
+onclick="translateToInput(
+'row1Inp',
+'row1Inp_pa'
+)">
 ⇄
 </button>
 
@@ -951,7 +1188,10 @@ placeholder="KABADDI CUP / SHOW MATCH">
 
 <button
 class="trans-btn"
-onclick="translateToInput('programInp','programInp_pa')">
+onclick="translateToInput(
+'programInp',
+'programInp_pa'
+)">
 ⇄
 </button>
 
@@ -1026,7 +1266,13 @@ placeholder="Best Player Prize">
 <button
 class="btn-full btn-green"
 onclick="updateAllTickerDetails()"
-style="height:52px;min-height:52px;font-size:16px;margin-top:15px;margin-bottom:15px;">
+style="
+height:52px;
+min-height:52px;
+font-size:16px;
+margin-top:15px;
+margin-bottom:15px;
+">
 💾 UPDATE ALL TICKER DETAILS
 </button>
 
@@ -1035,7 +1281,12 @@ style="height:52px;min-height:52px;font-size:16px;margin-top:15px;margin-bottom:
 3. Special Ads & Services
 </label>
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+<div style="
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-bottom:10px;
+">
 
 <input
 type="text"
@@ -1068,9 +1319,15 @@ oninput="syncAds()">
 4. Upcoming Events
 </label>
 
-<div style="background:#f8f9fa;padding:12px;border-radius:8px;border:1px solid #ddd;">
+<div style="
+background:#f8f9fa;
+padding:12px;
+border-radius:8px;
+border:1px solid #ddd;
+">
 
-<div class="team-inputs-wrap" style="margin-bottom:10px;">
+<div class="team-inputs-wrap"
+style="margin-bottom:10px;">
 
 <div class="team-input-row">
 
@@ -1082,7 +1339,10 @@ placeholder="Event Name">
 
 <button
 class="trans-btn"
-onclick="translateToInput('ueName','ueName_pa')">
+onclick="translateToInput(
+'ueName',
+'ueName_pa'
+)">
 ⇄
 </button>
 
@@ -1096,7 +1356,11 @@ placeholder="Event Name Punjabi">
 
 </div>
 
-<div style="display:flex;gap:5px;margin-bottom:10px;">
+<div style="
+display:flex;
+gap:5px;
+margin-bottom:10px;
+">
 
 <input
 type="date"
@@ -1105,7 +1369,14 @@ style="padding:8px;flex:1;">
 
 <button
 class="btn-green"
-style="border:none;color:white;border-radius:6px;font-weight:bold;padding:0 15px;cursor:pointer;"
+style="
+border:none;
+color:white;
+border-radius:6px;
+font-weight:bold;
+padding:0 15px;
+cursor:pointer;
+"
 onclick="addUpcomingEvent()">
 ADD EVENT
 </button>
@@ -1155,7 +1426,13 @@ TOURNAMENT TEAM MANAGER
 ➕ Add Teams
 </label>
 
-<div style="background:#f8f9fa;padding:10px;border:1px solid #ddd;border-radius:8px;margin-bottom:15px;">
+<div style="
+background:#f8f9fa;
+padding:10px;
+border:1px solid #ddd;
+border-radius:8px;
+margin-bottom:15px;
+">
 
 <div class="team-input-row">
 
@@ -1176,12 +1453,17 @@ onclick="translateBatchTeams()">
 <textarea
 id="newTeamPa"
 rows="2"
-placeholder="Punjabi Teams"></textarea>
+placeholder="Punjabi Teams">
+</textarea>
 
 <button
 class="btn-full btn-green"
 onclick="addBatchTeams()"
-style="height:42px;min-height:42px;font-size:14px;">
+style="
+height:42px;
+min-height:42px;
+font-size:14px;
+">
 ADD TEAMS TO LIST
 </button>
 
@@ -1202,15 +1484,29 @@ oninput="syncFieldArrayTeams(this.value)">
 
 
 <div class="qualified-box">
-<b>✅ QUALIFIED / WINNER TEAMS</b>
-<div id="qualifiedTeamsView">None</div>
+
+<b>
+✅ QUALIFIED / WINNER TEAMS
+</b>
+
+<div id="qualifiedTeamsView">
+None
+</div>
+
 </div>
 
 <br>
 
 <div class="eliminated-box">
-<b>❌ ELIMINATED / LOSER TEAMS</b>
-<div id="eliminatedTeamsView">None</div>
+
+<b>
+❌ ELIMINATED / LOSER TEAMS
+</b>
+
+<div id="eliminatedTeamsView">
+None
+</div>
+
 </div>
 
 </div>
@@ -1220,7 +1516,8 @@ oninput="syncFieldArrayTeams(this.value)">
 <!-- RESULT HISTORY -->
 <div class="card">
 
-<div class="header" style="background:#28a745;">
+<div class="header"
+style="background:#28a745;">
 RESULT HISTORY
 </div>
 
@@ -1237,7 +1534,15 @@ No Result Yet
 <button
 class="btn-full btn-red"
 onclick="clearAllTeams()"
-style="width:100%;margin-bottom:15px;padding:14px;border-radius:10px;font-size:15px;height:50px;min-height:50px;">
+style="
+width:100%;
+margin-bottom:15px;
+padding:14px;
+border-radius:10px;
+font-size:15px;
+height:50px;
+min-height:50px;
+">
 RESET ALL TEAMS & DATA
 </button>
 
@@ -1246,18 +1551,32 @@ RESET ALL TEAMS & DATA
 
 <script>
 
+/* =====================================================
+   FIREBASE
+===================================================== */
+
 const firebaseConfig={
-    databaseURL:"https://my-scorebord-default-rtdb.firebaseio.com/"
+    databaseURL:
+    "https://my-scorebord-default-rtdb.firebaseio.com/"
 };
 
 firebase.initializeApp(firebaseConfig);
 
-const urlParams=new URLSearchParams(window.location.search);
+const urlParams=
+new URLSearchParams(window.location.search);
 
-const matchId=urlParams.get('id')||'defaultMatch';
+const matchId=
+urlParams.get('id')||'defaultMatch';
 
-const db=firebase.database().ref("matchData/"+matchId);
+const db=
+firebase.database().ref(
+    "matchData/"+matchId
+);
 
+
+/* =====================================================
+   VARIABLES
+===================================================== */
 
 let curA=0;
 let curB=0;
@@ -1271,293 +1590,595 @@ let qualifiedTeams=[];
 let eliminatedTeams=[];
 let resultHistory=[];
 
+let resultFinalized=false;
+let lastResult=null;
+
+let scoreVisible=true;
+
+
+/* =====================================================
+   SAFE INPUT
+===================================================== */
 
 function setSafely(id,val){
 
-    const el=document.getElementById(id);
+    const el=
+    document.getElementById(id);
 
     if(
         el &&
         document.activeElement!==el &&
-        document.activeElement!==document.getElementById('matchRoundSelect')
+        document.activeElement!==document.getElementById(
+            'matchRoundSelect'
+        )
     ){
-        el.value=val||"";
+
+        el.value=
+        val===undefined || val===null
+        ?""
+        :val;
+
     }
+
 }
 
 
+/* =====================================================
+   BASIC SYNC
+===================================================== */
+
 function syncField(key,val){
+
     db.update({
         [key]:val
     });
+
 }
 
 
 function syncFieldArrayTeams(val){
 
-    let arr=val
-        .split("\n")
-        .map(t=>t.trim())
-        .filter(t=>t!=="");
+    let arr=
+    val
+    .split("\n")
+    .map(t=>t.trim())
+    .filter(t=>t!=="");
 
     db.update({
         allTeams:arr
     });
+
 }
 
 
+/* =====================================================
+   ADS
+===================================================== */
+
 function syncAds(){
 
-    let comm=document.getElementById("adComm").value;
-    let sound=document.getElementById("adSound").value;
-    let tent=document.getElementById("adTent").value;
-    let sec=document.getElementById("adSec").value;
+    let comm=
+    document.getElementById("adComm").value;
+
+    let sound=
+    document.getElementById("adSound").value;
+
+    let tent=
+    document.getElementById("adTent").value;
+
+    let sec=
+    document.getElementById("adSec").value;
 
     let adsArr=[];
 
-    if(comm)adsArr.push("🎙️ COMM: "+comm);
-    if(sound)adsArr.push("🔊 SOUND: "+sound);
-    if(tent)adsArr.push("⛺ TENT: "+tent);
-    if(sec)adsArr.push("🛡️ SEC: "+sec);
+    if(comm)
+    adsArr.push("🎙️ COMM: "+comm);
+
+    if(sound)
+    adsArr.push("🔊 SOUND: "+sound);
+
+    if(tent)
+    adsArr.push("⛺ TENT: "+tent);
+
+    if(sec)
+    adsArr.push("🛡️ SEC: "+sec);
 
     db.update({
-        adsText:adsArr.join(" | "),
+
+        adsText:
+        adsArr.join(" | "),
+
         adComm:comm,
         adSound:sound,
         adTent:tent,
         adSec:sec
+
     });
+
 }
 
+
+/* =====================================================
+   TICKER
+===================================================== */
 
 function updateAllTickerDetails(){
 
     db.update({
 
-        row1Txt:document.getElementById("row1Inp").value.trim(),
+        row1Txt:
+        document.getElementById("row1Inp").value.trim(),
 
-        row1Txt_pa:document.getElementById("row1Inp_pa").value.trim(),
+        row1Txt_pa:
+        document.getElementById("row1Inp_pa").value.trim(),
 
-        programTxt:document.getElementById("programInp").value.trim(),
+        programTxt:
+        document.getElementById("programInp").value.trim(),
 
-        programTxt_pa:document.getElementById("programInp_pa").value.trim(),
+        programTxt_pa:
+        document.getElementById("programInp_pa").value.trim(),
 
-        pzTitle1:document.getElementById("pzTitle1").value.trim(),
+        pzTitle1:
+        document.getElementById("pzTitle1").value.trim(),
 
-        pzOp1:document.getElementById("pzOp1").value,
+        pzOp1:
+        document.getElementById("pzOp1").value,
 
-        pzOp2:document.getElementById("pzOp2").value,
+        pzOp2:
+        document.getElementById("pzOp2").value,
 
-        pzOpBest:document.getElementById("pzOpBest").value,
+        pzOpBest:
+        document.getElementById("pzOpBest").value,
 
-        pzTitle2:document.getElementById("pzTitle2").value.trim(),
+        pzTitle2:
+        document.getElementById("pzTitle2").value.trim(),
 
-        pzWt1:document.getElementById("pzWt1").value,
+        pzWt1:
+        document.getElementById("pzWt1").value,
 
-        pzWt2:document.getElementById("pzWt2").value,
+        pzWt2:
+        document.getElementById("pzWt2").value,
 
-        pzWtBest:document.getElementById("pzWtBest").value
+        pzWtBest:
+        document.getElementById("pzWtBest").value,
+
+        /*
+         * UPDATE karan te village/prize
+         * ticker/window ch available ho jaan
+         */
+        villageVisible:true,
+        prizesVisible:true
 
     })
     .then(()=>{
-        alert("Ticker details updated!");
+
+        alert(
+            "Ticker details updated!"
+        );
+
     })
     .catch(error=>{
+
         alert(error.message);
+
     });
+
 }
 
 
-async function translateToInput(sourceId,targetId){
+/* =====================================================
+   TRANSLATION
+===================================================== */
 
-    const text=document.getElementById(sourceId).value;
+async function translateToInput(
+    sourceId,
+    targetId
+){
 
-    const targetLang=document.getElementById("targetLang").value;
+    const text=
+    document.getElementById(sourceId).value;
+
+    const targetLang=
+    document.getElementById("targetLang").value;
 
     if(!text)return;
 
     try{
 
-        const res=await fetch(
-            `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`
+        const res=
+        await fetch(
+        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`
         );
 
-        const data=await res.json();
+        const data=
+        await res.json();
 
-        document.getElementById(targetId).value=data[0][0][0];
+        const translated=
+        data[0][0][0];
 
-    }catch(e){
+        document.getElementById(
+            targetId
+        ).value=translated;
+
+        syncField(
+            targetId,
+            translated
+        );
+
+    }
+    catch(e){
 
         alert("Translation error!");
 
     }
+
 }
 
 
 async function translateBatchTeams(){
 
-    const text=document.getElementById("newTeamEn").value;
+    const text=
+    document.getElementById(
+        "newTeamEn"
+    ).value;
 
-    const targetLang=document.getElementById("targetLang").value;
-
-    if(!text)return;
-
-    try{
-
-        const res=await fetch(
-            `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`
-        );
-
-        const data=await res.json();
-
-        document.getElementById("newTeamPa").value=data[0][0][0];
-
-    }catch(e){
-
-        alert("Translation error!");
-
-    }
-}
-
-
-async function translateAndSync(sourceId,targetId){
-
-    const text=document.getElementById(sourceId).value;
-
-    const targetLang=document.getElementById("targetLang").value;
+    const targetLang=
+    document.getElementById(
+        "targetLang"
+    ).value;
 
     if(!text)return;
 
     try{
 
-        const res=await fetch(
-            `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`
+        const res=
+        await fetch(
+        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`
         );
 
-        const data=await res.json();
+        const data=
+        await res.json();
 
-        const translatedVal=data[0][0][0];
+        document.getElementById(
+            "newTeamPa"
+        ).value=
+        data[0][0][0];
 
-        document.getElementById(targetId).value=translatedVal;
-
-        syncField(targetId,translatedVal);
-
-    }catch(e){
+    }
+    catch(e){
 
         alert("Translation error!");
 
     }
+
 }
 
 
-/* ================================
-   FIREBASE LIVE LISTENER
-================================ */
+async function translateAndSync(
+    sourceId,
+    targetId
+){
+
+    const text=
+    document.getElementById(
+        sourceId
+    ).value;
+
+    const targetLang=
+    document.getElementById(
+        "targetLang"
+    ).value;
+
+    if(!text)return;
+
+    try{
+
+        const res=
+        await fetch(
+        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`
+        );
+
+        const data=
+        await res.json();
+
+        const translatedVal=
+        data[0][0][0];
+
+        document.getElementById(
+            targetId
+        ).value=
+        translatedVal;
+
+        syncField(
+            targetId,
+            translatedVal
+        );
+
+    }
+    catch(e){
+
+        alert("Translation error!");
+
+    }
+
+}
+
+
+/* =====================================================
+   FIREBASE LISTENER
+===================================================== */
 
 db.on("value",(snap)=>{
 
-    const data=snap.val();
+    const data=
+    snap.val();
 
     if(!data)return;
 
-    curA=parseFloat(data.scoreA)||0;
 
-    curB=parseFloat(data.scoreB)||0;
+    curA=
+    parseFloat(data.scoreA)||0;
 
-    allTeams=data.allTeams||[];
-
-    nextMatches=data.nextMatches||[];
-
-    upcomingEvents=data.upcomingEvents||[];
-
-    qualifiedTeams=data.qualifiedTeams||[];
-
-    eliminatedTeams=data.eliminatedTeams||[];
-
-    resultHistory=data.resultHistory||[];
+    curB=
+    parseFloat(data.scoreB)||0;
 
 
-    document.getElementById("dispA").innerText=curA;
+    allTeams=
+    Array.isArray(data.allTeams)
+    ?data.allTeams
+    :[];
 
-    document.getElementById("dispB").innerText=curB;
+    nextMatches=
+    Array.isArray(data.nextMatches)
+    ?data.nextMatches
+    :[];
 
+    upcomingEvents=
+    Array.isArray(data.upcomingEvents)
+    ?data.upcomingEvents
+    :[];
 
-    setSafely("nameA",data.nameA);
+    qualifiedTeams=
+    Array.isArray(data.qualifiedTeams)
+    ?data.qualifiedTeams
+    :[];
 
-    setSafely("nameA_pa",data.nameA_pa);
+    eliminatedTeams=
+    Array.isArray(data.eliminatedTeams)
+    ?data.eliminatedTeams
+    :[];
 
-    setSafely("nameB",data.nameB);
-
-    setSafely("nameB_pa",data.nameB_pa);
-
-    setSafely("roundInp",data.round);
-
-
-    setSafely("row1Inp",data.row1Txt);
-
-    setSafely("row1Inp_pa",data.row1Txt_pa);
-
-    setSafely("programInp",data.programTxt);
-
-    setSafely("programInp_pa",data.programTxt_pa);
-
-
-    setSafely("row6Inp",data.row6Txt);
-
-    setSafely("watermarkInp",data.watermarkTxt);
-
-
-    setSafely("pzTitle1",data.pzTitle1);
-
-    setSafely("pzOp1",data.pzOp1);
-
-    setSafely("pzOp2",data.pzOp2);
-
-    setSafely("pzOpBest",data.pzOpBest);
+    resultHistory=
+    Array.isArray(data.resultHistory)
+    ?data.resultHistory
+    :[];
 
 
-    setSafely("pzTitle2",data.pzTitle2);
+    resultFinalized=
+    data.resultFinalized===true;
 
-    setSafely("pzWt1",data.pzWt1);
+    lastResult=
+    data.lastResult||null;
 
-    setSafely("pzWt2",data.pzWt2);
-
-    setSafely("pzWtBest",data.pzWtBest);
-
-
-    setSafely("allTeamsInp",allTeams.join("\n"));
+    scoreVisible=
+    data.scoreVisible!==false;
 
 
-    setSafely("adComm",data.adComm);
+    document.getElementById(
+        "dispA"
+    ).innerText=curA;
 
-    setSafely("adSound",data.adSound);
-
-    setSafely("adTent",data.adTent);
-
-    setSafely("adSec",data.adSec);
-
-
-    setSafely("bestRaiderName",data.bestRaiderName);
-
-    setSafely("bestRaiderTouches",data.bestRaiderTouches);
-
-    setSafely("bestRaiderPoints",data.bestRaiderPoints);
-
-    setSafely("bestJaffiName",data.bestJaffiName);
-
-    setSafely("bestJaffiTouches",data.bestJaffiTouches);
-
-    setSafely("bestJaffiJaffe",data.bestJaffiJaffe);
+    document.getElementById(
+        "dispB"
+    ).innerText=curB;
 
 
-    setSafely("bestRaiderPrize",data.bestRaiderPrize);
+    setSafely(
+        "nameA",
+        data.nameA
+    );
 
-    setSafely("bestRaiderPrizeCustom",data.bestRaiderPrizeCustom);
+    setSafely(
+        "nameA_pa",
+        data.nameA_pa
+    );
 
-    setSafely("bestJaffiPrize",data.bestJaffiPrize);
+    setSafely(
+        "nameB",
+        data.nameB
+    );
 
-    setSafely("bestJaffiPrizeCustom",data.bestJaffiPrizeCustom);
+    setSafely(
+        "nameB_pa",
+        data.nameB_pa
+    );
 
+    setSafely(
+        "roundInp",
+        data.round
+    );
+
+
+    /* TICKER */
+
+    setSafely(
+        "row1Inp",
+        data.row1Txt
+    );
+
+    setSafely(
+        "row1Inp_pa",
+        data.row1Txt_pa
+    );
+
+    setSafely(
+        "programInp",
+        data.programTxt
+    );
+
+    setSafely(
+        "programInp_pa",
+        data.programTxt_pa
+    );
+
+
+    setSafely(
+        "row6Inp",
+        data.row6Txt
+    );
+
+    setSafely(
+        "watermarkInp",
+        data.watermarkTxt
+    );
+
+
+    setSafely(
+        "pzTitle1",
+        data.pzTitle1
+    );
+
+    setSafely(
+        "pzOp1",
+        data.pzOp1
+    );
+
+    setSafely(
+        "pzOp2",
+        data.pzOp2
+    );
+
+    setSafely(
+        "pzOpBest",
+        data.pzOpBest
+    );
+
+
+    setSafely(
+        "pzTitle2",
+        data.pzTitle2
+    );
+
+    setSafely(
+        "pzWt1",
+        data.pzWt1
+    );
+
+    setSafely(
+        "pzWt2",
+        data.pzWt2
+    );
+
+    setSafely(
+        "pzWtBest",
+        data.pzWtBest
+    );
+
+
+    setSafely(
+        "allTeamsInp",
+        allTeams.join("\n")
+    );
+
+
+    /* ADS */
+
+    setSafely(
+        "adComm",
+        data.adComm
+    );
+
+    setSafely(
+        "adSound",
+        data.adSound
+    );
+
+    setSafely(
+        "adTent",
+        data.adTent
+    );
+
+    setSafely(
+        "adSec",
+        data.adSec
+    );
+
+
+    /* BEST RAIDER */
+
+    setSafely(
+        "bestRaiderName",
+        data.bestRaiderName
+    );
+
+    setSafely(
+        "bestRaiderTouches",
+        data.bestRaiderTouches
+    );
+
+    setSafely(
+        "bestRaiderPoints",
+        data.bestRaiderPoints
+    );
+
+    setSafely(
+        "bestRaiderPrize",
+        data.bestRaiderPrize
+    );
+
+    setSafely(
+        "bestRaiderPrizeCustom",
+        data.bestRaiderPrizeCustom
+    );
+
+
+    /* BEST JAFFI */
+
+    setSafely(
+        "bestJaffiName",
+        data.bestJaffiName
+    );
+
+    setSafely(
+        "bestJaffiTouches",
+        data.bestJaffiTouches
+    );
+
+    setSafely(
+        "bestJaffiJaffe",
+        data.bestJaffiJaffe
+    );
+
+    setSafely(
+        "bestJaffiPrize",
+        data.bestJaffiPrize
+    );
+
+    setSafely(
+        "bestJaffiPrizeCustom",
+        data.bestJaffiPrizeCustom
+    );
+
+
+    /* CUSTOM PRIZE VISIBILITY */
+
+    document.getElementById(
+        "bestRaiderPrizeCustom"
+    ).style.display=
+    data.bestRaiderPrize==="OTHER"
+    ?"block"
+    :"none";
+
+
+    document.getElementById(
+        "bestJaffiPrizeCustom"
+    ).style.display=
+    data.bestJaffiPrize==="OTHER"
+    ?"block"
+    :"none";
+
+
+    /* RENDER */
 
     renderNextMatches();
 
@@ -1570,6 +2191,8 @@ db.on("value",(snap)=>{
     updateDropdowns();
 
 
+    /* SCORE BUTTON */
+
     updateVisibilityButton(
         "scoreVisible",
         "visBtn",
@@ -1577,6 +2200,8 @@ db.on("value",(snap)=>{
         "Show Scoreboard"
     );
 
+
+    /* MATCH LIST */
 
     updateVisibilityButton(
         "matchListVisible",
@@ -1586,13 +2211,7 @@ db.on("value",(snap)=>{
     );
 
 
-    updateVisibilityButton(
-        "resultVisible",
-        "resultBtn",
-        "HIDE RESULT",
-        "SHOW RESULT"
-    );
-
+    /* ALL TEAMS */
 
     updateVisibilityButton(
         "teamsVisible",
@@ -1602,6 +2221,8 @@ db.on("value",(snap)=>{
     );
 
 
+    /* VILLAGE */
+
     updateVisibilityButton(
         "villageVisible",
         "villageBtn",
@@ -1609,6 +2230,8 @@ db.on("value",(snap)=>{
         "SHOW VILLAGE"
     );
 
+
+    /* PRIZES */
 
     updateVisibilityButton(
         "prizesVisible",
@@ -1618,6 +2241,8 @@ db.on("value",(snap)=>{
     );
 
 
+    /* BEST PLAYER */
+
     updateVisibilityButton(
         "bestPlayerVisible",
         "bestPlayerBtn",
@@ -1626,187 +2251,269 @@ db.on("value",(snap)=>{
     );
 
 
-    camOpposite=data.cameraOpposite||false;
+    camOpposite=
+    data.cameraOpposite||false;
 
-    document.getElementById("teamWrap").style.flexDirection=
-        camOpposite?"row-reverse":"row";
 
-    document.getElementById("camBtn").innerText=
-        camOpposite?"Camera Oppo View":"Camera View";
+    document.getElementById(
+        "teamWrap"
+    ).style.flexDirection=
+    camOpposite
+    ?"row-reverse"
+    :"row";
+
+
+    document.getElementById(
+        "camBtn"
+    ).innerText=
+    camOpposite
+    ?"Camera Oppo View"
+    :"Camera View";
 
 });
 
 
-/* ================================
+/* =====================================================
    VISIBILITY
-================================ */
+===================================================== */
 
 function toggleVisibility(field){
 
-    db.child(field).once("value",snap=>{
+    db.child(field)
+    .once("value",snap=>{
 
-        const current=snap.val()===true;
+        const current=
+        snap.val()===true;
 
-        const newValue=!current;
+        const newValue=
+        !current;
 
         db.update({
-            [field]:newValue
+
+            [field]:
+            newValue
+
         });
 
-        /* Result ON = scoreboard OFF */
-
-        if(field==="resultVisible" && newValue===true){
-
-            db.update({
-                scoreVisible:false
-            });
-
-        }
-
     });
+
 }
 
 
-function updateVisibilityButton(field,buttonId,onText,offText){
+function updateVisibilityButton(
+    field,
+    buttonId,
+    onText,
+    offText
+){
 
-    db.child(field).once("value",snap=>{
+    db.child(field)
+    .once("value",snap=>{
 
-        const value=snap.val()===true;
+        const value=
+        snap.val()===true;
 
-        const btn=document.getElementById(buttonId);
+        const btn=
+        document.getElementById(
+            buttonId
+        );
 
         if(!btn)return;
 
-        btn.innerText=value?onText:offText;
+        btn.innerText=
+        value
+        ?onText
+        :offText;
 
-        btn.style.background=value?"#dc3545":"#28a745";
+        btn.style.background=
+        value
+        ?" #dc3545"
+        :"#28a745";
 
-        const statusId=buttonId.replace("Btn","Status");
+        const statusId=
+        buttonId.replace(
+            "Btn",
+            "Status"
+        );
 
-        const status=document.getElementById(statusId);
+        const status=
+        document.getElementById(
+            statusId
+        );
 
         if(status){
 
-            status.innerText=value?"VISIBLE":"HIDDEN";
+            status.innerText=
+            value
+            ?"VISIBLE"
+            :"HIDDEN";
 
-            status.style.color=value?"#28a745":"#dc3545";
+            status.style.color=
+            value
+            ?" #28a745"
+            :"#dc3545";
 
         }
 
     });
+
 }
 
 
-/* ================================
+/* =====================================================
    MATCH LIST
-================================ */
+===================================================== */
 
 function addNewMatch(){
 
-    const a=document.getElementById("nextTeamA").value;
+    const a=
+    document.getElementById(
+        "nextTeamA"
+    ).value;
 
-    const b=document.getElementById("nextTeamB").value;
+    const b=
+    document.getElementById(
+        "nextTeamB"
+    ).value;
 
-    const round=document.getElementById("matchRoundSelect").value;
+    const round=
+    document.getElementById(
+        "matchRoundSelect"
+    ).value;
 
-    const cat=document.getElementById("matchCategoryInp").value.trim();
+    const cat=
+    document.getElementById(
+        "matchCategoryInp"
+    ).value.trim();
+
 
     if(a===""||b===""){
 
-        alert("Team select karo.");
+        alert(
+            "Team select karo."
+        );
 
         return;
+
     }
 
 
     let tagParts=[];
 
-    if(cat)tagParts.push(cat);
+    if(cat)
+    tagParts.push(cat);
 
-    if(round)tagParts.push(round);
+    if(round)
+    tagParts.push(round);
 
 
-    let tag=tagParts.join(" - ");
+    let tag=
+    tagParts.join(" - ");
 
-    let matchStr=a+" VS "+b;
+    let matchStr=
+    a+" VS "+b;
+
 
     if(tag){
 
-        matchStr="("+tag+") "+matchStr;
+        matchStr=
+        "("+tag+") "+matchStr;
 
     }
 
 
-    nextMatches.push(matchStr);
+    nextMatches.push(
+        matchStr
+    );
 
-    document.getElementById("nextTeamA").value="";
 
-    document.getElementById("nextTeamB").value="";
+    document.getElementById(
+        "nextTeamA"
+    ).value="";
 
-    document.getElementById("matchRoundSelect").value="";
+    document.getElementById(
+        "nextTeamB"
+    ).value="";
 
-    document.getElementById("matchCategoryInp").value="";
+    document.getElementById(
+        "matchRoundSelect"
+    ).value="";
+
+    document.getElementById(
+        "matchCategoryInp"
+    ).value="";
 
 
     syncMatchListToDB();
 
-    /* Automatically show match list */
+
+    /* ADD MATCH = MATCH LIST SHOW */
 
     db.update({
         matchListVisible:true
     });
+
 }
 
 
 function renderNextMatches(){
 
-    const container=document.getElementById("nextMatchContainer");
+    const container=
+    document.getElementById(
+        "nextMatchContainer"
+    );
+
 
     if(nextMatches.length===0){
 
         container.innerHTML=
-        `<div style="text-align:center;padding:10px;color:#999;">
+        `<div style="
+        text-align:center;
+        padding:10px;
+        color:#999;">
         No Scheduled Matches
         </div>`;
 
         return;
+
     }
 
 
     let html="";
 
 
-    nextMatches.forEach((matchStr,index)=>{
+    nextMatches.forEach(
+        (matchStr,index)=>{
 
         html+=`
 
         <div class="match-item">
 
-            <div class="match-title">
-                ${formatDisplayMatch(matchStr)}
-            </div>
+        <div class="match-title">
+        ${formatDisplayMatch(matchStr)}
+        </div>
 
-            <div class="match-actions">
+        <div class="match-actions">
 
-                <button
-                class="btn-sm btn-start"
-                onclick="startSpecificMatch(${index})">
-                START
-                </button>
+        <button
+        class="btn-sm btn-start"
+        onclick="startSpecificMatch(${index})">
+        START
+        </button>
 
-                <button
-                class="btn-sm btn-walkover"
-                onclick="walkoverMatch(${index})">
-                WALKOVER
-                </button>
+        <button
+        class="btn-sm btn-walkover"
+        onclick="walkoverMatch(${index})">
+        WALKOVER
+        </button>
 
-                <button
-                class="btn-sm btn-delete"
-                onclick="deleteSpecificMatch(${index})">
-                X
-                </button>
+        <button
+        class="btn-sm btn-delete"
+        onclick="deleteSpecificMatch(${index})">
+        X
+        </button>
 
-            </div>
+        </div>
 
         </div>
 
@@ -1815,49 +2522,75 @@ function renderNextMatches(){
     });
 
 
-    container.innerHTML=html;
+    container.innerHTML=
+    html;
+
 }
 
 
 function startSpecificMatch(index){
 
-    let rawMatchStr=nextMatches[index];
+    let rawMatchStr=
+    nextMatches[index];
 
     let category="";
 
-    let matchStr=rawMatchStr;
+    let matchStr=
+    rawMatchStr;
 
 
-    if(rawMatchStr.startsWith("(")){
+    if(
+        rawMatchStr.startsWith("(")
+    ){
 
-        let parts=rawMatchStr.split(") ");
+        let parts=
+        rawMatchStr.split(") ");
 
-        category=parts[0].replace("(","").trim();
+        category=
+        parts[0]
+        .replace("(","")
+        .trim();
 
-        matchStr=parts[1]||rawMatchStr;
+        matchStr=
+        parts[1]||rawMatchStr;
 
     }
 
 
-    let teams=matchStr.split(" VS ");
-
-    let t1Parts=(teams[0]||"").split("=");
-
-    let t2Parts=(teams[1]||"").split("=");
+    let teams=
+    matchStr.split(" VS ");
 
 
-    nextMatches.splice(index,1);
+    let t1Parts=
+    (teams[0]||"").split("=");
+
+    let t2Parts=
+    (teams[1]||"").split("=");
+
+
+    nextMatches.splice(
+        index,
+        1
+    );
 
 
     let updateObj={
 
-        nameA:t1Parts[0].trim(),
+        nameA:
+        t1Parts[0].trim(),
 
-        nameA_pa:t1Parts[1]?t1Parts[1].trim():"",
+        nameA_pa:
+        t1Parts[1]
+        ?t1Parts[1].trim()
+        :"",
 
-        nameB:t2Parts[0].trim(),
+        nameB:
+        t2Parts[0].trim(),
 
-        nameB_pa:t2Parts[1]?t2Parts[1].trim():"",
+        nameB_pa:
+        t2Parts[1]
+        ?t2Parts[1].trim()
+        :"",
 
         scoreA:0,
 
@@ -1865,56 +2598,83 @@ function startSpecificMatch(index){
 
         scoreVisible:true,
 
-        resultVisible:false
+        resultVisible:false,
+
+        resultFinalized:false,
+
+        lastResult:null
 
     };
 
 
     if(category){
 
-        updateObj.round=category;
+        updateObj.round=
+        category;
 
-        document.getElementById("roundInp").value=category;
+        document.getElementById(
+            "roundInp"
+        ).value=
+        category;
 
     }
 
 
-    db.update(updateObj)
-    .then(()=>syncMatchListToDB());
+    db.update(
+        updateObj
+    )
+    .then(()=>{
+
+        syncMatchListToDB();
+
+    });
 
 }
 
 
 function walkoverMatch(index){
 
-    let rawMatchStr=nextMatches[index];
+    let rawMatchStr=
+    nextMatches[index];
 
-    let matchStr=rawMatchStr;
+    let matchStr=
+    rawMatchStr;
 
 
-    if(rawMatchStr.startsWith("(")){
+    if(
+        rawMatchStr.startsWith("(")
+    ){
 
-        let parts=rawMatchStr.split(") ");
+        let parts=
+        rawMatchStr.split(") ");
 
-        matchStr=parts[1]||rawMatchStr;
+        matchStr=
+        parts[1]||rawMatchStr;
 
     }
 
 
-    let teams=matchStr.split(" VS ");
-
-    let t1Parts=(teams[0]||"").split("=");
-
-    let t2Parts=(teams[1]||"").split("=");
+    let teams=
+    matchStr.split(" VS ");
 
 
-    let t1Name=t1Parts[0].trim();
+    let t1Parts=
+    (teams[0]||"").split("=");
 
-    let t2Name=t2Parts[0].trim();
+    let t2Parts=
+    (teams[1]||"").split("=");
 
 
-    let winNum=prompt(
-        `Walkover winner choose kro:
+    let t1Name=
+    t1Parts[0].trim();
+
+    let t2Name=
+    t2Parts[0].trim();
+
+
+    let winNum=
+    prompt(
+`Walkover winner choose kro:
 
 1 = ${t1Name}
 
@@ -1925,26 +2685,21 @@ function walkoverMatch(index){
 
 
     let winner="";
-
     let loser="";
 
 
     if(winNum==="1"){
 
         winner=t1Name;
-
         loser=t2Name;
 
     }
-
     else if(winNum==="2"){
 
         winner=t2Name;
-
         loser=t1Name;
 
     }
-
     else{
 
         return;
@@ -1952,7 +2707,10 @@ function walkoverMatch(index){
     }
 
 
-    nextMatches.splice(index,1);
+    nextMatches.splice(
+        index,
+        1
+    );
 
 
     saveResult(
@@ -1960,16 +2718,24 @@ function walkoverMatch(index){
         loser,
         0,
         0,
-        "WALKOVER"
+        "WALKOVER",
+        false
     )
-    .then(()=>syncMatchListToDB());
+    .then(()=>{
+
+        syncMatchListToDB();
+
+    });
 
 }
 
 
 function deleteSpecificMatch(index){
 
-    nextMatches.splice(index,1);
+    nextMatches.splice(
+        index,
+        1
+    );
 
     syncMatchListToDB();
 
@@ -1979,104 +2745,147 @@ function deleteSpecificMatch(index){
 function syncMatchListToDB(){
 
     let tEn="";
-
     let tPa="";
 
 
     nextMatches.forEach(m=>{
 
         let prefix="";
-
         let main=m;
 
 
         if(m.startsWith("(")){
 
-            let p=m.split(") ");
+            let p=
+            m.split(") ");
 
-            prefix=p[0]+") ";
+            prefix=
+            p[0]+") ";
 
-            main=p[1]||m;
+            main=
+            p[1]||m;
 
         }
 
 
-        let tms=main.split(" VS ");
+        let tms=
+        main.split(" VS ");
 
-        let t1=(tms[0]||"").split("=");
+        let t1=
+        (tms[0]||"").split("=");
 
-        let t2=(tms[1]||"").split("=");
+        let t2=
+        (tms[1]||"").split("=");
 
 
-        tEn+=`${prefix}${t1[0]} VS ${t2[0]} , `;
+        tEn+=
+        `${prefix}${t1[0]} VS ${t2[0]} , `;
 
-        tPa+=`${prefix}${t1[1]||t1[0]} VS ${t2[1]||t2[0]} , `;
+        tPa+=
+        `${prefix}${t1[1]||t1[0]} VS ${t2[1]||t2[0]} , `;
 
     });
 
 
     db.update({
 
-        nextMatches:nextMatches,
+        nextMatches:
+        nextMatches,
 
-        row5Txt:tEn,
+        row5Txt:
+        tEn,
 
-        row5Txt_pa:tPa
+        row5Txt_pa:
+        tPa
 
     });
 
 }
 
 
-function formatDisplayMatch(matchStr){
+function formatDisplayMatch(
+    matchStr
+){
 
-    return matchStr.replace(/=/g," / ");
+    return matchStr.replace(
+        /=/g,
+        " / "
+    );
 
 }
 
 
-/* ================================
+/* =====================================================
    SCORE
-================================ */
+===================================================== */
 
-function changeScore(team,val){
+function changeScore(
+    team,
+    val
+){
 
-    let current=(team==="scoreA")?curA:curB;
+    let current=
+    team==="scoreA"
+    ?curA
+    :curB;
 
     let newVal;
 
 
     if(val>0){
 
-        if(curA===0&&curB===0){
+        if(
+            curA===0 &&
+            curB===0
+        ){
 
             newVal=1.5;
 
-        }else{
+        }
+        else{
 
-            newVal=current+1;
+            newVal=
+            current+1;
 
         }
 
-    }else{
+    }
+    else{
 
         if(current===1.5){
 
             newVal=0;
 
-        }else{
+        }
+        else{
 
-            newVal=current-1;
+            newVal=
+            current-1;
 
         }
 
-        if(newVal<0)newVal=0;
+        if(newVal<0)
+        newVal=0;
 
     }
 
 
+    /*
+     * New score means old result
+     * no longer active
+     */
+
     db.update({
-        [team]:newVal
+
+        [team]:
+        newVal,
+
+        resultFinalized:
+        false,
+
+        resultVisible:
+        false
+
     });
 
 }
@@ -2084,11 +2893,22 @@ function changeScore(team,val){
 
 function resetScores(){
 
-    if(confirm("Reset Scores?")){
+    if(
+        confirm(
+            "Reset Scores?"
+        )
+    ){
 
         db.update({
+
             scoreA:0,
-            scoreB:0
+
+            scoreB:0,
+
+            resultFinalized:false,
+
+            resultVisible:false
+
         });
 
     }
@@ -2096,21 +2916,33 @@ function resetScores(){
 }
 
 
-/* ================================
+/* =====================================================
    SWAP / CAMERA
-================================ */
+===================================================== */
 
 function swapTeams(){
 
     db.update({
 
-        nameA:document.getElementById("nameB").value,
+        nameA:
+        document.getElementById(
+            "nameB"
+        ).value,
 
-        nameA_pa:document.getElementById("nameB_pa").value,
+        nameA_pa:
+        document.getElementById(
+            "nameB_pa"
+        ).value,
 
-        nameB:document.getElementById("nameA").value,
+        nameB:
+        document.getElementById(
+            "nameA"
+        ).value,
 
-        nameB_pa:document.getElementById("nameA_pa").value,
+        nameB_pa:
+        document.getElementById(
+            "nameA_pa"
+        ).value,
 
         scoreA:curB,
 
@@ -2124,78 +2956,191 @@ function swapTeams(){
 function toggleCameraView(){
 
     db.update({
-        cameraOpposite:!camOpposite
+
+        cameraOpposite:
+        !camOpposite
+
     });
 
 }
 
 
-/* ================================
+/* =====================================================
    RESULT SYSTEM
-================================ */
+===================================================== */
+
+/*
+ * RESULT button:
+ *
+ * First press:
+ *   current score -> save result
+ *   score hide
+ *   result show 5 sec
+ *
+ * Second press after 5 sec:
+ *   same saved result show again 5 sec
+ *
+ * No separate RESULT SHOW button.
+ */
 
 function showResultLayer(){
 
-    if(curA === 0 && curB === 0){
-        alert("Score 0-0 hai.");
+    /*
+     * If result already finalized,
+     * show SAME saved result again.
+     */
+
+    if(
+        resultFinalized &&
+        lastResult
+    ){
+
+        showStoredResult();
+
         return;
+
     }
 
-    if(!confirm("Result update karna chahunde ho?")){
+
+    if(
+        curA===0 &&
+        curB===0
+    ){
+
+        alert(
+            "Score 0-0 hai."
+        );
+
         return;
+
     }
 
-    const teamA = document.getElementById("nameA").value;
-    const teamB = document.getElementById("nameB").value;
 
-    let winner = "";
-    let loser = "";
+    if(
+        !confirm(
+            "Result update karna chahunde ho?"
+        )
+    ){
 
-    if(curA > curB){
-        winner = teamA;
-        loser = teamB;
+        return;
+
     }
-    else if(curB > curA){
-        winner = teamB;
-        loser = teamA;
+
+
+    const teamA=
+    document.getElementById(
+        "nameA"
+    ).value.trim();
+
+    const teamB=
+    document.getElementById(
+        "nameB"
+    ).value.trim();
+
+
+    let winner="";
+    let loser="";
+
+
+    if(curA>curB){
+
+        winner=teamA;
+        loser=teamB;
+
+    }
+    else if(curB>curA){
+
+        winner=teamB;
+        loser=teamA;
+
     }
     else{
-        winner = "TIE";
-        loser = "";
+
+        winner="TIE";
+        loser="";
+
     }
+
 
     saveResult(
         winner,
         loser,
         curA,
         curB,
-        "NORMAL"
-    ).then(() => {
+        "NORMAL",
+        true
+    );
 
-        /*
-         * RESULT WINDOW ON
-         * SCOREBOARD OFF
-         */
-        db.update({
-            resultVisible: true,
-            scoreVisible: false
-        });
-
-        /*
-         * 5 SECOND BAAD RESULT AUTO HIDE
-         */
-        setTimeout(() => {
-
-            db.update({
-                resultVisible: false
-            });
-
-        }, 5000);
-
-    });
 }
 
-function saveResult(winner,loser,scoreA,scoreB,type){
+
+/*
+ * Saved result nu 5 sec layi show
+ */
+
+function showStoredResult(){
+
+    if(!lastResult)
+    return;
+
+
+    const until=
+    Date.now()+5000;
+
+
+    db.update({
+
+        resultVisible:true,
+
+        resultVisibleUntil:
+        until,
+
+        scoreVisible:false
+
+    });
+
+
+    /*
+     * Admin side ton vi exact 5 sec
+     */
+
+    setTimeout(()=>{
+
+        db.update({
+
+            resultVisible:false,
+
+            resultVisibleUntil:0,
+
+            /*
+             * Result de time score hidden si,
+             * hun scoreboard wapas show.
+             *
+             * Je user ne pehla hide kita hoya si
+             * taan restore logic DB value naal hovega.
+             */
+
+            scoreVisible:true
+
+        });
+
+    },5000);
+
+}
+
+
+/*
+ * SAVE RESULT
+ */
+
+function saveResult(
+    winner,
+    loser,
+    scoreA,
+    scoreB,
+    type,
+    showNow=true
+){
 
     let resultTextStr;
 
@@ -2206,14 +3151,12 @@ function saveResult(winner,loser,scoreA,scoreB,type){
         `MATCH TIED (${scoreA}-${scoreB})`;
 
     }
-
     else if(type==="WALKOVER"){
 
         resultTextStr=
         `${winner} WIN BY WALKOVER`;
 
     }
-
     else{
 
         resultTextStr=
@@ -2222,15 +3165,26 @@ function saveResult(winner,loser,scoreA,scoreB,type){
     }
 
 
+    const teamA=
+    document.getElementById(
+        "nameA"
+    ).value.trim();
+
+    const teamB=
+    document.getElementById(
+        "nameB"
+    ).value.trim();
+
+
     let record={
 
         winner:winner,
 
         loser:loser,
 
-        teamA:document.getElementById("nameA").value,
+        teamA:teamA,
 
-        teamB:document.getElementById("nameB").value,
+        teamB:teamB,
 
         scoreA:scoreA,
 
@@ -2238,108 +3192,264 @@ function saveResult(winner,loser,scoreA,scoreB,type){
 
         type:type,
 
-        time:new Date().toLocaleString()
+        time:
+        new Date()
+        .toLocaleString(),
+
+        resultText:
+        resultTextStr
 
     };
 
 
-    resultHistory.push(record);
+    /*
+     * History sirf first finalization te add hove.
+     * RESULT dubara dabban te duplicate history nahi.
+     */
+
+    if(!resultFinalized){
+
+        resultHistory.push(
+            record
+        );
+
+    }
 
 
-    if(winner&&winner!=="TIE"){
+    /*
+     * Winner qualified
+     */
 
-        if(!qualifiedTeams.includes(winner)){
+    if(
+        winner &&
+        winner!=="TIE"
+    ){
 
-            qualifiedTeams.push(winner);
+        if(
+            !qualifiedTeams.includes(
+                winner
+            )
+        ){
+
+            qualifiedTeams.push(
+                winner
+            );
+
+        }
+
+
+        /*
+         * Winner nu master teams ch vi rakho
+         */
+
+        let winnerExists=
+        allTeams.some(
+            t=>t.split("=")[0].trim()
+            ===winner
+        );
+
+
+        if(!winnerExists){
+
+            allTeams.push(
+                winner
+            );
 
         }
 
     }
 
+
+    /*
+     * Loser eliminated
+     */
 
     if(loser){
 
-        if(!eliminatedTeams.includes(loser)){
+        if(
+            !eliminatedTeams.includes(
+                loser
+            )
+        ){
 
-            eliminatedTeams.push(loser);
+            eliminatedTeams.push(
+                loser
+            );
 
         }
 
     }
 
 
-    return db.update({
+    /*
+     * SAVE RESULT
+     */
 
-        resultText:resultTextStr,
+    let updateObj={
 
-        resultVisible:true,
+        resultText:
+        resultTextStr,
 
-        scoreVisible:false,
+        winnerTeam:
+        winner,
 
-        winnerTeam:winner,
-
-        loserTeam:loser,
+        loserTeam:
+        loser,
 
         winnerScore:
-            winner==="TIE"
+        winner==="TIE"
+        ?scoreA
+        :(scoreA>scoreB
             ?scoreA
-            :(scoreA>scoreB?scoreA:scoreB),
+            :scoreB),
 
         loserScore:
-            winner==="TIE"
+        winner==="TIE"
+        ?scoreB
+        :(scoreA>scoreB
             ?scoreB
-            :(scoreA>scoreB?scoreB:scoreA),
+            :scoreA),
 
-        resultType:type,
+        resultType:
+        type,
 
-        qualifiedTeams:qualifiedTeams,
+        qualifiedTeams:
+        qualifiedTeams,
 
-        eliminatedTeams:eliminatedTeams,
+        eliminatedTeams:
+        eliminatedTeams,
 
-        resultHistory:resultHistory,
+        resultHistory:
+        resultHistory,
 
-        lastResult:record
+        lastResult:
+        record,
+
+        resultFinalized:
+        true,
+
+        /*
+         * Score 0 ho jaan after saving,
+         * result window saved result ton chalega.
+         */
+
+        scoreA:0,
+
+        scoreB:0
+
+    };
+
+
+    if(showNow){
+
+        updateObj.resultVisible=
+        true;
+
+        updateObj.resultVisibleUntil=
+        Date.now()+5000;
+
+        updateObj.scoreVisible=
+        false;
+
+    }
+
+
+    return db.update(
+        updateObj
+    )
+    .then(()=>{
+
+        /*
+         * Local variable vi update
+         */
+
+        resultFinalized=true;
+        lastResult=record;
+
+        /*
+         * Only live result display.
+         */
+
+        if(showNow){
+
+            setTimeout(()=>{
+
+                db.update({
+
+                    resultVisible:false,
+
+                    resultVisibleUntil:0,
+
+                    scoreVisible:true
+
+                });
+
+            },5000);
+
+        }
 
     });
 
 }
 
 
-/* ================================
+/* =====================================================
    TEAMS
-================================ */
+===================================================== */
 
 function addBatchTeams(){
 
-    let enStr=document.getElementById("newTeamEn").value.trim();
+    let enStr=
+    document.getElementById(
+        "newTeamEn"
+    ).value.trim();
 
-    let paStr=document.getElementById("newTeamPa").value.trim();
+    let paStr=
+    document.getElementById(
+        "newTeamPa"
+    ).value.trim();
 
 
     if(!enStr)return;
 
 
-    let enArr=enStr
+    let enArr=
+    enStr
+    .split(",")
+    .map(t=>t.trim())
+    .filter(t=>t!=="");
+
+
+    let paArr=
+    paStr
+    ?paStr
         .split(",")
         .map(t=>t.trim())
-        .filter(t=>t!=="");
+        .filter(t=>t!=="")
+    :[];
 
 
-    let paArr=paStr
-        ?paStr.split(",").map(t=>t.trim()).filter(t=>t!=="")
-        :[];
+    enArr.forEach(
+        (en,i)=>{
+
+        let pa=
+        paArr[i]||"";
+
+        let combined=
+        pa
+        ?`${en}=${pa}`
+        :en;
 
 
-    enArr.forEach((en,i)=>{
+        if(
+            !allTeams.includes(
+                combined
+            )
+        ){
 
-        let pa=paArr[i]||"";
-
-        let combined=pa?`${en}=${pa}`:en;
-
-
-        if(!allTeams.includes(combined)){
-
-            allTeams.push(combined);
+            allTeams.push(
+                combined
+            );
 
         }
 
@@ -2347,61 +3457,108 @@ function addBatchTeams(){
 
 
     db.update({
-        allTeams:allTeams
+
+        allTeams:
+        allTeams
+
     });
 
 
-    document.getElementById("newTeamEn").value="";
+    document.getElementById(
+        "newTeamEn"
+    ).value="";
 
-    document.getElementById("newTeamPa").value="";
+    document.getElementById(
+        "newTeamPa"
+    ).value="";
 
 }
 
 
 function updateDropdowns(){
 
-    const a=document.getElementById("teamSelectA");
+    const a=
+    document.getElementById(
+        "teamSelectA"
+    );
 
-    const b=document.getElementById("teamSelectB");
+    const b=
+    document.getElementById(
+        "teamSelectB"
+    );
 
-    const na=document.getElementById("nextTeamA");
+    const na=
+    document.getElementById(
+        "nextTeamA"
+    );
 
-    const nb=document.getElementById("nextTeamB");
-
-
-    a.innerHTML='<option value="">Select Team A</option>';
-
-    b.innerHTML='<option value="">Select Team B</option>';
-
-    na.innerHTML='<option value="">Select Team 1</option>';
-
-    nb.innerHTML='<option value="">Select Team 2</option>';
-
-
-    allTeams.forEach(teamStr=>{
-
-        let parts=teamStr.split("=");
-
-        let en=parts[0].trim();
-
-        let pa=parts[1]?parts[1].trim():"";
-
-        let display=pa?`${en} / ${pa}`:en;
+    const nb=
+    document.getElementById(
+        "nextTeamB"
+    );
 
 
-        let opt=
-        `<option value="${teamStr}">
-        ${display}
-        </option>`;
+    a.innerHTML=
+    '<option value="">Select Team A</option>';
+
+    b.innerHTML=
+    '<option value="">Select Team B</option>';
+
+    na.innerHTML=
+    '<option value="">Select Team 1</option>';
+
+    nb.innerHTML=
+    '<option value="">Select Team 2</option>';
 
 
-        a.innerHTML+=opt;
+    allTeams.forEach(
+        teamStr=>{
 
-        b.innerHTML+=opt;
+        let parts=
+        teamStr.split("=");
 
-        na.innerHTML+=opt;
+        let en=
+        parts[0].trim();
 
-        nb.innerHTML+=opt;
+        let pa=
+        parts[1]
+        ?parts[1].trim()
+        :"";
+
+        let display=
+        pa
+        ?`${en} / ${pa}`
+        :en;
+
+
+        /*
+         * DOM option use kita
+         * taan special characters safe rehnde.
+         */
+
+        [
+            a,
+            b,
+            na,
+            nb
+        ].forEach(select=>{
+
+            const opt=
+            document.createElement(
+                "option"
+            );
+
+            opt.value=
+            teamStr;
+
+            opt.textContent=
+            display;
+
+            select.appendChild(
+                opt
+            );
+
+        });
 
     });
 
@@ -2412,13 +3569,21 @@ function selectTeamA(val){
 
     if(!val)return;
 
-    let p=val.split("=");
+    let p=
+    val.split("=");
+
 
     db.update({
 
-        nameA:p[0].trim(),
+        nameA:
+        p[0].trim(),
 
-        nameA_pa:p[1]?p[1].trim():""
+        nameA_pa:
+        p[1]
+        ?p[1].trim()
+        :"",
+
+        resultFinalized:false
 
     });
 
@@ -2429,44 +3594,64 @@ function selectTeamB(val){
 
     if(!val)return;
 
-    let p=val.split("=");
+    let p=
+    val.split("=");
+
 
     db.update({
 
-        nameB:p[0].trim(),
+        nameB:
+        p[0].trim(),
 
-        nameB_pa:p[1]?p[1].trim():""
+        nameB_pa:
+        p[1]
+        ?p[1].trim()
+        :"",
+
+        resultFinalized:false
 
     });
 
 }
 
 
-/* ================================
+/* =====================================================
    UPCOMING EVENTS
-================================ */
+===================================================== */
 
 function addUpcomingEvent(){
 
-    const nameEn=document.getElementById("ueName").value.trim();
+    const nameEn=
+    document.getElementById(
+        "ueName"
+    ).value.trim();
 
-    const namePa=document.getElementById("ueName_pa").value.trim();
+    const namePa=
+    document.getElementById(
+        "ueName_pa"
+    ).value.trim();
 
-    const dateVal=document.getElementById("ueDate").value;
+    const dateVal=
+    document.getElementById(
+        "ueDate"
+    ).value;
 
 
     if(nameEn==="")return;
 
 
-    let dateStr=dateVal
-        ?new Date(dateVal).toLocaleDateString(
-            'en-GB',
-            {
-                day:'numeric',
-                month:'short'
-            }
-        )
-        :"";
+    let dateStr=
+    dateVal
+    ?new Date(
+        dateVal
+    ).toLocaleDateString(
+        'en-GB',
+        {
+            day:'numeric',
+            month:'short'
+        }
+    )
+    :"";
 
 
     upcomingEvents.push({
@@ -2480,11 +3665,17 @@ function addUpcomingEvent(){
     });
 
 
-    document.getElementById("ueName").value="";
+    document.getElementById(
+        "ueName"
+    ).value="";
 
-    document.getElementById("ueName_pa").value="";
+    document.getElementById(
+        "ueName_pa"
+    ).value="";
 
-    document.getElementById("ueDate").value="";
+    document.getElementById(
+        "ueDate"
+    ).value="";
 
 
     syncUpcomingEventsToDB();
@@ -2494,7 +3685,10 @@ function addUpcomingEvent(){
 
 function deleteUpcomingEvent(index){
 
-    upcomingEvents.splice(index,1);
+    upcomingEvents.splice(
+        index,
+        1
+    );
 
     syncUpcomingEventsToDB();
 
@@ -2503,29 +3697,44 @@ function deleteUpcomingEvent(index){
 
 function syncUpcomingEventsToDB(){
 
-    let evEn=upcomingEvents
-        .map(
-            (ev,i)=>
-            `${i+1}. ${ev.name}${ev.date?" ("+ev.date+")":""}`
-        )
-        .join(" | ");
+    let evEn=
+    upcomingEvents
+    .map(
+        (ev,i)=>
+        `${i+1}. ${ev.name}${
+            ev.date
+            ?" ("+ev.date+")"
+            :""
+        }`
+    )
+    .join(" | ");
 
 
-    let evPa=upcomingEvents
-        .map(
-            (ev,i)=>
-            `${i+1}. ${ev.name_pa||ev.name}${ev.date?" ("+ev.date+")":""}`
-        )
-        .join(" | ");
+    let evPa=
+    upcomingEvents
+    .map(
+        (ev,i)=>
+        `${i+1}. ${
+            ev.name_pa||ev.name
+        }${
+            ev.date
+            ?" ("+ev.date+")"
+            :""
+        }`
+    )
+    .join(" | ");
 
 
     db.update({
 
-        upcomingEvents:upcomingEvents,
+        upcomingEvents:
+        upcomingEvents,
 
-        row4Txt:evEn||"UPCOMING EVENTS",
+        row4Txt:
+        evEn||"UPCOMING EVENTS",
 
-        row4Txt_pa:evPa||"ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ"
+        row4Txt_pa:
+        evPa||"ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ"
 
     });
 
@@ -2535,13 +3744,19 @@ function syncUpcomingEventsToDB(){
 function renderUpcomingEvents(){
 
     const container=
-        document.getElementById("upcomingEventsContainer");
+    document.getElementById(
+        "upcomingEventsContainer"
+    );
 
 
-    if(upcomingEvents.length===0){
+    if(
+        upcomingEvents.length===0
+    ){
 
         container.innerHTML=
-        `<div style="text-align:center;color:#999;">
+        `<div style="
+        text-align:center;
+        color:#999;">
         No events added yet.
         </div>`;
 
@@ -2553,18 +3768,19 @@ function renderUpcomingEvents(){
     let html="";
 
 
-    upcomingEvents.forEach((ev,idx)=>{
+    upcomingEvents.forEach(
+        (ev,idx)=>{
 
         let displayDate=
-            ev.date
-            ?`<small>(${ev.date})</small>`
-            :"";
+        ev.date
+        ?`<small>(${ev.date})</small>`
+        :"";
 
 
         let displayName=
-            ev.name_pa
-            ?`${ev.name} / ${ev.name_pa}`
-            :ev.name;
+        ev.name_pa
+        ?`${ev.name} / ${ev.name_pa}`
+        :ev.name;
 
 
         html+=`
@@ -2572,12 +3788,19 @@ function renderUpcomingEvents(){
         <div class="event-item">
 
         <span>
-        ${idx+1}. ${displayName} ${displayDate}
+        ${idx+1}. ${displayName}
+        ${displayDate}
         </span>
 
         <button
         class="btn-red"
-        style="border:none;border-radius:4px;padding:4px 10px;color:white;cursor:pointer;"
+        style="
+        border:none;
+        border-radius:4px;
+        padding:4px 10px;
+        color:white;
+        cursor:pointer;
+        "
         onclick="deleteUpcomingEvent(${idx})">
         X
         </button>
@@ -2589,30 +3812,49 @@ function renderUpcomingEvents(){
     });
 
 
-    container.innerHTML=html;
+    container.innerHTML=
+    html;
 
 }
 
 
-/* ================================
-   BEST PLAYER
-================================ */
+/* =====================================================
+   BEST RAIDER / JAFFI PRIZE
+===================================================== */
 
-function syncBestPrize(selectId,customId){
+function syncBestPrize(
+    selectId,
+    customId
+){
 
-    const select=document.getElementById(selectId);
+    const select=
+    document.getElementById(
+        selectId
+    );
 
-    const custom=document.getElementById(customId);
+    const custom=
+    document.getElementById(
+        customId
+    );
 
-    if(select.value==="OTHER"){
 
-        custom.style.display="block";
+    if(
+        select.value==="OTHER"
+    ){
 
-    }else{
+        custom.style.display=
+        "block";
 
-        custom.style.display="none";
+    }
+    else{
 
-        custom.value="";
+        custom.style.display=
+        "none";
+
+        /*
+         * Custom clear nahi karna
+         * taan data accidentally lose na hove.
+         */
 
     }
 
@@ -2625,92 +3867,150 @@ function syncBestPrize(selectId,customId){
 }
 
 
+/*
+ * SAVE BEST RAIDER + JAFFI
+ */
+
 function saveBestPlayerData(){
 
     db.update({
 
+        /*
+         * RAIDER
+         */
+
         bestRaiderName:
-            document.getElementById("bestRaiderName").value,
+        document.getElementById(
+            "bestRaiderName"
+        ).value,
 
         bestRaiderTouches:
-            document.getElementById("bestRaiderTouches").value,
+        document.getElementById(
+            "bestRaiderTouches"
+        ).value,
 
         bestRaiderPoints:
-            document.getElementById("bestRaiderPoints").value,
+        document.getElementById(
+            "bestRaiderPoints"
+        ).value,
 
         bestRaiderPrize:
-            document.getElementById("bestRaiderPrize").value,
+        document.getElementById(
+            "bestRaiderPrize"
+        ).value,
 
         bestRaiderPrizeCustom:
-            document.getElementById("bestRaiderPrizeCustom").value,
+        document.getElementById(
+            "bestRaiderPrizeCustom"
+        ).value,
+
+
+        /*
+         * JAFFI
+         */
 
         bestJaffiName:
-            document.getElementById("bestJaffiName").value,
+        document.getElementById(
+            "bestJaffiName"
+        ).value,
 
         bestJaffiTouches:
-            document.getElementById("bestJaffiTouches").value,
+        document.getElementById(
+            "bestJaffiTouches"
+        ).value,
 
         bestJaffiJaffe:
-            document.getElementById("bestJaffiJaffe").value,
+        document.getElementById(
+            "bestJaffiJaffe"
+        ).value,
 
         bestJaffiPrize:
-            document.getElementById("bestJaffiPrize").value,
+        document.getElementById(
+            "bestJaffiPrize"
+        ).value,
 
         bestJaffiPrizeCustom:
-            document.getElementById("bestJaffiPrizeCustom").value
+        document.getElementById(
+            "bestJaffiPrizeCustom"
+        ).value,
+
+        /*
+         * Best player window data available
+         */
+
+        bestPlayerVisible:true
 
     })
     .then(()=>{
 
-        alert("Best Player details saved!");
+        alert(
+            "Best Raider + Best Jaffi details saved!"
+        );
 
     });
 
 }
 
 
-/* ================================
+/* =====================================================
    QUALIFIED / ELIMINATED
-================================ */
+===================================================== */
 
 function renderQualifiedTeams(){
 
-    let q=document.getElementById("qualifiedTeamsView");
+    let q=
+    document.getElementById(
+        "qualifiedTeamsView"
+    );
 
-    let e=document.getElementById("eliminatedTeamsView");
+    let e=
+    document.getElementById(
+        "eliminatedTeamsView"
+    );
 
 
     q.innerHTML=
-        qualifiedTeams.length
-        ?qualifiedTeams.map(
-            (x,i)=>`${i+1}. ${x}`
-        ).join("<br>")
-        :"None";
+    qualifiedTeams.length
+    ?qualifiedTeams
+        .map(
+            (x,i)=>
+            `${i+1}. ${x}`
+        )
+        .join("<br>")
+    :"None";
 
 
     e.innerHTML=
-        eliminatedTeams.length
-        ?eliminatedTeams.map(
-            (x,i)=>`${i+1}. ${x}`
-        ).join("<br>")
-        :"None";
+    eliminatedTeams.length
+    ?eliminatedTeams
+        .map(
+            (x,i)=>
+            `${i+1}. ${x}`
+        )
+        .join("<br>")
+    :"None";
 
 }
 
 
-/* ================================
+/* =====================================================
    RESULT HISTORY
-================================ */
+===================================================== */
 
 function renderResultHistory(){
 
     const container=
-        document.getElementById("resultHistoryContainer");
+    document.getElementById(
+        "resultHistoryContainer"
+    );
 
 
-    if(!resultHistory.length){
+    if(
+        !resultHistory.length
+    ){
 
-        container.innerHTML="No Result Yet";
+        container.innerHTML=
+        "No Result Yet";
 
         return;
 
@@ -2721,54 +4021,68 @@ function renderResultHistory(){
 
 
     resultHistory
-        .slice()
-        .reverse()
-        .forEach((r,i)=>{
+    .slice()
+    .reverse()
+    .forEach(
+        (r,i)=>{
 
-            html+=`
+        html+=`
 
-            <div class="result-history-item">
+        <div class="result-history-item">
 
-            <b>🏆 ${r.winner}</b>
+        <b>
+        🏆 ${r.winner}
+        </b>
 
-            ${r.loser
-                ?`<br>❌ ${r.loser}`
-                :""
-            }
+        ${
+            r.loser
+            ?`<br>❌ ${r.loser}`
+            :""
+        }
 
-            <br>
+        <br>
 
-            Score:
-            ${r.scoreA} - ${r.scoreB}
+        Score:
+        ${r.scoreA} - ${r.scoreB}
 
-            <br>
+        <br>
 
-            <small>
-            ${r.type||"NORMAL"} |
-            ${r.time||""}
-            </small>
+        <small>
 
-            </div>
+        ${r.type||"NORMAL"}
 
-            `;
+        |
 
-        });
+        ${r.time||""}
+
+        </small>
+
+        </div>
+
+        `;
+
+    });
 
 
-    container.innerHTML=html;
+    container.innerHTML=
+    html;
 
 }
 
 
-/* ================================
+/* =====================================================
    CLEAR EVERYTHING
-================================ */
+===================================================== */
 
 function clearAllTeams(){
 
-    if(!confirm(
-        "WARNING!\n\nDelete ALL teams, matches and results?"
-    )){
+    if(
+        !confirm(
+`WARNING!
+
+Delete ALL teams, matches and results?`
+        )
+    ){
 
         return;
 
@@ -2801,9 +4115,20 @@ function clearAllTeams(){
 
         nameB_pa:"",
 
-        resultText:"No Result Yet",
+        resultText:
+        "No Result Yet",
 
         resultVisible:false,
+
+        resultVisibleUntil:0,
+
+        resultFinalized:false,
+
+        lastResult:null,
+
+        winnerTeam:"",
+
+        loserTeam:"",
 
         scoreVisible:true,
 
@@ -2815,7 +4140,27 @@ function clearAllTeams(){
 
         prizesVisible:false,
 
-        bestPlayerVisible:false
+        bestPlayerVisible:false,
+
+        bestRaiderName:"",
+
+        bestRaiderTouches:"",
+
+        bestRaiderPoints:"",
+
+        bestRaiderPrize:"",
+
+        bestRaiderPrizeCustom:"",
+
+        bestJaffiName:"",
+
+        bestJaffiTouches:"",
+
+        bestJaffiJaffe:"",
+
+        bestJaffiPrize:"",
+
+        bestJaffiPrizeCustom:""
 
     });
 
@@ -2824,10 +4169,14 @@ function clearAllTeams(){
     .querySelectorAll(
         'input[type="text"],textarea,input[type="date"],input[type="number"]'
     )
-    .forEach(el=>el.value='');
+    .forEach(
+        el=>el.value=''
+    );
 
 
-    alert("All teams/data reset.");
+    alert(
+        "All teams/data reset."
+    );
 
 }
 
