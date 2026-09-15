@@ -118,12 +118,8 @@ textarea{
     font-weight:bold;
     cursor:pointer;
 }
-.btn-plus{
-    background:#28a745;
-}
-.btn-minus{
-    background:#dc3545;
-}
+.btn-plus{background:#28a745;}
+.btn-minus{background:#dc3545;}
 .controls{
     padding:12px;
     display:grid;
@@ -145,16 +141,12 @@ textarea{
     align-items:center;
     justify-content:center;
     text-align:center;
-    line-height:1.2;
-    overflow:hidden;
-    word-break:break-word;
 }
 .btn-green{background:#28a745;}
 .btn-red{background:#ea4335;}
 .btn-yellow{background:#fbbc05;color:black;}
 .btn-dark{background:#333;}
 .btn-blue{background:#1a73e8;}
-.btn-purple{background:#6f42c1;}
 .btn-orange{background:#fd7e14;}
 .btn-gray{background:#777;}
 
@@ -183,184 +175,61 @@ textarea{
 }
 .match-actions{
     display:flex;
-    gap:5px;
+    gap:4px;
     justify-content:center;
+    flex-wrap:wrap;
 }
 .btn-sm{
     flex:1;
-    padding:10px;
+    min-width:70px;
+    padding:8px 4px;
     border:none;
     border-radius:6px;
     font-weight:bold;
     color:white;
     cursor:pointer;
-    font-size:14px;
+    font-size:12px;
+    text-align:center;
 }
 .btn-start{background:#1a73e8;}
+.btn-res{background:#28a745;}
+.btn-nxt{background:#ff9800;}
 .btn-walkover{background:#fd7e14;}
-.btn-delete{background:#dc3545;max-width:45px;}
+.btn-delete{background:#dc3545;max-width:35px;}
 
-.event-item{
+.category-group-header{
+    font-size:15px;
+    font-weight:900;
     background:#e3f2fd;
-    border:1px solid #90caf9;
-    border-radius:8px;
-    padding:10px;
-    margin-bottom:8px;
+    color:#1565c0;
+    padding:8px 12px;
+    border-radius:6px;
+    margin-top:10px;
+    margin-bottom:6px;
     display:flex;
     justify-content:space-between;
     align-items:center;
-    font-weight:bold;
-}
-.list-header{
-    font-size:15px;
-    font-weight:900;
-    padding:5px 0;
-    border-bottom:2px solid #ddd;
-    margin-bottom:10px;
-    color:#444;
-}
-.prize-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:15px;
-    background:#f8f9fa;
-    padding:12px;
-    border-radius:8px;
-    border:1px solid #ddd;
-}
-.prize-col input{
-    font-size:14px;
-    padding:8px;
-    margin-bottom:6px;
-}
-.ticker-label{
-    font-size:14px;
-    font-weight:800;
-    color:#1a73e8;
-    margin:15px 0 5px 0;
-    display:block;
-    border-bottom:2px solid #1a73e8;
-    padding-bottom:3px;
-}
-.visibility-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-}
-.visibility-card{
-    background:#f8f9fa;
-    border:1px solid #ddd;
-    border-radius:10px;
-    padding:10px;
-}
-.visibility-card button{
-    width:100%;
-    border:none;
-    border-radius:8px;
-    padding:12px;
-    font-size:14px;
-    font-weight:900;
-    cursor:pointer;
-    color:white;
-}
-.status{
-    text-align:center;
-    font-size:12px;
-    font-weight:bold;
-    margin-top:6px;
-}
-.stats-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:15px;
-}
-.stats-box{
-    background:#f8f9fa;
-    border:2px solid #ddd;
-    border-radius:10px;
-    padding:10px;
-}
-.stats-title{
-    font-size:16px;
-    font-weight:900;
-    color:#1a73e8;
-    text-align:center;
-    margin-bottom:8px;
 }
 
-.best-prize-box{
-    margin-top:8px;
-    padding:10px;
-    background:#fff;
-    border:2px solid #ff9800;
-    border-radius:8px;
-}
-.best-prize-title{
-    font-size:13px;
-    font-weight:900;
-    color:#e65100;
-    margin-bottom:7px;
-}
-.save-mini{
-    width:100%;
-    border:none;
-    border-radius:7px;
-    padding:10px;
-    color:white;
-    background:#1a73e8;
-    font-weight:900;
-    cursor:pointer;
-    margin-top:3px;
-}
-
-.result-history{
-    background:#f8f9fa;
-    border:1px solid #ddd;
-    border-radius:8px;
-    padding:10px;
-    margin-top:10px;
-}
-.result-history-item{
-    background:white;
-    border-left:4px solid #28a745;
-    padding:8px;
-    margin-bottom:6px;
-    border-radius:5px;
-}
-.qualified-box{
+.winner-card{
     background:#e8f5e9;
     border:2px solid #81c784;
     padding:10px;
     border-radius:8px;
+    margin-bottom:10px;
 }
-.eliminated-box{
+.loser-card{
     background:#ffebee;
     border:2px solid #ef9a9a;
     padding:10px;
     border-radius:8px;
+    margin-bottom:10px;
 }
-
-@media(max-width:768px){
-    .controls{
-        grid-template-columns:repeat(2,1fr);
-    }
-    .btn-full{
-        font-size:16px;
-        height:68px;
-    }
-    .teams-container{
-        flex-direction:column;
-    }
-    .vs-text{
-        padding:10px 0;
-    }
-    .prize-grid,
-    .stats-grid{
-        grid-template-columns:1fr;
-    }
-    .visibility-grid{
-        grid-template-columns:1fr 1fr;
-    }
+.winner-row{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    margin-bottom:6px;
 }
 </style>
 </head>
@@ -371,9 +240,7 @@ textarea{
 
 <!-- LANGUAGE -->
 <div class="card">
-<div class="header" style="background:#fbbc05;color:black;">
-LANGUAGE TRANSLATION SETTINGS
-</div>
+<div class="header" style="background:#fbbc05;color:black;">LANGUAGE TRANSLATION SETTINGS</div>
 <div class="settings-section" style="display:flex;align-items:center;gap:10px;">
 <span style="font-weight:bold;font-size:16px;">Translate to:</span>
 <select id="targetLang" style="margin-bottom:0;border:2px solid #fbbc05;">
@@ -392,9 +259,7 @@ LANGUAGE TRANSLATION SETTINGS
 
 <!-- TEAM A -->
 <div class="team-box">
-<select id="teamSelectA" onchange="selectTeamA(this.value)">
-<option value="">Select Team A</option>
-</select>
+<select id="teamSelectA" onchange="selectTeamA(this.value)"><option value="">Select Team A</option></select>
 <div class="team-top">
 <div class="team-inputs-wrap">
 <div class="team-input-row">
@@ -415,9 +280,7 @@ LANGUAGE TRANSLATION SETTINGS
 
 <!-- TEAM B -->
 <div class="team-box">
-<select id="teamSelectB" onchange="selectTeamB(this.value)">
-<option value="">Select Team B</option>
-</select>
+<select id="teamSelectB" onchange="selectTeamB(this.value)"><option value="">Select Team B</option></select>
 <div class="team-top">
 <div class="team-inputs-wrap">
 <div class="team-input-row">
@@ -466,138 +329,47 @@ LANGUAGE TRANSLATION SETTINGS
 <option value="Semi Final">Semi Final</option>
 <option value="Final">Final</option>
 </select>
-<input type="text" id="matchCategoryInp" placeholder="KG / Open..." style="flex:1;margin-bottom:0;">
+<input type="text" id="matchCategoryInp" placeholder="Category / 55 KG / 65 KG / Open" style="flex:1;margin-bottom:0;">
 </div>
-<button class="btn-full btn-green" onclick="addNewMatch()" style="height:48px;min-height:48px;font-size:15px;margin-top:5px;">+ ADD MATCH TO LIST</button>
+<button class="btn-full btn-green" onclick="addNewMatch()" style="height:48px;min-height:48px;font-size:15px;margin-top:5px;">+ ADD TO MATCH LIST</button>
 </div>
 
-<div class="list-header">📋 SCHEDULED MATCHES LIST</div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+<div class="list-header" style="margin-bottom:0;border:none;">📋 SCHEDULED MATCHES LIST</div>
+<button onclick="toggleVisibility('matchListVisible')" class="btn-sm btn-blue" style="max-width:120px;padding:6px;" id="matchListBtn">SHOW LIST</button>
+</div>
 <div id="nextMatchContainer"></div>
 
 </div>
 </div>
 
-<!-- DISPLAY CONTROLS -->
+<!-- WINNER & LOSER BOXES (Notebook Style) -->
 <div class="card">
-<div class="header" style="background:#6f42c1;">OVERLAY WINDOW SHOW / HIDE CONTROL</div>
+<div class="header" style="background:#ff9800;">🏆 WINNER BOX & ❌ LOOS TEAM BOX</div>
 <div class="settings-section">
-<div class="visibility-grid">
-<div class="visibility-card">
-<b>📋 Match List</b>
-<button id="matchListBtn" onclick="toggleVisibility('matchListVisible')" class="btn-green" style="margin-top:8px;">SHOW MATCH LIST</button>
-<div id="matchListStatus" class="status">HIDDEN</div>
+
+<div class="winner-card">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+<b>WINNER BOX (Qualified Teams)</b>
+<button class="btn-sm btn-green" onclick="updateWinnerBox()">UPDATE</button>
 </div>
-<div class="visibility-card">
-<b>👥 All Teams</b>
-<button id="teamsBtn" onclick="toggleVisibility('teamsVisible')" class="btn-green" style="margin-top:8px;">SHOW TEAMS</button>
-<div id="teamsStatus" class="status">HIDDEN</div>
+<div id="winnerBoxContainer">None</div>
 </div>
-<div class="visibility-card">
-<b>📍 Village Name</b>
-<button id="villageBtn" onclick="toggleVisibility('villageVisible')" class="btn-green" style="margin-top:8px;">SHOW VILLAGE</button>
-<div id="villageStatus" class="status">HIDDEN</div>
+
+<div class="loser-card">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+<b>LOOS TEAM BOX (Eliminated Teams)</b>
+<button class="btn-sm btn-red" onclick="updateLoserBox()">UPDATE</button>
 </div>
-<div class="visibility-card">
-<b>🏆 Prizes</b>
-<button id="prizesBtn" onclick="toggleVisibility('prizesVisible')" class="btn-green" style="margin-top:8px;">SHOW PRIZES</button>
-<div id="prizesStatus" class="status">HIDDEN</div>
+<div id="loserBoxContainer">None</div>
 </div>
-<div class="visibility-card">
-<b>⭐ Best Raider / Jaffi</b>
-<button id="bestPlayerBtn" onclick="toggleVisibility('bestPlayerVisible')" class="btn-green" style="margin-top:8px;">SHOW BEST PLAYER</button>
-<div id="bestPlayerStatus" class="status">HIDDEN</div>
-</div>
-</div>
+
 </div>
 </div>
 
-<!-- BEST PLAYER / PRIZE -->
+<!-- TEAM MANAGER -->
 <div class="card">
-<div class="header" style="background:#ff9800;">🏆 BEST RAIDER / BEST JAFFI / PRIZE</div>
-<div class="settings-section">
-<div class="stats-grid">
-<!-- BEST RAIDER -->
-<div class="stats-box">
-<div class="stats-title">🔥 BEST RAIDER</div>
-<input type="text" id="bestRaiderName" placeholder="Raider Name" oninput="syncField('bestRaiderName',this.value)">
-<input type="number" id="bestRaiderTouches" placeholder="Raider Touch" min="0" oninput="syncField('bestRaiderTouches',this.value)">
-<input type="number" id="bestRaiderPoints" placeholder="Raider Points" min="0" oninput="syncField('bestRaiderPoints',this.value)">
-<div class="best-prize-box">
-<div class="best-prize-title">🎁 BEST RAIDER PRIZE</div>
-<select id="bestRaiderPrize" onchange="syncBestPrize('bestRaiderPrize','bestRaiderPrizeCustom')">
-<option value="">-- Select Prize --</option>
-<option value="Laptop">Laptop</option>
-<option value="Motorcycle">Motorcycle</option>
-<option value="Bullet Motorcycle">Bullet Motorcycle</option>
-<option value="Car">Car</option>
-<option value="Tractor">Tractor</option>
-<option value="₹5,100">₹5,100</option>
-<option value="₹11,000">₹11,000</option>
-<option value="₹21,000">₹21,000</option>
-<option value="OTHER">Other / Custom</option>
-</select>
-<input type="text" id="bestRaiderPrizeCustom" placeholder="Custom Raider Prize" style="display:none;" oninput="syncField('bestRaiderPrizeCustom',this.value)">
-</div>
-<button class="save-mini" onclick="saveBestPlayerData()">💾 SAVE RAIDER</button>
-</div>
-
-<!-- BEST JAFFI -->
-<div class="stats-box">
-<div class="stats-title">💪 BEST JAFFI</div>
-<input type="text" id="bestJaffiName" placeholder="Jaffi Name" oninput="syncField('bestJaffiName',this.value)">
-<input type="number" id="bestJaffiTouches" placeholder="Jaffi Touch" min="0" oninput="syncField('bestJaffiTouches',this.value)">
-<input type="number" id="bestJaffiJaffe" placeholder="Successful Jaffe" min="0" oninput="syncField('bestJaffiJaffe',this.value)">
-<div class="best-prize-box">
-<div class="best-prize-title">🎁 BEST JAFFI PRIZE</div>
-<select id="bestJaffiPrize" onchange="syncBestPrize('bestJaffiPrize','bestJaffiPrizeCustom')">
-<option value="">-- Select Prize --</option>
-<option value="Laptop">Laptop</option>
-<option value="Motorcycle">Motorcycle</option>
-<option value="Bullet Motorcycle">Bullet Motorcycle</option>
-<option value="Car">Car</option>
-<option value="Tractor">Tractor</option>
-<option value="₹5,100">₹5,100</option>
-<option value="₹11,000">₹11,000</option>
-<option value="₹21,000">₹21,000</option>
-<option value="OTHER">Other / Custom</option>
-</select>
-<input type="text" id="bestJaffiPrizeCustom" placeholder="Custom Jaffi Prize" style="display:none;" oninput="syncField('bestJaffiPrizeCustom',this.value)">
-</div>
-<button class="save-mini" onclick="saveBestPlayerData()">💾 SAVE JAFFI</button>
-</div>
-</div>
-</div>
-</div>
-
-<!-- TICKER -->
-<div class="card">
-<div class="header" style="background:#0066cc;">TICKER SETTINGS & ADS</div>
-<div class="settings-section">
-<label class="ticker-label">1. Village / Location Name</label>
-<div class="team-inputs-wrap">
-<div class="team-input-row">
-<input type="text" id="row1Inp" class="team-input" placeholder="MAHLA, NEAR GORAYA">
-<button class="trans-btn" onclick="translateToInput('row1Inp','row1Inp_pa')">⇄</button>
-</div>
-<input type="text" id="row1Inp_pa" class="team-input" placeholder="Translated Village">
-</div>
-
-<label class="ticker-label">🏟️ Event Details & Program</label>
-<div class="team-inputs-wrap" style="margin-bottom:10px;">
-<div class="team-input-row">
-<input type="text" id="programInp" class="team-input" placeholder="KABADDI CUP / SHOW MATCH">
-<button class="trans-btn" onclick="translateToInput('programInp','programInp_pa')">⇄</button>
-</div>
-<input type="text" id="programInp_pa" class="team-input" placeholder="ਪ੍ਰੋਗਰਾਮ ਪੰਜਾਬੀ ਵਿੱਚ">
-</div>
-
-<button class="btn-full btn-green" onclick="updateAllTickerDetails()" style="height:52px;min-height:52px;font-size:16px;margin-top:15px;margin-bottom:15px;">💾 UPDATE ALL TICKER DETAILS</button>
-</div>
-</div>
-
-<!-- TEAM MANAGER & WINNERS -->
-<div class="card">
-<div class="header">TOURNAMENT TEAM MANAGER & WINNERS BOX</div>
+<div class="header">TOURNAMENT TEAM MANAGER</div>
 <div class="settings-section">
 <label class="ticker-label">➕ Add Teams</label>
 <div style="background:#f8f9fa;padding:10px;border:1px solid #ddd;border-radius:8px;margin-bottom:15px;">
@@ -608,29 +380,8 @@ LANGUAGE TRANSLATION SETTINGS
 <textarea id="newTeamPa" rows="2" placeholder="Punjabi Teams"></textarea>
 <button class="btn-full btn-green" onclick="addBatchTeams()" style="height:42px;min-height:42px;font-size:14px;">ADD TEAMS TO LIST</button>
 </div>
-
-<div class="qualified-box" style="margin-bottom:10px;">
-<b>✅ QUALIFIED / WINNER TEAMS (Winer Box)</b>
-<div id="qualifiedTeamsView">None</div>
+<textarea id="allTeamsInp" rows="4" placeholder="All Teams Master List" oninput="syncFieldArrayTeams(this.value)"></textarea>
 </div>
-
-<div class="eliminated-box">
-<b>❌ ELIMINATED / LOOS TEAMS (Loos Team Box)</b>
-<div id="eliminatedTeamsView">None</div>
-</div>
-</div>
-</div>
-
-<!-- RESULT HISTORY -->
-<div class="card">
-<div class="header" style="background:#28a745;">RESULT HISTORY</div>
-<div class="settings-section">
-<div id="resultHistoryContainer">No Result Yet</div>
-</div>
-</div>
-
-<button class="btn-full btn-red" onclick="clearAllTeams()" style="width:100%;margin-bottom:15px;padding:14px;border-radius:10px;font-size:15px;height:50px;min-height:50px;">RESET ALL TEAMS & DATA</button>
-
 </div>
 
 <script>
@@ -644,8 +395,7 @@ const matchId = urlParams.get('id') || 'defaultMatch';
 const db = firebase.database().ref("matchData/"+matchId);
 
 let curA=0, curB=0, camOpposite=false;
-let allTeams=[], nextMatches=[], upcomingEvents=[];
-let qualifiedTeams=[], eliminatedTeams=[], resultHistory=[];
+let allTeams=[], nextMatches=[], qualifiedTeams=[], eliminatedTeams=[];
 let resultFinalized=false, lastResult=null, scoreVisible=true;
 
 function setSafely(id,val){
@@ -659,52 +409,9 @@ function syncField(key,val){
     db.update({[key]:val});
 }
 
-function updateAllTickerDetails(){
-    db.update({
-        row1Txt: document.getElementById("row1Inp").value.trim(),
-        row1Txt_pa: document.getElementById("row1Inp_pa").value.trim(),
-        programTxt: document.getElementById("programInp").value.trim(),
-        programTxt_pa: document.getElementById("programInp_pa").value.trim(),
-        villageVisible:true,
-        prizesVisible:true
-    }).then(()=>{ alert("Ticker details updated!"); });
-}
-
-async function translateToInput(sourceId, targetId){
-    const text=document.getElementById(sourceId).value;
-    const targetLang=document.getElementById("targetLang").value;
-    if(!text)return;
-    try{
-        const res=await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`);
-        const data=await res.json();
-        const translated=data[0][0][0];
-        document.getElementById(targetId).value=translated;
-        syncField(targetId,translated);
-    }catch(e){ alert("Translation error!"); }
-}
-
-async function translateBatchTeams(){
-    const text=document.getElementById("newTeamEn").value;
-    const targetLang=document.getElementById("targetLang").value;
-    if(!text)return;
-    try{
-        const res=await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`);
-        const data=await res.json();
-        document.getElementById("newTeamPa").value=data[0][0][0];
-    }catch(e){ alert("Translation error!"); }
-}
-
-async function translateAndSync(sourceId, targetId){
-    const text=document.getElementById(sourceId).value;
-    const targetLang=document.getElementById("targetLang").value;
-    if(!text)return;
-    try{
-        const res=await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`);
-        const data=await res.json();
-        const translatedVal=data[0][0][0];
-        document.getElementById(targetId).value=translatedVal;
-        syncField(targetId,translatedVal);
-    }catch(e){ alert("Translation error!"); }
+function syncFieldArrayTeams(val){
+    let arr=val.split("\n").map(t=>t.trim()).filter(t=>t!=="");
+    db.update({allTeams:arr});
 }
 
 db.on("value",(snap)=>{
@@ -716,10 +423,8 @@ db.on("value",(snap)=>{
     nextMatches=Array.isArray(data.nextMatches)?data.nextMatches:[];
     qualifiedTeams=Array.isArray(data.qualifiedTeams)?data.qualifiedTeams:[];
     eliminatedTeams=Array.isArray(data.eliminatedTeams)?data.eliminatedTeams:[];
-    resultHistory=Array.isArray(data.resultHistory)?data.resultHistory:[];
     resultFinalized=data.resultFinalized===true;
     lastResult=data.lastResult||null;
-    scoreVisible=data.scoreVisible!==false;
 
     document.getElementById("dispA").innerText=curA;
     document.getElementById("dispB").innerText=curB;
@@ -729,41 +434,15 @@ db.on("value",(snap)=>{
     setSafely("nameB",data.nameB);
     setSafely("nameB_pa",data.nameB_pa);
     setSafely("roundInp",data.round);
-    setSafely("row1Inp",data.row1Txt);
-    setSafely("row1Inp_pa",data.row1Txt_pa);
-    setSafely("programInp",data.programTxt);
-    setSafely("programInp_pa",data.programTxt_pa);
-
-    setSafely("bestRaiderName",data.bestRaiderName);
-    setSafely("bestRaiderTouches",data.bestRaiderTouches);
-    setSafely("bestRaiderPoints",data.bestRaiderPoints);
-    setSafely("bestRaiderPrize",data.bestRaiderPrize);
-    setSafely("bestRaiderPrizeCustom",data.bestRaiderPrizeCustom);
-
-    setSafely("bestJaffiName",data.bestJaffiName);
-    setSafely("bestJaffiTouches",data.bestJaffiTouches);
-    setSafely("bestJaffiJaffe",data.bestJaffiJaffe);
-    setSafely("bestJaffiPrize",data.bestJaffiPrize);
-    setSafely("bestJaffiPrizeCustom",data.bestJaffiPrizeCustom);
-
-    document.getElementById("bestRaiderPrizeCustom").style.display=data.bestRaiderPrize==="OTHER"?"block":"none";
-    document.getElementById("bestJaffiPrizeCustom").style.display=data.bestJaffiPrize==="OTHER"?"block":"none";
+    setSafely("allTeamsInp",allTeams.join("\n"));
 
     renderNextMatches();
-    renderQualifiedTeams();
-    renderResultHistory();
+    renderWinnerLoserBoxes();
     updateDropdowns();
 
-    updateVisibilityButton("scoreVisible","visBtn","Hide Scoreboard","Show Scoreboard");
-    updateVisibilityButton("matchListVisible","matchListBtn","HIDE MATCH LIST","SHOW MATCH LIST");
-    updateVisibilityButton("teamsVisible","teamsBtn","HIDE TEAMS","SHOW TEAMS");
-    updateVisibilityButton("villageVisible","villageBtn","HIDE VILLAGE","SHOW VILLAGE");
-    updateVisibilityButton("prizesVisible","prizesBtn","HIDE PRIZES","SHOW PRIZES");
-    updateVisibilityButton("bestPlayerVisible","bestPlayerBtn","HIDE BEST PLAYER","SHOW BEST PLAYER");
-
+    updateVisibilityButton("matchListVisible","matchListBtn","HIDE LIST","SHOW LIST");
     camOpposite=data.cameraOpposite||false;
     document.getElementById("teamWrap").style.flexDirection=camOpposite?"row-reverse":"row";
-    document.getElementById("camBtn").innerText=camOpposite?"Camera Oppo View":"Camera View";
 });
 
 function toggleVisibility(field){
@@ -778,12 +457,7 @@ function updateVisibilityButton(field, buttonId, onText, offText){
         const btn=document.getElementById(buttonId);
         if(!btn)return;
         btn.innerText=value?onText:offText;
-        btn.style.background=value?"#dc3545":"#28a745";
-        const status=document.getElementById(buttonId.replace("Btn","Status"));
-        if(status){
-            status.innerText=value?"VISIBLE":"HIDDEN";
-            status.style.color=value?"#28a745":"#dc3545";
-        }
+        btn.style.background=value?"#dc3545":"#1a73e8";
     });
 }
 
@@ -793,17 +467,18 @@ function addNewMatch(){
     const round=document.getElementById("matchRoundSelect").value;
     const cat=document.getElementById("matchCategoryInp").value.trim();
     if(a===""||b===""){ alert("Team select karo."); return; }
-    let tagParts=[];
-    if(cat) tagParts.push(cat);
-    if(round) tagParts.push(round);
-    let tag=tagParts.join(" - ");
-    let matchStr=a+" VS "+b;
-    if(tag) matchStr="("+tag+") "+matchStr;
+    
+    let categoryName = cat ? cat.toUpperCase() : "GENERAL";
+    if(round) categoryName += " — " + round.toUpperCase();
+
+    let matchStr = `[${categoryName}] ${a} VS ${b}`;
     nextMatches.push(matchStr);
+
     document.getElementById("nextTeamA").value="";
     document.getElementById("nextTeamB").value="";
     document.getElementById("matchRoundSelect").value="";
     document.getElementById("matchCategoryInp").value="";
+
     syncMatchListToDB();
     db.update({matchListVisible:true});
 }
@@ -814,60 +489,87 @@ function renderNextMatches(){
         container.innerHTML=`<div style="text-align:center;padding:10px;color:#999;">No Scheduled Matches</div>`;
         return;
     }
-    let html="";
-    nextMatches.forEach((matchStr,index)=>{
-        html+=`<div class="match-item">
-        <div class="match-title">${formatDisplayMatch(matchStr)}</div>
-        <div class="match-actions">
-        <button class="btn-sm btn-start" onclick="startSpecificMatch(${index})">START</button>
-        <button class="btn-sm btn-walkover" onclick="walkoverMatch(${index})">WALKOVER</button>
-        <button class="btn-sm btn-delete" onclick="deleteSpecificMatch(${index})">X</button>
-        </div></div>`;
+
+    let groups = {};
+    nextMatches.forEach((matchStr, index) => {
+        let cat = "GENERAL";
+        let cleanMatch = matchStr;
+        if(matchStr.startsWith("[")){
+            let parts = matchStr.split("] ");
+            cat = parts[0].replace("[","");
+            cleanMatch = parts[1];
+        }
+        if(!groups[cat]) groups[cat] = [];
+        groups[cat].push({match: cleanMatch, index: index});
     });
+
+    let html="";
+    for(let cat in groups){
+        html += `<div class="category-group-header"><span>${cat}</span></div>`;
+        groups[cat].forEach((item, idx)=>{
+            html+=`<div class="match-item">
+            <div class="match-title">${idx+1}. ${formatDisplayMatch(item.match)}</div>
+            <div class="match-actions">
+            <button class="btn-sm btn-start" onclick="startSpecificMatch(${item.index})">START</button>
+            <button class="btn-sm btn-res" onclick="quickResult(${item.index})">RESULT</button>
+            <button class="btn-sm btn-nxt" onclick="sendToNextMatch(${item.index})">NEXT MATCH</button>
+            <button class="btn-sm btn-walkover" onclick="walkoverMatch(${item.index})">WALKOVER</button>
+            <button class="btn-sm btn-delete" onclick="deleteSpecificMatch(${item.index})">X</button>
+            </div></div>`;
+        });
+    }
     container.innerHTML=html;
+}
+
+function formatDisplayMatch(matchStr){
+    return matchStr.replace(/=/g," / ");
 }
 
 function startSpecificMatch(index){
     let rawMatchStr=nextMatches[index], category="", matchStr=rawMatchStr;
-    if(rawMatchStr.startsWith("(")){
-        let parts=rawMatchStr.split(") ");
-        category=parts[0].replace("(","").trim();
-        matchStr=parts[1]||rawMatchStr;
+    if(rawMatchStr.startsWith("[")){
+        let parts=rawMatchStr.split("] ");
+        category=parts[0].replace("[","");
+        matchStr=parts[1];
     }
     let teams=matchStr.split(" VS ");
     let t1Parts=(teams[0]||"").split("=");
     let t2Parts=(teams[1]||"").split("=");
-    nextMatches.splice(index,1);
-    let updateObj={
+    
+    db.update({
         nameA:t1Parts[0].trim(),
         nameA_pa:t1Parts[1]?t1Parts[1].trim():"",
         nameB:t2Parts[0].trim(),
         nameB_pa:t2Parts[1]?t2Parts[1].trim():"",
-        scoreA:0, scoreB:0, scoreVisible:true, resultVisible:false, resultFinalized:false, lastResult:null
-    };
-    if(category){
-        updateObj.round=category;
-        document.getElementById("roundInp").value=category;
-    }
-    db.update(updateObj).then(()=>{ syncMatchListToDB(); });
+        scoreA:0, scoreB:0, scoreVisible:true, resultVisible:false, resultFinalized:false,
+        round:category
+    });
+}
+
+function sendToNextMatch(index){
+    let rawMatchStr=nextMatches[index];
+    let teamsPart = rawMatchStr.includes("] ") ? rawMatchStr.split("] ")[1] : rawMatchStr;
+    let teams = teamsPart.split(" VS ");
+    
+    document.getElementById("nextTeamA").value = teams[0].trim();
+    document.getElementById("nextTeamB").value = teams[1].trim();
+    window.scrollTo({top: 0, behavior: 'smooth'});
 }
 
 function walkoverMatch(index){
-    let rawMatchStr=nextMatches[index], matchStr=rawMatchStr;
-    if(rawMatchStr.startsWith("(")){
-        let parts=rawMatchStr.split(") ");
-        matchStr=parts[1]||rawMatchStr;
-    }
-    let teams=matchStr.split(" VS ");
+    let rawMatchStr=nextMatches[index];
+    let teamsPart = rawMatchStr.includes("] ") ? rawMatchStr.split("] ")[1] : rawMatchStr;
+    let teams = teamsPart.split(" VS ");
     let t1Name=(teams[0]||"").split("=")[0].trim();
     let t2Name=(teams[1]||"").split("=")[0].trim();
     let winNum=prompt(`Walkover winner choose kro:\n1 = ${t1Name}\n2 = ${t2Name}\n1 ya 2 likho:`);
-    let winner="", loser="";
-    if(winNum==="1"){ winner=t1Name; loser=t2Name; }
-    else if(winNum==="2"){ winner=t2Name; loser=t1Name; }
-    else return;
-    nextMatches.splice(index,1);
-    saveResult(winner,loser,0,0,"WALKOVER",false).then(()=>{ syncMatchListToDB(); });
+    if(winNum==="1") saveWinnerLoser(t1Name, t2Name);
+    else if(winNum==="2") saveWinnerLoser(t2Name, t1Name);
+}
+
+function quickResult(index){
+    startSpecificMatch(index);
+    alert("Match loaded to scoreboard! Score update karke RESULT dabao.");
 }
 
 function deleteSpecificMatch(index){
@@ -876,25 +578,7 @@ function deleteSpecificMatch(index){
 }
 
 function syncMatchListToDB(){
-    let tEn="", tPa="";
-    nextMatches.forEach(m=>{
-        let prefix="", main=m;
-        if(m.startsWith("(")){
-            let p=m.split(") ");
-            prefix=p[0]+") ";
-            main=p[1]||m;
-        }
-        let tms=main.split(" VS ");
-        let t1=(tms[0]||"").split("=");
-        let t2=(tms[1]||"").split("=");
-        tEn+=`${prefix}${t1[0]} VS ${t2[0]} , `;
-        tPa+=`${prefix}${t1[1]||t1[0]} VS ${t2[1]||t2[0]} , `;
-    });
-    db.update({nextMatches:nextMatches, row5Txt:tEn, row5Txt_pa:tPa});
-}
-
-function formatDisplayMatch(matchStr){
-    return matchStr.replace(/=/g," / ");
+    db.update({nextMatches:nextMatches});
 }
 
 function changeScore(team,val){
@@ -905,17 +589,13 @@ function changeScore(team,val){
 }
 
 function resetScores(){
-    if(confirm("Reset Scores?")){
-        db.update({scoreA:0, scoreB:0, resultFinalized:false, resultVisible:false});
-    }
+    if(confirm("Reset Scores?")){ db.update({scoreA:0, scoreB:0, resultFinalized:false, resultVisible:false}); }
 }
 
 function swapTeams(){
     db.update({
-        nameA:document.getElementById("nameB").value,
-        nameA_pa:document.getElementById("nameB_pa").value,
-        nameB:document.getElementById("nameA").value,
-        nameB_pa:document.getElementById("nameA_pa").value,
+        nameA:document.getElementById("nameB").value, nameA_pa:document.getElementById("nameB_pa").value,
+        nameB:document.getElementById("nameA").value, nameB_pa:document.getElementById("nameA_pa").value,
         scoreA:curB, scoreB:curA
     });
 }
@@ -925,63 +605,63 @@ function toggleCameraView(){
 }
 
 function showResultLayer(){
-    if(resultFinalized&&lastResult){ showStoredResult(); return; }
     if(curA===0&&curB===0){ alert("Score 0-0 hai."); return; }
-    if(!confirm("Result update karna chahunde ho?"))return;
     const teamA=document.getElementById("nameA").value.trim();
     const teamB=document.getElementById("nameB").value.trim();
     let winner="", loser="";
     if(curA>curB){ winner=teamA; loser=teamB; }
     else if(curB>curA){ winner=teamB; loser=teamA; }
-    else{ winner="TIE"; loser=""; }
-    saveResult(winner,loser,curA,curB,"NORMAL",true);
+    else{ alert("Match Tied!"); return; }
+    saveWinnerLoser(winner, loser);
 }
 
-function showStoredResult(){
-    if(!lastResult)return;
-    const until=Date.now()+5000;
-    db.update({resultVisible:true, resultVisibleUntil:until, scoreVisible:false});
-    setTimeout(()=>{
-        db.update({resultVisible:false, resultVisibleUntil:0, scoreVisible:true});
-    },5000);
+function saveWinnerLoser(winner, loser){
+    if(!qualifiedTeams.includes(winner)) qualifiedTeams.push(winner);
+    if(loser && !eliminatedTeams.includes(loser)) eliminatedTeams.push(loser);
+    db.update({qualifiedTeams: qualifiedTeams, eliminatedTeams: eliminatedTeams, scoreA:0, scoreB:0});
+    alert(`Result Saved!\nWinner: ${winner}\nLoser: ${loser}`);
 }
 
-function saveResult(winner,loser,scoreA,scoreB,type,showNow=true){
-    let resultTextStr=winner==="TIE"?`MATCH TIED (${scoreA}-${scoreB})`:(type==="WALKOVER"?`${winner} WIN BY WALKOVER`:`${winner} WIN vs ${loser} (${scoreA}-${scoreB})`);
-    const teamA=document.getElementById("nameA").value.trim();
-    const teamB=document.getElementById("nameB").value.trim();
-    let record={winner:winner, loser:loser, teamA:teamA, teamB:teamB, scoreA:scoreA, scoreB:scoreB, type:type, time:new Date().toLocaleString(), resultText:resultTextStr};
+function updateWinnerBox(){
+    renderWinnerLoserBoxes();
+    alert("Winner Box Updated!");
+}
 
-    if(!resultFinalized){ resultHistory.push(record); }
-    if(winner&&winner!=="TIE"){
-        if(!qualifiedTeams.includes(winner)) qualifiedTeams.push(winner);
-    }
-    if(loser){
-        if(!eliminatedTeams.includes(loser)) eliminatedTeams.push(loser);
-    }
+function updateLoserBox(){
+    renderWinnerLoserBoxes();
+    alert("Loser Box Updated!");
+}
 
-    let updateObj={
-        resultText:resultTextStr, winnerTeam:winner, loserTeam:loser,
-        winnerScore:winner==="TIE"?scoreA:(scoreA>scoreB?scoreA:scoreB),
-        loserScore:winner==="TIE"?scoreB:(scoreA>scoreB?scoreB:scoreA),
-        resultType:type, qualifiedTeams:qualifiedTeams, eliminatedTeams:eliminatedTeams,
-        resultHistory:resultHistory, lastResult:record, resultFinalized:true, scoreA:0, scoreB:0
-    };
+function renderWinnerLoserBoxes(){
+    let wContainer = document.getElementById("winnerBoxContainer");
+    let lContainer = document.getElementById("loserBoxContainer");
 
-    if(showNow){
-        updateObj.resultVisible=true;
-        updateObj.resultVisibleUntil=Date.now()+5000;
-        updateObj.scoreVisible=false;
-    }
+    wContainer.innerHTML = qualifiedTeams.length ? qualifiedTeams.map((w, i)=>`
+        <div class="winner-row">
+            <span><b>${i+1}. ${w} WIN</b> VS</span>
+            <select style="flex:1;margin-bottom:0;" id="selectWinOpp_${i}">
+                <option value="">Select Team</option>
+                ${allTeams.map(t=>`<option value="${t.split('=')[0]}">${t.split('=')[0]}</option>`).join('')}
+            </select>
+            <button class="btn-sm btn-green" onclick="addWinnerToMatch('${w}', 'selectWinOpp_${i}')">ADD TO MATCH</button>
+        </div>
+    `).join('') : "None";
 
-    return db.update(updateObj).then(()=>{
-        resultFinalized=true; lastResult=record;
-        if(showNow){
-            setTimeout(()=>{
-                db.update({resultVisible:false, resultVisibleUntil:0, scoreVisible:true});
-            },5000);
-        }
-    });
+    lContainer.innerHTML = eliminatedTeams.length ? eliminatedTeams.map((l, i)=>`
+        <div class="winner-row">
+            <span><b>${i+1}. ${l}</b></span>
+        </div>
+    `).join('') : "None";
+}
+
+function addWinnerToMatch(winnerTeam, selectId){
+    let opp = document.getElementById(selectId).value;
+    if(!opp){ alert("Opponent team select karo!"); return; }
+    let matchStr = `[WINNER MATCH] ${winnerTeam} VS ${opp}`;
+    nextMatches.push(matchStr);
+    syncMatchListToDB();
+    db.update({matchListVisible:true});
+    alert(winnerTeam + " vs " + opp + " Match List vich add ho gaya!");
 }
 
 function addBatchTeams(){
@@ -1031,58 +711,15 @@ function selectTeamB(val){
     db.update({nameB:p[0].trim(), nameB_pa:p[1]?p[1].trim():"", resultFinalized:false});
 }
 
-function syncBestPrize(selectId, customId){
-    const select=document.getElementById(selectId);
-    const custom=document.getElementById(customId);
-    custom.style.display=select.value==="OTHER"?"block":"none";
-    syncField(selectId, select.value);
-}
-
-function saveBestPlayerData(){
-    db.update({
-        bestRaiderName:document.getElementById("bestRaiderName").value,
-        bestRaiderTouches:document.getElementById("bestRaiderTouches").value,
-        bestRaiderPoints:document.getElementById("bestRaiderPoints").value,
-        bestRaiderPrize:document.getElementById("bestRaiderPrize").value,
-        bestRaiderPrizeCustom:document.getElementById("bestRaiderPrizeCustom").value,
-        bestJaffiName:document.getElementById("bestJaffiName").value,
-        bestJaffiTouches:document.getElementById("bestJaffiTouches").value,
-        bestJaffiJaffe:document.getElementById("bestJaffiJaffe").value,
-        bestJaffiPrize:document.getElementById("bestJaffiPrize").value,
-        bestJaffiPrizeCustom:document.getElementById("bestJaffiPrizeCustom").value,
-        bestPlayerVisible:true
-    }).then(()=>{ alert("Best Raider + Best Jaffi details saved!"); });
-}
-
-function renderQualifiedTeams(){
-    let q=document.getElementById("qualifiedTeamsView");
-    let e=document.getElementById("eliminatedTeamsView");
-    q.innerHTML=qualifiedTeams.length?qualifiedTeams.map((x,i)=>`${i+1}. ${x}`).join("<br>"):"None";
-    e.innerHTML=eliminatedTeams.length?eliminatedTeams.map((x,i)=>`${i+1}. ${x}`).join("<br>"):"None";
-}
-
-function renderResultHistory(){
-    const container=document.getElementById("resultHistoryContainer");
-    if(!resultHistory.length){ container.innerHTML="No Result Yet"; return; }
-    let html="";
-    resultHistory.slice().reverse().forEach((r)=>{
-        html+=`<div class="result-history-item"><b>🏆 ${r.winner}</b>${r.loser?`<br>❌ ${r.loser}`:""}<br>Score: ${r.scoreA} - ${r.scoreB}<br><small>${r.type||"NORMAL"} | ${r.time||""}</small></div>`;
-    });
-    container.innerHTML=html;
-}
-
-function clearAllTeams(){
-    if(!confirm("WARNING!\nDelete ALL teams, matches and results?"))return;
-    db.update({
-        allTeams:[], nextMatches:[], upcomingEvents:[], qualifiedTeams:[], eliminatedTeams:[], resultHistory:[],
-        scoreA:0, scoreB:0, nameA:"", nameA_pa:"", nameB:"", nameB_pa:"", resultText:"No Result Yet",
-        resultVisible:false, resultVisibleUntil:0, resultFinalized:false, lastResult:null, winnerTeam:"", loserTeam:"",
-        scoreVisible:true, matchListVisible:false, teamsVisible:false, villageVisible:false, prizesVisible:false, bestPlayerVisible:false,
-        bestRaiderName:"", bestRaiderTouches:"", bestRaiderPoints:"", bestRaiderPrize:"", bestRaiderPrizeCustom:"",
-        bestJaffiName:"", bestJaffiTouches:"", bestJaffiJaffe:"", bestJaffiPrize:"", bestJaffiPrizeCustom:""
-    });
-    document.querySelectorAll('input[type="text"],textarea,input[type="date"],input[type="number"]').forEach(el=>el.value='');
-    alert("All teams/data reset.");
+async function translateBatchTeams(){
+    const text=document.getElementById("newTeamEn").value;
+    const targetLang=document.getElementById("targetLang").value;
+    if(!text)return;
+    try{
+        const res=await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`);
+        const data=await res.json();
+        document.getElementById("newTeamPa").value=data[0][0][0];
+    }catch(e){ alert("Translation error!"); }
 }
 </script>
 
