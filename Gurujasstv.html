@@ -246,8 +246,11 @@
     const db = firebase.database().ref("matchData/" + matchId);
 
     const clientLogos = {
-        "test": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Kabaddi%20101%20logo.png"
+        "test1": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Kabaddi%20101%20logo.png"
     };
+    "test": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/299a3d19-8813-4d9c-8728-f9d5181382e9.jpeg"
+    };
+    
 
     db.on("value", (snap) => {
         const data = snap.val() || {}; 
