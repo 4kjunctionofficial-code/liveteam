@@ -7,31 +7,31 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 <style>
-/* Positioned to the LEFT side for OBS stream */
+/* Positioned to the LEFT side for OBS stream, matching reference photo layout */
 body { background: transparent; margin: 0; padding: 20px; display: flex; justify-content: flex-start; align-items: flex-start; height: 100vh; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; }
 
-.scoreboard-overlay { display: flex; flex-direction: column; gap: 6px; width: 560px; font-weight: 900; }
-.top-row { display: flex; gap: 6px; }
+/* Main layout matching the exact reference image arrangement */
+.overlay-grid { display: grid; grid-template-columns: auto auto; gap: 8px; align-items: start; font-weight: 900; }
 
-/* Uniform box size for Shift and Race with RED Header style - Larger & Bolder Text */
-.badge-box { background: linear-gradient(to bottom, #cc0000, #990000); border: 2px solid #ffffff; border-radius: 8px; color: white; padding: 8px 14px; display: flex; justify-content: space-between; align-items: center; font-size: 22px; font-weight: 900; box-shadow: 0 3px 6px rgba(0,0,0,0.4); flex: 1; }
-.badge-box.race-title { flex: 1; background: linear-gradient(to bottom, #aa0000, #770000); justify-content: center; font-size: 24px; font-weight: 900; letter-spacing: 1px; }
+.left-stack { display: flex; flex-direction: column; gap: 8px; width: 180px; }
+.right-stack { display: flex; flex-direction: column; gap: 8px; width: 360px; }
 
-.value-box { background: #ffffff; color: #000000; padding: 2px 12px; border-radius: 4px; margin-left: 10px; font-size: 22px; font-weight: 900; min-width: 45px; text-align: center; }
+/* Badge styling matching reference image */
+.badge-box { background: linear-gradient(to bottom, #0044aa, #002266); border: 2px solid #ffffff; border-radius: 12px; color: white; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 20px; font-weight: 900; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
+.badge-box.race-main-title { background: linear-gradient(to bottom, #0044aa, #002266); justify-content: center; font-size: 22px; font-weight: 900; letter-spacing: 1px; padding: 10px; }
 
-.dogs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-.dog-column { display: flex; flex-direction: column; gap: 4px; }
+.value-box { background: #ffffff; color: #000000; padding: 2px 10px; border-radius: 6px; font-size: 20px; font-weight: 900; min-width: 35px; text-align: center; }
 
-/* Larger & Bolder Dog Names */
-.dog-name-box { border: 2px solid #ffffff; border-radius: 6px; color: white; text-align: center; padding: 8px; font-size: 22px; font-weight: 900; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+.dogs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+/* Dog Name Boxes */
+.dog-name-box { border: 2px solid #ffffff; border-radius: 12px; color: white; text-align: center; padding: 10px 6px; font-size: 20px; font-weight: 900; text-transform: uppercase; box-shadow: 0 3px 6px rgba(0,0,0,0.4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dog-name-box.red { background: linear-gradient(to bottom, #cc0000, #990000); }
 .dog-name-box.blue { background: linear-gradient(to bottom, #0044cc, #002288); }
-.dog-name-box.white { background: linear-gradient(to bottom, #ffffff, #cccccc); color: #000; }
+.dog-name-box.white { background: linear-gradient(to bottom, #ffffff, #eaeaea); color: #000000; }
 
-.time-box { background: #ffffff; color: #000000; border: 2px solid #888; border-radius: 6px; text-align: center; padding: 6px; font-size: 24px; font-weight: 900; font-family: monospace; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); }
-
-/* Larger & Bolder Winner tag */
-.winner-tag { background: linear-gradient(to bottom, #ffcc00, #cc9900); color: black; border: 2px solid #ffffff; border-radius: 6px; text-align: center; padding: 6px; font-size: 20px; font-weight: 900; text-transform: uppercase; box-shadow: 0 2px 5px rgba(0,0,0,0.4); animation: pulse-glow 1s infinite alternate; }
+/* Winner tag appearing right inside the dog's column */
+.winner-tag { background: linear-gradient(to bottom, #ffcc00, #cc9900); color: black; border: 2px solid #ffffff; border-radius: 8px; text-align: center; padding: 6px; font-size: 16px; font-weight: 900; text-transform: uppercase; box-shadow: 0 3px 6px rgba(0,0,0,0.4); animation: pulse-glow 1s infinite alternate; margin-top: 4px; }
 
 @keyframes pulse-glow { 0% { box-shadow: 0 0 4px #ffcc00; } 100% { box-shadow: 0 0 12px #ffcc00; } }
 .hidden { display: none !important; }
@@ -39,40 +39,35 @@ body { background: transparent; margin: 0; padding: 20px; display: flex; justify
 </head>
 <body>
 
-<div class="scoreboard-overlay" id="mainOverlayContainer">
-    <!-- Top Row: Shift Box & Current Race Title -->
-    <div class="top-row">
-        <div class="badge-box round">
-            <span>SHIFT</span>
+<div class="overlay-grid" id="mainOverlayContainer">
+    <!-- Left Column Stack: Shift / Round & Race Boxes -->
+    <div class="left-stack">
+        <div class="badge-box">
+            <span>Shift</span>
             <span class="value-box" id="dispRound">1</span>
         </div>
-        <div class="badge-box race-title">
-            <span>CURRENT RACE</span>
-        </div>
-    </div>
-    
-    <!-- Second Row: Race Box -->
-    <div class="top-row">
-        <div class="badge-box round" style="background: linear-gradient(to bottom, #990000, #660000);">
-            <span>RACE</span>
+        <div class="badge-box" style="background: linear-gradient(to bottom, #003388, #001144);">
+            <span>Race</span>
             <span class="value-box" id="dispRace">27</span>
         </div>
     </div>
     
-    <!-- Team / Dogs Row -->
-    <div class="dogs-row" id="dogsRowContainer">
-        <!-- Dog A Column -->
-        <div class="dog-column" id="colDogA">
-            <div class="dog-name-box red" id="dispDogAName">JADUGAR</div>
-            <div class="winner-tag hidden" id="winnerTagA">🏆 WINNER</div>
-            <div class="time-box hidden" id="dispDogATimeWrap">Time: <span id="dispDogATime"></span></div>
+    <!-- Right Column Stack: Current Race Banner & Dog Names Row -->
+    <div class="right-stack">
+        <div class="badge-box race-main-title">
+            <span>Current Race</span>
         </div>
-        
-        <!-- Dog B Column -->
-        <div class="dog-column" id="colDogB">
-            <div class="dog-name-box white" id="dispDogBName">WHITE POND</div>
-            <div class="winner-tag hidden" id="winnerTagB">🏆 WINNER</div>
-            <div class="time-box hidden" id="dispDogBTimeWrap">Time: <span id="dispDogBTime"></span></div>
+        <div class="dogs-row" id="dogsRowContainer">
+            <!-- Dog A -->
+            <div style="display: flex; flex-direction: column;">
+                <div class="dog-name-box red" id="dispDogAName">JADUGAR</div>
+                <div class="winner-tag hidden" id="winnerTagA">🏆 WINNER</div>
+            </div>
+            <!-- Dog B -->
+            <div style="display: flex; flex-direction: column;">
+                <div class="dog-name-box white" id="dispDogBName">WHITE POND</div>
+                <div class="winner-tag hidden" id="winnerTagB">🏆 WINNER</div>
+            </div>
         </div>
     </div>
 </div>
@@ -92,8 +87,6 @@ db.on("value", (snapshot) => {
         
         let dogAEl = document.getElementById('dispDogAName');
         let dogBEl = document.getElementById('dispDogBName');
-        let timeAWrap = document.getElementById('dispDogATimeWrap');
-        let timeBWrap = document.getElementById('dispDogBTimeWrap');
         let tagA = document.getElementById('winnerTagA');
         let tagB = document.getElementById('winnerTagB');
         let dogsRow = document.getElementById('dogsRowContainer');
@@ -110,8 +103,6 @@ db.on("value", (snapshot) => {
             dogBEl.className = `dog-name-box ${data.dogBColor || 'white'}`;
             dogBEl.classList.remove('hidden');
 
-            timeAWrap.classList.add('hidden');
-            timeBWrap.classList.add('hidden');
             dogsRow.classList.remove('hidden');
 
             if(data.winnerSide === 'A') {
