@@ -24,11 +24,11 @@ body { background: transparent; margin: 0; padding: 20px; display: flex; justify
 .dog-name-box.blue { background: linear-gradient(to bottom, #0044cc, #002288); }
 .dog-name-box.white { background: linear-gradient(to bottom, #ffffff, #cccccc); color: #000; }
 
-.time-box { background: #ffffff; color: #000000; border: 2px solid #888; border-radius: 6px; text-align: center; padding: 5px; font-size: 16px; font-family: monospace; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); }
+.time-box { background: #ffffff; color: #000000; border: 2px solid #888; border-radius: 6px; text-align: center; padding: 4px; font-size: 15px; font-family: monospace; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); }
 
-.winner-banner { background: linear-gradient(to bottom, #111, #222); border: 3px solid #ffcc00; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.6); animation: pulse-glow 1.5s infinite alternate; }
-.winner-title { background: linear-gradient(to bottom, #ffcc00, #cc9900); color: black; padding: 4px 8px; border-radius: 4px; font-size: 16px; display: flex; align-items: center; gap: 5px; }
-.winner-name-display { background: linear-gradient(to bottom, #cc0000, #990000); color: white; padding: 4px 15px; border-radius: 4px; font-size: 18px; border: 1px solid #fff; text-transform: uppercase; letter-spacing: 1px; }
+.winner-banner { background: linear-gradient(to bottom, #111, #222); border: 3px solid #ffcc00; border-radius: 8px; display: flex; flex-direction: column; align-items: center; padding: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.6); animation: pulse-glow 1.5s infinite alternate; text-align: center; }
+.winner-title { background: linear-gradient(to bottom, #ffcc00, #cc9900); color: black; padding: 2px 10px; border-radius: 4px; font-size: 14px; margin-bottom: 4px; font-weight: bold; }
+.winner-name-display { color: #ffffff; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; }
 
 @keyframes pulse-glow { 0% { box-shadow: 0 0 5px #ffcc00; } 100% { box-shadow: 0 0 15px #ffcc00; } }
 .hidden { display: none !important; }
@@ -55,15 +55,15 @@ body { background: transparent; margin: 0; padding: 20px; display: flex; justify
     <div class="dogs-row">
         <div class="dog-column">
             <div class="dog-name-box red" id="dispDogAName">JADUGAR</div>
-            <div class="time-box" id="dispDogATime">Time: 00:27.36</div>
+            <div class="time-box hidden" id="dispDogATimeWrap">Time: <span id="dispDogATime"></span></div>
         </div>
         <div class="dog-column">
             <div class="dog-name-box white" id="dispDogBName">WHITE POND</div>
-            <div class="time-box" id="dispDogBTime">Time: 00:28.42</div>
+            <div class="time-box hidden" id="dispDogBTimeWrap">Time: <span id="dispDogBTime"></span></div>
         </div>
     </div>
     <div class="winner-banner hidden" id="winnerBanner">
-        <div class="winner-title">🏆 Winner</div>
+        <div class="winner-title">🏆 WINNER</div>
         <div class="winner-name-display" id="dispWinnerName">JADUGAR</div>
     </div>
 </div>
@@ -73,6 +73,8 @@ const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebas
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database().ref("dogRaceData/match1");
 
+let hideTimeout = null;
+
 db.on("value", (snapshot) => {
     let data = snapshot.val();
     if(data) {
@@ -80,19 +82,44 @@ db.on("value", (snapshot) => {
         document.getElementById('dispRace').innerText = data.race || "27";
         
         let dogAEl = document.getElementById('dispDogAName');
-        dogAEl.innerText = data.dogAName || "JADUGAR";
+        dogAEl.innerText = data.dogANames || data.dogAName || "JADUGAR";
         dogAEl.className = `dog-name-box ${data.dogAColor || 'red'}`;
-        document.getElementById('dispDogATime').innerText = "Time: " + (data.dogATime || "00:00.00");
+        
+        if(data.dogATime && data.dogATime.trim() !== "") {
+            document.getElementById('dispDogATime').innerText = data.dogATime;
+            document.getElementById('dispDogATimeWrap').classList.remove('hidden');
+        } else {
+            document.getElementById('dispDogATimeWrap').classList.add('hidden');
+        }
 
         let dogBEl = document.getElementById('dispDogBName');
         dogBEl.innerText = data.dogBName || "WHITE POND";
         dogBEl.className = `dog-name-box ${data.dogBColor || 'white'}`;
-        document.getElementById('dispDogBTime').innerText = "Time: " + (data.dogBTime || "00:00.00");
+        
+        if(data.dogBTime && data.dogBTime.trim() !== "") {
+            document.getElementById('dispDogBTime').innerText = data.dogBTime;
+            document.getElementById('dispDogBTimeWrap').classList.remove('hidden');
+        } else {
+            document.getElementById('dispDogBTimeWrap').classList.add('hidden');
+        }
 
         let winnerBanner = document.getElementById('winnerBanner');
-        if(data.showWinner && data.winnerName) {
-            document.getElementById('dispWinnerName').innerText = data.winnerName;
+        
+        // Check 15 seconds auto hide based on timestamp
+        let currentTime = Date.now();
+        let timestamp = data.timestamp || 0;
+        
+        if(data.showWinner && data.winnerName && (currentTime - timestamp < 15000)) {
+            document.getElementById('dispWinnerName').innerText = data.winnerName + (data.winningTime ? ` (${data.winningTime})` : '');
             winnerBanner.classList.remove('hidden');
+            
+            // Clear previous timeout and set new one to auto-hide after remaining time
+            if(hideTimeout) clearTimeout(hideTimeout);
+            let remainingTime = 15000 - (currentTime - timestamp);
+            hideTimeout = setTimeout(() => {
+                winnerBanner.classList.add('hidden');
+                db.update({ showWinner: false });
+            }, remainingTime);
         } else {
             winnerBanner.classList.add('hidden');
         }
