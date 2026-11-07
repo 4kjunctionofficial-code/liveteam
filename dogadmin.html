@@ -28,6 +28,9 @@ button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size
     <div class="card">
         <div class="header">Dog Racing Admin Panel</div>
         
+        <label>Saved Result Box</label>
+        <div class="result-box" id="adminResultDisplay">No Result Yet</div>
+
         <div class="row">
             <div>
                 <label>Round Number</label>
@@ -42,7 +45,7 @@ button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size
         <div class="row">
             <div>
                 <label>Dog A (Left) Name</label>
-                <input type="text" id="dogAName" value="JADUGAR" oninput="syncData()">
+                <input type="text" id="dogAName" placeholder="Enter Dog A Name" oninput="syncData()">
                 <label>Dog A Color</label>
                 <select id="dogAColor" onchange="syncData()">
                     <option value="red">Red</option>
@@ -54,7 +57,7 @@ button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size
             </div>
             <div>
                 <label>Dog B (Right) Name</label>
-                <input type="text" id="dogBName" value="WHITE POND" oninput="syncData()">
+                <input type="text" id="dogBName" placeholder="Enter Dog B Name" oninput="syncData()">
                 <label>Dog B Color</label>
                 <select id="dogBColor" onchange="syncData()">
                     <option value="white">White</option>
@@ -71,11 +74,7 @@ button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size
             <button class="btn-green" onclick="declareWinner('A')">Declare Dog A Winner</button>
             <button class="btn-blue" onclick="declareWinner('B')">Declare Dog B Winner</button>
         </div>
-
-         <label>Saved Result Box</label>
-        <div class="result-box" id="adminResultDisplay">No Result Yet</div>
- 
-        <button class="btn-red" onclick="resetWinner()" style="margin-top:10px;">Clear Result & Winner</button>
+        <button class="btn-red" onclick="resetWinner()" style="margin-top:10px;">Clear Result & Fields</button>
     </div>
 </div>
 
@@ -110,36 +109,42 @@ function declareWinner(side) {
 
     document.getElementById('adminResultDisplay').innerText = resultString;
 
-    // Push data to Firebase with active timestamp
+    // Push winner data to Firebase and clear inputs immediately
     db.update({ 
+        winnerSide: side,
         winnerName: winner, 
         winningTime: winningTime,
         showWinner: true, 
         resultText: resultString,
+        dogAName: "",
+        dogBName: "",
+        dogATime: "",
+        dogBTime: "",
         timestamp: Date.now()
     }, () => {
-        // Clear time and name fields locally and in DB
-        document.getElementById('dogATime').value = "";
-        document.getElementById('dogBTime').value = "";
         document.getElementById('dogAName').value = "";
         document.getElementById('dogBName').value = "";
-        syncData();
+        document.getElementById('dogATime').value = "";
+        document.getElementById('dogBTime').value = "";
     });
 }
 
 function resetWinner() {
     document.getElementById('adminResultDisplay').innerText = "No Result Yet";
+    document.getElementById('dogAName').value = "";
+    document.getElementById('dogBName').value = "";
     document.getElementById('dogATime').value = "";
     document.getElementById('dogBTime').value = "";
     db.update({ 
+        winnerSide: "",
         winnerName: "", 
         winningTime: "", 
         showWinner: false, 
         resultText: "", 
+        dogAName: "",
+        dogBName: "",
         dogATime: "", 
         dogBTime: "",
-        dogAName: "JADUGAR",
-        dogBName: "WHITE POND",
         timestamp: 0 
     });
 }
