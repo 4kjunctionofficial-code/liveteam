@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dog Racing Overlay</title>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<style>
+body { background: transparent; margin: 0; padding: 20px; display: flex; justify-content: flex-end; align-items: flex-start; height: 100vh; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; }
+
+.scoreboard-overlay { display: flex; flex-direction: column; gap: 6px; width: 480px; font-weight: bold; }
+.top-row { display: flex; gap: 6px; }
+.badge-box { background: linear-gradient(to bottom, #0044aa, #002266); border: 2px solid #ffffff; border-radius: 8px; color: white; padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 20px; box-shadow: 0 3px 6px rgba(0,0,0,0.4); }
+.badge-box.round { flex: 1; }
+.badge-box.race-title { flex: 2; background: linear-gradient(to bottom, #003388, #001144); justify-content: center; font-size: 22px; letter-spacing: 1px; }
+.value-box { background: #ffffff; color: #000000; padding: 2px 10px; border-radius: 4px; margin-left: 10px; font-size: 20px; min-width: 40px; text-align: center; }
+
+.dogs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.dog-column { display: flex; flex-direction: column; gap: 4px; }
+
+.dog-name-box { border: 2px solid #ffffff; border-radius: 6px; color: white; text-align: center; padding: 6px; font-size: 18px; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+.dog-name-box.red { background: linear-gradient(to bottom, #cc0000, #990000); }
+.dog-name-box.blue { background: linear-gradient(to bottom, #0044cc, #002288); }
+.dog-name-box.white { background: linear-gradient(to bottom, #ffffff, #cccccc); color: #000; }
+
+.time-box { background: #ffffff; color: #000000; border: 2px solid #888; border-radius: 6px; text-align: center; padding: 5px; font-size: 16px; font-family: monospace; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); }
+
+.winner-banner { background: linear-gradient(to bottom, #111, #222); border: 3px solid #ffcc00; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.6); animation: pulse-glow 1.5s infinite alternate; }
+.winner-title { background: linear-gradient(to bottom, #ffcc00, #cc9900); color: black; padding: 4px 8px; border-radius: 4px; font-size: 16px; display: flex; align-items: center; gap: 5px; }
+.winner-name-display { background: linear-gradient(to bottom, #cc0000, #990000); color: white; padding: 4px 15px; border-radius: 4px; font-size: 18px; border: 1px solid #fff; text-transform: uppercase; letter-spacing: 1px; }
+
+@keyframes pulse-glow { 0% { box-shadow: 0 0 5px #ffcc00; } 100% { box-shadow: 0 0 15px #ffcc00; } }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="scoreboard-overlay">
+    <div class="top-row">
+        <div class="badge-box round">
+            <span>Round</span>
+            <span class="value-box" id="dispRound">1</span>
+        </div>
+        <div class="badge-box race-title">
+            <span>Current Race</span>
+        </div>
+    </div>
+    <div class="top-row">
+        <div class="badge-box round" style="background: linear-gradient(to bottom, #002266, #001133);">
+            <span>Race</span>
+            <span class="value-box" id="dispRace">27</span>
+        </div>
+    </div>
+    <div class="dogs-row">
+        <div class="dog-column">
+            <div class="dog-name-box red" id="dispDogAName">JADUGAR</div>
+            <div class="time-box" id="dispDogATime">Time: 00:27.36</div>
+        </div>
+        <div class="dog-column">
+            <div class="dog-name-box white" id="dispDogBName">WHITE POND</div>
+            <div class="time-box" id="dispDogBTime">Time: 00:28.42</div>
+        </div>
+    </div>
+    <div class="winner-banner hidden" id="winnerBanner">
+        <div class="winner-title">🏆 Winner</div>
+        <div class="winner-name-display" id="dispWinnerName">JADUGAR</div>
+    </div>
+</div>
+
+<script>
+const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database().ref("dogRaceData/match1");
+
+db.on("value", (snapshot) => {
+    let data = snapshot.val();
+    if(data) {
+        document.getElementById('dispRound').innerText = data.round || "1";
+        document.getElementById('dispRace').innerText = data.race || "27";
+        
+        let dogAEl = document.getElementById('dispDogAName');
+        dogAEl.innerText = data.dogAName || "JADUGAR";
+        dogAEl.className = `dog-name-box ${data.dogAColor || 'red'}`;
+        document.getElementById('dispDogATime').innerText = "Time: " + (data.dogATime || "00:00.00");
+
+        let dogBEl = document.getElementById('dispDogBName');
+        dogBEl.innerText = data.dogBName || "WHITE POND";
+        dogBEl.className = `dog-name-box ${data.dogBColor || 'white'}`;
+        document.getElementById('dispDogBTime').innerText = "Time: " + (data.dogBTime || "00:00.00");
+
+        let winnerBanner = document.getElementById('winnerBanner');
+        if(data.showWinner && data.winnerName) {
+            document.getElementById('dispWinnerName').innerText = data.winnerName;
+            winnerBanner.classList.remove('hidden');
+        } else {
+            winnerBanner.classList.add('hidden');
+        }
+    }
+});
+</script>
+</body>
+</html>
