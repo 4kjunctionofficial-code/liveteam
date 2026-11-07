@@ -26,11 +26,10 @@ body { background: transparent; margin: 0; padding: 20px; display: flex; justify
 
 .time-box { background: #ffffff; color: #000000; border: 2px solid #888; border-radius: 6px; text-align: center; padding: 4px; font-size: 15px; font-family: monospace; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); }
 
-.winner-banner { background: linear-gradient(to bottom, #111, #222); border: 3px solid #ffcc00; border-radius: 8px; display: flex; flex-direction: column; align-items: center; padding: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.6); animation: pulse-glow 1.5s infinite alternate; text-align: center; }
-.winner-title { background: linear-gradient(to bottom, #ffcc00, #cc9900); color: black; padding: 2px 10px; border-radius: 4px; font-size: 14px; margin-bottom: 4px; font-weight: bold; }
-.winner-name-display { color: #ffffff; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; }
+/* Winner tag appearing right below the dog name on its respective side */
+.winner-tag { background: linear-gradient(to bottom, #ffcc00, #cc9900); color: black; border: 2px solid #ffffff; border-radius: 6px; text-align: center; padding: 5px; font-size: 16px; font-weight: 900; text-transform: uppercase; box-shadow: 0 2px 5px rgba(0,0,0,0.4); animation: pulse-glow 1s infinite alternate; }
 
-@keyframes pulse-glow { 0% { box-shadow: 0 0 5px #ffcc00; } 100% { box-shadow: 0 0 15px #ffcc00; } }
+@keyframes pulse-glow { 0% { box-shadow: 0 0 4px #ffcc00; } 100% { box-shadow: 0 0 12px #ffcc00; } }
 .hidden { display: none !important; }
 </style>
 </head>
@@ -52,19 +51,21 @@ body { background: transparent; margin: 0; padding: 20px; display: flex; justify
             <span class="value-box" id="dispRace">27</span>
         </div>
     </div>
+    
     <div class="dogs-row" id="dogsRowContainer">
-        <div class="dog-column">
+        <!-- Dog A Column -->
+        <div class="dog-column" id="colDogA">
             <div class="dog-name-box red" id="dispDogAName">JADUGAR</div>
             <div class="time-box hidden" id="dispDogATimeWrap">Time: <span id="dispDogATime"></span></div>
+            <div class="winner-tag hidden" id="winnerTagA">🏆 WINNER</div>
         </div>
-        <div class="dog-column">
+        
+        <!-- Dog B Column -->
+        <div class="dog-column" id="colDogB">
             <div class="dog-name-box white" id="dispDogBName">WHITE POND</div>
             <div class="time-box hidden" id="dispDogBTimeWrap">Time: <span id="dispDogBTime"></span></div>
+            <div class="winner-tag hidden" id="winnerTagB">🏆 WINNER</div>
         </div>
-    </div>
-    <div class="winner-banner hidden" id="winnerBanner">
-        <div class="winner-title">🏆 WINNER</div>
-        <div class="winner-name-display" id="dispWinnerName">JADUGAR</div>
     </div>
 </div>
 
@@ -82,50 +83,68 @@ db.on("value", (snapshot) => {
         document.getElementById('dispRace').innerText = data.race || "27";
         
         let dogAEl = document.getElementById('dispDogAName');
-        dogAEl.innerText = data.dogAName || "JADUGAR";
+        let dogBEl = document.getElementById('dispDogBName');
+        let colA = document.getElementById('colDogA');
+        let colB = document.getElementById('colDogB');
+        let timeAWrap = document.getElementById('dispDogATimeWrap');
+        let timeBWrap = document.getElementById('dispDogBTimeWrap');
+        let tagA = document.getElementById('winnerTagA');
+        let tagB = document.getElementById('winnerTagB');
+        let container = document.getElementById('mainOverlayContainer');
+
+        dogAEl.innerText = data.dogAName || "";
         dogAEl.className = `dog-name-box ${data.dogAColor || 'red'}`;
-        
+
+        dogBEl.innerText = data.dogBName || "";
+        dogBEl.className = `dog-name-box ${data.dogBColor || 'white'}`;
+
+        // Handle Time display
         if(data.dogATime && data.dogATime.trim() !== "") {
             document.getElementById('dispDogATime').innerText = data.dogATime;
-            document.getElementById('dispDogATimeWrap').classList.remove('hidden');
+            timeAWrap.classList.remove('hidden');
         } else {
-            document.getElementById('dispDogATimeWrap').classList.add('hidden');
+            timeAWrap.classList.add('hidden');
         }
 
-        let dogBEl = document.getElementById('dispDogBName');
-        dogBEl.innerText = data.dogBName || "WHITE POND";
-        dogBEl.className = `dog-name-box ${data.dogBColor || 'white'}`;
-        
         if(data.dogBTime && data.dogBTime.trim() !== "") {
             document.getElementById('dispDogBTime').innerText = data.dogBTime;
-            document.getElementById('dispDogBTimeWrap').classList.remove('hidden');
+            timeBWrap.classList.remove('hidden');
         } else {
-            document.getElementById('dispDogBTimeWrap').classList.add('hidden');
+            timeBWrap.classList.add('hidden');
         }
 
-        let winnerBanner = document.getElementById('winnerBanner');
-        let dogsRow = document.getElementById('dogsRowContainer');
         let currentTime = Date.now();
         let timestamp = data.timestamp || 0;
         
-        // Check if 15 seconds have elapsed since winner was declared
-        if(data.showWinner && data.winnerName && (currentTime - timestamp < 15000)) {
-            document.getElementById('dispWinnerName').innerText = data.winnerName + (data.winningTime ? ` (${data.winningTime})` : '');
-            
-            // Hide normal dogs list and show winner banner in its place
-            dogsRow.classList.add('hidden');
-            winnerBanner.classList.remove('hidden');
-            
+        // If winner declared and within 15 seconds
+        if(data.showWinner && (currentTime - timestamp < 15000)) {
+            timeAWrap.classList.add('hidden');
+            timeBWrap.classList.add('hidden');
+
+            if(data.winnerSide === 'A') {
+                tagA.classList.remove('hidden');
+                tagB.classList.add('hidden');
+            } else if(data.winnerSide === 'B') {
+                tagB.classList.remove('hidden');
+                tagA.classList.add('hidden');
+            }
+
             if(hideTimeout) clearTimeout(hideTimeout);
             let remainingTime = 15000 - (currentTime - timestamp);
             hideTimeout = setTimeout(() => {
-                winnerBanner.classList.add('hidden');
-                dogsRow.classList.remove('hidden');
-                db.update({ showWinner: false, winnerName: "", winningTime: "", resultText: "" });
+                container.classList.add('hidden'); // Complete hide after 15 sec
+                db.update({ showWinner: false, resultText: "", timestamp: 0 });
             }, remainingTime);
         } else {
-            winnerBanner.classList.add('hidden');
-            dogsRow.classList.remove('hidden');
+            tagA.classList.add('hidden');
+            tagB.classList.add('hidden');
+            
+            // If fields are empty and no winner, keep container hidden or show if names exist
+            if((!data.dogAName || data.dogAName.trim() === "") && (!data.dogBName || data.dogBName.trim() === "")) {
+                container.classList.add('hidden');
+            } else {
+                container.classList.remove('hidden');
+            }
         }
     }
 });
