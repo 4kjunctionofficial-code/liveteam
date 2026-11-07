@@ -7,31 +7,31 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 <style>
-/* Positioned to the LEFT side for OBS stream, matching reference photo layout */
+/* Positioned to the LEFT side for OBS stream */
 body { background: transparent; margin: 0; padding: 20px; display: flex; justify-content: flex-start; align-items: flex-start; height: 100vh; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; }
 
-/* Main layout matching the exact reference image arrangement */
+/* Grid layout with smaller left stack and wider right stack */
 .overlay-grid { display: grid; grid-template-columns: auto auto; gap: 8px; align-items: start; font-weight: 900; }
 
-.left-stack { display: flex; flex-direction: column; gap: 8px; width: 180px; }
-.right-stack { display: flex; flex-direction: column; gap: 8px; width: 360px; }
+.left-stack { display: flex; flex-direction: column; gap: 6px; width: 135px; }
+.right-stack { display: flex; flex-direction: column; gap: 6px; width: 440px; }
 
-/* Badge styling matching reference image */
-.badge-box { background: linear-gradient(to bottom, #0044aa, #002266); border: 2px solid #ffffff; border-radius: 12px; color: white; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 20px; font-weight: 900; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
-.badge-box.race-main-title { background: linear-gradient(to bottom, #0044aa, #002266); justify-content: center; font-size: 22px; font-weight: 900; letter-spacing: 1px; padding: 10px; }
+/* Shift & Race boxes made smaller and compact */
+.badge-box { background: linear-gradient(to bottom, #0044aa, #002266); border: 2px solid #ffffff; border-radius: 10px; color: white; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; font-size: 17px; font-weight: 900; box-shadow: 0 3px 6px rgba(0,0,0,0.5); }
+.badge-box.race-main-title { background: linear-gradient(to bottom, #0044aa, #002266); justify-content: center; font-size: 25px; font-weight: 900; letter-spacing: 1px; padding: 10px; border-radius: 12px; }
 
-.value-box { background: #ffffff; color: #000000; padding: 2px 10px; border-radius: 6px; font-size: 20px; font-weight: 900; min-width: 35px; text-align: center; }
+.value-box { background: #ffffff; color: #000000; padding: 2px 8px; border-radius: 5px; font-size: 22px; font-weight: 900; min-width: 28px; text-align: center; }
 
-.dogs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.dogs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 
-/* Dog Name Boxes */
-.dog-name-box { border: 2px solid #ffffff; border-radius: 12px; color: white; text-align: center; padding: 10px 6px; font-size: 20px; font-weight: 900; text-transform: uppercase; box-shadow: 0 3px 6px rgba(0,0,0,0.4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Wider Dog Name Boxes */
+.dog-name-box { border: 2px solid #ffffff; border-radius: 12px; color: white; text-align: center; padding: 10px 8px; font-size: 26px; font-weight: 900; text-transform: uppercase; box-shadow: 0 3px 6px rgba(0,0,0,0.4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dog-name-box.red { background: linear-gradient(to bottom, #cc0000, #990000); }
 .dog-name-box.blue { background: linear-gradient(to bottom, #0044cc, #002288); }
 .dog-name-box.white { background: linear-gradient(to bottom, #ffffff, #eaeaea); color: #000000; }
 
-/* Winner tag appearing right inside the dog's column */
-.winner-tag { background: linear-gradient(to bottom, #ffcc00, #cc9900); color: black; border: 2px solid #ffffff; border-radius: 8px; text-align: center; padding: 6px; font-size: 16px; font-weight: 900; text-transform: uppercase; box-shadow: 0 3px 6px rgba(0,0,0,0.4); animation: pulse-glow 1s infinite alternate; margin-top: 4px; }
+/* Winner tag */
+.winner-tag { background: linear-gradient(to bottom, #ffcc00, #cc9900); color: black; border: 2px solid #ffffff; border-radius: 8px; text-align: center; padding: 6px; font-size: 22px; font-weight: 900; text-transform: uppercase; box-shadow: 0 3px 6px rgba(0,0,0,0.4); animation: pulse-glow 1s infinite alternate; margin-top: 4px; }
 
 @keyframes pulse-glow { 0% { box-shadow: 0 0 4px #ffcc00; } 100% { box-shadow: 0 0 12px #ffcc00; } }
 .hidden { display: none !important; }
@@ -40,7 +40,7 @@ body { background: transparent; margin: 0; padding: 20px; display: flex; justify
 <body>
 
 <div class="overlay-grid" id="mainOverlayContainer">
-    <!-- Left Column Stack: Shift / Round & Race Boxes -->
+    <!-- Left Column Stack: Compact Shift & Race Boxes -->
     <div class="left-stack">
         <div class="badge-box">
             <span>Shift</span>
@@ -52,7 +52,7 @@ body { background: transparent; margin: 0; padding: 20px; display: flex; justify
         </div>
     </div>
     
-    <!-- Right Column Stack: Current Race Banner & Dog Names Row -->
+    <!-- Right Column Stack: Wider Current Race Banner & Wider Dog Name Boxes -->
     <div class="right-stack">
         <div class="badge-box race-main-title">
             <span>Current Race</span>
