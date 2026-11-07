@@ -36,7 +36,7 @@ body { background: transparent; margin: 0; padding: 20px; display: flex; justify
 </head>
 <body>
 
-<div class="scoreboard-overlay">
+<div class="scoreboard-overlay" id="mainOverlayContainer">
     <div class="top-row">
         <div class="badge-box round">
             <span>Round</span>
@@ -52,7 +52,7 @@ body { background: transparent; margin: 0; padding: 20px; display: flex; justify
             <span class="value-box" id="dispRace">27</span>
         </div>
     </div>
-    <div class="dogs-row">
+    <div class="dogs-row" id="dogsRowContainer">
         <div class="dog-column">
             <div class="dog-name-box red" id="dispDogAName">JADUGAR</div>
             <div class="time-box hidden" id="dispDogATimeWrap">Time: <span id="dispDogATime"></span></div>
@@ -104,21 +104,28 @@ db.on("value", (snapshot) => {
         }
 
         let winnerBanner = document.getElementById('winnerBanner');
+        let dogsRow = document.getElementById('dogsRowContainer');
         let currentTime = Date.now();
         let timestamp = data.timestamp || 0;
         
+        // Check if 15 seconds have elapsed since winner was declared
         if(data.showWinner && data.winnerName && (currentTime - timestamp < 15000)) {
             document.getElementById('dispWinnerName').innerText = data.winnerName + (data.winningTime ? ` (${data.winningTime})` : '');
+            
+            // Hide normal dogs list and show winner banner in its place
+            dogsRow.classList.add('hidden');
             winnerBanner.classList.remove('hidden');
             
             if(hideTimeout) clearTimeout(hideTimeout);
             let remainingTime = 15000 - (currentTime - timestamp);
             hideTimeout = setTimeout(() => {
                 winnerBanner.classList.add('hidden');
-                db.update({ showWinner: false });
+                dogsRow.classList.remove('hidden');
+                db.update({ showWinner: false, winnerName: "", winningTime: "", resultText: "" });
             }, remainingTime);
         } else {
             winnerBanner.classList.add('hidden');
+            dogsRow.classList.remove('hidden');
         }
     }
 });
