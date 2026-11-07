@@ -82,7 +82,7 @@ db.on("value", (snapshot) => {
         document.getElementById('dispRace').innerText = data.race || "27";
         
         let dogAEl = document.getElementById('dispDogAName');
-        dogAEl.innerText = data.dogANames || data.dogAName || "JADUGAR";
+        dogAEl.innerText = data.dogAName || "JADUGAR";
         dogAEl.className = `dog-name-box ${data.dogAColor || 'red'}`;
         
         if(data.dogATime && data.dogATime.trim() !== "") {
@@ -104,8 +104,6 @@ db.on("value", (snapshot) => {
         }
 
         let winnerBanner = document.getElementById('winnerBanner');
-        
-        // Check 15 seconds auto hide based on timestamp
         let currentTime = Date.now();
         let timestamp = data.timestamp || 0;
         
@@ -113,7 +111,6 @@ db.on("value", (snapshot) => {
             document.getElementById('dispWinnerName').innerText = data.winnerName + (data.winningTime ? ` (${data.winningTime})` : '');
             winnerBanner.classList.remove('hidden');
             
-            // Clear previous timeout and set new one to auto-hide after remaining time
             if(hideTimeout) clearTimeout(hideTimeout);
             let remainingTime = 15000 - (currentTime - timestamp);
             hideTimeout = setTimeout(() => {
