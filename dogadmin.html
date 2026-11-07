@@ -52,8 +52,6 @@ button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size
                     <option value="blue">Blue</option>
                     <option value="white">White</option>
                 </select>
-                <label>Dog A Time</label>
-                <input type="text" id="dogATime" placeholder="e.g. 00:27.36" oninput="syncData()">
             </div>
             <div>
                 <label>Dog B (Right) Name</label>
@@ -64,8 +62,6 @@ button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size
                     <option value="red">Red</option>
                     <option value="blue">Blue</option>
                 </select>
-                <label>Dog B Time</label>
-                <input type="text" id="dogBTime" placeholder="e.g. 00:28.42" oninput="syncData()">
             </div>
         </div>
 
@@ -89,10 +85,8 @@ function syncData() {
         race: document.getElementById('raceInp').value,
         dogAName: document.getElementById('dogAName').value,
         dogAColor: document.getElementById('dogAColor').value,
-        dogATime: document.getElementById('dogATime').value,
         dogBName: document.getElementById('dogBName').value,
-        dogBColor: document.getElementById('dogBColor').value,
-        dogBTime: document.getElementById('dogBTime').value
+        dogBColor: document.getElementById('dogBColor').value
     };
     db.update(data);
 }
@@ -100,33 +94,25 @@ function syncData() {
 function declareWinner(side) {
     let nameA = document.getElementById('dogAName').value;
     let nameB = document.getElementById('dogBName').value;
-    let timeA = document.getElementById('dogATime').value;
-    let timeB = document.getElementById('dogBTime').value;
     
     let winner = side === 'A' ? nameA : nameB;
-    let winningTime = side === 'A' ? timeA : timeB;
-    let resultString = `${winner} WIN ${winningTime ? '('+winningTime+')' : ''}`;
+    let resultString = `${winner} WIN`;
 
-    // Display result in admin box
     document.getElementById('adminResultDisplay').innerText = resultString;
 
-    // Save result to Firebase and trigger overlay winner, while clearing local inputs and database name/time fields
     db.update({ 
         winnerSide: side,
         winnerName: winner, 
-        winningTime: winningTime,
+        winningTime: "",
         showWinner: true, 
         resultText: resultString,
         dogAName: "",
         dogBName: "",
-        dogATime: "",
-        dogBTime: "",
         timestamp: Date.now()
     }, () => {
         document.getElementById('dogAName').value = "";
         document.getElementById('dogBName').value = "";
-        document.getElementById('dogATime').value = "";
-        document.getElementById('dogBTime').value = "";
+        syncData();
     });
 }
 
@@ -134,8 +120,6 @@ function resetWinner() {
     document.getElementById('adminResultDisplay').innerText = "No Result Yet";
     document.getElementById('dogAName').value = "";
     document.getElementById('dogBName').value = "";
-    document.getElementById('dogATime').value = "";
-    document.getElementById('dogBTime').value = "";
     db.update({ 
         winnerSide: "",
         winnerName: "", 
@@ -144,8 +128,6 @@ function resetWinner() {
         resultText: "", 
         dogAName: "",
         dogBName: "",
-        dogATime: "", 
-        dogBTime: "",
         timestamp: 0 
     });
 }
