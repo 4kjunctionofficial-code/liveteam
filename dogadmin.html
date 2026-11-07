@@ -19,7 +19,7 @@ button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size
 .btn-green { background: #28a745; color: white; }
 .btn-red { background: #dc3545; color: white; }
 .btn-blue { background: #0066cc; color: white; }
-.btn-yellow { background: #ffc107; color: black; }
+.result-box { background: #2c2c2c; border: 1px solid #555; padding: 10px; border-radius: 6px; min-height: 40px; margin-bottom: 10px; font-weight: bold; color: #ffcc00; }
 </style>
 </head>
 <body>
@@ -49,8 +49,8 @@ button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size
                     <option value="blue">Blue</option>
                     <option value="white">White</option>
                 </select>
-                <label>Dog A Time</label>
-                <input type="text" id="dogATime" value="00:27.36" oninput="syncData()">
+                <label>Dog A Time (Optional)</label>
+                <input type="text" id="dogATime" placeholder="e.g. 00:27.36" oninput="syncData()">
             </div>
             <div>
                 <label>Dog B (Right) Name</label>
@@ -61,17 +61,20 @@ button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size
                     <option value="red">Red</option>
                     <option value="blue">Blue</option>
                 </select>
-                <label>Dog B Time</label>
-                <input type="text" id="dogBTime" value="00:28.42" oninput="syncData()">
+                <label>Dog B Time (Optional)</label>
+                <input type="text" id="dogBTime" placeholder="e.g. 00:28.42" oninput="syncData()">
             </div>
         </div>
+
+        <label>Saved Result Box</label>
+        <div class="result-box" id="adminResultDisplay">No Result Yet</div>
 
         <label>Winner Declaration</label>
         <div class="row">
             <button class="btn-green" onclick="declareWinner('A')">Declare Dog A Winner</button>
             <button class="btn-blue" onclick="declareWinner('B')">Declare Dog B Winner</button>
         </div>
-        <button class="btn-red" onclick="resetWinner()" style="margin-top:10px;">Clear Winner Banner</button>
+        <button class="btn-red" onclick="resetWinner()" style="margin-top:10px;">Clear Result & Winner</button>
     </div>
 </div>
 
@@ -97,13 +100,40 @@ function syncData() {
 function declareWinner(side) {
     let nameA = document.getElementById('dogAName').value;
     let nameB = document.getElementById('dogBName').value;
+    let timeA = document.getElementById('dogATime').value;
+    let timeB = document.getElementById('dogBTime').value;
+    
     let winner = side === 'A' ? nameA : nameB;
-    db.update({ winnerName: winner, showWinner: true });
+    let winningTime = side === 'A' ? timeA : timeB;
+    let resultString = `${winner} WIN ${winningTime ? '('+winningTime+')' : ''}`;
+
+    document.getElementById('adminResultDisplayinnerText' || 'adminResultDisplay').innerText = resultString;
+
+    db.update({ 
+        winnerName: winner, 
+        winningTime: winningTime,
+        showWinner: true, 
+        resultText: resultString,
+        timestamp: Date.now()
+    });
 }
 
 function resetWinner() {
-    db.update({ winnerName: "", showWinner: false });
+    document.getElementById('adminResultDisplay').innerText = "No Result Yet";
+    db.update({ winnerName: "", winningTime: "", showWinner: false, resultText: "", dogATime: "", dogBTime: "" });
+    document.getElementById('dogATime').value = "";
+    document.getElementById('dogBTime').value = "";
+    syncData();
 }
+
+db.on("value", (snapshot) => {
+    let data = snapshot.val();
+    if(data && data.resultText) {
+        document.getElementById('adminResultDisplay').innerText = data.resultText;
+    } else {
+        document.getElementById('adminResultDisplay').innerText = "No Result Yet";
+    }
+});
 </script>
 </body>
 </html>
