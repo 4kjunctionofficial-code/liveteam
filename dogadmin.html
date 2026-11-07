@@ -19,7 +19,7 @@ button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size
 .btn-green { background: #28a745; color: white; }
 .btn-red { background: #dc3545; color: white; }
 .btn-blue { background: #0066cc; color: white; }
-.result-box { background: #2c2c2c; border: 1px solid #555; padding: 10px; border-radius: 6px; min-height: 40px; margin-bottom: 10px; font-weight: bold; color: #ffcc00; }
+.result-box { background: #2c2c2c; border: 2px solid #ffcc00; padding: 12px; border-radius: 6px; min-height: 45px; margin-bottom: 15px; font-weight: bold; color: #ffcc00; font-size: 18px; text-align: center; }
 </style>
 </head>
 <body>
@@ -28,6 +28,9 @@ button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size
     <div class="card">
         <div class="header">Dog Racing Admin Panel</div>
         
+        <label>Saved Result Box</label>
+        <div class="result-box" id="adminResultDisplay">No Result Yet</div>
+
         <div class="row">
             <div>
                 <label>Round Number</label>
@@ -65,9 +68,6 @@ button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size
                 <input type="text" id="dogBTime" placeholder="e.g. 00:28.42" oninput="syncData()">
             </div>
         </div>
-
-        <label>Saved Result Box</label>
-        <div class="result-box" id="adminResultDisplay">No Result Yet</div>
 
         <label>Winner Declaration</label>
         <div class="row">
@@ -107,10 +107,9 @@ function declareWinner(side) {
     let winningTime = side === 'A' ? timeA : timeB;
     let resultString = `${winner} WIN ${winningTime ? '('+winningTime+')' : ''}`;
 
-    // Update Admin Box directly
     document.getElementById('adminResultDisplay').innerText = resultString;
 
-    // Push to Firebase
+    // Push data to Firebase with active timestamp
     db.update({ 
         winnerName: winner, 
         winningTime: winningTime,
@@ -118,9 +117,11 @@ function declareWinner(side) {
         resultText: resultString,
         timestamp: Date.now()
     }, () => {
-        // Clear inputs after success
+        // Clear time and name fields locally and in DB
         document.getElementById('dogATime').value = "";
         document.getElementById('dogBTime').value = "";
+        document.getElementById('dogAName').value = "";
+        document.getElementById('dogBName').value = "";
         syncData();
     });
 }
@@ -136,6 +137,8 @@ function resetWinner() {
         resultText: "", 
         dogATime: "", 
         dogBTime: "",
+        dogAName: "JADUGAR",
+        dogBName: "WHITE POND",
         timestamp: 0 
     });
 }
