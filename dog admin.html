@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dog Racing Admin Panel</title>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<style>
+body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; margin: 0; padding: 15px; }
+.container { max-width: 600px; margin: auto; }
+.card { background: #1e1e1e; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+.header { background: #0066cc; color: white; padding: 10px; text-align: center; font-size: 16px; font-weight: bold; border-radius: 6px; margin-bottom: 12px; text-transform: uppercase; }
+label { font-size: 14px; font-weight: bold; color: #bbb; display: block; margin-bottom: 5px; }
+input, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #444; background: #2c2c2c; color: #fff; font-size: 16px; margin-bottom: 10px; box-sizing: border-box; }
+.row { display: flex; gap: 10px; }
+.row > div { flex: 1; }
+button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+.btn-green { background: #28a745; color: white; }
+.btn-red { background: #dc3545; color: white; }
+.btn-blue { background: #0066cc; color: white; }
+.btn-yellow { background: #ffc107; color: black; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <div class="header">Dog Racing Admin Panel</div>
+        
+        <div class="row">
+            <div>
+                <label>Round Number</label>
+                <input type="number" id="roundInp" value="1" oninput="syncData()">
+            </div>
+            <div>
+                <label>Race Number</label>
+                <input type="number" id="raceInp" value="27" oninput="syncData()">
+            </div>
+        </div>
+
+        <div class="row">
+            <div>
+                <label>Dog A (Left) Name</label>
+                <input type="text" id="dogAName" value="JADUGAR" oninput="syncData()">
+                <label>Dog A Color</label>
+                <select id="dogAColor" onchange="syncData()">
+                    <option value="red">Red</option>
+                    <option value="blue">Blue</option>
+                    <option value="white">White</option>
+                </select>
+                <label>Dog A Time</label>
+                <input type="text" id="dogATime" value="00:27.36" oninput="syncData()">
+            </div>
+            <div>
+                <label>Dog B (Right) Name</label>
+                <input type="text" id="dogBName" value="WHITE POND" oninput="syncData()">
+                <label>Dog B Color</label>
+                <select id="dogBColor" onchange="syncData()">
+                    <option value="white">White</option>
+                    <option value="red">Red</option>
+                    <option value="blue">Blue</option>
+                </select>
+                <label>Dog B Time</label>
+                <input type="text" id="dogBTime" value="00:28.42" oninput="syncData()">
+            </div>
+        </div>
+
+        <label>Winner Declaration</label>
+        <div class="row">
+            <button class="btn-green" onclick="declareWinner('A')">Declare Dog A Winner</button>
+            <button class="btn-blue" onclick="declareWinner('B')">Declare Dog B Winner</button>
+        </div>
+        <button class="btn-red" onclick="resetWinner()" style="margin-top:10px;">Clear Winner Banner</button>
+    </div>
+</div>
+
+<script>
+const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database().ref("dogRaceData/match1");
+
+function syncData() {
+    let data = {
+        round: document.getElementById('roundInp').value,
+        race: document.getElementById('raceInp').value,
+        dogAName: document.getElementById('dogAName').value,
+        dogAColor: document.getElementById('dogAColor').value,
+        dogATime: document.getElementById('dogATime').value,
+        dogBName: document.getElementById('dogBName').value,
+        dogBColor: document.getElementById('dogBColor').value,
+        dogBTime: document.getElementById('dogBTime').value
+    };
+    db.update(data);
+}
+
+function declareWinner(side) {
+    let nameA = document.getElementById('dogAName').value;
+    let nameB = document.getElementById('dogBName').value;
+    let winner = side === 'A' ? nameA : nameB;
+    db.update({ winnerName: winner, showWinner: true });
+}
+
+function resetWinner() {
+    db.update({ winnerName: "", showWinner: false });
+}
+</script>
+</body>
+</html>
