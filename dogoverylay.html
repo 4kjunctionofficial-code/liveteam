@@ -94,27 +94,25 @@ db.on("value", (snapshot) => {
         let timeBWrap = document.getElementById('dispDogBTimeWrap');
         let tagA = document.getElementById('winnerTagA');
         let tagB = document.getElementById('winnerTagB');
+        let dogsRow = document.getElementById('dogsRowContainer');
 
-        // Always update and show team names if they exist in database
-        if(data.dogAName && data.dogAName.trim() !== "") {
-            dogAEl.innerText = data.dogAName;
-            dogAEl.style.display = "block";
-        }
-        dogAEl.className = `dog-name-box ${data.dogAColor || 'red'}`;
-
-        if(data.dogBName && data.dogBName.trim() !== "") {
-            dogBEl.innerText = data.dogBName;
-            dogBEl.style.display = "block";
-        }
-        dogBEl.className = `dog-name-box ${data.dogBColor || 'white'}`;
-
-        // Handle Time display if winner not active
         let currentTime = Date.now();
         let timestamp = data.timestamp || 0;
         
+        // Check if winner is active and within 15 seconds
         if(data.showWinner && (currentTime - timestamp < 15000)) {
+            // Update names before showing winner tag
+            if(data.dogAName) dogAEl.innerText = data.dogAName;
+            dogAEl.className = `dog-name-box ${data.dogAColor || 'red'}`;
+            dogAEl.classList.remove('hidden');
+
+            if(data.dogBName) dogBEl.innerText = data.dogBName;
+            dogBEl.className = `dog-name-box ${data.dogBColor || 'white'}`;
+            dogBEl.classList.remove('hidden');
+
             timeAWrap.classList.add('hidden');
             timeBWrap.classList.add('hidden');
+            dogsRow.classList.remove('hidden');
 
             if(data.winnerSide === 'A') {
                 tagA.classList.remove('hidden');
@@ -127,7 +125,8 @@ db.on("value", (snapshot) => {
             if(hideTimeout) clearTimeout(hideTimeout);
             let remainingTime = 15000 - (currentTime - timestamp);
             hideTimeout = setTimeout(() => {
-                // After 15 seconds, only hide the winner tags (Keep team names visible)
+                // After 15 seconds, hide both team names and winner tags together completely
+                dogsRow.classList.add('hidden');
                 tagA.classList.add('hidden');
                 tagB.classList.add('hidden');
                 db.update({ showWinner: false, resultText: "", timestamp: 0 });
@@ -136,19 +135,37 @@ db.on("value", (snapshot) => {
             tagA.classList.add('hidden');
             tagB.classList.add('hidden');
             
-            // Show times if available
-            if(data.dogATime && data.dogATime.trim() !== "") {
-                document.getElementById('dispDogATime').innerText = data.dogATime;
-                timeAWrap.classList.remove('hidden');
+            // Normal display of team names and times if not empty
+            if((!data.dogAName || data.dogAName.trim() === "") && (!data.dogBName || data.dogBName.trim() === "")) {
+                dogsRow.classList.add('hidden');
             } else {
-                timeAWrap.classList.add('hidden');
-            }
+                dogsRow.classList.remove('hidden');
+                
+                if(data.dogAName) {
+                    dogAEl.innerText = data.dogAName;
+                    dogAEl.classList.remove('hidden');
+                }
+                dogAEl.className = `dog-name-box ${data.dogAColor || 'red'}`;
 
-            if(data.dogBTime && data.dogBTime.trim() !== "") {
-                document.getElementById('dispDogBTime').innerText = data.dogBTime;
-                timeBWrap.classList.remove('hidden');
-            } else {
-                timeBWrap.classList.add('hidden');
+                if(data.dogBName) {
+                    dogBEl.innerText = data.dogBName;
+                    dogBEl.classList.remove('hidden');
+                }
+                dogBEl.className = `dog-name-box ${data.dogBColor || 'white'}`;
+
+                if(data.dogATime && data.dogATime.trim() !== "") {
+                    document.getElementById('dispDogATime').innerText = data.dogATime;
+                    timeAWrap.classList.remove('hidden');
+                } else {
+                    timeAWrap.classList.add('hidden');
+                }
+
+                if(data.dogBTime && data.dogBTime.trim() !== "") {
+                    document.getElementById('dispDogBTime').innerText = data.dogBTime;
+                    timeBWrap.classList.remove('hidden');
+                } else {
+                    timeBWrap.classList.add('hidden');
+                }
             }
         }
     }
