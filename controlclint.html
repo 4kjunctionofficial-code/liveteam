@@ -3,171 +3,71 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Manpreet Mudki - Live Scoreboard Control Hub</title>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<title>4K Junction Live - Professional Sports Scoreboards & OBS Overlays</title>
 <style>
-body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0d1117; color: #c9d1d9; margin: 0; padding: 20px; }
-.container { max-width: 1200px; margin: auto; }
-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #30363d; padding-bottom: 15px; margin-bottom: 25px; }
-h1 { color: #f0f6fc; margin: 0; font-size: 24px; }
-.brand { color: #58a6ff; font-weight: bold; }
-.grid-layout { display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
-@media (max-width: 850px) { .grid-layout { grid-template-columns: 1fr; } }
-.card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); margin-bottom: 20px; }
-.card h3 { margin-top: 0; color: #f0f6fc; border-bottom: 1px solid #30363d; padding-bottom: 10px; font-size: 18px; }
-label { font-size: 13px; font-weight: bold; color: #8b949e; display: block; margin-bottom: 5px; margin-top: 10px; }
-input, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #30363d; background: #0d1117; color: #fff; font-size: 14px; box-sizing: border-box; }
-button { width: 100%; padding: 11px; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 15px; background: #238636; color: white; transition: 0.2s; }
-button:hover { background: #2ea043; }
-.match-item { background: #21262d; border: 1px solid #30363d; padding: 15px; border-radius: 6px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-.match-info h4 { margin: 0 0 5px 0; color: #58a6ff; font-size: 16px; }
-.match-info p { margin: 0; font-size: 13px; color: #8b949e; }
-.btn-group { display: flex; gap: 8px; }
-.btn-sm { padding: 6px 12px; font-size: 13px; border-radius: 4px; text-decoration: none; font-weight: bold; text-align: center; display: inline-block; }
-.btn-blue { background: #1f6feb; color: white; }
-.btn-blue:hover { background: #388bfd; }
-.btn-red { background: #da3633; color: white; }
-.link-output { background: #0d1117; border: 1px dashed #58a6ff; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 12px; color: #58a6ff; word-break: break-all; margin-top: 10px; display: none; }
+body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0d1117; color: #c9d1d9; margin: 0; padding: 0; }
+header { background: #161b22; border-bottom: 1px solid #30363d; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; }
+.logo { font-size: 22px; font-weight: bold; color: #ffcc00; text-decoration: none; }
+.nav-links { display: flex; gap: 20px; align-items: center; }
+.nav-links a { color: #c9d1d9; text-decoration: none; font-weight: bold; font-size: 15px; }
+.nav-links a:hover { color: #58a6ff; }
+.btn-primary { background: #238636; color: white !important; padding: 10px 18px; border-radius: 6px; }
+.hero { text-align: center; padding: 80px 20px; background: linear-gradient(to bottom, #161b22, #0d1117); }
+.hero h1 { font-size: 42px; color: #f0f6fc; margin-bottom: 15px; }
+.hero p { font-size: 18px; color: #8b949e; max-width: 700px; margin: auto; margin-bottom: 30px; }
+.container { max-width: 1100px; margin: auto; padding: 40px 20px; }
+.section-title { text-align: center; font-size: 28px; color: #f0f6fc; margin-bottom: 40px; }
+.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+.card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; }
+.card:hover { border-color: #58a6ff; transform: translateY(-3px); }
+.card h3 { color: #58a6ff; margin-top: 0; font-size: 22px; }
+.card p { color: #8b949e; line-height: 1.5; }
+footer { background: #161b22; border-top: 1px solid #30363d; text-align: center; padding: 30px; color: #8b949e; font-size: 14px; margin-top: 60px; }
 </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1>MLiveLayer Hub - <span class="brand">4K Junction & Mudki Streaming</span></h1>
-        <div style="font-size: 14px; color: #8b949e;">Status: <b style="color: #2ea043;">Connected to Firebase</b></div>
-    </header>
+<!-- Public Navigation Bar -->
+<header>
+    <a href="#" class="logo">🎬 4K Junction Live</a>
+    <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="dashboard.html" class="btn-primary">Client Login / Hub</a>
+    </div>
+</header>
 
-    <div class="grid-layout">
-        <!-- Left Column: Create New Match / Overlay -->
-        <div>
-            <div class="card">
-                <h3>Create New Stream / Match</h3>
-                <label>Match / Client Title</label>
-                <input type="text" id="matchTitle" placeholder="e.g. Mudki Dog Race Final">
+<!-- Hero Section -->
+<div class="hero">
+    <h1>Professional Live Scoreboards & OBS Overlays</h1>
+    <p>Power your Kabaddi tournaments, Dog Racing matches, and sports live streams with real-time synchronized cloud graphics.</p>
+    <a href="dashboard.html" class="btn-primary" style="padding: 14px 30px; font-size: 18px; text-decoration: none; display: inline-block;">Get Started Now</a>
+</div>
 
-                <label>Sport / Overlay Type</label>
-                <select id="matchType">
-                    <option value="dog">Dog Racing Scoreboard</option>
-                    <option value="kabaddi">Kabaddi Pro Scoreboard</option>
-                    <option value="football">Football Ultimate Scoreboard</option>
-                </select>
-
-                <label>Plan / Validity Duration</label>
-                <select id="matchPlan">
-                    <option value="2">2 Hours Trial</option>
-                    <option value="24" selected>24 Hours Full Pass</option>
-                    <option value="168">7 Days Tournament Pass</option>
-                </select>
-
-                <button onclick="createNewMatch()">Create & Generate Link</button>
-            </div>
+<!-- Main Content / Features -->
+<div class="container" id="features">
+    <h2 class="section-title">Supported Sports & Scoreboards</h2>
+    <div class="features-grid">
+        <div class="card">
+            <h3>🔴 Kabaddi Pro Overlay</h3>
+            <p>Real-time team names in Punjabi/Gurmukhi, raid timers, live scores, and bottom scrolling ticker ads designed for high-end professional broadcasts.</p>
         </div>
-
-        <!-- Right Column: Active Matches & Links Hub -->
-        <div>
-            <div class="card">
-                <h3>Active Matches & OBS Browser Links</h3>
-                <div id="matchListContainer">
-                    <p style="color: #8b949e; text-align: center;">Loading active matches...</p>
-                </div>
-            </div>
+        <div class="card">
+            <h3>🐕 Dog Racing Control</h3>
+            <p>Shift and race number counters, dog color boxes, instant winner announcements with 15-second auto-hide animations for OBS Studio.</p>
+        </div>
+        <div class="card">
+            <h3>⚡ Cloud Cross-Device Sync</h3>
+            <p>Powered by Firebase Realtime Database. Control your scoreboards instantly from your mobile phone or laptop while streaming live.</p>
         </div>
     </div>
 </div>
 
-<script>
-const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
-firebase.initializeApp(firebaseConfig);
-const dbRef = firebase.database().ref("mlivelayerHub/matches");
+<!-- Footer -->
+<footer>
+    <p>&copy; 2026 Manpreet Singh Mudki (4K Junction Live). All rights reserved.</p>
+    <p style="margin-top: 5px;">Managed via manpreetmudki.in</p>
+</footer>
 
-function createNewMatch() {
-    let title = document.getElementById('matchTitle').value.trim();
-    let type = document.getElementById('matchType').value;
-    let hours = parseInt(document.getElementById('matchPlan').value);
-
-    if(!title) {
-        alert("Please enter a match or client title!");
-        return;
-    }
-
-    let matchId = 'match_' + Date.now();
-    let expiryTime = Date.now() + (hours * 3600 * 1000);
-
-    let matchData = {
-        title: title,
-        type: type,
-        expiresAt: expiryTime,
-        active: true,
-        round: 1,
-        race: 27,
-        dogAName: "JADUGAR",
-        dogBName: "WHITE POND",
-        scoreA: 0,
-        scoreB: 0
-    };
-
-    dbRef.child(matchId).set(matchData, (error) => {
-        if(error) {
-            alert("Failed to create match");
-        } else {
-            document.getElementById('matchTitle').value = "";
-            alert("Match created successfully!");
-        }
-    });
-}
-
-dbRef.on("value", (snapshot) => {
-    let data = snapshot.val();
-    let container = document.getElementById('matchListContainer');
-    container.innerHTML = "";
-
-    if(!data) {
-        container.innerHTML = `<p style="color: #8b949e; text-align: center;">No active matches found. Create one using the form.</p>`;
-        return;
-    }
-
-    let currentDomain = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
-
-    Object.keys(data).forEach(id => {
-        let match = data[id];
-        let overlayFile = match.type === 'dog' ? 'dog_overlay.html' : (match.type === 'kabaddi' ? 'kabaddi_overlay.html' : 'football_overlay.html');
-        let adminFile = match.type === 'dog' ? 'dog_admin.html' : 'kabaddi_admin.html';
-        let obsLink = `${currentDomain}${overlayFile}?id=${id}`;
-
-        let itemHTML = `
-            <div class="match-item">
-                <div class="match-info">
-                    <h4>${match.title} <span style="font-size:11px; background:#30363d; padding:2px 6px; border-radius:4px; color:#58a6ff; text-transform:uppercase;">${match.type}</span></h4>
-                    <p>Expires: ${new Date(match.expiresAt).toLocaleString()}</p>
-                    <div class="link-output" id="link_${id}"><b>OBS Link:</b> ${obsLink}</div>
-                </div>
-                <div class="btn-group">
-                    <a href="${adminFile}?id=${id}" class="btn-sm btn-blue" target="_blank">Admin</a>
-                    <button class="btn-sm btn-blue" style="margin:0; background:#21262d; border:1px solid #30363d;" onclick="toggleLink('${id}')">Copy Link</button>
-                    <button class="btn-sm btn-red" style="margin:0;" onclick="deleteMatch('${id}')">Delete</button>
-                </div>
-            </div>
-        `;
-        container.innerHTML += itemHTML;
-    });
-});
-
-function toggleLink(id) {
-    let box = document.getElementById(`link_${id}`);
-    box.style.display = box.style.display === 'block' ? 'none' : 'block';
-    
-    // Copy to clipboard automatically
-    let textToCopy = box.innerText.replace("OBS Link: ", "");
-    navigator.clipboard.writeText(textToCopy);
-}
-
-function deleteMatch(id) {
-    if(confirm("Are you sure you want to delete this match and overlay link?")) {
-        dbRef.child(id).remove();
-    }
-}
-</script>
 </body>
 </html>
