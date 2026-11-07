@@ -79,7 +79,35 @@ const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebas
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database().ref("dogRaceData/match1");
 
+// Save state locally so browser refresh doesn't wipe inputs
+function saveToLocal() {
+    let data = {
+        round: document.getElementById('roundInp').value,
+        race: document.getElementById('raceInp').value,
+        dogAName: document.getElementById('dogAName').value,
+        dogAColor: document.getElementById('dogAColor').value,
+        dogBName: document.getElementById('dogBName').value,
+        dogBColor: document.getElementById('dogBColor').value
+    };
+    localStorage.setItem('dogAdminPanelState', JSON.stringify(data));
+}
+
+// Restore state on page load
+window.addEventListener('DOMContentLoaded', () => {
+    let saved = localStorage.getItem('dogAdminPanelState');
+    if(saved) {
+        let d = JSON.parse(saved);
+        if(d.round !== undefined) document.getElementById('roundInp').value = d.round;
+        if(d.race !== undefined) document.getElementById('raceInp').value = d.race;
+        if(d.dogAName !== undefined) document.getElementById('dogAName').value = d.dogAName;
+        if(d.dogAColor !== undefined) document.getElementById('dogAColor').value = d.dogAColor;
+        if(d.dogBName !== undefined) document.getElementById('dogBName').value = d.dogBName;
+        if(d.dogBColor !== undefined) document.getElementById('dogBColor').value = d.dogBColor;
+    }
+});
+
 function syncData() {
+    saveToLocal();
     let data = {
         round: document.getElementById('roundInp').value,
         race: document.getElementById('raceInp').value,
@@ -112,6 +140,7 @@ function declareWinner(side) {
     }, () => {
         document.getElementById('dogAName').value = "";
         document.getElementById('dogBName').value = "";
+        saveToLocal();
         syncData();
     });
 }
@@ -120,6 +149,7 @@ function resetWinner() {
     document.getElementById('adminResultDisplay').innerText = "No Result Yet";
     document.getElementById('dogAName').value = "";
     document.getElementById('dogBName').value = "";
+    localStorage.removeItem('dogAdminPanelState');
     db.update({ 
         winnerSide: "",
         winnerName: "", 
@@ -132,6 +162,7 @@ function resetWinner() {
     });
 }
 
+// Real-time listener for multi-device / multi-mobile sync
 db.on("value", (snapshot) => {
     let data = snapshot.val();
     if(data) {
@@ -140,6 +171,21 @@ db.on("value", (snapshot) => {
         } else {
             document.getElementById('adminResultDisplay').innerText = "No Result Yet";
         }
+        
+        // Sync inputs from firebase if updated externally from another device/mobile
+        if(document.activeElement !== document.getElementById('roundInp') && data.round !== undefined) {
+            document.getElementById('roundInp').value = data.round;
+        }
+        if(document.activeElement !== document.getElementById('raceInp') && data.race !== undefined) {
+            document.getElementById('raceInp').value = data.race;
+        }
+        if(document.activeElement !== document.getElementById('dogAName') && data.dogAName !== undefined) {
+            document.getElementById('dogAName').value = data.dogAName;
+        }
+        if(document.activeElement !== document.getElementById('dogBName') && data.dogBName !== undefined) {
+            document.getElementById('dogBName').value = data.dogBName;
+        }
+        saveToLocal();
     }
 });
 </script>
