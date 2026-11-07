@@ -10,7 +10,7 @@
 body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; margin: 0; padding: 15px; }
 .container { max-width: 600px; margin: auto; }
 .card { background: #1e1e1e; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-.header { background: #0066cc; color: white; padding: 10px; text-align: center; font-size: 16px; font-weight: bold; border-radius: 6px; margin-bottom: 12px; text-transform: uppercase; }
+.header { background: #cc0000; color: white; padding: 10px; text-align: center; font-size: 16px; font-weight: bold; border-radius: 6px; margin-bottom: 12px; text-transform: uppercase; }
 label { font-size: 14px; font-weight: bold; color: #bbb; display: block; margin-bottom: 5px; }
 input, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #444; background: #2c2c2c; color: #fff; font-size: 16px; margin-bottom: 10px; box-sizing: border-box; }
 .row { display: flex; gap: 10px; }
@@ -27,7 +27,10 @@ button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size
 <div class="container">
     <div class="card">
         <div class="header">Dog Racing Admin Panel</div>
-      
+        
+        <label>Saved Result Box</label>
+        <div class="result-box" id="adminResultDisplay">No Result Yet</div>
+
         <div class="row">
             <div>
                 <label>Round Number</label>
@@ -71,11 +74,6 @@ button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size
             <button class="btn-green" onclick="declareWinner('A')">Declare Dog A Winner</button>
             <button class="btn-blue" onclick="declareWinner('B')">Declare Dog B Winner</button>
         </div>
-          
-        <label>Saved Result Box</label>
-        <div class="result-box" id="adminResultDisplay">No Result Yet</div>
-
-      
         <button class="btn-red" onclick="resetWinner()" style="margin-top:10px;">Clear Result & Fields</button>
     </div>
 </div>
@@ -109,16 +107,26 @@ function declareWinner(side) {
     let winningTime = side === 'A' ? timeA : timeB;
     let resultString = `${winner} WIN ${winningTime ? '('+winningTime+')' : ''}`;
 
+    // Display result in admin box
     document.getElementById('adminResultDisplay').innerText = resultString;
 
-    // Save result to Firebase and trigger overlay winner without clearing fields automatically
+    // Save result to Firebase and trigger overlay winner, while clearing local inputs and database name/time fields
     db.update({ 
         winnerSide: side,
         winnerName: winner, 
         winningTime: winningTime,
         showWinner: true, 
         resultText: resultString,
+        dogAName: "",
+        dogBName: "",
+        dogATime: "",
+        dogBTime: "",
         timestamp: Date.now()
+    }, () => {
+        document.getElementById('dogAName').value = "";
+        document.getElementById('dogBName').value = "";
+        document.getElementById('dogATime').value = "";
+        document.getElementById('dogBTime').value = "";
     });
 }
 
