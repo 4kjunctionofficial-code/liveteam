@@ -16,22 +16,22 @@ body { background: transparent; margin: 0; padding: 20px; display: flex; justify
 .left-stack { display: flex; flex-direction: column; gap: 6px; width: 145px; }
 .right-stack { display: flex; flex-direction: column; gap: 6px; width: 440px; }
 
-/* Shift & Race boxes height and font matched equal to right side boxes */
-.badge-box { background: linear-gradient(to bottom, #0044aa, #002266); border: 2px solid #ffffff; border-radius: 12px; color: white; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 20px; font-weight: 900; box-shadow: 0 3px 6px rgba(0,0,0,0.5); height: 50px; box-sizing: border-box; }
-.badge-box.race-main-title { background: linear-gradient(to bottom, #0044aa, #002266); justify-content: center; font-size: 25px; font-weight: 900; letter-spacing: 1px; padding: 10px; border-radius: 12px; height: 50px; box-sizing: border-box; }
+/* Shift & Race boxes with ultra bold text */
+.badge-box { background: linear-gradient(to bottom, #0044aa, #002266); border: 2px solid #ffffff; border-radius: 12px; color: white; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 21px; font-weight: 900; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); box-shadow: 0 3px 6px rgba(0,0,0,0.5); height: 50px; box-sizing: border-box; }
+.badge-box.race-main-title { background: linear-gradient(to bottom, #0044aa, #002266); justify-content: center; font-size: 26px; font-weight: 900; letter-spacing: 1px; padding: 10px; border-radius: 12px; height: 50px; box-sizing: border-box; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
 
-.value-box { background: #ffffff; color: #000000; padding: 2px 8px; border-radius: 6px; font-size: 22px; font-weight: 900; min-width: 32px; text-align: center; }
+.value-box { background: #ffffff; color: #000000; padding: 2px 8px; border-radius: 6px; font-size: 23px; font-weight: 900; min-width: 32px; text-align: center; text-shadow: none; }
 
 .dogs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 
-/* Dog Name Boxes */
-.dog-name-box { border: 2px solid #ffffff; border-radius: 12px; color: white; text-align: center; padding: 10px 8px; font-size: 26px; font-weight: 900; text-transform: uppercase; box-shadow: 0 3px 6px rgba(0,0,0,0.4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; height: 50px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; }
+/* Dog Name Boxes with ultra bold text and text-shadow */
+.dog-name-box { border: 2px solid #ffffff; border-radius: 12px; color: white; text-align: center; padding: 10px 8px; font-size: 27px; font-weight: 900; text-transform: uppercase; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); box-shadow: 0 3px 6px rgba(0,0,0,0.4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; height: 50px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; }
 .dog-name-box.red { background: linear-gradient(to bottom, #cc0000, #990000); }
 .dog-name-box.blue { background: linear-gradient(to bottom, #0044cc, #002288); }
-.dog-name-box.white { background: linear-gradient(to bottom, #ffffff, #eaeaea); color: #000000; }
+.dog-name-box.white { background: linear-gradient(to bottom, #ffffff, #eaeaea); color: #000000; text-shadow: none; }
 
 /* Winner tag */
-.winner-tag { background: linear-gradient(to bottom, #ffcc00, #cc9900); color: black; border: 2px solid #ffffff; border-radius: 8px; text-align: center; padding: 6px; font-size: 22px; font-weight: 900; text-transform: uppercase; box-shadow: 0 3px 6px rgba(0,0,0,0.4); animation: pulse-glow 1s infinite alternate; margin-top: 4px; }
+.winner-tag { background: linear-gradient(to bottom, #ffcc00, #cc9900); color: black; border: 2px solid #ffffff; border-radius: 8px; text-align: center; padding: 6px; font-size: 23px; font-weight: 900; text-transform: uppercase; text-shadow: none; box-shadow: 0 3px 6px rgba(0,0,0,0.4); animation: pulse-glow 1s infinite alternate; margin-top: 4px; }
 
 @keyframes pulse-glow { 0% { box-shadow: 0 0 4px #ffcc00; } 100% { box-shadow: 0 0 12px #ffcc00; } }
 .hidden { display: none !important; }
@@ -40,7 +40,7 @@ body { background: transparent; margin: 0; padding: 20px; display: flex; justify
 <body>
 
 <div class="overlay-grid" id="mainOverlayContainer">
-    <!-- Left Column Stack: Shift & Race Boxes (Equal Height) -->
+    <!-- Left Column Stack: Shift & Race Boxes -->
     <div class="left-stack">
         <div class="badge-box">
             <span>Shift</span>
