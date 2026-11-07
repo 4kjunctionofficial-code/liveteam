@@ -49,7 +49,7 @@ button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size
                     <option value="blue">Blue</option>
                     <option value="white">White</option>
                 </select>
-                <label>Dog A Time (Optional)</label>
+                <label>Dog A Time</label>
                 <input type="text" id="dogATime" placeholder="e.g. 00:27.36" oninput="syncData()">
             </div>
             <div>
@@ -61,7 +61,7 @@ button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size
                     <option value="red">Red</option>
                     <option value="blue">Blue</option>
                 </select>
-                <label>Dog B Time (Optional)</label>
+                <label>Dog B Time</label>
                 <input type="text" id="dogBTime" placeholder="e.g. 00:28.42" oninput="syncData()">
             </div>
         </div>
@@ -107,31 +107,47 @@ function declareWinner(side) {
     let winningTime = side === 'A' ? timeA : timeB;
     let resultString = `${winner} WIN ${winningTime ? '('+winningTime+')' : ''}`;
 
-    document.getElementById('adminResultDisplayinnerText' || 'adminResultDisplay').innerText = resultString;
+    // Update Admin Box directly
+    document.getElementById('adminResultDisplay').innerText = resultString;
 
+    // Push to Firebase
     db.update({ 
         winnerName: winner, 
         winningTime: winningTime,
         showWinner: true, 
         resultText: resultString,
         timestamp: Date.now()
+    }, () => {
+        // Clear inputs after success
+        document.getElementById('dogATime').value = "";
+        document.getElementById('dogBTime').value = "";
+        syncData();
     });
 }
 
 function resetWinner() {
     document.getElementById('adminResultDisplay').innerText = "No Result Yet";
-    db.update({ winnerName: "", winningTime: "", showWinner: false, resultText: "", dogATime: "", dogBTime: "" });
     document.getElementById('dogATime').value = "";
     document.getElementById('dogBTime').value = "";
-    syncData();
+    db.update({ 
+        winnerName: "", 
+        winningTime: "", 
+        showWinner: false, 
+        resultText: "", 
+        dogATime: "", 
+        dogBTime: "",
+        timestamp: 0 
+    });
 }
 
 db.on("value", (snapshot) => {
     let data = snapshot.val();
-    if(data && data.resultText) {
-        document.getElementById('adminResultDisplay').innerText = data.resultText;
-    } else {
-        document.getElementById('adminResultDisplay').innerText = "No Result Yet";
+    if(data) {
+        if(data.resultText) {
+            document.getElementById('adminResultDisplay').innerText = data.resultText;
+        } else {
+            document.getElementById('adminResultDisplay').innerText = "No Result Yet";
+        }
     }
 });
 </script>
