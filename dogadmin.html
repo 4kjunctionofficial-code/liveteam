@@ -28,9 +28,6 @@ button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size
     <div class="card">
         <div class="header">Dog Racing Admin Panel</div>
         
-        <label>Saved Result Box</label>
-        <div class="result-box" id="adminResultDisplay">No Result Yet</div>
-
         <div class="row">
             <div>
                 <label>Round Number</label>
@@ -74,6 +71,10 @@ button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size
             <button class="btn-green" onclick="declareWinner('A')">Declare Dog A Winner</button>
             <button class="btn-blue" onclick="declareWinner('B')">Declare Dog B Winner</button>
         </div>
+
+         <label>Saved Result Box</label>
+        <div class="result-box" id="adminResultDisplay">No Result Yet</div>
+ 
         <button class="btn-red" onclick="resetWinner()" style="margin-top:10px;">Clear Result & Winner</button>
     </div>
 </div>
