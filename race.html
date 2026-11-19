@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="pa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horse Race Admin - Manpreet Mudki</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gurmukhi:wght@600;700;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans Gurmukhi', Arial, sans-serif;
+    background: #eef1f5;
+    color: #111827;
+    padding: 14px;
+  }
+  .wrap {
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .top-bar {
+    background: #111827;
+    color: #ffffff;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .top-title {
+    font-size: 17px;
+    font-weight: 800;
+  }
+  .id-badge {
+    background: #ffcc00;
+    color: #111827;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .card {
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
+  .card-head {
+    background: #f8fafc;
+    padding: 10px 14px;
+    font-size: 15px;
+    font-weight: 800;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .counter-box {
+    padding: 14px 10px;
+    text-align: center;
+  }
+  .counter-num {
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .btn-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  .btn-plus, .btn-minus {
+    width: 58px;
+    height: 46px;
+    border: none;
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .btn-plus { background: #16a34a; }
+  .btn-minus { background: #dc2626; }
+
+  .form-body {
+    padding: 14px;
+  }
+  .input-group {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    background: #ffffff;
+  }
+  .input-label {
+    background: #e2e8f0;
+    color: #1e293b;
+    font-size: 13px;
+    font-weight: 800;
+    min-width: 78px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    border-right: 1px solid #cbd5e1;
+  }
+  .input-group input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 10px 12px;
+    font-size: 15px;
+    font-family: 'Noto Sans Gurmukhi', sans-serif;
+  }
+  .btn-primary {
+    width: 100%;
+    padding: 11px;
+    background: #16a34a;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .btn-secondary {
+    width: 100%;
+    padding: 9px;
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    margin-top: 6px;
+  }
+  .btn-cancel {
+    width: 100%;
+    padding: 8px;
+    background: #6b7280;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 6px;
+    display: none;
+  }
+
+  .toggles-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+  .toggle-btn {
+    padding: 9px 10px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    background: #f8fafc;
+  }
+  .toggle-btn.active {
+    background: #111827;
+    color: #ffcc00;
+    border-color: #111827;
+  }
+
+  .entry-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 14px;
+  }
+  .entry-row:last-child { border-bottom: none; }
+  .entry-info {
+    font-weight: 700;
+    line-height: 1.35;
+  }
+  .entry-actions {
+    display: flex;
+    gap: 6px;
+  }
+  .btn-edit {
+    background: #f59e0b;
+    color: #111827;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 9px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .btn-del {
+    background: #ef4444;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 9px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top-bar">
+    <div class="top-title">Horse Race Admin</div>
+    <div class="id-badge" id="idBadge">ID: defaultMatch</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-head">Shift</div>
+      <div class="counter-box">
+        <div class="counter-num" id="admShift">0</div>
+        <div class="btn-row">
+          <button class="btn-plus" onclick="changeCounter('shift', 1)">+</button>
+          <button class="btn-minus" onclick="changeCounter('shift', -1)">-</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-head">Race</div>
+      <div class="counter-box">
+        <div class="counter-num" id="admRace">0</div>
+        <div class="btn-row">
+          <button class="btn-plus" onclick="changeCounter('race', 1)">+</button>
+          <button class="btn-minus" onclick="changeCounter('race', -1)">-</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" id="formHeader">Create new (Shift: 0, Race: 0)</div>
+    <div class="form-body">
+      <div class="input-group">
+        <span class="input-label">Time</span>
+        <input type="text" id="timeInput" placeholder="e.g. 24.09" inputmode="decimal">
+      </div>
+
+      <div class="input-group">
+        <span class="input-label">Name</span>
+        <input type="text" id="nameInput" placeholder="ਘੋੜੇ / ਮਾਲਕ ਦਾ ਨਾਮ">
+      </div>
+
+      <button class="btn-primary" id="saveEntryBtn" onclick="saveEntry()">Add</button>
+      <button class="btn-cancel" id="cancelEditBtn" onclick="cancelEdit()">Cancel Edit</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">Overlay Controls</div>
+    <div class="toggles-row">
+      <button class="toggle-btn active" id="btnScoreToggle" onclick="toggleVisibility('scoreVisible')">Scoreboard: ON</button>
+      <button class="toggle-btn active" id="btnTickerToggle" onclick="toggleVisibility('tickerVisible')">Ticker: ON</button>
+    </div>
+    <div class="form-body" style="padding-top:0;">
+      <div class="input-group">
+        <span class="input-label">Round</span>
+        <input type="text" id="roundInput" placeholder="e.g. Final / ਫਾਈਨਲ">
+      </div>
+      <button class="btn-secondary" onclick="updateRound()">Update Round</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">Current Race Entries (Fastest First)</div>
+    <div id="entriesList"></div>
+  </div>
+</div>
+
+<script>
+  const firebaseConfig = {
+    databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+
+  const params = new URLSearchParams(window.location.search);
+  const matchId = params.get("id") || "defaultMatch";
+  document.getElementById("idBadge").textContent = `ID: ${matchId}`;
+
+  const horseRef = firebase.database().ref("horseRaceData/" + matchId);
+  const matchRef = firebase.database().ref("matchData/" + matchId);
+
+  let currentShift = 0;
+  let currentRace = 0;
+  let editingKey = null;
+  let latestEntries = [];
+  let scoreVisibleState = true;
+  let tickerVisibleState = true;
+
+  matchRef.child("sport").set("horse");
+
+  function changeCounter(field, delta) {
+    const base = field === "shift" ? currentShift : currentRace;
+    const nextVal = Math.max(0, base + delta);
+    horseRef.child(field).set(nextVal);
+  }
+
+  function saveEntry() {
+    const timeVal = document.getElementById("timeInput").value.trim();
+    const nameVal = document.getElementById("nameInput").value.trim();
+
+    if (!timeVal || !nameVal) {
+      alert("Time te Name dono bharo");
+      return;
+    }
+
+    const payload = {
+      shift: currentShift,
+      race: currentRace,
+      time: timeVal,
+      name: nameVal,
+      updatedAt: Date.now()
+    };
+
+    if (editingKey) {
+      horseRef.child("entries").child(editingKey).update(payload).then(() => {
+        cancelEdit();
+      });
+    } else {
+      horseRef.child("entries").push(payload).then(() => {
+        document.getElementById("timeInput").value = "";
+        document.getElementById("nameInput").value = "";
+        document.getElementById("timeInput").focus();
+      });
+    }
+  }
+
+  function startEdit(key) {
+    const item = latestEntries.find(e => e.key === key);
+    if (!item) return;
+
+    editingKey = key;
+    document.getElementById("timeInput").value = item.time;
+    document.getElementById("nameInput").value = item.name;
+    document.getElementById("saveEntryBtn").textContent = "Update Entry";
+    document.getElementById("cancelEditBtn").style.display = "block";
+  }
+
+  function cancelEdit() {
+    editingKey = null;
+    document.getElementById("timeInput").value = "";
+    document.getElementById("nameInput").value = "";
+    document.getElementById("saveEntryBtn").textContent = "Add";
+    document.getElementById("cancelEditBtn").style.display = "none";
+  }
+
+  function deleteEntry(key) {
+    if (editingKey === key) cancelEdit();
+    horseRef.child("entries").child(key).remove();
+  }
+
+  function toggleVisibility(prop) {
+    if (prop === "scoreVisible") {
+      matchRef.child("scoreVisible").set(!scoreVisibleState);
+    } else if (prop === "tickerVisible") {
+      matchRef.child("tickerVisible").set(!tickerVisibleState);
+    }
+  }
+
+  function updateRound() {
+    const rVal = document.getElementById("roundInput").value.trim();
+    matchRef.child("round").set(rVal);
+  }
+
+  matchRef.on("value", (snap) => {
+    const d = snap.val() || {};
+    scoreVisibleState = d.scoreVisible !== false;
+    tickerVisibleState = d.tickerVisible !== false;
+
+    const sBtn = document.getElementById("btnScoreToggle");
+    sBtn.textContent = `Scoreboard: ${scoreVisibleState ? "ON" : "OFF"}`;
+    sBtn.classList.toggle("active", scoreVisibleState);
+
+    const tBtn = document.getElementById("btnTickerToggle");
+    tBtn.textContent = `Ticker: ${tickerVisibleState ? "ON" : "OFF"}`;
+    tBtn.classList.toggle("active", tickerVisibleState);
+
+    const rInput = document.getElementById("roundInput");
+    if (document.activeElement !== rInput && typeof d.round === "string") {
+      rInput.value = d.round;
+    }
+  });
+
+  horseRef.on("value", (snap) => {
+    const data = snap.val() || {};
+    currentShift = Number(data.shift ?? 0);
+    currentRace = Number(data.race ?? 0);
+
+    document.getElementById("admShift").textContent = currentShift;
+    document.getElementById("admRace").textContent = currentRace;
+    document.getElementById("formHeader").textContent =
+      `Create new (Shift: ${currentShift}, Race: ${currentRace})`;
+
+    const entriesObj = data.entries || {};
+    latestEntries = Object.entries(entriesObj)
+      .map(([key, val]) => ({ key, ...val }))
+      .filter(e => Number(e.shift) === currentShift && Number(e.race) === currentRace)
+      .sort((a, b) => parseFloat(a.time) - parseFloat(b.time));
+
+    const listEl = document.getElementById("entriesList");
+    if (!latestEntries.length) {
+      listEl.innerHTML = `<div class="entry-row" style="color:#6b7280;">Is Shift/Race vich koi entry nahi hai</div>`;
+      return;
+    }
+
+    listEl.innerHTML = latestEntries.map((item, idx) => `
+      <div class="entry-row">
+        <div class="entry-info">#${idx + 1} — <b>${item.time}s</b> | ${item.name}</div>
+        <div class="entry-actions">
+          <button class="btn-edit" onclick="startEdit('${item.key}')">Edit</button>
+          <button class="btn-del" onclick="deleteEntry('${item.key}')">Del</button>
+        </div>
+      </div>
+    `).join("");
+  });
+</script>
+</body>
+</html>
