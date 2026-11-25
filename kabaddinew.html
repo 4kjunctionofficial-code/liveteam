@@ -197,7 +197,7 @@
             pointer-events: none;
         }
 
-        /* Upper Tier: Row 1 Badge (Village + Event/Tournament) + Row 2 Gold Track (Prize + Upcoming + Winner) */
+        /* Upper Tier: Row 1 Badge (Village + Event/Tournament) + Row 2 Gold Track (Row 2 + Prize + Upcoming + Winner) */
         .upper-tier {
             position: relative;
             display: flex;
@@ -271,7 +271,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* Lower Tier (Row 3): Match List + Right Corner Clock Time Box */
+        /* Lower Tier (Row 3): Match List + Row 3 / Contact + Right Corner Clock Time Box */
         .lower-tier {
             position: relative;
             z-index: 1;
@@ -430,7 +430,7 @@
 
     <!-- BROADCAST TICKER -->
     <div id="ticker-wrap">
-        <!-- Upper Tier: Row 1 Badge (Village + Event/Tournament) + Row 2 Gold Track (Prize + Upcoming + Winner) -->
+        <!-- Upper Tier: Row 1 Badge (Village + Event/Tournament) + Row 2 Gold Track (Row 2 + Prize + Upcoming + Winner) -->
         <div class="upper-tier">
             <div class="skewed-badge">
                 <div class="skewed-badge-unskew">
@@ -445,7 +445,7 @@
             </div>
         </div>
 
-        <!-- Lower Tier (Row 3): Match List + Right Corner Clock Time Box -->
+        <!-- Lower Tier (Row 3): Match List + Row 3 / Contact + Right Corner Clock Time Box -->
         <div class="lower-tier">
             <div class="lower-content">
                 <div id="lower-ticker" class="anim-wrap"></div>
@@ -495,9 +495,6 @@
         const urlParams = new URLSearchParams(window.location.search);
         const matchId = urlParams.get('id') || 'defaultMatch';
 
-        // Per-row constant scroll speeds (pixels per second)
-        // Can be set via URL (?r1Speed=80&r2Speed=90&r3Speed=85), Firebase (row1Speed, row2Speed, row3Speed),
-        // or localStorage ("kabaddi_row_speeds") / console helper window.setRowSpeeds(...)
         const DEFAULT_ROW_SPEEDS = {
             "badge-ticker": 80,
             "gold-ticker": 90,
@@ -523,7 +520,6 @@
         }
         loadSavedRowSpeeds();
 
-        // Helper so speed can also be changed live from console or future admin UI without restarting active scroll
         window.setRowSpeeds = function({ row1, row2, row3 } = {}) {
             if (Number(row1) > 0) rowSpeeds["badge-ticker"] = Number(row1);
             if (Number(row2) > 0) rowSpeeds["gold-ticker"] = Number(row2);
@@ -693,8 +689,18 @@
             }
 
             // =====================================================
-            // ROW 2 (GOLD TRACK): ONLY Prize + Upcoming + Winner Details
+            // ROW 2 (GOLD TRACK): Admin Row 2 + Prize + Upcoming + Winner Details
             // =====================================================
+            if (hasValue(data.row2Txt) || hasValue(data.row2Txt_pa)) {
+                const r2En = String(data.row2Txt || data.row2Txt_pa).trim();
+                const r2Pa = String(data.row2Txt_pa || data.row2Txt).trim();
+                goldItems.push({
+                    id: "row2:" + r2En + "|" + r2Pa,
+                    pa: translateToPunjabi(r2Pa),
+                    en: r2En
+                });
+            }
+
             const prizePartsEn = [];
             const prizePartsPa = [];
 
@@ -959,7 +965,6 @@
             const data = snap.val() || {};
             window.currentData = data;
 
-            // Optional per-row speed override from Firebase without interrupting active scroll
             if (Number(data.row1Speed) > 0) rowSpeeds["badge-ticker"] = Number(data.row1Speed);
             if (Number(data.row2Speed) > 0) rowSpeeds["gold-ticker"] = Number(data.row2Speed);
             if (Number(data.row3Speed) > 0) rowSpeeds["lower-ticker"] = Number(data.row3Speed);
