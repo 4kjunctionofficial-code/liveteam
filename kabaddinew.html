@@ -197,7 +197,7 @@
             pointer-events: none;
         }
 
-        /* Upper Tier: Row 1 Badge (Village + Event) + Row 2 Gold Track (Match List + Upcoming + Winner) */
+        /* Upper Tier: Row 1 Badge (Village + Event/Tournament) + Row 2 Gold Track (Prize + Upcoming + Winner) */
         .upper-tier {
             position: relative;
             display: flex;
@@ -271,7 +271,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* Lower Tier (Row 3): Same as before + Right Corner Clock Time Box */
+        /* Lower Tier (Row 3): Match List + Right Corner Clock Time Box */
         .lower-tier {
             position: relative;
             z-index: 1;
@@ -333,6 +333,12 @@
             to { opacity: 0.35; transform: scale(0.8); }
         }
 
+        .dot-sep {
+            color: #090909;
+            margin: 0 10px;
+            font-weight: 900;
+        }
+
         .star-accent {
             color: #ffe24a;
             font-weight: 900;
@@ -341,10 +347,7 @@
         }
 
         .round-tag {
-            color: #090909;
-            background: rgba(255, 255, 255, 0.55);
-            padding: 0 6px;
-            border-radius: 4px;
+            color: #ffe24a;
             font-weight: 900;
             margin-right: 4px;
         }
@@ -427,7 +430,7 @@
 
     <!-- BROADCAST TICKER -->
     <div id="ticker-wrap">
-        <!-- Upper Tier: Row 1 Badge (Village + Event) + Row 2 Gold Track (Match List + Upcoming + Winner) -->
+        <!-- Upper Tier: Row 1 Badge (Village + Event/Tournament) + Row 2 Gold Track (Prize + Upcoming + Winner) -->
         <div class="upper-tier">
             <div class="skewed-badge">
                 <div class="skewed-badge-unskew">
@@ -442,7 +445,7 @@
             </div>
         </div>
 
-        <!-- Lower Tier (Row 3): Same as before + Right Corner Clock Time Box -->
+        <!-- Lower Tier (Row 3): Match List + Right Corner Clock Time Box -->
         <div class="lower-tier">
             <div class="lower-content">
                 <div id="lower-ticker" class="anim-wrap"></div>
@@ -633,18 +636,53 @@
             }
 
             // =====================================================
-            // ROW 2 (GOLD TRACK): Match List + Upcoming + Winner Details
+            // ROW 2 (GOLD TRACK): ONLY Prize + Upcoming + Winner Details
             // =====================================================
-            const rawMatches = normalizeArray(data.nextMatches);
-            if (rawMatches.length > 0) {
+            const prizePartsEn = [];
+            const prizePartsPa = [];
+
+            if (hasValue(data.pzOp1) || hasValue(data.pzOp2) || hasValue(data.pzOpBest)) {
+                const t1 = hasValue(data.pzTitle1) ? String(data.pzTitle1).trim() : "OPEN";
+                const t1Pa = translateToPunjabi(t1);
+                const p1En = [
+                    hasValue(data.pzOp1) && `1st: ${String(data.pzOp1).trim()}`,
+                    hasValue(data.pzOp2) && `2nd: ${String(data.pzOp2).trim()}`,
+                    hasValue(data.pzOpBest) && `Best: ${String(data.pzOpBest).trim()}`
+                ].filter(Boolean).join(" • ");
+                const p1Pa = [
+                    hasValue(data.pzOp1) && `ਪਹਿਲਾ: ${String(data.pzOp1).trim()}`,
+                    hasValue(data.pzOp2) && `ਦੂਜਾ: ${String(data.pzOp2).trim()}`,
+                    hasValue(data.pzOpBest) && `ਬੈਸਟ: ${String(data.pzOpBest).trim()}`
+                ].filter(Boolean).join(" • ");
+                if (p1En) {
+                    prizePartsEn.push(`🏆 ${t1}: ${p1En}`);
+                    prizePartsPa.push(`🏆 ${t1Pa}: ${p1Pa}`);
+                }
+            }
+
+            if (hasValue(data.pzWt1) || hasValue(data.pzWt2) || hasValue(data.pzWtBest)) {
+                const t2 = hasValue(data.pzTitle2) ? String(data.pzTitle2).trim() : "WEIGHT";
+                const t2Pa = translateToPunjabi(t2);
+                const p2En = [
+                    hasValue(data.pzWt1) && `1st: ${String(data.pzWt1).trim()}`,
+                    hasValue(data.pzWt2) && `2nd: ${String(data.pzWt2).trim()}`,
+                    hasValue(data.pzWtBest) && `Best: ${String(data.pzWtBest).trim()}`
+                ].filter(Boolean).join(" • ");
+                const p2Pa = [
+                    hasValue(data.pzWt1) && `ਪਹਿਲਾ: ${String(data.pzWt1).trim()}`,
+                    hasValue(data.pzWt2) && `ਦੂਜਾ: ${String(data.pzWt2).trim()}`,
+                    hasValue(data.pzWtBest) && `ਬੈਸਟ: ${String(data.pzWtBest).trim()}`
+                ].filter(Boolean).join(" • ");
+                if (p2En) {
+                    prizePartsEn.push(`🏆 ${t2}: ${p2En}`);
+                    prizePartsPa.push(`🏆 ${t2Pa}: ${p2Pa}`);
+                }
+            }
+
+            if (prizePartsEn.length > 0) {
                 goldList.push({
-                    pa: `📋 ਮੈਚ ਲਿਸਟ: ${rawMatches.map((m, i) => formatMatchString(m, i, false)).join(" • ")}`,
-                    en: `📋 MATCH LIST: ${rawMatches.map((m, i) => formatMatchString(m, i, true)).join(" • ")}`
-                });
-            } else if (hasValue(data.row5Txt) || hasValue(data.row5Txt_pa)) {
-                goldList.push({
-                    pa: `📋 ਮੈਚ ਲਿਸਟ: ${translateToPunjabi(data.row5Txt_pa || data.row5Txt)}`,
-                    en: `📋 MATCH LIST: ${data.row5Txt || data.row5Txt_pa}`
+                    pa: `${prizePartsPa.join(" <span class='dot-sep'>•</span> ")}`,
+                    en: `${prizePartsEn.join(" <span class='dot-sep'>•</span> ")}`
                 });
             }
 
@@ -660,6 +698,7 @@
                 }
             }
 
+            const rawMatches = normalizeArray(data.nextMatches);
             const winnersFromMatches = rawMatches.filter(m => /winner|ਵਿੰਨਰ|\(win\)/i.test(String(m)));
             if (winnersFromMatches.length > 0) {
                 goldList.push({
@@ -689,7 +728,7 @@
             }
 
             // =====================================================
-            // ROW 3 (LOWER BLUE BAR): Same as before
+            // ROW 3 (LOWER BLUE BAR): Match List (with Round) + Row 3 / Contact (NO Team List)
             // =====================================================
             const r3En = (data.row3Txt || "").trim();
             const r3Pa = (data.row3Txt_pa || r3En).trim();
@@ -697,18 +736,27 @@
                 ? String(data.contactUs || data.row6Txt).trim()
                 : "MANPREET MUDKI • +91 8699640061 / 9115426711";
 
-            const teamsArr = normalizeArray(data.allTeams);
-            if (teamsArr.length > 0) {
-                const tEn = teamsArr.map(t => String(t).split("=")[0].trim()).filter(Boolean).join(", ");
-                const tPa = teamsArr.map(t => translateToPunjabi((String(t).split("=")[1] || String(t).split("=")[0] || "").trim())).filter(Boolean).join(", ");
+            const extraPa = [r3Pa && translateToPunjabi(r3Pa), contactText && `ਸੰਪਰਕ: ${translateToPunjabi(contactText)}`].filter(Boolean).join(" <span class='star-accent'>******</span> ");
+            const extraEn = [r3En, contactText && `CONTACT US: ${contactText}`].filter(Boolean).join(" <span class='star-accent'>******</span> ");
+
+            if (rawMatches.length > 0) {
+                const matchListPa = rawMatches.map((m, i) => formatMatchString(m, i, false)).join(" <span class='star-accent'>•</span> ");
+                const matchListEn = rawMatches.map((m, i) => formatMatchString(m, i, true)).join(" <span class='star-accent'>•</span> ");
                 lowerList.push({
-                    pa: `${r3Pa ? translateToPunjabi(r3Pa) + " <span class='star-accent'>******</span> " : ""}ਟੀਮ ਲਿਸਟ: ${tPa} <span class='star-accent'>******</span> ਸੰਪਰਕ: ${translateToPunjabi(contactText)}`,
-                    en: `${r3En ? r3En + " <span class='star-accent'>******</span> " : ""}TEAM LIST: ${tEn} <span class='star-accent'>******</span> CONTACT US: ${contactText}`
+                    pa: `📋 ਮੈਚ ਲਿਸਟ: ${matchListPa}${extraPa ? ` <span class='star-accent'>******</span> ${extraPa}` : ""}`,
+                    en: `📋 MATCH LIST: ${matchListEn}${extraEn ? ` <span class='star-accent'>******</span> ${extraEn}` : ""}`
+                });
+            } else if (hasValue(data.row5Txt) || hasValue(data.row5Txt_pa)) {
+                const mRawPa = translateToPunjabi(data.row5Txt_pa || data.row5Txt);
+                const mRawEn = data.row5Txt || data.row5Txt_pa;
+                lowerList.push({
+                    pa: `📋 ਮੈਚ ਲਿਸਟ: ${mRawPa}${extraPa ? ` <span class='star-accent'>******</span> ${extraPa}` : ""}`,
+                    en: `📋 MATCH LIST: ${mRawEn}${extraEn ? ` <span class='star-accent'>******</span> ${extraEn}` : ""}`
                 });
             } else {
                 lowerList.push({
-                    pa: `${r3Pa ? translateToPunjabi(r3Pa) + " <span class='star-accent'>******</span> " : ""}ਸੰਪਰਕ ਕਰੋ: ${translateToPunjabi(contactText)}`,
-                    en: `${r3En ? r3En + " <span class='star-accent'>******</span> " : ""}CONTACT US: ${contactText}`
+                    pa: extraPa || `ਸੰਪਰਕ ਕਰੋ: ${translateToPunjabi(contactText)}`,
+                    en: extraEn || `CONTACT US: ${contactText}`
                 });
             }
 
@@ -738,7 +786,7 @@
             renderSlot('lower-ticker', lowerList.length ? lowerList[lIdx % lowerList.length] : null);
         }
 
-        // Constant speed marquee that scrolls all the way across without stopping mid-way
+        // Constant speed marquee that scrolls completely across without stopping mid-way
         function renderSlot(elementId, item) {
             const el = document.getElementById(elementId);
             if (!el) return;
@@ -778,7 +826,7 @@
                     const startX = 12;
                     const endX = -(textWidth + 24);
                     const totalDistance = Math.abs(endX - startX);
-                    const constantSpeedPxPerSec = 70; // Constant speed across all items
+                    const constantSpeedPxPerSec = 70;
                     const duration = Math.max(8, totalDistance / constantSpeedPxPerSec);
 
                     el.classList.add("marquee-mode");
