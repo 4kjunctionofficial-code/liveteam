@@ -197,7 +197,7 @@
             pointer-events: none;
         }
 
-        /* Upper Tier: Skewed Badge (Row 1) + Gold Ticker Track (Row 2) */
+        /* Upper Tier: Row 1 Badge + Row 2 Gold Track */
         .upper-tier {
             position: relative;
             display: flex;
@@ -511,7 +511,7 @@
         });
 
         const clientLogos = {
-            "mudki1": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/KABADDI%20SPORTS%201%20Logo.png"
+            "mudki1": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/kabaddisports1.png"
         };
 
         const dict = {
@@ -567,7 +567,6 @@
             return [];
         }
 
-        // Formats "(Round / Category) TeamA=PaA VS TeamB=PaB"
         function formatMatchString(m, index, isEnglishMode) {
             m = String(m || "").trim();
             let bracketContent = "";
@@ -637,8 +636,7 @@
             }
 
             // =====================================================
-            // ROW 2 (GOLD TRACK): Row 2 Text + Prizes + Upcoming + Winners
-            // (Shown ONLY when admin provides actual data)
+            // ROW 2 (GOLD TRACK): Row 2 + Prizes + Upcoming + Winners
             // =====================================================
             if (hasValue(data.row2Txt) || hasValue(data.row2Txt_pa)) {
                 goldList.push({
@@ -695,6 +693,7 @@
                 });
             }
 
+            // Upcoming Live: strictly follow data.upcomingEvents so deleting/clearing stops stale row4Txt
             const upcomingArr = normalizeArray(data.upcomingEvents);
             if (upcomingArr.length > 0) {
                 const upEn = upcomingArr.map((ev, i) => `${i + 1}. ${ev.name || ev.eventName || ""}${hasValue(ev.date) ? ` (${ev.date})` : ""}`).join(" • ");
@@ -705,11 +704,6 @@
                         en: `📡 UPCOMING LIVE: ${upEn}`
                     });
                 }
-            } else if (hasValue(data.row4Txt) || hasValue(data.row4Txt_pa)) {
-                goldList.push({
-                    pa: `📡 ਆਉਣ ਵਾਲੇ ਲਾਈਵ: ${translateToPunjabi(data.row4Txt_pa || data.row4Txt)}`,
-                    en: `📡 UPCOMING LIVE: ${data.row4Txt || data.row4Txt_pa}`
-                });
             }
 
             const rawMatches = normalizeArray(data.nextMatches);
