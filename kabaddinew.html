@@ -197,7 +197,7 @@
             pointer-events: none;
         }
 
-        /* Upper Tier: Row 1 Badge (Village + Event/Tournament) + Row 2 Gold Track (Match + Upcoming + Winner) */
+        /* Upper Tier: Row 1 Badge (Village + Event/Tournament) + Row 2 Gold Track (Prize + Upcoming + Winner) */
         .upper-tier {
             position: relative;
             display: flex;
@@ -271,7 +271,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* Lower Tier (Row 3): Row 3 / Contact + Right Corner Clock Time Box */
+        /* Lower Tier (Row 3): Match List + Right Corner Clock Time Box */
         .lower-tier {
             position: relative;
             z-index: 1;
@@ -333,6 +333,12 @@
             to { opacity: 0.35; transform: scale(0.8); }
         }
 
+        .dot-sep {
+            color: #090909;
+            margin: 0 10px;
+            font-weight: 900;
+        }
+
         .star-accent {
             color: #ffe24a;
             font-weight: 900;
@@ -341,10 +347,7 @@
         }
 
         .round-tag {
-            color: #090909;
-            background: rgba(255, 255, 255, 0.55);
-            padding: 0 6px;
-            border-radius: 4px;
+            color: #ffe24a;
             font-weight: 900;
             margin-right: 4px;
         }
@@ -427,7 +430,7 @@
 
     <!-- BROADCAST TICKER -->
     <div id="ticker-wrap">
-        <!-- Upper Tier: Row 1 Badge (Village + Event/Tournament) + Row 2 Gold Track (Match + Upcoming + Winner) -->
+        <!-- Upper Tier: Row 1 Badge (Village + Event/Tournament) + Row 2 Gold Track (Prize + Upcoming + Winner) -->
         <div class="upper-tier">
             <div class="skewed-badge">
                 <div class="skewed-badge-unskew">
@@ -442,7 +445,7 @@
             </div>
         </div>
 
-        <!-- Lower Tier (Row 3): Row 3 / Contact + Right Corner Clock Time Box -->
+        <!-- Lower Tier (Row 3): Match List + Right Corner Clock Time Box -->
         <div class="lower-tier">
             <div class="lower-content">
                 <div id="lower-ticker" class="anim-wrap"></div>
@@ -491,6 +494,48 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const matchId = urlParams.get('id') || 'defaultMatch';
+
+        // Per-row constant scroll speeds (pixels per second)
+        // Can be set via URL (?r1Speed=80&r2Speed=90&r3Speed=85), Firebase (row1Speed, row2Speed, row3Speed),
+        // or localStorage ("kabaddi_row_speeds") / console helper window.setRowSpeeds(...)
+        const DEFAULT_ROW_SPEEDS = {
+            "badge-ticker": 80,
+            "gold-ticker": 90,
+            "lower-ticker": 85
+        };
+
+        let rowSpeeds = { ...DEFAULT_ROW_SPEEDS };
+
+        function loadSavedRowSpeeds() {
+            try {
+                const saved = JSON.parse(localStorage.getItem("kabaddi_row_speeds") || "{}");
+                if (Number(saved.row1) > 0) rowSpeeds["badge-ticker"] = Number(saved.row1);
+                if (Number(saved.row2) > 0) rowSpeeds["gold-ticker"] = Number(saved.row2);
+                if (Number(saved.row3) > 0) rowSpeeds["lower-ticker"] = Number(saved.row3);
+            } catch (e) {}
+
+            const q1 = Number(urlParams.get("r1Speed"));
+            const q2 = Number(urlParams.get("r2Speed"));
+            const q3 = Number(urlParams.get("r3Speed"));
+            if (q1 > 0) rowSpeeds["badge-ticker"] = q1;
+            if (q2 > 0) rowSpeeds["gold-ticker"] = q2;
+            if (q3 > 0) rowSpeeds["lower-ticker"] = q3;
+        }
+        loadSavedRowSpeeds();
+
+        // Helper so speed can also be changed live from console or future admin UI without restarting active scroll
+        window.setRowSpeeds = function({ row1, row2, row3 } = {}) {
+            if (Number(row1) > 0) rowSpeeds["badge-ticker"] = Number(row1);
+            if (Number(row2) > 0) rowSpeeds["gold-ticker"] = Number(row2);
+            if (Number(row3) > 0) rowSpeeds["lower-ticker"] = Number(row3);
+            try {
+                localStorage.setItem("kabaddi_row_speeds", JSON.stringify({
+                    row1: rowSpeeds["badge-ticker"],
+                    row2: rowSpeeds["gold-ticker"],
+                    row3: rowSpeeds["lower-ticker"]
+                }));
+            } catch (e) {}
+        };
 
         const db = firebase.database().ref("matchData/" + matchId);
         const userDb = firebase.database().ref("users/" + matchId);
@@ -596,7 +641,6 @@
             return `${num}${tagPa}${t1Pa} <span class="match-vs-pill">ਬਨਾਮ</span> ${t2Pa}`;
         }
 
-        // Each slot maintains independent state so updates or deletions in one item never reset the whole line
         const slotState = {
             "badge-ticker": {
                 items: [],
@@ -634,21 +678,13 @@
             const progEn = (data.programTxt || "").trim();
             const progPa = (data.programTxt_pa || progEn).trim();
 
-            if (hasValue(locPa) || hasValue(locEn)) {
+            if (hasValue(locPa) || hasValue(locEn) || hasValue(progPa) || hasValue(progEn)) {
                 badgeItems.push({
-                    id: "loc:" + (locEn || locPa),
-                    pa: `** ${translateToPunjabi(locPa || locEn)}`,
-                    en: `** ${locEn || locPa}`
+                    id: "row1:" + (locEn || locPa) + "|" + (progEn || progPa),
+                    pa: `** ${[locPa, progPa].filter(hasValue).map(translateToPunjabi).join(" • ")}`,
+                    en: `** ${[locEn, progEn].filter(hasValue).join(" • ")}`
                 });
-            }
-            if (hasValue(progPa) || hasValue(progEn)) {
-                badgeItems.push({
-                    id: "prog:" + (progEn || progPa),
-                    pa: `** ${translateToPunjabi(progPa || progEn)}`,
-                    en: `** ${progEn || progPa}`
-                });
-            }
-            if (badgeItems.length === 0) {
+            } else {
                 badgeItems.push({
                     id: "default-badge",
                     pa: "** ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ ਲਾਈਵ",
@@ -657,24 +693,54 @@
             }
 
             // =====================================================
-            // ROW 2 (GOLD TRACK): Match List + Upcoming + Winner Details (Individual items)
+            // ROW 2 (GOLD TRACK): ONLY Prize + Upcoming + Winner Details
             // =====================================================
-            const rawMatches = normalizeArray(data.nextMatches);
-            rawMatches.forEach((m, idx) => {
-                goldItems.push({
-                    id: "match:" + String(m).trim() + ":" + idx,
-                    pa: `📋 ਮੈਚ: ${formatMatchString(m, idx, false)}`,
-                    en: `📋 MATCH: ${formatMatchString(m, idx, true)}`
-                });
-            });
+            const prizePartsEn = [];
+            const prizePartsPa = [];
 
-            if (rawMatches.length === 0 && (hasValue(data.row5Txt) || hasValue(data.row5Txt_pa))) {
-                const mRawPa = translateToPunjabi(data.row5Txt_pa || data.row5Txt);
-                const mRawEn = data.row5Txt || data.row5Txt_pa;
+            if (hasValue(data.pzOp1) || hasValue(data.pzOp2) || hasValue(data.pzOpBest)) {
+                const t1 = hasValue(data.pzTitle1) ? String(data.pzTitle1).trim() : "OPEN";
+                const t1Pa = translateToPunjabi(t1);
+                const p1En = [
+                    hasValue(data.pzOp1) && `1st: ${String(data.pzOp1).trim()}`,
+                    hasValue(data.pzOp2) && `2nd: ${String(data.pzOp2).trim()}`,
+                    hasValue(data.pzOpBest) && `Best: ${String(data.pzOpBest).trim()}`
+                ].filter(Boolean).join(" • ");
+                const p1Pa = [
+                    hasValue(data.pzOp1) && `ਪਹਿਲਾ: ${String(data.pzOp1).trim()}`,
+                    hasValue(data.pzOp2) && `ਦੂਜਾ: ${String(data.pzOp2).trim()}`,
+                    hasValue(data.pzOpBest) && `ਬੈਸਟ: ${String(data.pzOpBest).trim()}`
+                ].filter(Boolean).join(" • ");
+                if (p1En) {
+                    prizePartsEn.push(`🏆 ${t1}: ${p1En}`);
+                    prizePartsPa.push(`🏆 ${t1Pa}: ${p1Pa}`);
+                }
+            }
+
+            if (hasValue(data.pzWt1) || hasValue(data.pzWt2) || hasValue(data.pzWtBest)) {
+                const t2 = hasValue(data.pzTitle2) ? String(data.pzTitle2).trim() : "WEIGHT";
+                const t2Pa = translateToPunjabi(t2);
+                const p2En = [
+                    hasValue(data.pzWt1) && `1st: ${String(data.pzWt1).trim()}`,
+                    hasValue(data.pzWt2) && `2nd: ${String(data.pzWt2).trim()}`,
+                    hasValue(data.pzWtBest) && `Best: ${String(data.pzWtBest).trim()}`
+                ].filter(Boolean).join(" • ");
+                const p2Pa = [
+                    hasValue(data.pzWt1) && `ਪਹਿਲਾ: ${String(data.pzWt1).trim()}`,
+                    hasValue(data.pzWt2) && `ਦੂਜਾ: ${String(data.pzWt2).trim()}`,
+                    hasValue(data.pzWtBest) && `ਬੈਸਟ: ${String(data.pzWtBest).trim()}`
+                ].filter(Boolean).join(" • ");
+                if (p2En) {
+                    prizePartsEn.push(`🏆 ${t2}: ${p2En}`);
+                    prizePartsPa.push(`🏆 ${t2Pa}: ${p2Pa}`);
+                }
+            }
+
+            if (prizePartsEn.length > 0) {
                 goldItems.push({
-                    id: "row5:" + (mRawEn || mRawPa),
-                    pa: `📋 ਮੈਚ ਲਿਸਟ: ${mRawPa}`,
-                    en: `📋 MATCH LIST: ${mRawEn}`
+                    id: "prize:" + prizePartsEn.join("|"),
+                    pa: `${prizePartsPa.join(" <span class='dot-sep'>•</span> ")}`,
+                    en: `${prizePartsEn.join(" <span class='dot-sep'>•</span> ")}`
                 });
             }
 
@@ -692,6 +758,7 @@
                 }
             });
 
+            const rawMatches = normalizeArray(data.nextMatches);
             const winnersFromMatches = rawMatches.filter(m => /winner|ਵਿੰਨਰ|\(win\)/i.test(String(m)));
             if (winnersFromMatches.length > 0) {
                 winnersFromMatches.forEach((m, idx) => {
@@ -726,13 +793,31 @@
             }
 
             // =====================================================
-            // ROW 3 (LOWER BLUE BAR): Row 3 / Contact (Individual items)
+            // ROW 3 (LOWER BLUE BAR): Match List + Row 3 / Contact (NO Team List)
             // =====================================================
             const r3En = (data.row3Txt || "").trim();
             const r3Pa = (data.row3Txt_pa || r3En).trim();
             const contactText = hasValue(data.contactUs || data.row6Txt)
                 ? String(data.contactUs || data.row6Txt).trim()
                 : "MANPREET MUDKI • +91 8699640061 / 9115426711";
+
+            rawMatches.forEach((m, idx) => {
+                lowerItems.push({
+                    id: "match:" + String(m).trim() + ":" + idx,
+                    pa: `📋 ਮੈਚ: ${formatMatchString(m, idx, false)}`,
+                    en: `📋 MATCH: ${formatMatchString(m, idx, true)}`
+                });
+            });
+
+            if (rawMatches.length === 0 && (hasValue(data.row5Txt) || hasValue(data.row5Txt_pa))) {
+                const mRawPa = translateToPunjabi(data.row5Txt_pa || data.row5Txt);
+                const mRawEn = data.row5Txt || data.row5Txt_pa;
+                lowerItems.push({
+                    id: "row5:" + (mRawEn || mRawPa),
+                    pa: `📋 ਮੈਚ ਲਿਸਟ: ${mRawPa}`,
+                    en: `📋 MATCH LIST: ${mRawEn}`
+                });
+            }
 
             if (hasValue(r3En) || hasValue(r3Pa)) {
                 lowerItems.push({
@@ -778,7 +863,6 @@
                 return;
             }
 
-            // Keep pointing to the currently playing item if it still exists; if deleted, move smoothly without resetting
             if (currentItem) {
                 const idxById = newItems.findIndex(x => x.id === currentItem.id);
                 if (idxById !== -1) {
@@ -793,7 +877,6 @@
             const targetItem = newItems[st.cursor];
             const desiredKey = `${targetItem.id}::${st.useEn ? "en" : "pa"}`;
 
-            // If already showing this exact item in this exact language, do NOT restart its scroll/animation
             if (st.activeKey === desiredKey) {
                 return;
             }
@@ -835,8 +918,8 @@
                     const startX = boxWidth - 12;
                     const endX = -(textWidth + 24);
                     const totalDistance = Math.abs(endX - startX);
-                    const constantSpeedPxPerSec = 85;
-                    const duration = Math.max(5, totalDistance / constantSpeedPxPerSec);
+                    const speedPxPerSec = rowSpeeds[slotId] || 85;
+                    const duration = Math.max(4, totalDistance / speedPxPerSec);
 
                     el.classList.add("marquee-mode");
                     el.style.setProperty("--start-x", `${startX}px`);
@@ -862,10 +945,8 @@
             const st = slotState[slotId];
             if (!st || st.items.length === 0) return;
 
-            // Independent per-slot translation toggle: after finishing an item, translate its language
             st.useEn = !st.useEn;
 
-            // When returning to Punjabi, advance to the next item in this slot's list
             if (!st.useEn) {
                 st.cursor = (st.cursor + 1) % st.items.length;
             }
@@ -877,6 +958,11 @@
         db.on("value", (snap) => {
             const data = snap.val() || {};
             window.currentData = data;
+
+            // Optional per-row speed override from Firebase without interrupting active scroll
+            if (Number(data.row1Speed) > 0) rowSpeeds["badge-ticker"] = Number(data.row1Speed);
+            if (Number(data.row2Speed) > 0) rowSpeeds["gold-ticker"] = Number(data.row2Speed);
+            if (Number(data.row3Speed) > 0) rowSpeeds["lower-ticker"] = Number(data.row3Speed);
 
             const logoCont = document.getElementById('logo-container');
             const logoKey = matchId.trim().toLowerCase();
