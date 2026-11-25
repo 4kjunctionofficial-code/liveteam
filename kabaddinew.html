@@ -197,7 +197,7 @@
             pointer-events: none;
         }
 
-        /* Upper Tier: Row 1 Badge + Row 2 Gold Track */
+        /* Upper Tier: Row 1 Badge (Village + Event) + Row 2 Gold Track (Match List + Upcoming + Winner) */
         .upper-tier {
             position: relative;
             display: flex;
@@ -271,7 +271,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* Lower Tier (Row 3): Match List (with Round) + Row 3 / Contact + Right Corner Clock */
+        /* Lower Tier (Row 3): Same as before + Right Corner Clock Time Box */
         .lower-tier {
             position: relative;
             z-index: 1;
@@ -333,12 +333,6 @@
             to { opacity: 0.35; transform: scale(0.8); }
         }
 
-        .dot-sep {
-            color: #090909;
-            margin: 0 10px;
-            font-weight: 900;
-        }
-
         .star-accent {
             color: #ffe24a;
             font-weight: 900;
@@ -347,7 +341,10 @@
         }
 
         .round-tag {
-            color: #ffe24a;
+            color: #090909;
+            background: rgba(255, 255, 255, 0.55);
+            padding: 0 6px;
+            border-radius: 4px;
             font-weight: 900;
             margin-right: 4px;
         }
@@ -394,13 +391,12 @@
             width: max-content;
             white-space: nowrap;
             will-change: transform;
-            animation: tickerMarquee var(--marquee-duration, 16s) linear infinite;
+            animation: tickerMarquee var(--marquee-duration, 20s) linear infinite;
         }
 
         @keyframes tickerMarquee {
-            0% { transform: translateX(0); }
-            10% { transform: translateX(0); }
-            100% { transform: translateX(calc(-1 * var(--scroll-distance, 120px))); }
+            0% { transform: translateX(var(--start-x, 0px)); }
+            100% { transform: translateX(var(--end-x, -200px)); }
         }
     </style>
 </head>
@@ -431,7 +427,7 @@
 
     <!-- BROADCAST TICKER -->
     <div id="ticker-wrap">
-        <!-- Upper Tier: Row 1 Badge + Row 2 Gold Track -->
+        <!-- Upper Tier: Row 1 Badge (Village + Event) + Row 2 Gold Track (Match List + Upcoming + Winner) -->
         <div class="upper-tier">
             <div class="skewed-badge">
                 <div class="skewed-badge-unskew">
@@ -446,7 +442,7 @@
             </div>
         </div>
 
-        <!-- Lower Tier (Row 3): Match List (with Round) + Row 3 / Contact + Right Corner Clock -->
+        <!-- Lower Tier (Row 3): Same as before + Right Corner Clock Time Box -->
         <div class="lower-tier">
             <div class="lower-content">
                 <div id="lower-ticker" class="anim-wrap"></div>
@@ -526,7 +522,8 @@
             "4th Round": "ਚੌਥਾ ਰਾਊਂਡ",
             "Pool A": "ਪੂਲ ਏ",
             "Pool B": "ਪੂਲ ਬੀ",
-            "Winner": "ਵਿੰਨਰ"
+            "Winner": "ਵਿੰਨਰ",
+            "Tournament": "ਟੂਰਨਾਮੈਂਟ"
         };
 
         function translateToPunjabi(text) {
@@ -616,7 +613,7 @@
             lowerList = [];
 
             // =====================================================
-            // ROW 1 (SKEWED BADGE): Row 1 Location + Event/Program
+            // ROW 1 (SKEWED BADGE): ONLY Village/Location + Event/Tournament
             // =====================================================
             const locEn = (data.row1Txt || data.location || "").trim();
             const locPa = (data.row1Txt_pa || data.location_pa || locEn).trim();
@@ -630,70 +627,27 @@
                 });
             } else {
                 badgeList.push({
-                    pa: "** ਕਬੱਡੀ ਸਪੋਰਟਸ 1 ਲਾਈਵ",
-                    en: "** KABADDI SPORTS 1 LIVE"
+                    pa: "** ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ ਲਾਈਵ",
+                    en: "** KABADDI TOURNAMENT LIVE"
                 });
             }
 
             // =====================================================
-            // ROW 2 (GOLD TRACK): Row 2 + Prizes + Upcoming + Winners
+            // ROW 2 (GOLD TRACK): Match List + Upcoming + Winner Details
             // =====================================================
-            if (hasValue(data.row2Txt) || hasValue(data.row2Txt_pa)) {
+            const rawMatches = normalizeArray(data.nextMatches);
+            if (rawMatches.length > 0) {
                 goldList.push({
-                    pa: `${translateToPunjabi(data.row2Txt_pa || data.row2Txt)}`,
-                    en: `${data.row2Txt || data.row2Txt_pa}`
+                    pa: `📋 ਮੈਚ ਲਿਸਟ: ${rawMatches.map((m, i) => formatMatchString(m, i, false)).join(" • ")}`,
+                    en: `📋 MATCH LIST: ${rawMatches.map((m, i) => formatMatchString(m, i, true)).join(" • ")}`
+                });
+            } else if (hasValue(data.row5Txt) || hasValue(data.row5Txt_pa)) {
+                goldList.push({
+                    pa: `📋 ਮੈਚ ਲਿਸਟ: ${translateToPunjabi(data.row5Txt_pa || data.row5Txt)}`,
+                    en: `📋 MATCH LIST: ${data.row5Txt || data.row5Txt_pa}`
                 });
             }
 
-            const prizePartsEn = [];
-            const prizePartsPa = [];
-
-            if (hasValue(data.pzOp1) || hasValue(data.pzOp2) || hasValue(data.pzOpBest)) {
-                const t1 = hasValue(data.pzTitle1) ? String(data.pzTitle1).trim() : "OPEN";
-                const t1Pa = translateToPunjabi(t1);
-                const p1En = [
-                    hasValue(data.pzOp1) && `1st: ${String(data.pzOp1).trim()}`,
-                    hasValue(data.pzOp2) && `2nd: ${String(data.pzOp2).trim()}`,
-                    hasValue(data.pzOpBest) && `Best: ${String(data.pzOpBest).trim()}`
-                ].filter(Boolean).join(" • ");
-                const p1Pa = [
-                    hasValue(data.pzOp1) && `ਪਹਿਲਾ: ${String(data.pzOp1).trim()}`,
-                    hasValue(data.pzOp2) && `ਦੂਜਾ: ${String(data.pzOp2).trim()}`,
-                    hasValue(data.pzOpBest) && `ਬੈਸਟ: ${String(data.pzOpBest).trim()}`
-                ].filter(Boolean).join(" • ");
-                if (p1En) {
-                    prizePartsEn.push(`🏆 ${t1}: ${p1En}`);
-                    prizePartsPa.push(`🏆 ${t1Pa}: ${p1Pa}`);
-                }
-            }
-
-            if (hasValue(data.pzWt1) || hasValue(data.pzWt2) || hasValue(data.pzWtBest)) {
-                const t2 = hasValue(data.pzTitle2) ? String(data.pzTitle2).trim() : "WEIGHT";
-                const t2Pa = translateToPunjabi(t2);
-                const p2En = [
-                    hasValue(data.pzWt1) && `1st: ${String(data.pzWt1).trim()}`,
-                    hasValue(data.pzWt2) && `2nd: ${String(data.pzWt2).trim()}`,
-                    hasValue(data.pzWtBest) && `Best: ${String(data.pzWtBest).trim()}`
-                ].filter(Boolean).join(" • ");
-                const p2Pa = [
-                    hasValue(data.pzWt1) && `ਪਹਿਲਾ: ${String(data.pzWt1).trim()}`,
-                    hasValue(data.pzWt2) && `ਦੂਜਾ: ${String(data.pzWt2).trim()}`,
-                    hasValue(data.pzWtBest) && `ਬੈਸਟ: ${String(data.pzWtBest).trim()}`
-                ].filter(Boolean).join(" • ");
-                if (p2En) {
-                    prizePartsEn.push(`🏆 ${t2}: ${p2En}`);
-                    prizePartsPa.push(`🏆 ${t2Pa}: ${p2Pa}`);
-                }
-            }
-
-            if (prizePartsEn.length > 0) {
-                goldList.push({
-                    pa: `${prizePartsPa.join(" <span class='dot-sep'>•</span> ")}`,
-                    en: `${prizePartsEn.join(" <span class='dot-sep'>•</span> ")}`
-                });
-            }
-
-            // Upcoming Live: strictly follow data.upcomingEvents so deleting/clearing stops stale row4Txt
             const upcomingArr = normalizeArray(data.upcomingEvents);
             if (upcomingArr.length > 0) {
                 const upEn = upcomingArr.map((ev, i) => `${i + 1}. ${ev.name || ev.eventName || ""}${hasValue(ev.date) ? ` (${ev.date})` : ""}`).join(" • ");
@@ -706,27 +660,26 @@
                 }
             }
 
-            const rawMatches = normalizeArray(data.nextMatches);
             const winnersFromMatches = rawMatches.filter(m => /winner|ਵਿੰਨਰ|\(win\)/i.test(String(m)));
             if (winnersFromMatches.length > 0) {
                 goldList.push({
-                    pa: `🥇 ਵਿੰਨਰ ਮੈਚ ਲਿਸਟ: ${winnersFromMatches.map((m, i) => formatMatchString(m, i, false)).join(" • ")}`,
-                    en: `🥇 WINNER MATCH LIST: ${winnersFromMatches.map((m, i) => formatMatchString(m, i, true)).join(" • ")}`
+                    pa: `🥇 ਵਿੰਨਰ ਲਿਸਟ: ${winnersFromMatches.map((m, i) => formatMatchString(m, i, false)).join(" • ")}`,
+                    en: `🥇 WINNER LIST: ${winnersFromMatches.map((m, i) => formatMatchString(m, i, true)).join(" • ")}`
                 });
             } else if (hasValue(data.qualifiedTeams)) {
                 const qRaw = String(data.qualifiedTeams).split("\n").map(s => s.trim()).filter(Boolean).join(" • ");
                 if (qRaw) {
                     goldList.push({
-                        pa: `🥇 ਵਿੰਨਰ ਮੈਚ ਲਿਸਟ: ${translateToPunjabi(qRaw)}`,
-                        en: `🥇 WINNER MATCH LIST: ${qRaw}`
+                        pa: `🥇 ਵਿੰਨਰ ਲਿਸਟ: ${translateToPunjabi(qRaw)}`,
+                        en: `🥇 WINNER LIST: ${qRaw}`
                     });
                 }
             }
 
             if (hasValue(data.resultText) && String(data.resultText).trim() !== "No Result Yet") {
                 goldList.push({
-                    pa: `ਨਤੀਜਾ: ${translateToPunjabi(data.resultText)}`,
-                    en: `RESULT: ${data.resultText}`
+                    pa: `🥇 ਨਤੀਜਾ: ${translateToPunjabi(data.resultText)}`,
+                    en: `🥇 RESULT: ${data.resultText}`
                 });
             }
 
@@ -736,7 +689,7 @@
             }
 
             // =====================================================
-            // ROW 3 (LOWER BLUE BAR): Match List (with Round) + Row 3 / Contact
+            // ROW 3 (LOWER BLUE BAR): Same as before
             // =====================================================
             const r3En = (data.row3Txt || "").trim();
             const r3Pa = (data.row3Txt_pa || r3En).trim();
@@ -744,27 +697,18 @@
                 ? String(data.contactUs || data.row6Txt).trim()
                 : "MANPREET MUDKI • +91 8699640061 / 9115426711";
 
-            const extraPa = [r3Pa && translateToPunjabi(r3Pa), contactText && `ਸੰਪਰਕ: ${translateToPunjabi(contactText)}`].filter(Boolean).join(" <span class='star-accent'>******</span> ");
-            const extraEn = [r3En, contactText && `CONTACT US: ${contactText}`].filter(Boolean).join(" <span class='star-accent'>******</span> ");
-
-            if (rawMatches.length > 0) {
-                const matchListPa = rawMatches.map((m, i) => formatMatchString(m, i, false)).join(" <span class='star-accent'>•</span> ");
-                const matchListEn = rawMatches.map((m, i) => formatMatchString(m, i, true)).join(" <span class='star-accent'>•</span> ");
+            const teamsArr = normalizeArray(data.allTeams);
+            if (teamsArr.length > 0) {
+                const tEn = teamsArr.map(t => String(t).split("=")[0].trim()).filter(Boolean).join(", ");
+                const tPa = teamsArr.map(t => translateToPunjabi((String(t).split("=")[1] || String(t).split("=")[0] || "").trim())).filter(Boolean).join(", ");
                 lowerList.push({
-                    pa: `ਮੈਚ ਲਿਸਟ: ${matchListPa}${extraPa ? ` <span class='star-accent'>******</span> ${extraPa}` : ""}`,
-                    en: `MATCH LIST: ${matchListEn}${extraEn ? ` <span class='star-accent'>******</span> ${extraEn}` : ""}`
-                });
-            } else if (hasValue(data.row5Txt) || hasValue(data.row5Txt_pa)) {
-                const mRawPa = translateToPunjabi(data.row5Txt_pa || data.row5Txt);
-                const mRawEn = data.row5Txt || data.row5Txt_pa;
-                lowerList.push({
-                    pa: `ਮੈਚ ਲਿਸਟ: ${mRawPa}${extraPa ? ` <span class='star-accent'>******</span> ${extraPa}` : ""}`,
-                    en: `MATCH LIST: ${mRawEn}${extraEn ? ` <span class='star-accent'>******</span> ${extraEn}` : ""}`
+                    pa: `${r3Pa ? translateToPunjabi(r3Pa) + " <span class='star-accent'>******</span> " : ""}ਟੀਮ ਲਿਸਟ: ${tPa} <span class='star-accent'>******</span> ਸੰਪਰਕ: ${translateToPunjabi(contactText)}`,
+                    en: `${r3En ? r3En + " <span class='star-accent'>******</span> " : ""}TEAM LIST: ${tEn} <span class='star-accent'>******</span> CONTACT US: ${contactText}`
                 });
             } else {
                 lowerList.push({
-                    pa: extraPa || `ਸੰਪਰਕ ਕਰੋ: ${translateToPunjabi(contactText)}`,
-                    en: extraEn || `CONTACT US: ${contactText}`
+                    pa: `${r3Pa ? translateToPunjabi(r3Pa) + " <span class='star-accent'>******</span> " : ""}ਸੰਪਰਕ ਕਰੋ: ${translateToPunjabi(contactText)}`,
+                    en: `${r3En ? r3En + " <span class='star-accent'>******</span> " : ""}CONTACT US: ${contactText}`
                 });
             }
 
@@ -794,6 +738,7 @@
             renderSlot('lower-ticker', lowerList.length ? lowerList[lIdx % lowerList.length] : null);
         }
 
+        // Constant speed marquee that scrolls all the way across without stopping mid-way
         function renderSlot(elementId, item) {
             const el = document.getElementById(elementId);
             if (!el) return;
@@ -817,7 +762,8 @@
             el.className = "anim-wrap";
             el.innerHTML = "";
             el.style.removeProperty("--marquee-duration");
-            el.style.removeProperty("--scroll-distance");
+            el.style.removeProperty("--start-x");
+            el.style.removeProperty("--end-x");
 
             const span = document.createElement("span");
             span.className = "ticker-text";
@@ -829,10 +775,15 @@
                 const textWidth = span.scrollWidth;
 
                 if (textWidth > boxWidth - 16) {
-                    const distance = textWidth - boxWidth + 40;
-                    const duration = Math.max(10, distance / 62 + 2);
+                    const startX = 12;
+                    const endX = -(textWidth + 24);
+                    const totalDistance = Math.abs(endX - startX);
+                    const constantSpeedPxPerSec = 70; // Constant speed across all items
+                    const duration = Math.max(8, totalDistance / constantSpeedPxPerSec);
+
                     el.classList.add("marquee-mode");
-                    el.style.setProperty("--scroll-distance", `${distance}px`);
+                    el.style.setProperty("--start-x", `${startX}px`);
+                    el.style.setProperty("--end-x", `${endX}px`);
                     el.style.setProperty("--marquee-duration", `${duration}s`);
                     span.style.animation = "none";
                     void span.offsetWidth;
@@ -881,7 +832,7 @@
             if (goldList.length > 0) gIdx = (gIdx + 1) % goldList.length;
             if (lowerList.length > 0) lIdx = (lIdx + 1) % lowerList.length;
             if (window.currentData) buildTicker(window.currentData);
-        }, 10000);
+        }, 12000);
 
         setInterval(() => {
             isEnglish = !isEnglish;
