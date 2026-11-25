@@ -197,7 +197,7 @@
             pointer-events: none;
         }
 
-        /* Upper Tier: Skewed Badge + Gold Ticker Track */
+        /* Upper Tier: Skewed Badge (Row 1) + Gold Ticker Track (Row 2) */
         .upper-tier {
             position: relative;
             display: flex;
@@ -271,7 +271,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* Lower Tier (Row 3): Royal Blue Banner + Right Corner Clock Box */
+        /* Lower Tier (Row 3): Match List (with Round) + Row 3 / Contact + Right Corner Clock */
         .lower-tier {
             position: relative;
             z-index: 1;
@@ -344,6 +344,12 @@
             font-weight: 900;
             margin: 0 10px;
             letter-spacing: 1.5px;
+        }
+
+        .round-tag {
+            color: #ffe24a;
+            font-weight: 900;
+            margin-right: 4px;
         }
 
         .match-vs-pill {
@@ -425,7 +431,7 @@
 
     <!-- BROADCAST TICKER -->
     <div id="ticker-wrap">
-        <!-- Upper Tier: Skewed Badge + Gold Track (Only shown when admin updates Prize / Upcoming Live / Winner Match) -->
+        <!-- Upper Tier: Row 1 Badge + Row 2 Gold Track -->
         <div class="upper-tier">
             <div class="skewed-badge">
                 <div class="skewed-badge-unskew">
@@ -440,7 +446,7 @@
             </div>
         </div>
 
-        <!-- Lower Tier (Row 3): Team List + Contact Us + Right Corner Clock Time Box -->
+        <!-- Lower Tier (Row 3): Match List (with Round) + Row 3 / Contact + Right Corner Clock -->
         <div class="lower-tier">
             <div class="lower-content">
                 <div id="lower-ticker" class="anim-wrap"></div>
@@ -561,6 +567,7 @@
             return [];
         }
 
+        // Formats "(Round / Category) TeamA=PaA VS TeamB=PaB"
         function formatMatchString(m, index, isEnglishMode) {
             m = String(m || "").trim();
             let bracketContent = "";
@@ -583,8 +590,8 @@
             const t1Pa = translateToPunjabi((t1Parts[1] || t1Parts[0] || "").trim());
             const t2Pa = translateToPunjabi((t2Parts[1] || t2Parts[0] || "").trim());
 
-            const tagPa = translateToPunjabi(bracketContent) ? `(${translateToPunjabi(bracketContent)}) ` : "";
-            const tagEn = bracketContent ? `(${bracketContent}) ` : "";
+            const tagPa = hasValue(bracketContent) ? `<span class="round-tag">[${translateToPunjabi(bracketContent)}]</span> ` : "";
+            const tagEn = hasValue(bracketContent) ? `<span class="round-tag">[${bracketContent}]</span> ` : "";
             const num = `${index + 1}. `;
 
             if (isEnglishMode) {
@@ -609,34 +616,37 @@
             goldList = [];
             lowerList = [];
 
-            // 1. Skewed Badge: Event / Location / Row1-Row3 Update
+            // =====================================================
+            // ROW 1 (SKEWED BADGE): Row 1 Location + Event/Program
+            // =====================================================
             const locEn = (data.row1Txt || data.location || "").trim();
             const locPa = (data.row1Txt_pa || data.location_pa || locEn).trim();
-            const progEn = (data.programTxt || data.row2Txt || "").trim();
-            const progPa = (data.programTxt_pa || data.row2Txt_pa || progEn).trim();
-            const r3En = (data.row3Txt || "").trim();
-            const r3Pa = (data.row3Txt_pa || r3En).trim();
+            const progEn = (data.programTxt || "").trim();
+            const progPa = (data.programTxt_pa || progEn).trim();
 
             if (hasValue(locPa) || hasValue(locEn) || hasValue(progPa) || hasValue(progEn)) {
                 badgeList.push({
                     pa: `** ${[locPa, progPa].filter(hasValue).map(translateToPunjabi).join(" • ")}`,
                     en: `** ${[locEn, progEn].filter(hasValue).join(" • ")}`
                 });
-            }
-            if (hasValue(r3Pa) || hasValue(r3En)) {
-                badgeList.push({
-                    pa: `** ${translateToPunjabi(r3Pa)}`,
-                    en: `** ${r3En}`
-                });
-            }
-            if (badgeList.length === 0) {
+            } else {
                 badgeList.push({
                     pa: "** ਕਬੱਡੀ ਸਪੋਰਟਸ 1 ਲਾਈਵ",
                     en: "** KABADDI SPORTS 1 LIVE"
                 });
             }
 
-            // 2. Gold Track: Show ONLY when admin has actually updated Prize List, Upcoming Live, or Winner Match List
+            // =====================================================
+            // ROW 2 (GOLD TRACK): Row 2 Text + Prizes + Upcoming + Winners
+            // (Shown ONLY when admin provides actual data)
+            // =====================================================
+            if (hasValue(data.row2Txt) || hasValue(data.row2Txt_pa)) {
+                goldList.push({
+                    pa: `${translateToPunjabi(data.row2Txt_pa || data.row2Txt)}`,
+                    en: `${data.row2Txt || data.row2Txt_pa}`
+                });
+            }
+
             const prizePartsEn = [];
             const prizePartsPa = [];
 
@@ -726,29 +736,41 @@
                 });
             }
 
-            // Note: If goldList is empty, keep gold-track hidden (no placeholder/fallback text)
             const goldTrackBox = document.getElementById("gold-track-box");
             if (goldTrackBox) {
                 goldTrackBox.classList.toggle("empty-track", goldList.length === 0);
             }
 
-            // 3. Lower Blue Banner: Team List + Contact Us
-            const teamsArr = normalizeArray(data.allTeams);
+            // =====================================================
+            // ROW 3 (LOWER BLUE BAR): Match List (with Round) + Row 3 / Contact
+            // =====================================================
+            const r3En = (data.row3Txt || "").trim();
+            const r3Pa = (data.row3Txt_pa || r3En).trim();
             const contactText = hasValue(data.contactUs || data.row6Txt)
                 ? String(data.contactUs || data.row6Txt).trim()
                 : "MANPREET MUDKI • +91 8699640061 / 9115426711";
 
-            if (teamsArr.length > 0) {
-                const tEn = teamsArr.map(t => String(t).split("=")[0].trim()).filter(Boolean).join(", ");
-                const tPa = teamsArr.map(t => translateToPunjabi((String(t).split("=")[1] || String(t).split("=")[0] || "").trim())).filter(Boolean).join(", ");
+            const extraPa = [r3Pa && translateToPunjabi(r3Pa), contactText && `ਸੰਪਰਕ: ${translateToPunjabi(contactText)}`].filter(Boolean).join(" <span class='star-accent'>******</span> ");
+            const extraEn = [r3En, contactText && `CONTACT US: ${contactText}`].filter(Boolean).join(" <span class='star-accent'>******</span> ");
+
+            if (rawMatches.length > 0) {
+                const matchListPa = rawMatches.map((m, i) => formatMatchString(m, i, false)).join(" <span class='star-accent'>•</span> ");
+                const matchListEn = rawMatches.map((m, i) => formatMatchString(m, i, true)).join(" <span class='star-accent'>•</span> ");
                 lowerList.push({
-                    pa: `ਟੀਮ ਲਿਸਟ: ${tPa} <span class="star-accent">******</span> ਸੰਪਰਕ: ${translateToPunjabi(contactText)} <span class="star-accent">******</span>`,
-                    en: `TEAM LIST: ${tEn} <span class="star-accent">******</span> CONTACT US: ${contactText} <span class="star-accent">******</span>`
+                    pa: `ਮੈਚ ਲਿਸਟ: ${matchListPa}${extraPa ? ` <span class='star-accent'>******</span> ${extraPa}` : ""}`,
+                    en: `MATCH LIST: ${matchListEn}${extraEn ? ` <span class='star-accent'>******</span> ${extraEn}` : ""}`
+                });
+            } else if (hasValue(data.row5Txt) || hasValue(data.row5Txt_pa)) {
+                const mRawPa = translateToPunjabi(data.row5Txt_pa || data.row5Txt);
+                const mRawEn = data.row5Txt || data.row5Txt_pa;
+                lowerList.push({
+                    pa: `ਮੈਚ ਲਿਸਟ: ${mRawPa}${extraPa ? ` <span class='star-accent'>******</span> ${extraPa}` : ""}`,
+                    en: `MATCH LIST: ${mRawEn}${extraEn ? ` <span class='star-accent'>******</span> ${extraEn}` : ""}`
                 });
             } else {
                 lowerList.push({
-                    pa: `ਸੰਪਰਕ ਕਰੋ: ${translateToPunjabi(contactText)} <span class="star-accent">******</span> ਕਬੱਡੀ ਸਪੋਰਟਸ 1 ਲਾਈਵ`,
-                    en: `CONTACT US: ${contactText} <span class="star-accent">******</span> KABADDI SPORTS 1 LIVE`
+                    pa: extraPa || `ਸੰਪਰਕ ਕਰੋ: ${translateToPunjabi(contactText)}`,
+                    en: extraEn || `CONTACT US: ${contactText}`
                 });
             }
 
