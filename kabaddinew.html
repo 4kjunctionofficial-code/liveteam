@@ -394,7 +394,7 @@
             width: max-content;
             white-space: nowrap;
             will-change: transform;
-            animation: tickerMarquee var(--marquee-duration, 20s) linear infinite;
+            animation: tickerMarquee var(--marquee-duration, 20s) linear 1 forwards;
         }
 
         @keyframes tickerMarquee {
@@ -607,8 +607,52 @@
         let gIdx = 0;
         let lIdx = 0;
 
-        let isEnglish = false;
+        // Language state per slot: false = Punjabi, true = English
+        const slotLang = {
+            "badge-ticker": false,
+            "gold-ticker": false,
+            "lower-ticker": false
+        };
+
+        const slotTimers = {
+            "badge-ticker": null,
+            "gold-ticker": null,
+            "lower-ticker": null
+        };
+
         let lastSig = "";
+
+        function getSlotItem(slotId) {
+            if (slotId === "badge-ticker") {
+                return badgeList.length ? badgeList[bIdx % badgeList.length] : null;
+            }
+            if (slotId === "gold-ticker") {
+                return goldList.length ? goldList[gIdx % goldList.length] : null;
+            }
+            if (slotId === "lower-ticker") {
+                return lowerList.length ? lowerList[lIdx % lowerList.length] : null;
+            }
+            return null;
+        }
+
+        function advanceSlotAfterCycle(slotId) {
+            // Toggle language (Punjabi <-> English) after completing the current line/scroll
+            slotLang[slotId] = !slotLang[slotId];
+
+            // When switching back to Punjabi, move to next item in list if available
+            if (!slotLang[slotId]) {
+                if (slotId === "badge-ticker" && badgeList.length > 0) {
+                    bIdx = (bIdx + 1) % badgeList.length;
+                } else if (slotId === "gold-ticker" && goldList.length > 0) {
+                    gIdx = (gIdx + 1) % goldList.length;
+                } else if (slotId === "lower-ticker" && lowerList.length > 0) {
+                    lIdx = (lIdx + 1) % lowerList.length;
+                }
+            }
+
+            const nextItem = getSlotItem(slotId);
+            renderSlot(slotId, nextItem, true);
+        }
 
         function buildTicker(data) {
             badgeList = [];
@@ -728,7 +772,7 @@
             }
 
             // =====================================================
-            // ROW 3 (LOWER BLUE BAR): Match List (with Round) + Row 3 / Contact (NO Team List)
+            // ROW 3 (LOWER BLUE BAR): Match List + Row 3 / Contact (NO Team List)
             // =====================================================
             const r3En = (data.row3Txt || "").trim();
             const r3Pa = (data.row3Txt_pa || r3En).trim();
@@ -766,30 +810,30 @@
                 l: lowerList.map(x => x.en + x.pa)
             });
 
-            if (sig !== lastSig) {
+            const dataChanged = sig !== lastSig;
+            if (dataChanged) {
                 lastSig = sig;
                 bIdx = 0;
                 gIdx = 0;
                 lIdx = 0;
-                ['badge-ticker', 'gold-ticker', 'lower-ticker'].forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) {
-                        el.dataset.currentText = "";
-                        el.dataset.language = "";
-                        el.innerHTML = "";
-                    }
-                });
+                slotLang["badge-ticker"] = false;
+                slotLang["gold-ticker"] = false;
+                slotLang["lower-ticker"] = false;
             }
 
-            renderSlot('badge-ticker', badgeList.length ? badgeList[bIdx % badgeList.length] : null);
-            renderSlot('gold-ticker', goldList.length ? goldList[gIdx % goldList.length] : null);
-            renderSlot('lower-ticker', lowerList.length ? lowerList[lIdx % lowerList.length] : null);
+            renderSlot('badge-ticker', getSlotItem('badge-ticker'), dataChanged);
+            renderSlot('gold-ticker', getSlotItem('gold-ticker'), dataChanged);
+            renderSlot('lower-ticker', getSlotItem('lower-ticker'), dataChanged);
         }
 
-        // Constant speed marquee that scrolls completely across without stopping mid-way
-        function renderSlot(elementId, item) {
+        function renderSlot(elementId, item, forceRestart = false) {
             const el = document.getElementById(elementId);
             if (!el) return;
+
+            if (slotTimers[elementId]) {
+                clearTimeout(slotTimers[elementId]);
+                slotTimers[elementId] = null;
+            }
 
             if (!item) {
                 el.dataset.currentText = "";
@@ -798,10 +842,11 @@
                 return;
             }
 
-            const textToShow = isEnglish ? item.en : item.pa;
-            const langKey = String(isEnglish);
+            const useEn = !!slotLang[elementId];
+            const textToShow = useEn ? item.en : item.pa;
+            const langKey = String(useEn);
 
-            if (el.dataset.currentText === textToShow && el.dataset.language === langKey) {
+            if (!forceRestart && el.dataset.currentText === textToShow && el.dataset.language === langKey) {
                 return;
             }
 
@@ -823,11 +868,12 @@
                 const textWidth = span.scrollWidth;
 
                 if (textWidth > boxWidth - 16) {
-                    const startX = 12;
+                    // Full scroll across box at constant speed (1 cycle), then translate & restart
+                    const startX = boxWidth - 12;
                     const endX = -(textWidth + 24);
                     const totalDistance = Math.abs(endX - startX);
-                    const constantSpeedPxPerSec = 70;
-                    const duration = Math.max(8, totalDistance / constantSpeedPxPerSec);
+                    const constantSpeedPxPerSec = 85;
+                    const duration = Math.max(6, totalDistance / constantSpeedPxPerSec);
 
                     el.classList.add("marquee-mode");
                     el.style.setProperty("--start-x", `${startX}px`);
@@ -835,9 +881,16 @@
                     el.style.setProperty("--marquee-duration", `${duration}s`);
                     span.style.animation = "none";
                     void span.offsetWidth;
-                    span.style.animation = `tickerMarquee ${duration}s linear infinite`;
+                    span.style.animation = `tickerMarquee ${duration}s linear 1 forwards`;
+
+                    slotTimers[elementId] = setTimeout(() => {
+                        advanceSlotAfterCycle(elementId);
+                    }, duration * 1000);
                 } else {
                     el.classList.add("anim-center-in");
+                    slotTimers[elementId] = setTimeout(() => {
+                        advanceSlotAfterCycle(elementId);
+                    }, 7000);
                 }
             });
         }
@@ -876,27 +929,12 @@
         });
 
         setInterval(() => {
-            if (badgeList.length > 0) bIdx = (bIdx + 1) % badgeList.length;
-            if (goldList.length > 0) gIdx = (gIdx + 1) % goldList.length;
-            if (lowerList.length > 0) lIdx = (lIdx + 1) % lowerList.length;
-            if (window.currentData) buildTicker(window.currentData);
-        }, 12000);
-
-        setInterval(() => {
-            isEnglish = !isEnglish;
-            ['badge-ticker', 'gold-ticker', 'lower-ticker'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.dataset.language = "";
-            });
-            if (window.currentData) buildTicker(window.currentData);
-        }, 18000);
-
-        setInterval(() => {
             const d = window.currentData;
             if (!d) return;
-            document.getElementById('nA').innerText = (!isEnglish && d.nameA_pa) ? d.nameA_pa : (d.nameA || "ਟੀਮ 1");
-            document.getElementById('nB').innerText = (!isEnglish && d.nameB_pa) ? d.nameB_pa : (d.nameB || "ਟੀਮ 2");
-        }, 2000);
+            const showEn = !!slotLang["lower-ticker"];
+            document.getElementById('nA').innerText = (!showEn && d.nameA_pa) ? d.nameA_pa : (d.nameA || "ਟੀਮ 1");
+            document.getElementById('nB').innerText = (!showEn && d.nameB_pa) ? d.nameB_pa : (d.nameB || "ਟੀਮ 2");
+        }, 1500);
 
         const wm = document.getElementById('single-wm');
         let x = 200, y = 200, dx = 1.8, dy = 1.4;
