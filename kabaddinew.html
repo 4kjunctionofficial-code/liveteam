@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Ultra HD - 3-Row Smart Ticker</title>
+    <title>Ultra HD - Broadcast Ticker Design</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@800;900&display=swap" rel="stylesheet">
 
@@ -190,103 +190,151 @@
         }
 
         /* =========================================================
-            3-ROW TICKER WRAP
+            BROADCAST TICKER DESIGN (IMAGE MATCH)
         ========================================================= */
         #ticker-wrap {
             position: absolute;
-            bottom: 0;
+            bottom: 36px;
             left: 0;
             width: 1920px;
             z-index: 9998;
             display: flex;
             flex-direction: column;
+            filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.75));
             transition: opacity 0.5s ease;
-            box-shadow: 0 -6px 28px rgba(0,0,0,0.85);
         }
 
         #ticker-wrap.hidden {
             opacity: 0;
         }
 
-        .ticker-row {
-            display: flex;
-            align-items: stretch;
-            width: 100%;
-            height: 54px;
-            overflow: hidden;
-        }
-
-        /* Row 1: Admin Row 3 Update */
-        .row-1 {
-            background: linear-gradient(90deg, #0b5ed7, #1a8cff, #0b5ed7);
-            border-bottom: 2px solid rgba(255,255,255,0.25);
-        }
-
-        /* Row 2: Winner Match */
-        .row-2 {
-            background: linear-gradient(90deg, #161616, #262626, #161616);
-            border-bottom: 2px solid rgba(255,204,0,0.45);
-        }
-
-        /* Row 3: Match List */
-        .row-3 {
-            background: linear-gradient(90deg, #090909, #151515, #090909);
-            border-top: 1px solid rgba(255,255,255,0.18);
-        }
-
-        .row-badge {
-            flex: 0 0 290px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 25px;
-            font-weight: 900;
-            letter-spacing: 1.5px;
-            padding: 0 18px;
-            white-space: nowrap;
-        }
-
-        .row-1 .row-badge {
-            background: #ffcc00;
-            color: #111111;
-        }
-
-        .row-2 .row-badge {
-            background: #e6b800;
-            color: #111111;
-        }
-
-        .row-3 .row-badge {
-            background: #1a8cff;
-            color: #ffffff;
-        }
-
-        .row-content {
-            flex: 1;
+        /* Upper Tier: Green Skewed Badge + Yellow Marquee Track */
+        .upper-tier {
             position: relative;
             display: flex;
             align-items: center;
+            height: 56px;
+            width: 100%;
+            z-index: 2;
+        }
+
+        .yellow-track {
+            position: relative;
+            flex: 1;
+            height: 46px;
+            background: linear-gradient(180deg, #ffe600 0%, #f5c400 55%, #dca000 100%);
+            border-top: 4px solid #080808;
+            border-bottom: 4px solid #080808;
+            display: flex;
+            align-items: center;
             overflow: hidden;
-            padding: 0 20px;
+            margin-left: -26px;
+            padding-left: 34px;
+        }
+
+        .green-badge-skew {
+            position: relative;
+            z-index: 3;
+            height: 56px;
+            min-width: 640px;
+            max-width: 780px;
+            background: linear-gradient(180deg, #008a00 0%, #006600 55%, #004700 100%);
+            border: 3.5px solid #ffe600;
+            border-left: none;
+            transform: skewX(-24deg);
+            margin-left: -14px;
+            padding: 0 38px 0 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.55);
+        }
+
+        .green-badge-unskew {
+            transform: skewX(24deg);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            color: #ffffff;
             font-size: 31px;
             font-weight: 900;
+            letter-spacing: 0.8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.75);
+            white-space: nowrap;
+        }
+
+        .yellow-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            color: #0b0b0b;
+            font-size: 29px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+        }
+
+        /* Lower Tier: Deep Green Banner */
+        .lower-tier {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 44px;
+            margin-top: -4px;
+            background: linear-gradient(90deg, #004d00 0%, #007a00 22%, #008c00 50%, #007a00 78%, #004400 100%);
+            border-top: 1.5px solid rgba(255, 255, 255, 0.25);
+            border-bottom: 2px solid #051f05;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            padding: 0 28px;
+        }
+
+        .lower-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
             color: #ffffff;
-            letter-spacing: 1.5px;
+            font-size: 27px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 3px rgba(0, 0, 0, 0.7);
         }
 
-        .match-vs-3d {
-            color: #ffcc00;
-            background: #111111;
-            padding: 1px 10px;
-            border-radius: 5px;
-            margin: 0 8px;
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 28px;
-            letter-spacing: 1.5px;
+        .dot-sep {
+            color: #000000;
+            margin: 0 10px;
+            font-weight: 900;
+        }
+
+        .star-accent {
+            color: #081208;
+            font-weight: 900;
+            margin: 0 12px;
+            letter-spacing: 2px;
+        }
+
+        .match-vs-pill {
             display: inline-block;
-            transform: translateY(-2px);
+            background: #111111;
+            color: #ffe600;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 25px;
+            padding: 0 9px;
+            border-radius: 4px;
+            margin: 0 6px;
+            letter-spacing: 1px;
+            vertical-align: middle;
         }
 
+        /* =========================================================
+            TEXT & MARQUEE ANIMATIONS
+        ========================================================= */
         .anim-wrap {
             position: relative;
             width: 100%;
@@ -299,11 +347,11 @@
         }
 
         .anim-center-in {
-            animation: tickerCenterIn 0.45s cubic-bezier(0.22,1,0.36,1) both;
+            animation: tickerFadeSlide 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
 
-        @keyframes tickerCenterIn {
-            0% { opacity: 0; transform: translateY(14px); }
+        @keyframes tickerFadeSlide {
+            0% { opacity: 0; transform: translateY(10px); }
             100% { opacity: 1; transform: translateY(0); }
         }
 
@@ -323,7 +371,7 @@
         @keyframes tickerMarquee {
             0% { transform: translateX(0); }
             10% { transform: translateX(0); }
-            100% { transform: translateX(calc(-1 * var(--scroll-distance, 100px))); }
+            100% { transform: translateX(calc(-1 * var(--scroll-distance, 120px))); }
         }
     </style>
 </head>
@@ -352,29 +400,28 @@
         </div>
     </div>
 
-    <!-- 3-ROW TICKER -->
+    <!-- BROADCAST TICKER -->
     <div id="ticker-wrap">
-        <!-- Row 1: Admin Row 3 Update -->
-        <div class="ticker-row row-1">
-            <div class="row-badge" id="badge-r1">ਤਾਜ਼ਾ ਅਪਡੇਟ</div>
-            <div class="row-content">
-                <div id="r1-text" class="anim-wrap"></div>
+        <div class="upper-tier">
+            <!-- Left Skewed Green Badge: Admin Row 3 Update -->
+            <div class="green-badge-skew">
+                <div class="green-badge-unskew">
+                    <div id="badge-row3-update" class="anim-wrap"></div>
+                </div>
+            </div>
+
+            <!-- Yellow Track: Winner Match -->
+            <div class="yellow-track">
+                <div class="yellow-content">
+                    <div id="winner-match-ticker" class="anim-wrap"></div>
+                </div>
             </div>
         </div>
 
-        <!-- Row 2: Winner Match -->
-        <div class="ticker-row row-2">
-            <div class="row-badge" id="badge-r2">ਵਿੰਨਰ ਮੈਚ</div>
-            <div class="row-content">
-                <div id="r2-text" class="anim-wrap"></div>
-            </div>
-        </div>
-
-        <!-- Row 3: Match List -->
-        <div class="ticker-row row-3">
-            <div class="row-badge" id="badge-r3">ਮੈਚ ਲਿਸਟ</div>
-            <div class="row-content">
-                <div id="r3-text" class="anim-wrap"></div>
+        <!-- Bottom Green Banner: Match List & Info -->
+        <div class="lower-tier">
+            <div class="lower-content">
+                <div id="match-list-ticker" class="anim-wrap"></div>
             </div>
         </div>
     </div>
@@ -454,7 +501,7 @@
             return [];
         }
 
-        function formatMatchItem(m, index) {
+        function formatMatchString(m, index, isEnglishMode) {
             m = String(m || "").trim();
             let bracketContent = "";
             let teamPart = m;
@@ -476,100 +523,102 @@
             const t1Pa = translateToPunjabi((t1Parts[1] || t1Parts[0] || "").trim());
             const t2Pa = translateToPunjabi((t2Parts[1] || t2Parts[0] || "").trim());
 
-            const bracketPa = translateToPunjabi(bracketContent);
-            const tagPa = bracketPa ? `(${bracketPa}) ` : "";
+            const tagPa = translateToPunjabi(bracketContent) ? `(${translateToPunjabi(bracketContent)}) ` : "";
             const tagEn = bracketContent ? `(${bracketContent}) ` : "";
-            const numTag = `${index + 1}. `;
+            const num = `${index + 1}. `;
 
-            const vsPa = `<span class="match-vs-3d">ਬਨਾਮ</span>`;
-            const vsEn = `<span class="match-vs-3d">VS</span>`;
-
-            return {
-                pa: `${numTag}${tagPa}${t1Pa} ${vsPa} ${t2Pa}`,
-                en: `${numTag}${tagEn}${t1En} ${vsEn} ${t2En}`
-            };
+            if (isEnglishMode) {
+                return `${num}${tagEn}${t1En} <span class="match-vs-pill">VS</span> ${t2En}`;
+            }
+            return `${num}${tagPa}${t1Pa} <span class="match-vs-pill">ਬਨਾਮ</span> ${t2Pa}`;
         }
 
-        let row1Items = [];
-        let row2Items = [];
-        let row3Items = [];
+        let row3Updates = [];
+        let winnerMatchItems = [];
+        let matchListItems = [];
 
-        let r1Idx = 0;
-        let r2Idx = 0;
         let r3Idx = 0;
+        let winIdx = 0;
+        let listIdx = 0;
 
         let isEnglish = false;
         let lastSignature = "";
 
-        function buildTickerRows(data) {
-            // 1. Admin Row 3 update (row3Txt / row3Txt_pa) + fallback info
-            row1Items = [];
-            const adminRow3Pa = (data.row3Txt_pa || data.row3Txt || "").trim();
-            const adminRow3En = (data.row3Txt || data.row3Txt_pa || "").trim();
+        function buildTickerData(data) {
+            // 1. Admin Row 3 update (row3Txt / row3Txt_pa)
+            row3Updates = [];
+            const r3Pa = (data.row3Txt_pa || data.row3Txt || "").trim();
+            const r3En = (data.row3Txt || data.row3Txt_pa || "").trim();
 
-            if (adminRow3Pa || adminRow3En) {
-                row1Items.push({
-                    pa: translateToPunjabi(adminRow3Pa),
-                    en: adminRow3En
+            if (r3Pa || r3En) {
+                row3Updates.push({
+                    pa: `** ${translateToPunjabi(r3Pa)}`,
+                    en: `** ${r3En}`
                 });
             }
 
             if (data.programTxt || data.programTxt_pa) {
-                row1Items.push({
-                    pa: translateToPunjabi(data.programTxt_pa || data.programTxt),
-                    en: data.programTxt || data.programTxt_pa
+                row3Updates.push({
+                    pa: `** ${translateToPunjabi(data.programTxt_pa || data.programTxt)}`,
+                    en: `** ${data.programTxt || data.programTxt_pa}`
                 });
             }
 
-            if (data.resultText && data.resultText !== "No Result Yet") {
-                row1Items.push({
-                    pa: `ਨਤੀਜਾ: ${translateToPunjabi(data.resultText)}`,
-                    en: `RESULT: ${data.resultText}`
+            if (row3Updates.length === 0) {
+                row3Updates.push({
+                    pa: "** ਲਾਈਵ ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ",
+                    en: "** LIVE KABADDI TOURNAMENT"
                 });
             }
 
-            if (row1Items.length === 0) {
-                row1Items.push({
-                    pa: "ਲਾਈਵ ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ",
-                    en: "LIVE KABADDI TOURNAMENT"
-                });
-            }
-
-            // 2. Match List update -> Winner Match goes into Row 2
+            // 2. Match List update -> Winner Match in Yellow Track, Match List in Lower Green Bar
             const rawMatches = normalizeArray(data.nextMatches);
-            row2Items = [];
-            row3Items = [];
+            winnerMatchItems = [];
+            matchListItems = [];
 
             if (rawMatches.length > 0) {
-                const winnerMatches = [];
-                const otherMatches = [];
+                const explicitWinners = [];
+                const normalMatches = [];
 
                 rawMatches.forEach((mStr, idx) => {
-                    const formatted = formatMatchItem(mStr, idx);
-                    const isWinner = /winner|ਵਿੰਨਰ/i.test(String(mStr));
-                    if (isWinner) {
-                        winnerMatches.push(formatted);
+                    const isWin = /winner|ਵਿੰਨਰ/i.test(String(mStr));
+                    const paStr = formatMatchString(mStr, idx, false);
+                    const enStr = formatMatchString(mStr, idx, true);
+                    if (isWin) {
+                        explicitWinners.push({ pa: paStr, en: enStr });
                     } else {
-                        otherMatches.push(formatted);
+                        normalMatches.push({ pa: paStr, en: enStr });
                     }
                 });
 
-                // If explicit "winner" match exists in list, use it; otherwise promote first match to Row 2
-                if (winnerMatches.length > 0) {
-                    row2Items = winnerMatches;
-                    row3Items = otherMatches.length > 0 ? otherMatches : winnerMatches;
+                if (explicitWinners.length > 0) {
+                    winnerMatchItems = explicitWinners.map(w => ({
+                        pa: `ਵਿੰਨਰ ਮੈਚ: ${w.pa}`,
+                        en: `WINNER MATCH: ${w.en}`
+                    }));
                 } else {
-                    row2Items = [otherMatches[0]];
-                    row3Items = otherMatches.length > 1 ? otherMatches.slice(1) : [otherMatches[0]];
+                    winnerMatchItems = [{
+                        pa: `ਵਿੰਨਰ ਮੈਚ: ${normalMatches[0].pa}`,
+                        en: `WINNER MATCH: ${normalMatches[0].en}`
+                    }];
                 }
-            } else {
-                row2Items.push({
-                    pa: "ਵਿੰਨਰ ਮੈਚ ਜਲਦ ਆ ਰਿਹਾ ਹੈ",
-                    en: "WINNER MATCH COMING SOON"
+
+                const listSource = normalMatches.length > 0 ? normalMatches : explicitWinners;
+                const combinedPa = listSource.map(x => x.pa).join(` <span class="star-accent">******</span> `);
+                const combinedEn = listSource.map(x => x.en).join(` <span class="star-accent">******</span> `);
+
+                matchListItems.push({
+                    pa: `<span class="star-accent">******</span> ਮੈਚ ਲਿਸਟ: ${combinedPa} <span class="star-accent">******</span>`,
+                    en: `<span class="star-accent">******</span> MATCH LIST: ${combinedEn} <span class="star-accent">******</span>`
                 });
-                row3Items.push({
-                    pa: "ਮੈਚ ਲਿਸਟ ਅੱਪਡੇਟ ਹੋ ਰਹੀ ਹੈ",
-                    en: "MATCH LIST UPDATING"
+            } else {
+                winnerMatchItems.push({
+                    pa: "ਵਿੰਨਰ ਮੈਚ: ਜਲਦ ਆ ਰਿਹਾ ਹੈ",
+                    en: "WINNER MATCH: COMING SOON"
+                });
+                matchListItems.push({
+                    pa: `<span class="star-accent">******</span> ਮੈਚ ਲਿਸਟ ਅੱਪਡੇਟ ਹੋ ਰਹੀ ਹੈ <span class="star-accent">******</span>`,
+                    en: `<span class="star-accent">******</span> MATCH LIST UPDATING <span class="star-accent">******</span>`
                 });
             }
 
@@ -578,16 +627,15 @@
                 r3pa: data.row3Txt_pa,
                 prog: data.programTxt,
                 progPa: data.programTxt_pa,
-                res: data.resultText,
                 matches: rawMatches
             });
 
             if (sig !== lastSignature) {
                 lastSignature = sig;
-                r1Idx = 0;
-                r2Idx = 0;
                 r3Idx = 0;
-                ['r1-text', 'r2-text', 'r3-text'].forEach(id => {
+                winIdx = 0;
+                listIdx = 0;
+                ['badge-row3-update', 'winner-match-ticker', 'match-list-ticker'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) {
                         el.dataset.currentText = "";
@@ -596,12 +644,12 @@
                 });
             }
 
-            renderRow('r1-text', row1Items[r1Idx % row1Items.length]);
-            renderRow('r2-text', row2Items[r2Idx % row2Items.length]);
-            renderRow('r3-text', row3Items[r3Idx % row3Items.length]);
+            renderTickerSlot('badge-row3-update', row3Updates[r3Idx % row3Updates.length]);
+            renderTickerSlot('winner-match-ticker', winnerMatchItems[winIdx % winnerMatchItems.length]);
+            renderTickerSlot('match-list-ticker', matchListItems[listIdx % matchListItems.length]);
         }
 
-        function renderRow(elementId, item) {
+        function renderTickerSlot(elementId, item) {
             const el = document.getElementById(elementId);
             if (!el || !item) return;
 
@@ -628,9 +676,9 @@
                 const boxWidth = el.clientWidth;
                 const textWidth = span.scrollWidth;
 
-                if (textWidth > boxWidth - 20) {
-                    const distance = textWidth - boxWidth + 30;
-                    const duration = Math.max(10, distance / 55 + 2);
+                if (textWidth > boxWidth - 16) {
+                    const distance = textWidth - boxWidth + 36;
+                    const duration = Math.max(10, distance / 60 + 2);
                     el.classList.add("marquee-mode");
                     el.style.setProperty("--scroll-distance", `${distance}px`);
                     el.style.setProperty("--marquee-duration", `${duration}s`);
@@ -673,28 +721,25 @@
             document.getElementById('sB').innerText = data.scoreB ?? "0";
             document.getElementById('single-wm').innerText = data.watermarkTxt || "ਐੱਮ ਲਾਈਵ";
 
-            buildTickerRows(data);
+            buildTickerData(data);
         });
 
-        // Cycle items every 10s
         setInterval(() => {
-            r1Idx++;
-            r2Idx++;
             r3Idx++;
-            if (window.currentData) buildTickerRows(window.currentData);
+            winIdx++;
+            listIdx++;
+            if (window.currentData) buildTickerData(window.currentData);
         }, 10000);
 
-        // Toggle Punjabi / English every 18s
         setInterval(() => {
             isEnglish = !isEnglish;
-            ['r1-text', 'r2-text', 'r3-text'].forEach(id => {
+            ['badge-row3-update', 'winner-match-ticker', 'match-list-ticker'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.dataset.language = "";
             });
-            if (window.currentData) buildTickerRows(window.currentData);
+            if (window.currentData) buildTickerData(window.currentData);
         }, 18000);
 
-        // Logo spin every 15s
         setInterval(() => {
             const logoBox = document.getElementById('logo-container');
             if (logoBox && !logoBox.classList.contains('hidden')) {
@@ -703,7 +748,6 @@
             }
         }, 15000);
 
-        // Scoreboard names update
         setInterval(() => {
             const d = window.currentData;
             if (!d) return;
@@ -711,7 +755,6 @@
             document.getElementById('nB').innerText = (!isEnglish && d.nameB_pa) ? d.nameB_pa : (d.nameB || "ਟੀਮ 2");
         }, 2000);
 
-        // Watermark movement
         const wm = document.getElementById('single-wm');
         let x = 200, y = 200, dx = 1.8, dy = 1.4;
         function animateWatermark() {
