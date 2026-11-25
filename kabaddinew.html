@@ -33,12 +33,12 @@
         }
 
         /* =========================================================
-            SCOREBOARD (KABADDI SPORTS 1 GOLD + ROYAL BLUE)
+            SCOREBOARD (COMPACT HEIGHT + GOLD + ROYAL BLUE)
         ========================================================= */
         #top-scoreboard-container {
             position: absolute;
-            top: 35px;
-            right: 45px;
+            top: 30px;
+            right: 40px;
             display: flex;
             flex-direction: column;
             align-items: flex-end;
@@ -54,12 +54,12 @@
         #main-score-strip {
             display: flex;
             align-items: stretch;
-            height: 75px;
-            border-radius: 8px;
+            height: 58px;
+            border-radius: 7px;
             overflow: hidden;
-            border: 2.5px solid #ffd000;
+            border: 2px solid #ffd000;
             transform: skewX(16deg);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.75);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.75);
         }
 
         .unskew {
@@ -74,26 +74,26 @@
         .score-a {
             background: linear-gradient(180deg, #ffe24a 0%, #f5b400 65%, #c98600 100%);
             color: #090909;
-            font-size: 58px;
+            font-size: 44px;
             font-weight: 900;
-            padding: 0 38px;
+            padding: 0 28px;
             font-family: 'Bebas Neue', sans-serif;
         }
 
         .team-a-panel {
             background: linear-gradient(180deg, #1b78ff 0%, #0047cc 60%, #002773 100%);
             color: #ffffff;
-            font-size: 38px;
+            font-size: 29px;
             font-weight: 800;
-            padding: 0 46px;
+            padding: 0 32px;
             white-space: nowrap;
-            min-width: 180px;
-            letter-spacing: 1.5px;
+            min-width: 140px;
+            letter-spacing: 1px;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
         }
 
         .vs-divider {
-            width: 12px;
+            width: 10px;
             background: #090909;
             border-left: 1.5px solid #ffd000;
             border-right: 1.5px solid #ffd000;
@@ -102,37 +102,37 @@
         .team-b-panel {
             background: linear-gradient(180deg, #1b78ff 0%, #0047cc 60%, #002773 100%);
             color: #ffffff;
-            font-size: 38px;
+            font-size: 29px;
             font-weight: 800;
-            padding: 0 46px;
+            padding: 0 32px;
             white-space: nowrap;
-            min-width: 180px;
-            letter-spacing: 1.5px;
+            min-width: 140px;
+            letter-spacing: 1px;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
         }
 
         .score-b {
             background: linear-gradient(180deg, #ffe24a 0%, #f5b400 65%, #c98600 100%);
             color: #090909;
-            font-size: 58px;
+            font-size: 44px;
             font-weight: 900;
-            padding: 0 38px;
+            padding: 0 28px;
             font-family: 'Bebas Neue', sans-serif;
         }
 
         #match-details-strip {
             background: linear-gradient(90deg, #002b80 0%, #0055ff 50%, #002b80 100%);
             color: #ffe24a;
-            font-size: 24px;
+            font-size: 19px;
             font-weight: 800;
-            padding: 6px 40px;
-            margin-top: 8px;
-            border-radius: 6px;
-            letter-spacing: 2px;
+            padding: 4px 30px;
+            margin-top: 6px;
+            border-radius: 5px;
+            letter-spacing: 1.5px;
             border: 1.5px solid #ffd000;
             transform: skewX(16deg);
-            margin-right: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.65);
+            margin-right: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.65);
         }
 
         #match-details-strip.hidden {
@@ -140,7 +140,7 @@
         }
 
         /* =========================================================
-            LOGO & WATERMARK (STATIC LOGO - NO ANIMATION)
+            LOGO & WATERMARK (COMPACT STATIC LOGO - NO ANIMATION)
         ========================================================= */
         #logo-container {
             position: absolute;
@@ -159,7 +159,7 @@
         }
 
         #main-logo {
-            height: 100px;
+            height: 72px;
             width: auto;
             object-fit: contain;
         }
@@ -510,7 +510,7 @@
         });
 
         const clientLogos = {
-            "mudki1": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/KABADDI%20SPORTS%201%20Logo.png"
+            "mudki1": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/kabaddisports1.png"
         };
 
         const dict = {
@@ -868,7 +868,6 @@
                 const textWidth = span.scrollWidth;
 
                 if (textWidth > boxWidth - 16) {
-                    // Full scroll across box at constant speed (1 cycle), then translate & restart
                     const startX = boxWidth - 12;
                     const endX = -(textWidth + 24);
                     const totalDistance = Math.abs(endX - startX);
