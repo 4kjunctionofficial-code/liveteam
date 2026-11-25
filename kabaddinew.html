@@ -381,12 +381,12 @@
         }
 
         .anim-center-in {
-            animation: tickerFadeSlide 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+            animation: tickerFadeSlide 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
 
         @keyframes tickerFadeSlide {
-            0% { opacity: 0; transform: translate3d(0, 8px, 0); }
-            100% { opacity: 1; transform: translate3d(0, 0, 0); }
+            0% { opacity: 0; transform: translateY(8px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
         .anim-wrap.marquee-mode {
@@ -394,14 +394,17 @@
         }
 
         .anim-wrap.marquee-mode .ticker-text {
-            position: relative;
             display: inline-block;
             flex: 0 0 auto;
             width: max-content;
             white-space: nowrap;
             will-change: transform;
-            transform: translate3d(0, 0, 0);
-            backface-visibility: hidden;
+            animation: tickerMarquee var(--marquee-duration, 20s) linear 1 forwards;
+        }
+
+        @keyframes tickerMarquee {
+            0% { transform: translateX(var(--start-x, 0px)); }
+            100% { transform: translateX(var(--end-x, -200px)); }
         }
     </style>
 </head>
@@ -498,9 +501,9 @@
         const matchId = urlParams.get('id') || 'defaultMatch';
 
         const DEFAULT_ROW_SPEEDS = {
-            "badge-ticker": 95,
-            "gold-ticker": 105,
-            "lower-ticker": 100
+            "badge-ticker": 80,
+            "gold-ticker": 90,
+            "lower-ticker": 85
         };
 
         let rowSpeeds = { ...DEFAULT_ROW_SPEEDS };
@@ -645,37 +648,23 @@
                 cursor: 0,
                 useEn: false,
                 activeKey: "",
-                timer: null,
-                rafId: null
+                timer: null
             },
             "gold-ticker": {
                 items: [],
                 cursor: 0,
                 useEn: false,
                 activeKey: "",
-                timer: null,
-                rafId: null
+                timer: null
             },
             "lower-ticker": {
                 items: [],
                 cursor: 0,
                 useEn: false,
                 activeKey: "",
-                timer: null,
-                rafId: null
+                timer: null
             }
         };
-
-        function cancelSlotLoop(st) {
-            if (st.timer) {
-                clearTimeout(st.timer);
-                st.timer = null;
-            }
-            if (st.rafId) {
-                cancelAnimationFrame(st.rafId);
-                st.rafId = null;
-            }
-        }
 
         function buildSlotItems(data) {
             const badgeItems = [];
@@ -705,4 +694,337 @@
             // ROW 2 (GOLD TRACK): STRICTLY Row 2 + Prize + Upcoming + Winner ONLY
             // =====================================================
             if (hasValue(data.row2Txt) || hasValue(data.row2Txt_pa)) {
-                const r2En = String(data.
+                const r2En = String(data.row2Txt || data.row2Txt_pa).trim();
+                const r2Pa = String(data.row2Txt_pa || data.row2Txt).trim();
+                goldItems.push({
+                    id: "r2-only:" + r2En + "|" + r2Pa,
+                    pa: translateToPunjabi(r2Pa),
+                    en: r2En
+                });
+            }
+
+            const prizePartsEn = [];
+            const prizePartsPa = [];
+
+            if (hasValue(data.pzOp1) || hasValue(data.pzOp2) || hasValue(data.pzOpBest)) {
+                const t1 = hasValue(data.pzTitle1) ? String(data.pzTitle1).trim() : "OPEN";
+                const t1Pa = translateToPunjabi(t1);
+                const p1En = [
+                    hasValue(data.pzOp1) && `1st: ${String(data.pzOp1).trim()}`,
+                    hasValue(data.pzOp2) && `2nd: ${String(data.pzOp2).trim()}`,
+                    hasValue(data.pzOpBest) && `Best: ${String(data.pzOpBest).trim()}`
+                ].filter(Boolean).join(" • ");
+                const p1Pa = [
+                    hasValue(data.pzOp1) && `ਪਹਿਲਾ: ${String(data.pzOp1).trim()}`,
+                    hasValue(data.pzOp2) && `ਦੂਜਾ: ${String(data.pzOp2).trim()}`,
+                    hasValue(data.pzOpBest) && `ਬੈਸਟ: ${String(data.pzOpBest).trim()}`
+                ].filter(Boolean).join(" • ");
+                if (p1En) {
+                    prizePartsEn.push(`🏆 ${t1}: ${p1En}`);
+                    prizePartsPa.push(`🏆 ${t1Pa}: ${p1Pa}`);
+                }
+            }
+
+            if (hasValue(data.pzWt1) || hasValue(data.pzWt2) || hasValue(data.pzWtBest)) {
+                const t2 = hasValue(data.pzTitle2) ? String(data.pzTitle2).trim() : "WEIGHT";
+                const t2Pa = translateToPunjabi(t2);
+                const p2En = [
+                    hasValue(data.pzWt1) && `1st: ${String(data.pzWt1).trim()}`,
+                    hasValue(data.pzWt2) && `2nd: ${String(data.pzWt2).trim()}`,
+                    hasValue(data.pzWtBest) && `Best: ${String(data.pzWtBest).trim()}`
+                ].filter(Boolean).join(" • ");
+                const p2Pa = [
+                    hasValue(data.pzWt1) && `ਪਹਿਲਾ: ${String(data.pzWt1).trim()}`,
+                    hasValue(data.pzWt2) && `ਦੂਜਾ: ${String(data.pzWt2).trim()}`,
+                    hasValue(data.pzWtBest) && `ਬੈਸਟ: ${String(data.pzWtBest).trim()}`
+                ].filter(Boolean).join(" • ");
+                if (p2En) {
+                    prizePartsEn.push(`🏆 ${t2}: ${p2En}`);
+                    prizePartsPa.push(`🏆 ${t2Pa}: ${p2Pa}`);
+                }
+            }
+
+            if (prizePartsEn.length > 0) {
+                goldItems.push({
+                    id: "r2-prize:" + prizePartsEn.join("|"),
+                    pa: `${prizePartsPa.join(" <span class='dot-sep'>•</span> ")}`,
+                    en: `${prizePartsEn.join(" <span class='dot-sep'>•</span> ")}`
+                });
+            }
+
+            const upcomingArr = normalizeArray(data.upcomingEvents);
+            upcomingArr.forEach((ev, idx) => {
+                const nameEn = ev.name || ev.eventName || "";
+                const namePa = ev.name_pa || ev.eventName_pa || translateToPunjabi(nameEn);
+                const datePart = hasValue(ev.date) ? ` (${ev.date})` : "";
+                if (hasValue(nameEn) || hasValue(namePa)) {
+                    goldItems.push({
+                        id: "r2-up:" + nameEn + ":" + ev.date + ":" + idx,
+                        pa: `📡 ਆਉਣ ਵਾਲਾ ਲਾਈਵ: ${namePa}${datePart}`,
+                        en: `📡 UPCOMING LIVE: ${nameEn}${datePart}`
+                    });
+                }
+            });
+
+            const rawMatches = normalizeArray(data.nextMatches);
+            const winnersFromMatches = rawMatches.filter(m => /winner|ਵਿੰਨਰ|\(win\)/i.test(String(m)));
+            if (winnersFromMatches.length > 0) {
+                winnersFromMatches.forEach((m, idx) => {
+                    goldItems.push({
+                        id: "r2-winm:" + String(m).trim() + ":" + idx,
+                        pa: `🥇 ਵਿੰਨਰ: ${formatMatchString(m, idx, false)}`,
+                        en: `🥇 WINNER: ${formatMatchString(m, idx, true)}`
+                    });
+                });
+            } else if (hasValue(data.qualifiedTeams)) {
+                const qLines = String(data.qualifiedTeams).split("\n").map(s => s.trim()).filter(Boolean);
+                qLines.forEach((qLine, idx) => {
+                    goldItems.push({
+                        id: "r2-qual:" + qLine + ":" + idx,
+                        pa: `🥇 ਵਿੰਨਰ: ${translateToPunjabi(qLine)}`,
+                        en: `🥇 WINNER: ${qLine}`
+                    });
+                });
+            }
+
+            if (hasValue(data.resultText) && String(data.resultText).trim() !== "No Result Yet") {
+                goldItems.push({
+                    id: "r2-res:" + String(data.resultText).trim(),
+                    pa: `🥇 ਨਤੀਜਾ: ${translateToPunjabi(data.resultText)}`,
+                    en: `🥇 RESULT: ${data.resultText}`
+                });
+            }
+
+            const goldTrackBox = document.getElementById("gold-track-box");
+            if (goldTrackBox) {
+                goldTrackBox.classList.toggle("empty-track", goldItems.length === 0);
+            }
+
+            // =====================================================
+            // ROW 3 (LOWER BLUE BAR): Match List + Row 3 / Contact (NO Team List)
+            // =====================================================
+            const r3En = (data.row3Txt || "").trim();
+            const r3Pa = (data.row3Txt_pa || r3En).trim();
+            const contactText = hasValue(data.contactUs || data.row6Txt)
+                ? String(data.contactUs || data.row6Txt).trim()
+                : "MANPREET MUDKI • +91 8699640061 / 9115426711";
+
+            rawMatches.forEach((m, idx) => {
+                lowerItems.push({
+                    id: "r3-match:" + String(m).trim() + ":" + idx,
+                    pa: `📋 ਮੈਚ: ${formatMatchString(m, idx, false)}`,
+                    en: `📋 MATCH: ${formatMatchString(m, idx, true)}`
+                });
+            });
+
+            if (rawMatches.length === 0 && (hasValue(data.row5Txt) || hasValue(data.row5Txt_pa))) {
+                const mRawPa = translateToPunjabi(data.row5Txt_pa || data.row5Txt);
+                const mRawEn = data.row5Txt || data.row5Txt_pa;
+                lowerItems.push({
+                    id: "r3-row5:" + (mRawEn || mRawPa),
+                    pa: `📋 ਮੈਚ ਲਿਸਟ: ${mRawPa}`,
+                    en: `📋 MATCH LIST: ${mRawEn}`
+                });
+            }
+
+            if (hasValue(r3En) || hasValue(r3Pa)) {
+                lowerItems.push({
+                    id: "r3-txt:" + (r3En || r3Pa),
+                    pa: translateToPunjabi(r3Pa || r3En),
+                    en: r3En || r3Pa
+                });
+            }
+
+            if (hasValue(contactText)) {
+                lowerItems.push({
+                    id: "r3-contact:" + contactText,
+                    pa: `ਸੰਪਰਕ: ${translateToPunjabi(contactText)} <span class="star-accent">******</span> ਕਬੱਡੀ ਸਪੋਰਟਸ 1 ਲਾਈਵ`,
+                    en: `CONTACT US: ${contactText} <span class="star-accent">******</span> KABADDI SPORTS 1 LIVE`
+                });
+            }
+
+            return {
+                "badge-ticker": badgeItems,
+                "gold-ticker": goldItems,
+                "lower-ticker": lowerItems
+            };
+        }
+
+        function syncSlotData(slotId, newItems) {
+            const st = slotState[slotId];
+            if (!st) return;
+
+            const oldItems = st.items;
+            const currentItem = oldItems.length > 0 ? oldItems[st.cursor % oldItems.length] : null;
+
+            st.items = newItems;
+
+            if (newItems.length === 0) {
+                st.cursor = 0;
+                st.activeKey = "";
+                if (st.timer) {
+                    clearTimeout(st.timer);
+                    st.timer = null;
+                }
+                const el = document.getElementById(slotId);
+                if (el) el.innerHTML = "";
+                return;
+            }
+
+            if (currentItem) {
+                const idxById = newItems.findIndex(x => x.id === currentItem.id);
+                if (idxById !== -1) {
+                    st.cursor = idxById;
+                } else {
+                    st.cursor = st.cursor % newItems.length;
+                }
+            } else {
+                st.cursor = 0;
+            }
+
+            const targetItem = newItems[st.cursor];
+            const desiredKey = `${targetItem.id}::${st.useEn ? "en" : "pa"}`;
+
+            if (st.activeKey === desiredKey) {
+                return;
+            }
+
+            startSlotItem(slotId, targetItem);
+        }
+
+        function startSlotItem(slotId, item) {
+            const st = slotState[slotId];
+            const el = document.getElementById(slotId);
+            if (!st || !el || !item) return;
+
+            if (st.timer) {
+                clearTimeout(st.timer);
+                st.timer = null;
+            }
+
+            const desiredKey = `${item.id}::${st.useEn ? "en" : "pa"}`;
+            st.activeKey = desiredKey;
+
+            const textToShow = st.useEn ? item.en : item.pa;
+
+            el.className = "anim-wrap";
+            el.innerHTML = "";
+            el.style.removeProperty("--marquee-duration");
+            el.style.removeProperty("--start-x");
+            el.style.removeProperty("--end-x");
+
+            const span = document.createElement("span");
+            span.className = "ticker-text";
+            span.innerHTML = textToShow;
+            el.appendChild(span);
+
+            requestAnimationFrame(() => {
+                const boxWidth = el.clientWidth;
+                const textWidth = span.scrollWidth;
+
+                if (textWidth > boxWidth - 16) {
+                    const startX = boxWidth - 12;
+                    const endX = -(textWidth + 24);
+                    const totalDistance = Math.abs(endX - startX);
+                    const speedPxPerSec = rowSpeeds[slotId] || 85;
+                    const duration = Math.max(4, totalDistance / speedPxPerSec);
+
+                    el.classList.add("marquee-mode");
+                    el.style.setProperty("--start-x", `${startX}px`);
+                    el.style.setProperty("--end-x", `${endX}px`);
+                    el.style.setProperty("--marquee-duration", `${duration}s`);
+                    span.style.animation = "none";
+                    void span.offsetWidth;
+                    span.style.animation = `tickerMarquee ${duration}s linear 1 forwards`;
+
+                    st.timer = setTimeout(() => {
+                        onSlotItemFinished(slotId);
+                    }, duration * 1000);
+                } else {
+                    el.classList.add("anim-center-in");
+                    st.timer = setTimeout(() => {
+                        onSlotItemFinished(slotId);
+                    }, 6000);
+                }
+            });
+        }
+
+        function onSlotItemFinished(slotId) {
+            const st = slotState[slotId];
+            if (!st || st.items.length === 0) return;
+
+            st.useEn = !st.useEn;
+
+            if (!st.useEn) {
+                st.cursor = (st.cursor + 1) % st.items.length;
+            }
+
+            const nextItem = st.items[st.cursor % st.items.length];
+            startSlotItem(slotId, nextItem);
+        }
+
+        db.on("value", (snap) => {
+            const data = snap.val() || {};
+            window.currentData = data;
+
+            if (Number(data.row1Speed) > 0) rowSpeeds["badge-ticker"] = Number(data.row1Speed);
+            if (Number(data.row2Speed) > 0) rowSpeeds["gold-ticker"] = Number(data.row2Speed);
+            if (Number(data.row3Speed) > 0) rowSpeeds["lower-ticker"] = Number(data.row3Speed);
+
+            const logoCont = document.getElementById('logo-container');
+            const logoKey = matchId.trim().toLowerCase();
+
+            if (clientLogos[logoKey] && data.logoVisible !== false) {
+                document.getElementById('main-logo').src = clientLogos[logoKey];
+                logoCont.classList.remove('hidden');
+            } else {
+                logoCont.classList.add('hidden');
+            }
+
+            document.getElementById('top-scoreboard-container').classList.toggle('hidden', data.scoreVisible === false);
+            document.getElementById('ticker-wrap').classList.toggle('hidden', data.tickerVisible === false);
+
+            const roundText = data.round || "";
+            const detailsStrip = document.getElementById('match-details-strip');
+            if (String(roundText).trim() === "") {
+                detailsStrip.classList.add('hidden');
+            } else {
+                detailsStrip.classList.remove('hidden');
+                document.getElementById('match-round').innerText = translateToPunjabi(roundText);
+            }
+
+            document.getElementById('sA').innerText = data.scoreA ?? "0";
+            document.getElementById('sB').innerText = data.scoreB ?? "0";
+            document.getElementById('single-wm').innerText = data.watermarkTxt || "ਐੱਮ ਲਾਈਵ";
+
+            const grouped = buildSlotItems(data);
+            syncSlotData("badge-ticker", grouped["badge-ticker"]);
+            syncSlotData("gold-ticker", grouped["gold-ticker"]);
+            syncSlotData("lower-ticker", grouped["lower-ticker"]);
+        });
+
+        setInterval(() => {
+            const d = window.currentData;
+            if (!d) return;
+            const showEn = !!slotState["badge-ticker"].useEn;
+            document.getElementById('nA').innerText = (!showEn && d.nameA_pa) ? d.nameA_pa : (d.nameA || "ਟੀਮ 1");
+            document.getElementById('nB').innerText = (!showEn && d.nameB_pa) ? d.nameB_pa : (d.nameB || "ਟੀਮ 2");
+        }, 1500);
+
+        const wm = document.getElementById('single-wm');
+        let x = 200, y = 200, dx = 1.8, dy = 1.4;
+        function animateWatermark() {
+            const maxX = 1920 - wm.offsetWidth - 50;
+            const maxY = 850 - wm.offsetHeight;
+            x += dx;
+            y += dy;
+            if (x <= 50 || x >= maxX) dx *= -1;
+            if (y <= 120 || y >= maxY) dy *= -1;
+            wm.style.left = x + 'px';
+            wm.style.top = y + 'px';
+            requestAnimationFrame(animateWatermark);
+        }
+        animateWatermark();
+    </script>
+</body>
+</html>
