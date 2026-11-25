@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Sports 1 - Dual Admin Overlay & Ticker</title>
+    <title>Kabaddi Sports 1 - 3-Row Broadcast Overlay</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@800;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -140,7 +140,7 @@
         }
 
         /* =========================================================
-            LOGO
+            LOGO & WATERMARK
         ========================================================= */
         #logo-container {
             position: absolute;
@@ -161,7 +161,7 @@
         }
 
         #logo-container.animate-slow-spin {
-            animation: logoSlowSpin 2.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation: logoSlowSpin 2.2s cubic-bezier(0.4,0,0.2,1) forwards;
         }
 
         @keyframes logoSlowSpin {
@@ -176,9 +176,6 @@
             object-fit: contain;
         }
 
-        /* =========================================================
-            WATERMARK
-        ========================================================= */
         #single-wm {
             position: absolute;
             left: 300px;
@@ -193,11 +190,11 @@
         }
 
         /* =========================================================
-            BROADCAST TICKER (KABADDI SPORTS 1 COLOR MATCH)
+            3-ROW TICKER (ROW 1 GREEN + LOGO GOLD/BLUE THEME)
         ========================================================= */
         #ticker-wrap {
             position: absolute;
-            bottom: 36px;
+            bottom: 24px;
             left: 0;
             width: 1920px;
             z-index: 9998;
@@ -212,108 +209,97 @@
             pointer-events: none;
         }
 
-        /* Upper Tier: Gold/Black Skewed Badge + Gold Track */
-        .upper-tier {
-            position: relative;
+        .ticker-row {
             display: flex;
-            align-items: center;
-            height: 56px;
+            align-items: stretch;
             width: 100%;
-            z-index: 2;
-        }
-
-        .gold-badge-skew {
-            position: relative;
-            z-index: 3;
-            height: 56px;
-            min-width: 640px;
-            max-width: 790px;
-            background: linear-gradient(180deg, #ffe24a 0%, #f5b400 58%, #c98600 100%);
-            border: 3.5px solid #090909;
-            border-left: none;
-            transform: skewX(-24deg);
-            margin-left: -14px;
-            padding: 0 38px 0 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.6);
-        }
-
-        .gold-badge-unskew {
-            transform: skewX(24deg);
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            height: 48px;
             overflow: hidden;
+        }
+
+        /* Row 1: Green Background with Gold Border/Badge */
+        .row-1-green {
+            background: linear-gradient(90deg, #004700 0%, #007a00 30%, #008c00 50%, #007a00 70%, #004400 100%);
+            border-top: 2.5px solid #ffd000;
+            border-bottom: 2px solid #090909;
+        }
+
+        .row-1-green .row-badge {
+            background: linear-gradient(180deg, #ffe24a 0%, #f5b400 70%, #c98600 100%);
             color: #090909;
-            font-size: 31px;
+            border-right: 2.5px solid #090909;
+        }
+
+        .row-1-green .row-content {
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.75);
+        }
+
+        /* Row 2: Gold Track (Prize List + Upcoming Live + Winner Match List) */
+        .row-2-gold {
+            background: linear-gradient(180deg, #ffd41f 0%, #f0a800 55%, #b87800 100%);
+            border-bottom: 2px solid #090909;
+        }
+
+        .row-2-gold .row-badge {
+            background: #090909;
+            color: #ffe24a;
+            border-right: 2.5px solid #ffd000;
+        }
+
+        .row-2-gold .row-content {
+            color: #090909;
+        }
+
+        /* Row 3: Royal Blue Banner (Team List + Contact Us) */
+        .row-3-blue {
+            background: linear-gradient(90deg, #001f66 0%, #0047cc 25%, #0066ff 50%, #0047cc 75%, #001a54 100%);
+            border-bottom: 2px solid #ffd000;
+        }
+
+        .row-3-blue .row-badge {
+            background: linear-gradient(180deg, #1b78ff 0%, #003b99 100%);
+            color: #ffe24a;
+            border-right: 2.5px solid #ffd000;
+        }
+
+        .row-3-blue .row-content {
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.75);
+        }
+
+        .row-badge {
+            flex: 0 0 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 23px;
             font-weight: 900;
-            letter-spacing: 0.8px;
+            letter-spacing: 1px;
+            padding: 0 14px;
             white-space: nowrap;
         }
 
-        .gold-track {
-            position: relative;
+        .row-content {
             flex: 1;
-            height: 46px;
-            background: linear-gradient(180deg, #ffd41f 0%, #f0a800 55%, #b87800 100%);
-            border-top: 4px solid #080808;
-            border-bottom: 4px solid #080808;
-            display: flex;
-            align-items: center;
-            overflow: hidden;
-            margin-left: -26px;
-            padding-left: 34px;
-        }
-
-        .gold-content {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            overflow: hidden;
-            color: #090909;
-            font-size: 29px;
-            font-weight: 900;
-            letter-spacing: 0.5px;
-        }
-
-        /* Lower Tier: Royal Blue Banner (Matches Logo Bottom Bar) */
-        .lower-tier {
             position: relative;
-            z-index: 1;
-            width: 100%;
-            height: 44px;
-            margin-top: -4px;
-            background: linear-gradient(90deg, #001f66 0%, #0047cc 24%, #0066ff 50%, #0047cc 76%, #001a54 100%);
-            border-top: 1.5px solid #ffd000;
-            border-bottom: 2px solid #00123b;
             display: flex;
             align-items: center;
             overflow: hidden;
-            padding: 0 28px;
-        }
-
-        .lower-content {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            overflow: hidden;
-            color: #ffffff;
-            font-size: 27px;
+            padding: 0 20px;
+            font-size: 28px;
             font-weight: 900;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.75);
+            letter-spacing: 0.8px;
         }
 
         .star-accent {
             color: #ffe24a;
             font-weight: 900;
-            margin: 0 12px;
-            letter-spacing: 2px;
+            margin: 0 10px;
+        }
+
+        .row-2-gold .star-accent {
+            color: #090909;
         }
 
         .match-vs-pill {
@@ -321,18 +307,13 @@
             background: #090909;
             color: #ffe24a;
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 25px;
-            padding: 0 9px;
+            font-size: 24px;
+            padding: 0 8px;
             border-radius: 4px;
-            margin: 0 6px;
-            letter-spacing: 1px;
+            margin: 0 5px;
             vertical-align: middle;
-            border: 1px solid rgba(255, 226, 74, 0.6);
         }
 
-        /* =========================================================
-            TEXT & MARQUEE ANIMATIONS
-        ========================================================= */
         .anim-wrap {
             position: relative;
             width: 100%;
@@ -398,28 +379,29 @@
         </div>
     </div>
 
-    <!-- BROADCAST TICKER -->
+    <!-- 3-ROW TICKER -->
     <div id="ticker-wrap">
-        <div class="upper-tier">
-            <!-- Left Skewed Gold Badge: Admin Row 3 Update -->
-            <div class="gold-badge-skew">
-                <div class="gold-badge-unskew">
-                    <div id="badge-row3-update" class="anim-wrap"></div>
-                </div>
-            </div>
-
-            <!-- Gold Track: Winner Match -->
-            <div class="gold-track">
-                <div class="gold-content">
-                    <div id="winner-match-ticker" class="anim-wrap"></div>
-                </div>
+        <!-- Row 1 (Green): Event / Location / Live Update -->
+        <div class="ticker-row row-1-green">
+            <div class="row-badge" id="badge-r1">ਲਾਈਵ ਅੱਪਡੇਟ</div>
+            <div class="row-content">
+                <div id="r1-text" class="anim-wrap"></div>
             </div>
         </div>
 
-        <!-- Bottom Royal Blue Banner: Match List & Info -->
-        <div class="lower-tier">
-            <div class="lower-content">
-                <div id="match-list-ticker" class="anim-wrap"></div>
+        <!-- Row 2 (Gold): Prize List + Upcoming Live + Winner Match List -->
+        <div class="ticker-row row-2-gold">
+            <div class="row-badge" id="badge-r2">ਇਨਾਮ • ਵਿੰਨਰ • ਲਾਈਵ</div>
+            <div class="row-content">
+                <div id="r2-text" class="anim-wrap"></div>
+            </div>
+        </div>
+
+        <!-- Row 3 (Blue): Team List + Contact Us -->
+        <div class="ticker-row row-3-blue">
+            <div class="row-badge" id="badge-r3">ਟੀਮਾਂ • ਸੰਪਰਕ</div>
+            <div class="row-content">
+                <div id="r3-text" class="anim-wrap"></div>
             </div>
         </div>
     </div>
@@ -531,147 +513,155 @@
             return `${num}${tagPa}${t1Pa} <span class="match-vs-pill">ਬਨਾਮ</span> ${t2Pa}`;
         }
 
-        let row3Updates = [];
-        let winnerMatchItems = [];
-        let matchListItems = [];
+        let r1List = [];
+        let r2List = [];
+        let r3List = [];
 
+        let r1Idx = 0;
+        let r2Idx = 0;
         let r3Idx = 0;
-        let winIdx = 0;
-        let listIdx = 0;
 
         let isEnglish = false;
-        let lastSignature = "";
+        let lastSig = "";
 
-        function buildTickerData(data) {
-            // 1. Admin Row 3 update (compatible with both Admin 1 & Admin 2)
-            row3Updates = [];
-            const r3Pa = (data.row3Txt_pa || data.row3Txt || "").trim();
-            const r3En = (data.row3Txt || data.row3Txt_pa || "").trim();
+        function buildRows(data) {
+            r1List = [];
+            r2List = [];
+            r3List = [];
 
+            // ---------------- ROW 1 (GREEN): Program / Location / Row1-Row3 / Result ----------------
+            const locEn = (data.row1Txt || data.location || "").trim();
+            const locPa = (data.row1Txt_pa || data.location_pa || locEn).trim();
+            const progEn = (data.programTxt || data.row2Txt || "").trim();
+            const progPa = (data.programTxt_pa || data.row2Txt_pa || progEn).trim();
+            const r3En = (data.row3Txt || "").trim();
+            const r3Pa = (data.row3Txt_pa || r3En).trim();
+
+            if (progPa || progEn || locPa || locEn) {
+                r1List.push({
+                    pa: [locPa, progPa].filter(Boolean).map(translateToPunjabi).join(" • "),
+                    en: [locEn, progEn].filter(Boolean).join(" • ")
+                });
+            }
             if (r3Pa || r3En) {
-                row3Updates.push({
-                    pa: `** ${translateToPunjabi(r3Pa)}`,
-                    en: `** ${r3En}`
+                r1List.push({
+                    pa: translateToPunjabi(r3Pa),
+                    en: r3En
                 });
             }
-
-            if (data.programTxt || data.programTxt_pa) {
-                row3Updates.push({
-                    pa: `** ${translateToPunjabi(data.programTxt_pa || data.programTxt)}`,
-                    en: `** ${data.programTxt || data.programTxt_pa}`
-                });
-            }
-
-            if (data.row1Txt) {
-                row3Updates.push({
-                    pa: `** ${translateToPunjabi(data.row1Txt_pa || data.row1Txt)}`,
-                    en: `** ${data.row1Txt}`
-                });
-            }
-
-            if (row3Updates.length === 0) {
-                row3Updates.push({
-                    pa: "** ਕਬੱਡੀ ਸਪੋਰਟਸ 1 ਲਾਈਵ",
-                    en: "** KABADDI SPORTS 1 LIVE"
-                });
-            }
-
-            // 2. Match List & Winner Match (from nextMatches, qualifiedTeams, or row5Txt/row5Txt_pa)
-            const rawMatches = normalizeArray(data.nextMatches);
-            winnerMatchItems = [];
-            matchListItems = [];
-
-            if (rawMatches.length > 0) {
-                const explicitWinners = [];
-                const normalMatches = [];
-
-                rawMatches.forEach((mStr, idx) => {
-                    const isWin = /winner|ਵਿੰਨਰ/i.test(String(mStr));
-                    const paStr = formatMatchString(mStr, idx, false);
-                    const enStr = formatMatchString(mStr, idx, true);
-                    if (isWin) {
-                        explicitWinners.push({ pa: paStr, en: enStr });
-                    } else {
-                        normalMatches.push({ pa: paStr, en: enStr });
-                    }
-                });
-
-                if (explicitWinners.length > 0) {
-                    winnerMatchItems = explicitWinners.map(w => ({
-                        pa: `ਵਿੰਨਰ ਮੈਚ: ${w.pa}`,
-                        en: `WINNER MATCH: ${w.en}`
-                    }));
-                } else if (data.qualifiedTeams) {
-                    const qText = String(data.qualifiedTeams).replace(/\n+/g, " • ");
-                    winnerMatchItems.push({
-                        pa: `ਵਿੰਨਰ / ਕੁਆਲੀਫਾਈਡ: ${translateToPunjabi(qText)}`,
-                        en: `WINNER / QUALIFIED: ${qText}`
-                    });
-                } else {
-                    winnerMatchItems = [{
-                        pa: `ਵਿੰਨਰ ਮੈਚ: ${normalMatches[0].pa}`,
-                        en: `WINNER MATCH: ${normalMatches[0].en}`
-                    }];
-                }
-
-                const listSource = normalMatches.length > 0 ? normalMatches : explicitWinners;
-                const combinedPa = listSource.map(x => x.pa).join(` <span class="star-accent">******</span> `);
-                const combinedEn = listSource.map(x => x.en).join(` <span class="star-accent">******</span> `);
-
-                matchListItems.push({
-                    pa: `<span class="star-accent">******</span> ਮੈਚ ਲਿਸਟ: ${combinedPa} <span class="star-accent">******</span>`,
-                    en: `<span class="star-accent">******</span> MATCH LIST: ${combinedEn} <span class="star-accent">******</span>`
-                });
-            } else if (data.row5Txt || data.row5Txt_pa) {
-                const mPa = (data.row5Txt_pa || data.row5Txt || "").trim();
-                const mEn = (data.row5Txt || data.row5Txt_pa || "").trim();
-                winnerMatchItems.push({
-                    pa: `ਵਿੰਨਰ ਮੈਚ: ${translateToPunjabi(mPa.split(",")[0] || mPa)}`,
-                    en: `WINNER MATCH: ${mEn.split(",")[0] || mEn}`
-                });
-                matchListItems.push({
-                    pa: `<span class="star-accent">******</span> ਮੈਚ ਲਿਸਟ: ${translateToPunjabi(mPa)} <span class="star-accent">******</span>`,
-                    en: `<span class="star-accent">******</span> MATCH LIST: ${mEn} <span class="star-accent">******</span>`
-                });
-            } else {
-                winnerMatchItems.push({
-                    pa: "ਵਿੰਨਰ ਮੈਚ: ਜਲਦ ਆ ਰਿਹਾ ਹੈ",
-                    en: "WINNER MATCH: COMING SOON"
-                });
-                matchListItems.push({
-                    pa: `<span class="star-accent">******</span> ਮੈਚ ਲਿਸਟ ਅੱਪਡੇਟ ਹੋ ਰਹੀ ਹੈ <span class="star-accent">******</span>`,
-                    en: `<span class="star-accent">******</span> MATCH LIST UPDATING <span class="star-accent">******</span>`
-                });
-            }
-
             if (data.resultText && data.resultText !== "No Result Yet") {
-                matchListItems.push({
-                    pa: `<span class="star-accent">******</span> ਨਤੀਜਾ: ${translateToPunjabi(data.resultText)} <span class="star-accent">******</span>`,
-                    en: `<span class="star-accent">******</span> RESULT: ${data.resultText} <span class="star-accent">******</span>`
+                r1List.push({
+                    pa: `ਨਤੀਜਾ: ${translateToPunjabi(data.resultText)}`,
+                    en: `RESULT: ${data.resultText}`
+                });
+            }
+            if (r1List.length === 0) {
+                r1List.push({
+                    pa: "ਕਬੱਡੀ ਸਪੋਰਟਸ 1 ਲਾਈਵ ਪ੍ਰਸਾਰਣ",
+                    en: "KABADDI SPORTS 1 LIVE TELECAST"
                 });
             }
 
-            const sig = JSON.stringify({
-                r1: data.row1Txt,
-                r1pa: data.row1Txt_pa,
-                r2: data.row2Txt,
-                r3: data.row3Txt,
-                r3pa: data.row3Txt_pa,
-                r5: data.row5Txt,
-                r5pa: data.row5Txt_pa,
-                prog: data.programTxt,
-                progPa: data.programTxt_pa,
-                qual: data.qualifiedTeams,
-                res: data.resultText,
-                matches: rawMatches
+            // ---------------- ROW 2 (GOLD): Prize List + Upcoming Live + Winner Match List ----------------
+            // 1. Prize List
+            const prizePartsEn = [];
+            const prizePartsPa = [];
+            if (data.pzTitle1 || data.pzOp1 || data.pzOp2 || data.pzOpBest) {
+                const t1 = data.pzTitle1 || "OPEN";
+                const t1Pa = translateToPunjabi(t1);
+                const p1En = [data.pzOp1 && `1st: ${data.pzOp1}`, data.pzOp2 && `2nd: ${data.pzOp2}`, data.pzOpBest && `Best: ${data.pzOpBest}`].filter(Boolean).join(", ");
+                const p1Pa = [data.pzOp1 && `ਪਹਿਲਾ: ${data.pzOp1}`, data.pzOp2 && `ਦੂਜਾ: ${data.pzOp2}`, data.pzOpBest && `ਬੈਸਟ: ${data.pzOpBest}`].filter(Boolean).join(", ");
+                prizePartsEn.push(`🏆 ${t1} (${p1En})`);
+                prizePartsPa.push(`🏆 ${t1Pa} (${p1Pa})`);
+            }
+            if (data.pzTitle2 || data.pzWt1 || data.pzWt2 || data.pzWtBest) {
+                const t2 = data.pzTitle2 || "WEIGHT";
+                const t2Pa = translateToPunjabi(t2);
+                const p2En = [data.pzWt1 && `1st: ${data.pzWt1}`, data.pzWt2 && `2nd: ${data.pzWt2}`, data.pzWtBest && `Best: ${data.pzWtBest}`].filter(Boolean).join(", ");
+                const p2Pa = [data.pzWt1 && `ਪਹਿਲਾ: ${data.pzWt1}`, data.pzWt2 && `ਦੂਜਾ: ${data.pzWt2}`, data.pzWtBest && `ਬੈਸਟ: ${data.pzWtBest}`].filter(Boolean).join(", ");
+                prizePartsEn.push(`🏆 ${t2} (${p2En})`);
+                prizePartsPa.push(`🏆 ${t2Pa} (${p2Pa})`);
+            }
+            if (prizePartsEn.length > 0) {
+                r2List.push({
+                    pa: `ਇਨਾਮ ਸੂਚੀ: ${prizePartsPa.join(" | ")}`,
+                    en: `PRIZE LIST: ${prizePartsEn.join(" | ")}`
+                });
+            }
+
+            // 2. Upcoming Live
+            const upcomingArr = normalizeArray(data.upcomingEvents);
+            if (upcomingArr.length > 0) {
+                const upEn = upcomingArr.map((ev, i) => `${i + 1}. ${ev.name || ev.eventName || ""}${ev.date ? ` (${ev.date})` : ""}`).join(" • ");
+                const upPa = upcomingArr.map((ev, i) => `${i + 1}. ${ev.name_pa || ev.eventName_pa || translateToPunjabi(ev.name || ev.eventName || "")}${ev.date ? ` (${ev.date})` : ""}`).join(" • ");
+                r2List.push({
+                    pa: `📡 ਆਉਣ ਵਾਲੇ ਲਾਈਵ: ${upPa}`,
+                    en: `📡 UPCOMING LIVE: ${upEn}`
+                });
+            } else if (data.row4Txt || data.row4Txt_pa) {
+                r2List.push({
+                    pa: `📡 ਆਉਣ ਵਾਲੇ ਲਾਈਵ: ${translateToPunjabi(data.row4Txt_pa || data.row4Txt)}`,
+                    en: `📡 UPCOMING LIVE: ${data.row4Txt || data.row4Txt_pa}`
+                });
+            }
+
+            // 3. Winner Match List
+            const rawMatches = normalizeArray(data.nextMatches);
+            const winnersFromMatches = rawMatches.filter(m => /winner|ਵਿੰਨਰ|\(win\)/i.test(String(m)));
+            if (winnersFromMatches.length > 0) {
+                r2List.push({
+                    pa: `🥇 ਵਿੰਨਰ ਮੈਚ ਲਿਸਟ: ${winnersFromMatches.map((m, i) => formatMatchString(m, i, false)).join(" • ")}`,
+                    en: `🥇 WINNER MATCH LIST: ${winnersFromMatches.map((m, i) => formatMatchString(m, i, true)).join(" • ")}`
+                });
+            } else if (data.qualifiedTeams) {
+                const qRaw = String(data.qualifiedTeams).split("\n").map(s => s.trim()).filter(Boolean).join(" • ");
+                r2List.push({
+                    pa: `🥇 ਵਿੰਨਰ / ਕੁਆਲੀਫਾਈਡ ਟੀਮਾਂ: ${translateToPunjabi(qRaw)}`,
+                    en: `🥇 WINNER / QUALIFIED TEAMS: ${qRaw}`
+                });
+            } else if (rawMatches.length > 0) {
+                r2List.push({
+                    pa: `🥇 ਵਿੰਨਰ ਮੈਚ: ${formatMatchString(rawMatches[0], 0, false)}`,
+                    en: `🥇 WINNER MATCH: ${formatMatchString(rawMatches[0], 0, true)}`
+                });
+            }
+
+            if (r2List.length === 0) {
+                r2List.push({
+                    pa: "🏆 ਇਨਾਮ ਸੂਚੀ • ਆਉਣ ਵਾਲੇ ਲਾਈਵ • ਵਿੰਨਰ ਮੈਚ ਲਿਸਟ",
+                    en: "🏆 PRIZE LIST • UPCOMING LIVE • WINNER MATCH LIST"
+                });
+            }
+
+            // ---------------- ROW 3 (BLUE): Team List + Contact Us ----------------
+            const teamsArr = normalizeArray(data.allTeams);
+            if (teamsArr.length > 0) {
+                const tEn = teamsArr.map(t => t.split("=")[0].trim()).join(", ");
+                const tPa = teamsArr.map(t => translateToPunjabi((t.split("=")[1] || t.split("=")[0] || "").trim())).join(", ");
+                r3List.push({
+                    pa: `👥 ਟੀਮ ਲਿਸਟ: ${tPa}`,
+                    en: `👥 TEAM LIST: ${tEn}`
+                });
+            }
+
+            const contactText = (data.contactUs || data.row6Txt || "MANPREET MUDKI • +91 8699640061 / 9115426711").trim();
+            r3List.push({
+                pa: `📞 ਸੰਪਰਕ ਕਰੋ (CONTACT US): ${translateToPunjabi(contactText)}`,
+                en: `📞 CONTACT US: ${contactText}`
             });
 
-            if (sig !== lastSignature) {
-                lastSignature = sig;
+            const sig = JSON.stringify({
+                r1: r1List.map(x => x.en + x.pa),
+                r2: r2List.map(x => x.en + x.pa),
+                r3: r3List.map(x => x.en + x.pa)
+            });
+
+            if (sig !== lastSig) {
+                lastSig = sig;
+                r1Idx = 0;
+                r2Idx = 0;
                 r3Idx = 0;
-                winIdx = 0;
-                listIdx = 0;
-                ['badge-row3-update', 'winner-match-ticker', 'match-list-ticker'].forEach(id => {
+                ['r1-text', 'r2-text', 'r3-text'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) {
                         el.dataset.currentText = "";
@@ -680,12 +670,12 @@
                 });
             }
 
-            renderTickerSlot('badge-row3-update', row3Updates[r3Idx % row3Updates.length]);
-            renderTickerSlot('winner-match-ticker', winnerMatchItems[winIdx % winnerMatchItems.length]);
-            renderTickerSlot('match-list-ticker', matchListItems[listIdx % matchListItems.length]);
+            renderSlot('r1-text', r1List[r1Idx % r1List.length]);
+            renderSlot('r2-text', r2List[r2Idx % r2List.length]);
+            renderSlot('r3-text', r3List[r3Idx % r3List.length]);
         }
 
-        function renderTickerSlot(elementId, item) {
+        function renderSlot(elementId, item) {
             const el = document.getElementById(elementId);
             if (!el || !item) return;
 
@@ -713,8 +703,8 @@
                 const textWidth = span.scrollWidth;
 
                 if (textWidth > boxWidth - 16) {
-                    const distance = textWidth - boxWidth + 36;
-                    const duration = Math.max(10, distance / 60 + 2);
+                    const distance = textWidth - boxWidth + 40;
+                    const duration = Math.max(10, distance / 62 + 2);
                     el.classList.add("marquee-mode");
                     el.style.setProperty("--scroll-distance", `${distance}px`);
                     el.style.setProperty("--marquee-duration", `${duration}s`);
@@ -757,23 +747,23 @@
             document.getElementById('sB').innerText = data.scoreB ?? "0";
             document.getElementById('single-wm').innerText = data.watermarkTxt || "ਐੱਮ ਲਾਈਵ";
 
-            buildTickerData(data);
+            buildRows(data);
         });
 
         setInterval(() => {
+            r1Idx++;
+            r2Idx++;
             r3Idx++;
-            winIdx++;
-            listIdx++;
-            if (window.currentData) buildTickerData(window.currentData);
+            if (window.currentData) buildRows(window.currentData);
         }, 10000);
 
         setInterval(() => {
             isEnglish = !isEnglish;
-            ['badge-row3-update', 'winner-match-ticker', 'match-list-ticker'].forEach(id => {
+            ['r1-text', 'r2-text', 'r3-text'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.dataset.language = "";
             });
-            if (window.currentData) buildTickerData(window.currentData);
+            if (window.currentData) buildRows(window.currentData);
         }, 18000);
 
         setInterval(() => {
@@ -795,7 +785,7 @@
         let x = 200, y = 200, dx = 1.8, dy = 1.4;
         function animateWatermark() {
             const maxX = 1920 - wm.offsetWidth - 50;
-            const maxY = 880 - wm.offsetHeight;
+            const maxY = 850 - wm.offsetHeight;
             x += dx;
             y += dy;
             if (x <= 50 || x >= maxX) dx *= -1;
