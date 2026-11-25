@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabaddi Sports 1 - 3-Row Broadcast Overlay</title>
+    <title>Kabaddi Sports 1 - Broadcast Ticker & Clock Box</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@800;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -190,7 +190,7 @@
         }
 
         /* =========================================================
-            3-ROW TICKER (ROW 1 GREEN + LOGO GOLD/BLUE THEME)
+            3-ROW BROADCAST TICKER + ROW 3 CLOCK BOX
         ========================================================= */
         #ticker-wrap {
             position: absolute;
@@ -217,7 +217,7 @@
             overflow: hidden;
         }
 
-        /* Row 1: Green Background with Gold Border/Badge */
+        /* Row 1: Green Background with Gold Badge */
         .row-1-green {
             background: linear-gradient(90deg, #004700 0%, #007a00 30%, #008c00 50%, #007a00 70%, #004400 100%);
             border-top: 2.5px solid #ffd000;
@@ -251,9 +251,9 @@
             color: #090909;
         }
 
-        /* Row 3: Royal Blue Banner (Team List + Contact Us) */
+        /* Row 3: Royal Blue Banner + Right Corner Clock Time Box */
         .row-3-blue {
-            background: linear-gradient(90deg, #001f66 0%, #0047cc 25%, #0066ff 50%, #0047cc 75%, #001a54 100%);
+            background: linear-gradient(90deg, #001f66 0%, #0047cc 25%, #0066ff 55%, #003b99 85%, #001a54 100%);
             border-bottom: 2px solid #ffd000;
         }
 
@@ -269,11 +269,11 @@
         }
 
         .row-badge {
-            flex: 0 0 280px;
+            flex: 0 0 275px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 23px;
+            font-size: 22px;
             font-weight: 900;
             letter-spacing: 1px;
             padding: 0 14px;
@@ -286,10 +286,43 @@
             display: flex;
             align-items: center;
             overflow: hidden;
-            padding: 0 20px;
-            font-size: 28px;
+            padding: 0 18px;
+            font-size: 27px;
             font-weight: 900;
             letter-spacing: 0.8px;
+        }
+
+        /* Row 3 Right Corner Clock Time Box */
+        .clock-time-box {
+            flex: 0 0 245px;
+            height: 100%;
+            background: linear-gradient(180deg, #ffe24a 0%, #f5b400 65%, #c98600 100%);
+            color: #090909;
+            border-left: 3px solid #090909;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 0 14px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            white-space: nowrap;
+        }
+
+        .clock-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #d90429;
+            box-shadow: 0 0 8px rgba(217, 4, 41, 0.85);
+            animation: clockPulse 1s infinite alternate;
+        }
+
+        @keyframes clockPulse {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0.35; transform: scale(0.8); }
         }
 
         .star-accent {
@@ -397,11 +430,15 @@
             </div>
         </div>
 
-        <!-- Row 3 (Blue): Team List + Contact Us -->
+        <!-- Row 3 (Blue): Team List + Contact Us + Right Corner Clock Box -->
         <div class="ticker-row row-3-blue">
             <div class="row-badge" id="badge-r3">ਟੀਮਾਂ • ਸੰਪਰਕ</div>
             <div class="row-content">
                 <div id="r3-text" class="anim-wrap"></div>
+            </div>
+            <div class="clock-time-box" id="row3-clock-box">
+                <span class="clock-dot"></span>
+                <span id="live-clock-text">11:23:00 AM</span>
             </div>
         </div>
     </div>
@@ -419,6 +456,22 @@
         window.addEventListener('resize', autoResizeOverlay);
         window.addEventListener('load', autoResizeOverlay);
         autoResizeOverlay();
+
+        // Live Clock in Row 3 Right Corner
+        function updateLiveClock() {
+            const now = new Date();
+            const clockEl = document.getElementById("live-clock-text");
+            if (clockEl) {
+                clockEl.innerText = now.toLocaleTimeString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: true
+                });
+            }
+        }
+        updateLiveClock();
+        setInterval(updateLiveClock, 1000);
 
         const firebaseConfig = {
             databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/"
@@ -443,7 +496,7 @@
         });
 
         const clientLogos = {
-            "mudki1": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/KABADDI%20SPORTS%201%20Logo.png"
+            "mudki1": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/kabaddisports1.png"
         };
 
         const dict = {
@@ -539,57 +592,55 @@
 
             if (progPa || progEn || locPa || locEn) {
                 r1List.push({
-                    pa: [locPa, progPa].filter(Boolean).map(translateToPunjabi).join(" • "),
-                    en: [locEn, progEn].filter(Boolean).join(" • ")
+                    pa: `** ${[locPa, progPa].filter(Boolean).map(translateToPunjabi).join(" • ")}`,
+                    en: `** ${[locEn, progEn].filter(Boolean).join(" • ")}`
                 });
             }
             if (r3Pa || r3En) {
                 r1List.push({
-                    pa: translateToPunjabi(r3Pa),
-                    en: r3En
+                    pa: `** ${translateToPunjabi(r3Pa)}`,
+                    en: `** ${r3En}`
                 });
             }
             if (data.resultText && data.resultText !== "No Result Yet") {
                 r1List.push({
-                    pa: `ਨਤੀਜਾ: ${translateToPunjabi(data.resultText)}`,
-                    en: `RESULT: ${data.resultText}`
+                    pa: `** ਨਤੀਜਾ: ${translateToPunjabi(data.resultText)}`,
+                    en: `** RESULT: ${data.resultText}`
                 });
             }
             if (r1List.length === 0) {
                 r1List.push({
-                    pa: "ਕਬੱਡੀ ਸਪੋਰਟਸ 1 ਲਾਈਵ ਪ੍ਰਸਾਰਣ",
-                    en: "KABADDI SPORTS 1 LIVE TELECAST"
+                    pa: "** ਕਬੱਡੀ ਸਪੋਰਟਸ 1 ਲਾਈਵ ਪ੍ਰਸਾਰਣ",
+                    en: "** KABADDI SPORTS 1 LIVE TELECAST"
                 });
             }
 
             // ---------------- ROW 2 (GOLD): Prize List + Upcoming Live + Winner Match List ----------------
-            // 1. Prize List
             const prizePartsEn = [];
             const prizePartsPa = [];
             if (data.pzTitle1 || data.pzOp1 || data.pzOp2 || data.pzOpBest) {
                 const t1 = data.pzTitle1 || "OPEN";
                 const t1Pa = translateToPunjabi(t1);
-                const p1En = [data.pzOp1 && `1st: ${data.pzOp1}`, data.pzOp2 && `2nd: ${data.pzOp2}`, data.pzOpBest && `Best: ${data.pzOpBest}`].filter(Boolean).join(", ");
-                const p1Pa = [data.pzOp1 && `ਪਹਿਲਾ: ${data.pzOp1}`, data.pzOp2 && `ਦੂਜਾ: ${data.pzOp2}`, data.pzOpBest && `ਬੈਸਟ: ${data.pzOpBest}`].filter(Boolean).join(", ");
-                prizePartsEn.push(`🏆 ${t1} (${p1En})`);
-                prizePartsPa.push(`🏆 ${t1Pa} (${p1Pa})`);
+                const p1En = [data.pzOp1 && `1st: ${data.pzOp1}`, data.pzOp2 && `2nd: ${data.pzOp2}`, data.pzOpBest && `Best: ${data.pzOpBest}`].filter(Boolean).join(" • ");
+                const p1Pa = [data.pzOp1 && `ਪਹਿਲਾ: ${data.pzOp1}`, data.pzOp2 && `ਦੂਜਾ: ${data.pzOp2}`, data.pzOpBest && `ਬੈਸਟ: ${data.pzOpBest}`].filter(Boolean).join(" • ");
+                prizePartsEn.push(`🏆 ${t1}: ${p1En}`);
+                prizePartsPa.push(`🏆 ${t1Pa}: ${p1Pa}`);
             }
             if (data.pzTitle2 || data.pzWt1 || data.pzWt2 || data.pzWtBest) {
                 const t2 = data.pzTitle2 || "WEIGHT";
                 const t2Pa = translateToPunjabi(t2);
-                const p2En = [data.pzWt1 && `1st: ${data.pzWt1}`, data.pzWt2 && `2nd: ${data.pzWt2}`, data.pzWtBest && `Best: ${data.pzWtBest}`].filter(Boolean).join(", ");
-                const p2Pa = [data.pzWt1 && `ਪਹਿਲਾ: ${data.pzWt1}`, data.pzWt2 && `ਦੂਜਾ: ${data.pzWt2}`, data.pzWtBest && `ਬੈਸਟ: ${data.pzWtBest}`].filter(Boolean).join(", ");
-                prizePartsEn.push(`🏆 ${t2} (${p2En})`);
-                prizePartsPa.push(`🏆 ${t2Pa} (${p2Pa})`);
+                const p2En = [data.pzWt1 && `1st: ${data.pzWt1}`, data.pzWt2 && `2nd: ${data.pzWt2}`, data.pzWtBest && `Best: ${data.pzWtBest}`].filter(Boolean).join(" • ");
+                const p2Pa = [data.pzWt1 && `ਪਹਿਲਾ: ${data.pzWt1}`, data.pzWt2 && `ਦੂਜਾ: ${data.pzWt2}`, data.pzWtBest && `ਬੈਸਟ: ${data.pzWtBest}`].filter(Boolean).join(" • ");
+                prizePartsEn.push(`🏆 ${t2}: ${p2En}`);
+                prizePartsPa.push(`🏆 ${t2Pa}: ${p2Pa}`);
             }
             if (prizePartsEn.length > 0) {
                 r2List.push({
-                    pa: `ਇਨਾਮ ਸੂਚੀ: ${prizePartsPa.join(" | ")}`,
-                    en: `PRIZE LIST: ${prizePartsEn.join(" | ")}`
+                    pa: `${prizePartsPa.join(" <span class='star-accent'>•</span> ")}`,
+                    en: `${prizePartsEn.join(" <span class='star-accent'>•</span> ")}`
                 });
             }
 
-            // 2. Upcoming Live
             const upcomingArr = normalizeArray(data.upcomingEvents);
             if (upcomingArr.length > 0) {
                 const upEn = upcomingArr.map((ev, i) => `${i + 1}. ${ev.name || ev.eventName || ""}${ev.date ? ` (${ev.date})` : ""}`).join(" • ");
@@ -605,7 +656,6 @@
                 });
             }
 
-            // 3. Winner Match List
             const rawMatches = normalizeArray(data.nextMatches);
             const winnersFromMatches = rawMatches.filter(m => /winner|ਵਿੰਨਰ|\(win\)/i.test(String(m)));
             if (winnersFromMatches.length > 0) {
@@ -635,20 +685,21 @@
 
             // ---------------- ROW 3 (BLUE): Team List + Contact Us ----------------
             const teamsArr = normalizeArray(data.allTeams);
+            const contactText = (data.contactUs || data.row6Txt || "MANPREET MUDKI • +91 8699640061 / 9115426711").trim();
+
             if (teamsArr.length > 0) {
                 const tEn = teamsArr.map(t => t.split("=")[0].trim()).join(", ");
                 const tPa = teamsArr.map(t => translateToPunjabi((t.split("=")[1] || t.split("=")[0] || "").trim())).join(", ");
                 r3List.push({
-                    pa: `👥 ਟੀਮ ਲਿਸਟ: ${tPa}`,
-                    en: `👥 TEAM LIST: ${tEn}`
+                    pa: `ਟੀਮ ਲਿਸਟ: ${tPa} <span class="star-accent">******</span> ਸੰਪਰਕ: ${translateToPunjabi(contactText)} <span class="star-accent">******</span>`,
+                    en: `TEAM LIST: ${tEn} <span class="star-accent">******</span> CONTACT US: ${contactText} <span class="star-accent">******</span>`
+                });
+            } else {
+                r3List.push({
+                    pa: `ਸੰਪਰਕ ਕਰੋ (CONTACT US): ${translateToPunjabi(contactText)} <span class="star-accent">******</span> ਕਬੱਡੀ ਸਪੋਰਟਸ 1 ਲਾਈਵ`,
+                    en: `CONTACT US: ${contactText} <span class="star-accent">******</span> KABADDI SPORTS 1 LIVE`
                 });
             }
-
-            const contactText = (data.contactUs || data.row6Txt || "MANPREET MUDKI • +91 8699640061 / 9115426711").trim();
-            r3List.push({
-                pa: `📞 ਸੰਪਰਕ ਕਰੋ (CONTACT US): ${translateToPunjabi(contactText)}`,
-                en: `📞 CONTACT US: ${contactText}`
-            });
 
             const sig = JSON.stringify({
                 r1: r1List.map(x => x.en + x.pa),
