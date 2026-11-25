@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Ultra HD - Broadcast Ticker Design</title>
+    <title>Kabaddi Sports 1 - Dual Admin Overlay & Ticker</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@800;900&display=swap" rel="stylesheet">
-
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
@@ -35,7 +33,7 @@
         }
 
         /* =========================================================
-            SCOREBOARD
+            SCOREBOARD (KABADDI SPORTS 1 GOLD + ROYAL BLUE)
         ========================================================= */
         #top-scoreboard-container {
             position: absolute;
@@ -45,11 +43,12 @@
             flex-direction: column;
             align-items: flex-end;
             z-index: 9999;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.4s ease;
         }
 
         #top-scoreboard-container.hidden {
             opacity: 0;
+            pointer-events: none;
         }
 
         #main-score-strip {
@@ -58,9 +57,9 @@
             height: 75px;
             border-radius: 8px;
             overflow: hidden;
-            border: 2.5px solid rgba(255,255,255,0.9);
+            border: 2.5px solid #ffd000;
             transform: skewX(16deg);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.7);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.75);
         }
 
         .unskew {
@@ -73,8 +72,8 @@
         }
 
         .score-a {
-            background: linear-gradient(135deg, #0066cc, #0099ff);
-            color: #ffffff;
+            background: linear-gradient(180deg, #ffe24a 0%, #f5b400 65%, #c98600 100%);
+            color: #090909;
             font-size: 58px;
             font-weight: 900;
             padding: 0 38px;
@@ -82,35 +81,39 @@
         }
 
         .team-a-panel {
-            background: linear-gradient(135deg, #1a8cff, #4da6ff);
+            background: linear-gradient(180deg, #1b78ff 0%, #0047cc 60%, #002773 100%);
             color: #ffffff;
             font-size: 38px;
             font-weight: 800;
-            padding: 0 50px;
+            padding: 0 46px;
             white-space: nowrap;
             min-width: 180px;
             letter-spacing: 1.5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
         }
 
         .vs-divider {
             width: 12px;
-            background: #111111;
+            background: #090909;
+            border-left: 1.5px solid #ffd000;
+            border-right: 1.5px solid #ffd000;
         }
 
         .team-b-panel {
-            background: linear-gradient(135deg, #1f1f1f, #2e2e2e);
+            background: linear-gradient(180deg, #1b78ff 0%, #0047cc 60%, #002773 100%);
             color: #ffffff;
             font-size: 38px;
             font-weight: 800;
-            padding: 0 50px;
+            padding: 0 46px;
             white-space: nowrap;
             min-width: 180px;
             letter-spacing: 1.5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
         }
 
         .score-b {
-            background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
-            color: #ffcc00;
+            background: linear-gradient(180deg, #ffe24a 0%, #f5b400 65%, #c98600 100%);
+            color: #090909;
             font-size: 58px;
             font-weight: 900;
             padding: 0 38px;
@@ -118,18 +121,18 @@
         }
 
         #match-details-strip {
-            background: rgba(0,0,0,0.95);
-            color: #ffcc00;
+            background: linear-gradient(90deg, #002b80 0%, #0055ff 50%, #002b80 100%);
+            color: #ffe24a;
             font-size: 24px;
             font-weight: 800;
             padding: 6px 40px;
             margin-top: 8px;
             border-radius: 6px;
-            letter-spacing: 2.5px;
-            border: 1.5px solid rgba(255,204,0,0.6);
+            letter-spacing: 2px;
+            border: 1.5px solid #ffd000;
             transform: skewX(16deg);
             margin-right: 25px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.65);
         }
 
         #match-details-strip.hidden {
@@ -158,12 +161,12 @@
         }
 
         #logo-container.animate-slow-spin {
-            animation: logoSlowSpin 2.2s cubic-bezier(0.4,0,0.2,1) forwards;
+            animation: logoSlowSpin 2.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
         @keyframes logoSlowSpin {
             0% { transform: scale(1) rotate(0deg); }
-            50% { filter: drop-shadow(0 0 20px rgba(51,153,255,0.9)); }
+            50% { filter: drop-shadow(0 0 20px rgba(255, 208, 0, 0.95)); }
             100% { transform: scale(1) rotate(360deg); }
         }
 
@@ -190,7 +193,7 @@
         }
 
         /* =========================================================
-            BROADCAST TICKER DESIGN (IMAGE MATCH)
+            BROADCAST TICKER (KABADDI SPORTS 1 COLOR MATCH)
         ========================================================= */
         #ticker-wrap {
             position: absolute;
@@ -200,15 +203,16 @@
             z-index: 9998;
             display: flex;
             flex-direction: column;
-            filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.75));
-            transition: opacity 0.5s ease;
+            filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.8));
+            transition: opacity 0.4s ease;
         }
 
         #ticker-wrap.hidden {
             opacity: 0;
+            pointer-events: none;
         }
 
-        /* Upper Tier: Green Skewed Badge + Yellow Marquee Track */
+        /* Upper Tier: Gold/Black Skewed Badge + Gold Track */
         .upper-tier {
             position: relative;
             display: flex;
@@ -218,11 +222,43 @@
             z-index: 2;
         }
 
-        .yellow-track {
+        .gold-badge-skew {
+            position: relative;
+            z-index: 3;
+            height: 56px;
+            min-width: 640px;
+            max-width: 790px;
+            background: linear-gradient(180deg, #ffe24a 0%, #f5b400 58%, #c98600 100%);
+            border: 3.5px solid #090909;
+            border-left: none;
+            transform: skewX(-24deg);
+            margin-left: -14px;
+            padding: 0 38px 0 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.6);
+        }
+
+        .gold-badge-unskew {
+            transform: skewX(24deg);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            color: #090909;
+            font-size: 31px;
+            font-weight: 900;
+            letter-spacing: 0.8px;
+            white-space: nowrap;
+        }
+
+        .gold-track {
             position: relative;
             flex: 1;
             height: 46px;
-            background: linear-gradient(180deg, #ffe600 0%, #f5c400 55%, #dca000 100%);
+            background: linear-gradient(180deg, #ffd41f 0%, #f0a800 55%, #b87800 100%);
             border-top: 4px solid #080808;
             border-bottom: 4px solid #080808;
             display: flex;
@@ -232,61 +268,28 @@
             padding-left: 34px;
         }
 
-        .green-badge-skew {
-            position: relative;
-            z-index: 3;
-            height: 56px;
-            min-width: 640px;
-            max-width: 780px;
-            background: linear-gradient(180deg, #008a00 0%, #006600 55%, #004700 100%);
-            border: 3.5px solid #ffe600;
-            border-left: none;
-            transform: skewX(-24deg);
-            margin-left: -14px;
-            padding: 0 38px 0 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.55);
-        }
-
-        .green-badge-unskew {
-            transform: skewX(24deg);
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            color: #ffffff;
-            font-size: 31px;
-            font-weight: 900;
-            letter-spacing: 0.8px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.75);
-            white-space: nowrap;
-        }
-
-        .yellow-content {
+        .gold-content {
             width: 100%;
             height: 100%;
             display: flex;
             align-items: center;
             overflow: hidden;
-            color: #0b0b0b;
+            color: #090909;
             font-size: 29px;
             font-weight: 900;
             letter-spacing: 0.5px;
         }
 
-        /* Lower Tier: Deep Green Banner */
+        /* Lower Tier: Royal Blue Banner (Matches Logo Bottom Bar) */
         .lower-tier {
             position: relative;
             z-index: 1;
             width: 100%;
             height: 44px;
             margin-top: -4px;
-            background: linear-gradient(90deg, #004d00 0%, #007a00 22%, #008c00 50%, #007a00 78%, #004400 100%);
-            border-top: 1.5px solid rgba(255, 255, 255, 0.25);
-            border-bottom: 2px solid #051f05;
+            background: linear-gradient(90deg, #001f66 0%, #0047cc 24%, #0066ff 50%, #0047cc 76%, #001a54 100%);
+            border-top: 1.5px solid #ffd000;
+            border-bottom: 2px solid #00123b;
             display: flex;
             align-items: center;
             overflow: hidden;
@@ -303,17 +306,11 @@
             font-size: 27px;
             font-weight: 900;
             letter-spacing: 1px;
-            text-shadow: 0 2px 3px rgba(0, 0, 0, 0.7);
-        }
-
-        .dot-sep {
-            color: #000000;
-            margin: 0 10px;
-            font-weight: 900;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.75);
         }
 
         .star-accent {
-            color: #081208;
+            color: #ffe24a;
             font-weight: 900;
             margin: 0 12px;
             letter-spacing: 2px;
@@ -321,8 +318,8 @@
 
         .match-vs-pill {
             display: inline-block;
-            background: #111111;
-            color: #ffe600;
+            background: #090909;
+            color: #ffe24a;
             font-family: 'Bebas Neue', sans-serif;
             font-size: 25px;
             padding: 0 9px;
@@ -330,6 +327,7 @@
             margin: 0 6px;
             letter-spacing: 1px;
             vertical-align: middle;
+            border: 1px solid rgba(255, 226, 74, 0.6);
         }
 
         /* =========================================================
@@ -403,22 +401,22 @@
     <!-- BROADCAST TICKER -->
     <div id="ticker-wrap">
         <div class="upper-tier">
-            <!-- Left Skewed Green Badge: Admin Row 3 Update -->
-            <div class="green-badge-skew">
-                <div class="green-badge-unskew">
+            <!-- Left Skewed Gold Badge: Admin Row 3 Update -->
+            <div class="gold-badge-skew">
+                <div class="gold-badge-unskew">
                     <div id="badge-row3-update" class="anim-wrap"></div>
                 </div>
             </div>
 
-            <!-- Yellow Track: Winner Match -->
-            <div class="yellow-track">
-                <div class="yellow-content">
+            <!-- Gold Track: Winner Match -->
+            <div class="gold-track">
+                <div class="gold-content">
                     <div id="winner-match-ticker" class="anim-wrap"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Bottom Green Banner: Match List & Info -->
+        <!-- Bottom Royal Blue Banner: Match List & Info -->
         <div class="lower-tier">
             <div class="lower-content">
                 <div id="match-list-ticker" class="anim-wrap"></div>
@@ -453,7 +451,7 @@
 
         userDb.on("value", (snap) => {
             const user = snap.val();
-            if (!user || Date.now() > new Date(user.expiryDate).getTime()) {
+            if (user && user.expiryDate && Date.now() > new Date(user.expiryDate).getTime()) {
                 document.body.innerHTML = `
                     <div style="width:100vw;height:100vh;display:flex;justify-content:center;align-items:center;background:black;color:white;font-size:50px;text-align:center;">
                         🛑 ਪਲਾਨ ਖਤਮ ਹੋ ਗਿਆ ਹੈ<br>ਹੈਲਪ ਲਾਈਨ: ਮਨਪ੍ਰੀਤ ਮੁਦਕੀ<br>9115426711
@@ -545,7 +543,7 @@
         let lastSignature = "";
 
         function buildTickerData(data) {
-            // 1. Admin Row 3 update (row3Txt / row3Txt_pa)
+            // 1. Admin Row 3 update (compatible with both Admin 1 & Admin 2)
             row3Updates = [];
             const r3Pa = (data.row3Txt_pa || data.row3Txt || "").trim();
             const r3En = (data.row3Txt || data.row3Txt_pa || "").trim();
@@ -564,14 +562,21 @@
                 });
             }
 
-            if (row3Updates.length === 0) {
+            if (data.row1Txt) {
                 row3Updates.push({
-                    pa: "** ਲਾਈਵ ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ",
-                    en: "** LIVE KABADDI TOURNAMENT"
+                    pa: `** ${translateToPunjabi(data.row1Txt_pa || data.row1Txt)}`,
+                    en: `** ${data.row1Txt}`
                 });
             }
 
-            // 2. Match List update -> Winner Match in Yellow Track, Match List in Lower Green Bar
+            if (row3Updates.length === 0) {
+                row3Updates.push({
+                    pa: "** ਕਬੱਡੀ ਸਪੋਰਟਸ 1 ਲਾਈਵ",
+                    en: "** KABADDI SPORTS 1 LIVE"
+                });
+            }
+
+            // 2. Match List & Winner Match (from nextMatches, qualifiedTeams, or row5Txt/row5Txt_pa)
             const rawMatches = normalizeArray(data.nextMatches);
             winnerMatchItems = [];
             matchListItems = [];
@@ -596,6 +601,12 @@
                         pa: `ਵਿੰਨਰ ਮੈਚ: ${w.pa}`,
                         en: `WINNER MATCH: ${w.en}`
                     }));
+                } else if (data.qualifiedTeams) {
+                    const qText = String(data.qualifiedTeams).replace(/\n+/g, " • ");
+                    winnerMatchItems.push({
+                        pa: `ਵਿੰਨਰ / ਕੁਆਲੀਫਾਈਡ: ${translateToPunjabi(qText)}`,
+                        en: `WINNER / QUALIFIED: ${qText}`
+                    });
                 } else {
                     winnerMatchItems = [{
                         pa: `ਵਿੰਨਰ ਮੈਚ: ${normalMatches[0].pa}`,
@@ -611,6 +622,17 @@
                     pa: `<span class="star-accent">******</span> ਮੈਚ ਲਿਸਟ: ${combinedPa} <span class="star-accent">******</span>`,
                     en: `<span class="star-accent">******</span> MATCH LIST: ${combinedEn} <span class="star-accent">******</span>`
                 });
+            } else if (data.row5Txt || data.row5Txt_pa) {
+                const mPa = (data.row5Txt_pa || data.row5Txt || "").trim();
+                const mEn = (data.row5Txt || data.row5Txt_pa || "").trim();
+                winnerMatchItems.push({
+                    pa: `ਵਿੰਨਰ ਮੈਚ: ${translateToPunjabi(mPa.split(",")[0] || mPa)}`,
+                    en: `WINNER MATCH: ${mEn.split(",")[0] || mEn}`
+                });
+                matchListItems.push({
+                    pa: `<span class="star-accent">******</span> ਮੈਚ ਲਿਸਟ: ${translateToPunjabi(mPa)} <span class="star-accent">******</span>`,
+                    en: `<span class="star-accent">******</span> MATCH LIST: ${mEn} <span class="star-accent">******</span>`
+                });
             } else {
                 winnerMatchItems.push({
                     pa: "ਵਿੰਨਰ ਮੈਚ: ਜਲਦ ਆ ਰਿਹਾ ਹੈ",
@@ -622,11 +644,25 @@
                 });
             }
 
+            if (data.resultText && data.resultText !== "No Result Yet") {
+                matchListItems.push({
+                    pa: `<span class="star-accent">******</span> ਨਤੀਜਾ: ${translateToPunjabi(data.resultText)} <span class="star-accent">******</span>`,
+                    en: `<span class="star-accent">******</span> RESULT: ${data.resultText} <span class="star-accent">******</span>`
+                });
+            }
+
             const sig = JSON.stringify({
+                r1: data.row1Txt,
+                r1pa: data.row1Txt_pa,
+                r2: data.row2Txt,
                 r3: data.row3Txt,
                 r3pa: data.row3Txt_pa,
+                r5: data.row5Txt,
+                r5pa: data.row5Txt_pa,
                 prog: data.programTxt,
                 progPa: data.programTxt_pa,
+                qual: data.qualifiedTeams,
+                res: data.resultText,
                 matches: rawMatches
             });
 
