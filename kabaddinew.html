@@ -197,7 +197,7 @@
             pointer-events: none;
         }
 
-        /* Upper Tier: Row 1 Badge (Village + Event/Tournament) + Row 2 Gold Track (Row 2 + Prize + Upcoming + Winner) */
+        /* Upper Tier: Row 1 Badge (Row 1 ONLY) + Row 2 Gold Track (Row 2 ONLY) */
         .upper-tier {
             position: relative;
             display: flex;
@@ -223,6 +223,11 @@
             align-items: center;
             justify-content: center;
             box-shadow: 4px 0 12px rgba(0, 0, 0, 0.6);
+        }
+
+        .skewed-badge.empty-badge {
+            opacity: 0;
+            pointer-events: none;
         }
 
         .skewed-badge-unskew {
@@ -432,7 +437,7 @@
     <div id="ticker-wrap">
         <!-- Upper Tier: Row 1 Badge (Row 1 ONLY) + Row 2 Gold Track (Row 2 ONLY) -->
         <div class="upper-tier">
-            <div class="skewed-badge">
+            <div class="skewed-badge empty-badge" id="badge-box">
                 <div class="skewed-badge-unskew">
                     <div id="badge-ticker" class="anim-wrap"></div>
                 </div>
@@ -667,43 +672,32 @@
             const lowerItems = [];
 
             // =====================================================
-            // ROW 1 (SKEWED BADGE): STRICTLY Row 1 (Village + Event/Tournament) ONLY
+            // ROW 1 (SKEWED BADGE): STRICTLY Row 1 ONLY (NO Row 2 data)
             // =====================================================
-            const locEn = (data.row1Txt || data.location || "").trim();
-            const locPa = (data.row1Txt_pa || data.location_pa || locEn).trim();
-            const progEn = (data.programTxt || "").trim();
-            const progPa = (data.programTxt_pa || progEn).trim();
+            const r1En = (data.row1Txt || data.programTxt || data.location || "").trim();
+            const r1Pa = (data.row1Txt_pa || data.programTxt_pa || data.location_pa || r1En).trim();
 
-            if (hasValue(locPa) || hasValue(locEn)) {
+            if (hasValue(r1Pa) || hasValue(r1En)) {
                 badgeItems.push({
-                    id: "r1-loc:" + (locEn || locPa),
-                    pa: `** ${translateToPunjabi(locPa || locEn)}`,
-                    en: `** ${locEn || locPa}`
-                });
-            }
-            if (hasValue(progPa) || hasValue(progEn)) {
-                badgeItems.push({
-                    id: "r1-prog:" + (progEn || progPa),
-                    pa: `** ${translateToPunjabi(progPa || progEn)}`,
-                    en: `** ${progEn || progPa}`
-                });
-            }
-            if (badgeItems.length === 0) {
-                badgeItems.push({
-                    id: "default-badge",
-                    pa: "** ਕਬੱਡੀ ਟੂਰਨਾਮੈਂਟ ਲਾਈਵ",
-                    en: "** KABADDI TOURNAMENT LIVE"
+                    id: "r1-only:" + r1En + "|" + r1Pa,
+                    pa: `** ${translateToPunjabi(r1Pa || r1En)}`,
+                    en: `** ${r1En || r1Pa}`
                 });
             }
 
+            const badgeBox = document.getElementById("badge-box");
+            if (badgeBox) {
+                badgeBox.classList.toggle("empty-badge", badgeItems.length === 0);
+            }
+
             // =====================================================
-            // ROW 2 (GOLD TRACK): STRICTLY Row 2 + Prize + Upcoming + Winner Details ONLY
+            // ROW 2 (GOLD TRACK): STRICTLY Row 2 + Prize + Upcoming + Winner ONLY
             // =====================================================
             if (hasValue(data.row2Txt) || hasValue(data.row2Txt_pa)) {
                 const r2En = String(data.row2Txt || data.row2Txt_pa).trim();
                 const r2Pa = String(data.row2Txt_pa || data.row2Txt).trim();
                 goldItems.push({
-                    id: "r2-txt:" + r2En + "|" + r2Pa,
+                    id: "r2-only:" + r2En + "|" + r2Pa,
                     pa: translateToPunjabi(r2Pa),
                     en: r2En
                 });
