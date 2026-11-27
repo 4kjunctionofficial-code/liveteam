@@ -14,6 +14,7 @@
     margin: 0;
     padding: 0;
     font-weight: 900;
+    text-transform: uppercase;
   }
 
   html, body {
@@ -23,6 +24,7 @@
     overflow: hidden;
     font-family: 'Roboto Condensed', 'Noto Sans Devanagari', 'Noto Sans Gurmukhi', sans-serif;
     font-weight: 900;
+    text-transform: uppercase;
   }
 
   #render-stage {
@@ -295,6 +297,7 @@
     transform: translate3d(0px, -50%, 0);
     display: inline-block;
     font-weight: 900;
+    text-transform: uppercase;
     white-space: pre;
     will-change: transform;
   }
@@ -440,6 +443,10 @@
   let isOverlayLocked = false;
   let rafId = null;
 
+  function toCaps(val) {
+    return String(val ?? "").toUpperCase();
+  }
+
   function fitStage() {
     const stage = document.getElementById("render-stage");
     const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
@@ -528,8 +535,8 @@
   });
 
   function getText(enVal, paVal) {
-    if (langMode === 'pa' && paVal && String(paVal).trim() !== "") return String(paVal).trim();
-    return (enVal || "").trim();
+    if (langMode === 'pa' && paVal && String(paVal).trim() !== "") return toCaps(String(paVal).trim());
+    return toCaps((enVal || "").trim());
   }
 
   let currentLogoUrl = getActiveLogo("");
@@ -599,7 +606,7 @@
   let wmActive = false;
 
   function setFloatingWatermark(txt) {
-    const clean = String(txt || "").trim().toUpperCase();
+    const clean = toCaps(String(txt || "").trim());
     if (!clean) {
       wmActive = false;
       wmEl.textContent = "";
@@ -629,7 +636,7 @@
 
   function normalizeTickerLine(val) {
     if (val === undefined || val === null) return "";
-    const str = String(val).replace(/\r?\n/g, " ");
+    const str = toCaps(String(val).replace(/\r?\n/g, " "));
     return str.trim() === "" ? "" : str;
   }
 
@@ -826,11 +833,11 @@
     const nameA = getText(data.nameA, data.nameA_pa) || "TEAM A";
     const nameB = getText(data.nameB, data.nameB_pa) || "TEAM B";
     document.getElementById("teamTop").innerText = nameA;
-    document.getElementById("scoreLeft").innerText = (data.scoreA !== undefined && data.scoreA !== null) ? data.scoreA : "0";
+    document.getElementById("scoreLeft").innerText = (data.scoreA !== undefined && data.scoreA !== null) ? toCaps(data.scoreA) : "0";
     document.getElementById("teamBottom").innerText = nameB;
-    document.getElementById("scoreRight").innerText = (data.scoreB !== undefined && data.scoreB !== null) ? data.scoreB : "0";
+    document.getElementById("scoreRight").innerText = (data.scoreB !== undefined && data.scoreB !== null) ? toCaps(data.scoreB) : "0";
 
-    const roundVal = (data.round !== undefined && data.round !== null) ? String(data.round).trim() : "";
+    const roundVal = (data.round !== undefined && data.round !== null) ? toCaps(String(data.round).trim()) : "";
     const roundEl = document.getElementById("roundDisplay");
     roundEl.innerText = roundVal;
     roundEl.style.display = roundVal ? "block" : "none";
