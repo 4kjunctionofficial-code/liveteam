@@ -12,22 +12,26 @@
         /* MAIN PANEL STYLES */
         #main-panel { display: flex; width: 100%; flex-direction: column; align-items: center; }
         .card { background: white; width: 100%; max-width: 500px; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); overflow: hidden; margin-bottom: 20px; box-sizing: border-box;}
-        .header { background: #1a73e8; color: white; padding: 12px; text-align: center; font-size: 16px; font-weight: bold; text-transform: uppercase; }
+        .header { background: #1a73e8; color: white; padding: 12px; text-align: center; font-size: 16px; font-weight: 900; text-transform: uppercase; }
         .teams-container { display: flex; padding: 15px; gap: 10px; border-bottom: 2px solid #eee; }
         .team-box { flex: 1; display: flex; flex-direction: column; align-items: center; }
-        .team-input { width: 95%; padding: 8px; border: 2px solid #ddd; border-radius: 6px; font-size: 15px; font-weight: bold; margin-bottom: 8px; text-align: center; }
+        .team-input { width: 95%; padding: 8px; border: 2px solid #ddd; border-radius: 6px; font-size: 15px; font-weight: 800; margin-bottom: 8px; text-align: center; }
         .score-val { font-size: 50px; font-weight: 900; color: #333; margin: 5px 0; }
-        .btn-pm { border: none; color: white; padding: 12px; border-radius: 6px; font-size: 24px; font-weight: bold; cursor: pointer; flex: 1; margin: 0 4px; }
+        .btn-pm { border: none; color: white; padding: 12px; border-radius: 6px; font-size: 24px; font-weight: 900; cursor: pointer; flex: 1; margin: 0 4px; }
         .btn-plus { background: #28a745; } .btn-minus { background: #dc3545; }
         .settings-section { padding: 15px; background: #fafafa; box-sizing: border-box; }
-        .label { font-size: 12px; font-weight: bold; color: #555; margin-bottom: 5px; display: block; text-transform: uppercase; }
-        textarea, .std-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; margin-bottom: 12px; resize: none; box-sizing: border-box; font-family: inherit; }
+        .label { font-size: 12px; font-weight: 800; color: #444; margin-bottom: 5px; display: block; text-transform: uppercase; }
+        textarea, .std-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; font-weight: 700; margin-bottom: 12px; resize: none; box-sizing: border-box; font-family: inherit; }
         .line-scroll-box { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px; margin-bottom: 12px; }
         .line-scroll-top { display: flex; gap: 8px; align-items: center; }
         .line-scroll-top .std-input { margin-bottom: 0; flex: 1; text-align: center; }
-        .btn-scroll-toggle { border: none; color: white; padding: 10px 14px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; text-transform: uppercase; min-width: 125px; }
+        .btn-scroll-toggle { border: none; color: white; padding: 10px 14px; border-radius: 6px; font-size: 13px; font-weight: 800; cursor: pointer; text-transform: uppercase; min-width: 125px; }
+        .pos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+        .pos-cell { background: #fff; border: 1px solid #e2e6ea; border-radius: 8px; padding: 8px; }
+        .pos-cell .label { font-size: 11px; margin-bottom: 4px; text-align: center; }
+        .pos-cell .std-input { margin-bottom: 0; padding: 7px; text-align: center; }
         .controls { padding: 15px; display: flex; flex-direction: column; gap: 8px; }
-        .btn-full { border: none; color: white; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-bottom: 5px; width: 100%; box-sizing: border-box;}
+        .btn-full { border: none; color: white; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-bottom: 5px; width: 100%; box-sizing: border-box;}
         .btn-blue { background: #1a73e8; } .btn-yellow { background: #fbbc05; color: #000; } .btn-red { background: #ea4335; } .btn-dark { background: #333; }
         button:active { transform: scale(0.98); }
     </style>
@@ -46,7 +50,7 @@
                     <button class="btn-pm btn-plus" onclick="changeScore('scoreA', 1)">+</button>
                 </div>
             </div>
-            <div style="display:flex; align-items:center; font-weight:bold; color:#aaa;">VS</div>
+            <div style="display:flex; align-items:center; font-weight:900; color:#aaa;">VS</div>
             <div class="team-box">
                 <input type="text" id="nameB" class="team-input" placeholder="TEAM 2" oninput="updateDB()">
                 <div class="score-val" id="dispB">0</div>
@@ -61,6 +65,55 @@
             <button class="btn-full btn-yellow" onclick="swapTeams()">Swap Teams</button>
             <button class="btn-full btn-red" style="background:#777;" onclick="resetScores()">Reset Scores</button>
             <input type="text" id="roundInp" class="std-input" style="text-align:center; margin-bottom:0;" placeholder="ROUND" oninput="updateDB()">
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="header">Position & Size Controls</div>
+        <div class="settings-section">
+            <label class="label">Scoreboard (Top / Left / Scale %)</label>
+            <div class="pos-grid">
+                <div class="pos-cell">
+                    <span class="label">Top (px)</span>
+                    <input type="number" id="sbTopInp" class="std-input" step="2" placeholder="14" oninput="updateDB()">
+                </div>
+                <div class="pos-cell">
+                    <span class="label">Left (px)</span>
+                    <input type="number" id="sbLeftInp" class="std-input" step="2" placeholder="40" oninput="updateDB()">
+                </div>
+                <div class="pos-cell">
+                    <span class="label">Size (%)</span>
+                    <input type="number" id="sbScaleInp" class="std-input" min="40" max="200" step="2" placeholder="100" oninput="updateDB()">
+                </div>
+            </div>
+
+            <label class="label">Logo (Size % / Top px / Right px)</label>
+            <div class="pos-grid">
+                <div class="pos-cell">
+                    <span class="label">Size (%)</span>
+                    <input type="number" id="logoSizeInp" class="std-input" min="30" max="250" step="5" placeholder="100" oninput="updateDB()">
+                </div>
+                <div class="pos-cell">
+                    <span class="label">Top (px)</span>
+                    <input type="number" id="logoTopInp" class="std-input" step="2" placeholder="24" oninput="updateDB()">
+                </div>
+                <div class="pos-cell">
+                    <span class="label">Right (px)</span>
+                    <input type="number" id="logoRightInp" class="std-input" step="2" placeholder="32" oninput="updateDB()">
+                </div>
+            </div>
+
+            <label class="label">Ticker (Height px / Bottom px)</label>
+            <div class="pos-grid" style="grid-template-columns: repeat(2, 1fr);">
+                <div class="pos-cell">
+                    <span class="label">Height (px)</span>
+                    <input type="number" id="tickerHeightInp" class="std-input" min="72" max="540" step="4" placeholder="144" oninput="updateDB()">
+                </div>
+                <div class="pos-cell">
+                    <span class="label">Bottom (px)</span>
+                    <input type="number" id="tickerBottomInp" class="std-input" step="2" placeholder="0" oninput="updateDB()">
+                </div>
+            </div>
         </div>
     </div>
 
@@ -135,6 +188,18 @@
             setIfIdle('nameA', data.nameA);
             setIfIdle('nameB', data.nameB);
             setIfIdle('roundInp', data.round);
+
+            setIfIdle('sbTopInp', data.sbTop !== undefined ? data.sbTop : 14);
+            setIfIdle('sbLeftInp', data.sbLeft !== undefined ? data.sbLeft : 40);
+            setIfIdle('sbScaleInp', data.sbScale !== undefined ? data.sbScale : 100);
+
+            setIfIdle('logoSizeInp', data.logoSize !== undefined ? data.logoSize : 100);
+            setIfIdle('logoTopInp', data.logoTop !== undefined ? data.logoTop : 24);
+            setIfIdle('logoRightInp', data.logoRight !== undefined ? data.logoRight : 32);
+
+            setIfIdle('tickerHeightInp', data.tickerHeight !== undefined ? data.tickerHeight : 144);
+            setIfIdle('tickerBottomInp', data.tickerBottom !== undefined ? data.tickerBottom : 0);
+
             setIfIdle('row1Inp', data.row1Txt);
             setIfIdle('row2Inp', data.row2Txt);
             setIfIdle('row3Inp', data.row3Txt);
@@ -182,12 +247,15 @@
         db.update({ [team]: newVal });
     }
 
-    function parseSpdAllowZero(id, fallback) {
+    function parseNum(id, fallback, minVal, maxVal) {
         const raw = document.getElementById(id).value;
         if (raw === "") return fallback;
         const n = parseFloat(raw);
-        if (!Number.isFinite(n) || n <= 0) return 0;
-        return Math.min(n, 500);
+        if (!Number.isFinite(n)) return fallback;
+        let out = n;
+        if (typeof minVal === "number") out = Math.max(minVal, out);
+        if (typeof maxVal === "number") out = Math.min(maxVal, out);
+        return out;
     }
 
     function updateDB() {
@@ -195,12 +263,20 @@
             nameA: document.getElementById('nameA').value,
             nameB: document.getElementById('nameB').value,
             round: document.getElementById('roundInp').value,
+            sbTop: parseNum('sbTopInp', 14, -200, 900),
+            sbLeft: parseNum('sbLeftInp', 40, -200, 1600),
+            sbScale: parseNum('sbScaleInp', 100, 40, 200),
+            logoSize: parseNum('logoSizeInp', 100, 30, 250),
+            logoTop: parseNum('logoTopInp', 24, -200, 900),
+            logoRight: parseNum('logoRightInp', 32, -200, 1600),
+            tickerHeight: parseNum('tickerHeightInp', 144, 72, 540),
+            tickerBottom: parseNum('tickerBottomInp', 0, -200, 700),
             row1Txt: document.getElementById('row1Inp').value,
             row2Txt: document.getElementById('row2Inp').value,
             row3Txt: document.getElementById('row3Inp').value,
-            speedRow1: parseSpdAllowZero('speedRow1Inp', 95),
-            speedRow2: parseSpdAllowZero('speedRow2Inp', 115),
-            speedRow3: parseSpdAllowZero('speedRow3Inp', 105),
+            speedRow1: parseNum('speedRow1Inp', 95, 0, 500),
+            speedRow2: parseNum('speedRow2Inp', 115, 0, 500),
+            speedRow3: parseNum('speedRow3Inp', 105, 0, 500),
             watermarkTxt: document.getElementById('watermarkInp').value
         });
     }
