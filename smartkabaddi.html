@@ -35,21 +35,15 @@
     overflow: hidden;
   }
 
-  /* ==================== TOP-LEFT SCOREBOARD + CLIENT LOGO ==================== */
+  /* ==================== TOP-LEFT SCOREBOARD ==================== */
   #scoreboard-wrapper {
     position: absolute;
     top: 30px;
     left: 40px;
     display: flex;
-    align-items: flex-start;
-    gap: 14px;
+    flex-direction: column;
     transition: opacity 0.25s ease;
     z-index: 15;
-  }
-
-  .sb-left-col {
-    display: flex;
-    flex-direction: column;
   }
 
   .sb-main {
@@ -146,41 +140,26 @@
     paint-order: stroke fill;
   }
 
-  /* Client PNG Logo Attached Beside Scoreboard */
+  /* ==================== TOP-RIGHT CLIENT LOGO ==================== */
   #sb-logo-box {
-    width: 112px;
-    height: 98px;
+    position: absolute;
+    top: 30px;
+    right: 42px;
+    width: 132px;
+    height: 104px;
     display: none;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
+    z-index: 16;
   }
 
   #pngLogoImg {
-    max-width: 108px;
-    max-height: 96px;
+    max-width: 128px;
+    max-height: 100px;
     width: auto;
     height: auto;
     object-fit: contain;
     filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.75));
-  }
-
-  /* ==================== TOP-RIGHT WATERMARK ==================== */
-  #watermark-box {
-    position: absolute;
-    top: 30px;
-    right: 42px;
-    background: rgba(12, 12, 12, 0.88);
-    border: 2px solid #ffe600;
-    border-radius: 10px;
-    padding: 7px 20px;
-    color: #ffe600;
-    font-size: 26px;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    display: none;
-    z-index: 15;
   }
 
   /* ==================== BOTTOM 3-LINE TICKER WITH GREEN SIDE BOXES ==================== */
@@ -309,33 +288,29 @@
 <body>
   <div id="render-stage">
 
-    <!-- SCOREBOARD + CLIENT LOGO -->
+    <!-- SCOREBOARD -->
     <div id="scoreboard-wrapper">
-      <div class="sb-left-col">
-        <div class="sb-main">
-          <div class="hex-wrap">
-            <div class="hex-box hex-left" id="scoreLeft">0</div>
-          </div>
-
-          <div class="teams-bars">
-            <div class="team-bar bar-top" id="teamTop">TEAM A</div>
-            <div class="team-bar bar-bottom" id="teamBottom">TEAM B</div>
-          </div>
-
-          <div class="hex-wrap">
-            <div class="hex-box hex-right" id="scoreRight">0</div>
-          </div>
+      <div class="sb-main">
+        <div class="hex-wrap">
+          <div class="hex-box hex-left" id="scoreLeft">0</div>
         </div>
-        <div class="sb-round" id="roundDisplay">KABADDI OPEN MATCH</div>
-      </div>
 
-      <div id="sb-logo-box">
-        <img id="pngLogoImg" alt="Client Logo">
+        <div class="teams-bars">
+          <div class="team-bar bar-top" id="teamTop">TEAM A</div>
+          <div class="team-bar bar-bottom" id="teamBottom">TEAM B</div>
+        </div>
+
+        <div class="hex-wrap">
+          <div class="hex-box hex-right" id="scoreRight">0</div>
+        </div>
       </div>
+      <div class="sb-round" id="roundDisplay">KABADDI OPEN MATCH</div>
     </div>
 
-    <!-- WATERMARK -->
-    <div id="watermark-box"></div>
+    <!-- TOP-RIGHT CLIENT LOGO -->
+    <div id="sb-logo-box">
+      <img id="pngLogoImg" alt="Client Logo">
+    </div>
 
     <!-- BOTTOM 3-LINE SCROLLING TICKER -->
     <div id="bottom-ticker-bar">
@@ -414,7 +389,7 @@
     return (enVal || "").trim();
   }
 
-  function setScoreboardLogo(url) {
+  function setRightCornerLogo(url) {
     const box = document.getElementById("sb-logo-box");
     const img = document.getElementById("pngLogoImg");
     const clean = (url || "").trim();
@@ -492,7 +467,7 @@
 
   const initialLogo = getActiveLogo("");
   if (initialLogo) {
-    setScoreboardLogo(initialLogo);
+    setRightCornerLogo(initialLogo);
   }
 
   db.on("value", (snap) => {
@@ -524,15 +499,7 @@
 
     document.getElementById("roundDisplay").innerText = data.round || "";
 
-    const wm = document.getElementById("watermark-box");
-    if (data.watermarkTxt && data.watermarkTxt.trim() !== "") {
-      wm.innerText = data.watermarkTxt.trim();
-      wm.style.display = "block";
-    } else {
-      wm.style.display = "none";
-    }
-
-    setScoreboardLogo(getActiveLogo(data.logoUrl));
+    setRightCornerLogo(getActiveLogo(data.logoUrl));
 
     const speed1 = parseFloat(data.speedRow1) || 95;
     const speed2 = parseFloat(data.speedRow2) || 115;
