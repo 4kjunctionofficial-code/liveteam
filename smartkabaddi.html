@@ -35,7 +35,7 @@
     overflow: hidden;
   }
 
-  /* ==================== TOP-LEFT SCOREBOARD + PNG LOGO ==================== */
+  /* ==================== TOP-LEFT SCOREBOARD + CLIENT LOGO ==================== */
   #scoreboard-wrapper {
     position: absolute;
     top: 30px;
@@ -146,7 +146,7 @@
     paint-order: stroke fill;
   }
 
-  /* PNG Logo Attached Right Beside Scoreboard */
+  /* Client PNG Logo Attached Beside Scoreboard */
   #sb-logo-box {
     width: 112px;
     height: 98px;
@@ -309,7 +309,7 @@
 <body>
   <div id="render-stage">
 
-    <!-- SCOREBOARD + PNG LOGO -->
+    <!-- SCOREBOARD + CLIENT LOGO -->
     <div id="scoreboard-wrapper">
       <div class="sb-left-col">
         <div class="sb-main">
@@ -330,7 +330,7 @@
       </div>
 
       <div id="sb-logo-box">
-        <img id="pngLogoImg" alt="Logo">
+        <img id="pngLogoImg" alt="Client Logo">
       </div>
     </div>
 
@@ -396,14 +396,15 @@
   const langMode = urlParams.get('lang') || 'en';
   const queryLogoUrl = (urlParams.get('logo') || "").trim();
 
+  // Client logo map (add your client IDs & PNG links here)
   const clientLogos = {
     "mudki1": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/KABADDI%20SPORTS%201%20Logo.png"
   };
 
   function getActiveLogo(dbLogoUrl) {
     if (queryLogoUrl) return queryLogoUrl;
-    if (dbLogoUrl && dbLogoUrl.trim() !== "") return dbLogoUrl.trim();
     if (clientLogos[matchId]) return clientLogos[matchId];
+    if (dbLogoUrl && dbLogoUrl.trim() !== "") return dbLogoUrl.trim();
     return "";
   }
 
@@ -538,11 +539,9 @@
     const speed2 = parseFloat(data.speedRow2) || 115;
     const speed3 = parseFloat(data.speedRow3) || 105;
 
-    // Row 1
     const r1 = (data.row1Txt || "").trim() || "OPEN KABADDI TOURNAMENT";
     updateTicker("trackTop", "itemTopA", "itemTopB", r1, speed1);
 
-    // Row 2
     const r2Parts = [];
     const r2Main = ((data.row2Txt || data.programTxt) || "").trim();
     if (r2Main) r2Parts.push(r2Main);
@@ -552,7 +551,6 @@
     const r2Line = r2Parts.length > 0 ? r2Parts.join("     |     ") : r1;
     updateTicker("trackYellow", "itemYellowA", "itemYellowB", r2Line, speed2);
 
-    // Row 3
     const r3Parts = [];
     if (data.row3Txt && data.row3Txt.trim() !== "") {
       r3Parts.push(data.row3Txt.trim());
