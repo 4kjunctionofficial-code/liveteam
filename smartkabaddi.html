@@ -162,16 +162,17 @@
     filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.75));
   }
 
-  /* ==================== BOTTOM 3-LINE TICKER WITH GREEN SIDE BOXES ==================== */
+  /* ==================== BOTTOM TICKER (~500px SPACE OF 1080) ==================== */
   #bottom-ticker-bar {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 1920px;
-    height: 122px;
+    height: 500px;
     display: flex;
     align-items: stretch;
-    background: #0d0d0d;
+    background: rgba(13, 13, 13, 0.92);
+    border-top: 3px solid #ffe600;
     transition: opacity 0.25s ease;
     z-index: 10;
   }
@@ -192,7 +193,7 @@
   .live-label {
     font-family: 'Roboto Condensed', sans-serif;
     font-style: italic;
-    font-size: 60px;
+    font-size: 64px;
     font-weight: 900;
     color: #ffe600;
     letter-spacing: 1.5px;
@@ -208,48 +209,43 @@
     margin-left: -28px;
     margin-right: -28px;
     overflow: hidden;
-    background: #0d0d0d;
     z-index: 2;
   }
 
-  .row-top {
-    height: 40px;
-    background: #0d0d0d;
-    color: #ffffff;
+  .ticker-line {
+    flex: 1;
+    min-height: 0;
     display: flex;
     align-items: center;
-    font-size: 27px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .row-top {
+    background: #0d0d0d;
+    color: #ffffff;
+    font-size: 32px;
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 0.6px;
-    overflow: hidden;
-    position: relative;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.14);
   }
 
   .row-yellow {
-    height: 42px;
     background: #ffe600;
     color: #111111;
-    display: flex;
-    align-items: center;
-    font-size: 28px;
+    font-size: 34px;
     font-weight: 900;
-    letter-spacing: 0.3px;
-    overflow: hidden;
-    position: relative;
+    letter-spacing: 0.4px;
+    border-bottom: 2px solid #090909;
   }
 
   .row-bottom {
-    height: 40px;
     background: #0d0d0d;
     color: #ffffff;
-    display: flex;
-    align-items: center;
-    font-size: 26px;
+    font-size: 30px;
     font-weight: 800;
-    letter-spacing: 0.3px;
-    overflow: hidden;
-    position: relative;
+    letter-spacing: 0.4px;
   }
 
   .scroll-box {
@@ -270,9 +266,10 @@
     will-change: transform;
   }
 
-  .scroll-item {
+  .scroll-chunk {
     display: inline-block;
-    padding-right: 75px;
+    padding-right: 90px;
+    flex-shrink: 0;
   }
 
   .side-box-right {
@@ -312,36 +309,36 @@
       <img id="pngLogoImg" alt="Client Logo">
     </div>
 
-    <!-- BOTTOM 3-LINE SCROLLING TICKER -->
+    <!-- BOTTOM TICKER (~500px SPACE) -->
     <div id="bottom-ticker-bar">
       <div class="side-box-left">
         <div class="live-label">LIVE</div>
       </div>
 
       <div class="ticker-center">
-        <div class="row-top">
+        <div class="ticker-line row-top">
           <div class="scroll-box">
             <div class="scroll-track" id="trackTop">
-              <span class="scroll-item" id="itemTopA">OPEN KABADDI TOURNAMENT</span>
-              <span class="scroll-item" id="itemTopB">OPEN KABADDI TOURNAMENT</span>
+              <span class="scroll-chunk" id="chunkTopA"></span>
+              <span class="scroll-chunk" id="chunkTopB"></span>
             </div>
           </div>
         </div>
 
-        <div class="row-yellow">
+        <div class="ticker-line row-yellow">
           <div class="scroll-box">
             <div class="scroll-track" id="trackYellow">
-              <span class="scroll-item" id="itemYellowA">LIVE KABADDI BROADCAST</span>
-              <span class="scroll-item" id="itemYellowB">LIVE KABADDI BROADCAST</span>
+              <span class="scroll-chunk" id="chunkYellowA"></span>
+              <span class="scroll-chunk" id="chunkYellowB"></span>
             </div>
           </div>
         </div>
 
-        <div class="row-bottom">
+        <div class="ticker-line row-bottom">
           <div class="scroll-box">
             <div class="scroll-track" id="trackBottom">
-              <span class="scroll-item" id="itemBottomA">STAY TUNED FOR UPDATES</span>
-              <span class="scroll-item" id="itemBottomB">STAY TUNED FOR UPDATES</span>
+              <span class="scroll-chunk" id="chunkBottomA"></span>
+              <span class="scroll-chunk" id="chunkBottomB"></span>
             </div>
           </div>
         </div>
@@ -411,59 +408,86 @@
     img.src = clean;
   }
 
-  const tickers = {};
+  /* Jump-Free Continuous Pixel Scroller (Exact Admin Line Only) */
+  const scrollers = {};
 
-  function updateTicker(trackId, itemAId, itemBId, text, speed) {
+  function setSingleLineTicker(trackId, chunkAId, chunkBId, rawText, speed) {
     const track = document.getElementById(trackId);
-    const itemA = document.getElementById(itemAId);
-    const itemB = document.getElementById(itemBId);
+    const chunkA = document.getElementById(chunkAId);
+    const chunkB = document.getElementById(chunkBId);
 
-    const clean = (text && text.trim()) ? text.trim() : "LIVE KABADDI TOURNAMENT";
-    itemA.textContent = clean;
-    itemB.textContent = clean;
+    const line = String(rawText || "").replace(/\s+/g, " ").trim();
+    const validSpeed = (Number.isFinite(speed) && speed > 0) ? speed : 100;
+
+    if (!line) {
+      chunkA.textContent = "";
+      chunkB.textContent = "";
+      if (scrollers[trackId]) {
+        scrollers[trackId].active = false;
+        scrollers[trackId].x = 0;
+        track.style.transform = "translate3d(0px, -50%, 0)";
+      }
+      return;
+    }
+
+    const prevKey = scrollers[trackId] ? scrollers[trackId].key : "";
+    const textChanged = (prevKey !== line);
+
+    chunkA.textContent = line;
+    chunkB.textContent = line;
 
     requestAnimationFrame(() => {
-      let w = itemA.getBoundingClientRect().width;
-      const boxW = track.parentElement.getBoundingClientRect().width || 1400;
+      const boxW = track.parentElement.getBoundingClientRect().width || 1380;
+      let w = chunkA.getBoundingClientRect().width;
 
-      if (w < boxW * 1.15) {
-        const count = Math.ceil((boxW * 1.4) / Math.max(w, 120));
-        const repeated = Array(count).fill(clean).join("     •     ");
-        itemA.textContent = repeated;
-        itemB.textContent = repeated;
-        w = itemA.getBoundingClientRect().width;
+      // Repeat the exact admin line enough times to fill past the viewport cleanly
+      if (w > 0 && w < boxW + 160) {
+        const times = Math.ceil((boxW + 240) / w);
+        const filled = Array(times).fill(line).join("     •     ");
+        chunkA.textContent = filled;
+        chunkB.textContent = filled;
+        w = chunkA.getBoundingClientRect().width;
       }
 
-      const validSpeed = (Number.isFinite(speed) && speed > 0) ? speed : 100;
-
-      if (!tickers[trackId]) {
-        tickers[trackId] = {
+      if (!scrollers[trackId]) {
+        scrollers[trackId] = {
           el: track,
+          key: line,
           x: 0,
-          width: w || 600,
+          width: Math.max(w, 1),
           speed: validSpeed,
-          ts: performance.now()
+          active: true,
+          lastTs: performance.now()
         };
       } else {
-        tickers[trackId].width = w || 600;
-        tickers[trackId].speed = validSpeed;
+        const s = scrollers[trackId];
+        s.key = line;
+        s.speed = validSpeed;
+        s.active = true;
+        if (textChanged && w > 0) {
+          s.x = s.x % w;
+          if (s.x > 0) s.x -= w;
+        }
+        if (w > 0) s.width = w;
+        s.lastTs = performance.now();
       }
     });
   }
 
-  function animateTickers(now) {
-    Object.values(tickers).forEach((t) => {
-      const dt = Math.min((now - t.ts) / 1000, 0.1);
-      t.ts = now;
-      t.x -= t.speed * dt;
-      if (Math.abs(t.x) >= t.width) {
-        t.x += t.width;
+  function stepAllTickers(now) {
+    Object.values(scrollers).forEach((s) => {
+      if (!s.active) return;
+      const dt = Math.min((now - s.lastTs) / 1000, 0.05);
+      s.lastTs = now;
+      s.x -= s.speed * dt;
+      if (s.x <= -s.width) {
+        s.x += s.width;
       }
-      t.el.style.transform = `translate3d(${t.x.toFixed(2)}px, -50%, 0)`;
+      s.el.style.transform = `translate3d(${s.x.toFixed(2)}px, -50%, 0)`;
     });
-    requestAnimationFrame(animateTickers);
+    requestAnimationFrame(stepAllTickers);
   }
-  requestAnimationFrame(animateTickers);
+  requestAnimationFrame(stepAllTickers);
 
   const initialLogo = getActiveLogo("");
   if (initialLogo) {
@@ -505,30 +529,13 @@
     const speed2 = parseFloat(data.speedRow2) || 115;
     const speed3 = parseFloat(data.speedRow3) || 105;
 
-    const r1 = (data.row1Txt || "").trim() || "OPEN KABADDI TOURNAMENT";
-    updateTicker("trackTop", "itemTopA", "itemTopB", r1, speed1);
+    const line1 = data.row1Txt || "";
+    const line2 = data.row2Txt || data.programTxt || "";
+    const line3 = data.row3Txt || data.contactUs || "";
 
-    const r2Parts = [];
-    const r2Main = ((data.row2Txt || data.programTxt) || "").trim();
-    if (r2Main) r2Parts.push(r2Main);
-    if (data.resultText && data.resultText !== "No Result Yet") {
-      r2Parts.push(`RESULT :- ${data.resultText}`);
-    }
-    const r2Line = r2Parts.length > 0 ? r2Parts.join("     |     ") : r1;
-    updateTicker("trackYellow", "itemYellowA", "itemYellowB", r2Line, speed2);
-
-    const r3Parts = [];
-    if (data.row3Txt && data.row3Txt.trim() !== "") {
-      r3Parts.push(data.row3Txt.trim());
-    }
-    if (Array.isArray(data.nextMatches) && data.nextMatches.length > 0) {
-      r3Parts.push(`NEXT MATCHES :- ${data.nextMatches.join(" , ")}`);
-    }
-    if (data.contactUs && data.contactUs.trim() !== "") {
-      r3Parts.push(data.contactUs.trim());
-    }
-    const r3Line = r3Parts.length > 0 ? r3Parts.join("     |     ") : "LIVE KABADDI BROADCAST";
-    updateTicker("trackBottom", "itemBottomA", "itemBottomB", r3Line, speed3);
+    setSingleLineTicker("trackTop", "chunkTopA", "chunkTopB", line1, speed1);
+    setSingleLineTicker("trackYellow", "chunkYellowA", "chunkYellowB", line2, speed2);
+    setSingleLineTicker("trackBottom", "chunkBottomA", "chunkBottomB", line3, speed3);
   });
 </script>
 </body>
