@@ -48,7 +48,7 @@
     letter-spacing: 2.5px;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
     pointer-events: none;
-    white-space: nowrap;
+    white-space: pre;
     display: none;
     z-index: 12;
   }
@@ -375,7 +375,7 @@
           <div class="hex-box hex-right" id="scoreRight">0</div>
         </div>
       </div>
-      <div class="sb-round" id="roundDisplay">KABADDI OPEN MATCH</div>
+      <div class="sb-round" id="roundDisplay"></div>
     </div>
 
     <!-- FLOATING WATERMARK -->
@@ -393,29 +393,29 @@
       </div>
 
       <div class="ticker-center">
-        <div class="row-top">
+        <div class="row-top" id="rowTopWrap">
           <div class="scroll-box">
             <div class="scroll-track" id="trackTop">
-              <span class="scroll-item" id="itemTopA">OPEN KABADDI TOURNAMENT</span>
-              <span class="scroll-item" id="itemTopB">OPEN KABADDI TOURNAMENT</span>
+              <span class="scroll-item" id="itemTopA"></span>
+              <span class="scroll-item" id="itemTopB"></span>
             </div>
           </div>
         </div>
 
-        <div class="row-yellow">
+        <div class="row-yellow" id="rowYellowWrap">
           <div class="scroll-box">
             <div class="scroll-track" id="trackYellow">
-              <span class="scroll-item" id="itemYellowA">LIVE KABADDI BROADCAST</span>
-              <span class="scroll-item" id="itemYellowB">LIVE KABADDI BROADCAST</span>
+              <span class="scroll-item" id="itemYellowA"></span>
+              <span class="scroll-item" id="itemYellowB"></span>
             </div>
           </div>
         </div>
 
-        <div class="row-bottom">
+        <div class="row-bottom" id="rowBottomWrap">
           <div class="scroll-box">
             <div class="scroll-track" id="trackBottom">
-              <span class="scroll-item" id="itemBottomA">STAY TUNED FOR UPDATES</span>
-              <span class="scroll-item" id="itemBottomB">STAY TUNED FOR UPDATES</span>
+              <span class="scroll-item" id="itemBottomA"></span>
+              <span class="scroll-item" id="itemBottomB"></span>
             </div>
           </div>
         </div>
@@ -530,26 +530,31 @@
     return (enVal || "").trim();
   }
 
-  function setRightCornerLogo(url) {
+  let currentLogoUrl = "";
+  let currentLogoVisible = true;
+  let roundHasValue = false;
+
+  function renderRightCornerLogo() {
     const box = document.getElementById("sb-logo-box");
     const img = document.getElementById("pngLogoImg");
-    const clean = (url || "").trim();
+    const clean = (currentLogoUrl || "").trim();
 
-    if (!clean) {
-      img.onload = null;
-      img.onerror = null;
-      img.removeAttribute("src");
+    if (!roundHasValue || !clean || !currentLogoVisible) {
       box.style.display = "none";
       return;
     }
 
-    img.onload = () => {
+    if (img.src !== clean) {
+      img.onload = () => {
+        if (roundHasValue && currentLogoVisible && img.src === clean) box.style.display = "flex";
+      };
+      img.onerror = () => {
+        box.style.display = "none";
+      };
+      img.src = clean;
+    } else if (img.complete && img.naturalWidth > 0) {
       box.style.display = "flex";
-    };
-    img.onerror = () => {
-      box.style.display = "none";
-    };
-    img.src = clean;
+    }
   }
 
   /* Floating Watermark State */
@@ -563,7 +568,7 @@
 
   function setFloatingWatermark(txt) {
     const clean = String(txt || "").trim();
-    if (!clean) {
+    if (!roundHasValue || !clean) {
       wmActive = false;
       wmEl.textContent = "";
       wmEl.style.display = "none";
@@ -584,89 +589,70 @@
   const tickers = {};
   let latestData = null;
 
-  function buildLinesFromData(data) {
-    if (!data) {
-      return {
-        r1: "OPEN KABADDI TOURNAMENT",
-        r2: "LIVE KABADDI BROADCAST",
-        r3: "STAY TUNED FOR UPDATES"
-      };
-    }
-
-    const r1Raw = (data.row1Txt !== undefined && data.row1Txt !== null) ? String(data.row1Txt) : "";
-    const r1 = r1Raw.replace(/\r?\n/g, " ");
-
-    const r2Parts = [];
-    const r2MainRaw = (data.row2Txt !== undefined && data.row2Txt !== null && String(data.row2Txt).trim() !== "")
-      ? String(data.row2Txt)
-      : ((data.programTxt !== undefined && data.programTxt !== null) ? String(data.programTxt) : "");
-    if (r2MainRaw.trim() !== "") r2Parts.push(r2MainRaw.replace(/\r?\n/g, " "));
-    if (data.resultText && String(data.resultText).trim() !== "" && String(data.resultText).trim() !== "No Result Yet") {
-      r2Parts.push(`RESULT :- ${String(data.resultText).trim()}`);
-    }
-    const r2 = r2Parts.length > 0 ? r2Parts.join("     |     ") : (r1.trim() ? r1 : "LIVE KABADDI BROADCAST");
-
-    const r3Parts = [];
-    if (data.row3Txt !== undefined && data.row3Txt !== null && String(data.row3Txt).trim() !== "") {
-      r3Parts.push(String(data.row3Txt).replace(/\r?\n/g, " "));
-    }
-    if (Array.isArray(data.nextMatches) && data.nextMatches.length > 0) {
-      r3Parts.push(`NEXT MATCHES :- ${data.nextMatches.join(" , ")}`);
-    }
-    if (data.contactUs !== undefined && data.contactUs !== null && String(data.contactUs).trim() !== "") {
-      r3Parts.push(String(data.contactUs).trim());
-    }
-    const r3 = r3Parts.length > 0 ? r3Parts.join("     |     ") : "LIVE KABADDI BROADCAST";
-
-    return {
-      r1: r1.trim() !== "" ? r1 : "OPEN KABADDI TOURNAMENT",
-      r2,
-      r3
-    };
+  function normalizeTickerLine(val) {
+    if (val === undefined || val === null) return "";
+    const str = String(val).replace(/\r?\n/g, " ");
+    return str.trim() === "" ? "" : str;
   }
 
-  function updateTicker(trackId, itemAId, itemBId, text, speed) {
+  function updateTicker(trackId, chunkAId, chunkBId, wrapId, rawText, speed) {
     const track = document.getElementById(trackId);
-    const itemA = document.getElementById(itemAId);
-    const itemB = document.getElementById(itemBId);
+    const chunkA = document.getElementById(chunkAId);
+    const chunkB = document.getElementById(chunkBId);
+    const wrap = wrapId ? document.getElementById(wrapId) : null;
 
-    const rawLine = (text !== undefined && text !== null && String(text).trim() !== "")
-      ? String(text)
-      : "LIVE KABADDI TOURNAMENT";
-
+    const line = normalizeTickerLine(rawText);
     const validSpeed = (Number.isFinite(speed) && speed > 0) ? speed : 100;
-    const prev = tickers[trackId];
-    const textChanged = !prev || prev.raw !== rawLine;
 
-    itemA.textContent = rawLine;
-    itemB.textContent = rawLine;
+    if (!line) {
+      if (wrap) wrap.style.visibility = "hidden";
+      chunkA.textContent = "";
+      chunkB.textContent = "";
+      if (tickers[trackId]) {
+        tickers[trackId].active = false;
+        tickers[trackId].raw = "";
+        tickers[trackId].x = 0;
+        track.style.transform = "translate3d(0px, -50%, 0)";
+      }
+      return;
+    }
+
+    if (wrap) wrap.style.visibility = "visible";
+
+    const prev = tickers[trackId];
+    const textChanged = !prev || prev.raw !== line;
+
+    chunkA.textContent = line;
+    chunkB.textContent = line;
 
     requestAnimationFrame(() => {
-      if (isOverlayLocked) return;
+      if (isOverlayLocked || !roundHasValue) return;
       const boxW = track.parentElement.getBoundingClientRect().width || 1380;
-      let w = itemA.getBoundingClientRect().width;
+      let w = chunkA.getBoundingClientRect().width;
 
       if (w > 0 && w < boxW + 180) {
         const spacer = "        ";
         const count = Math.ceil((boxW + 240) / Math.max(w + 90, 1));
-        const repeated = Array(count).fill(rawLine).join(spacer);
-        itemA.textContent = repeated;
-        itemB.textContent = repeated;
+        const repeated = Array(count).fill(line).join(spacer);
+        chunkA.textContent = repeated;
+        chunkB.textContent = repeated;
         w = itemA.getBoundingClientRect().width;
       }
 
       if (!prev) {
         tickers[trackId] = {
           el: track,
-          raw: rawLine,
+          raw: line,
           x: 0,
           width: Math.max(w, 1),
           speed: validSpeed,
+          active: true,
           ts: performance.now()
         };
       } else {
-        prev.raw = rawLine;
+        prev.raw = line;
         prev.speed = validSpeed;
+        prev.active = true;
         if (w > 0) {
           if (textChanged) {
             prev.x = prev.x % w;
@@ -680,11 +666,28 @@
   }
 
   function refreshAllTickers() {
-    if (isOverlayLocked) return;
-    const lines = buildLinesFromData(latestData);
-    updateTicker("trackTop", "itemTopA", "itemTopB", lines.r1, lineSpeeds.trackTop);
-    updateTicker("trackYellow", "itemYellowA", "itemYellowB", lines.r2, lineSpeeds.trackYellow);
-    updateTicker("trackBottom", "itemBottomA", "itemBottomB", lines.r3, lineSpeeds.trackBottom);
+    if (isOverlayLocked || !roundHasValue) {
+      updateTicker("trackTop", "chunkTopA", "chunkTopB", "rowTopWrap", "", lineSpeeds.trackTop);
+      updateTicker("trackYellow", "chunkYellowA", "chunkYellowB", "rowYellowWrap", "", lineSpeeds.trackYellow);
+      updateTicker("trackBottom", "chunkBottomA", "chunkBottomB", "rowBottomWrap", "", lineSpeeds.trackBottom);
+      const bar = document.getElementById("bottom-ticker-bar");
+      if (bar) bar.style.display = "none";
+      return;
+    }
+
+    const r1 = normalizeTickerLine(latestData ? latestData.row1Txt : "");
+    const r2 = normalizeTickerLine(latestData ? latestData.row2Txt : "");
+    const r3 = normalizeTickerLine(latestData ? latestData.row3Txt : "");
+
+    const anyLineActive = Boolean(r1 || r2 || r3);
+    const bar = document.getElementById("bottom-ticker-bar");
+    if (bar) {
+      bar.style.display = anyLineActive ? "flex" : "none";
+    }
+
+    updateTicker("trackTop", "chunkTopA", "chunkTopB", "rowTopWrap", r1, lineSpeeds.trackTop);
+    updateTicker("trackYellow", "chunkYellowA", "chunkYellowB", r2, lineSpeeds.trackYellow);
+    updateTicker("trackBottom", "chunkBottomA", "chunkBottomB", r3, lineSpeeds.trackBottom);
   }
 
   window.setRowSpeeds = function({ row1, row2, row3 } = {}) {
@@ -702,6 +705,7 @@
     wmLastTs = now;
 
     Object.values(tickers).forEach((t) => {
+      if (!t.active) return;
       t.x -= t.speed * dt;
       if (t.x <= -t.width) {
         t.x += t.width;
@@ -741,19 +745,35 @@
   }
   rafId = requestAnimationFrame(animateLoop);
 
-  const initialLogo = getActiveLogo("");
-  if (initialLogo) {
-    setRightCornerLogo(initialLogo);
-  }
+  const stageEl = document.getElementById("render-stage");
+  stageEl.style.display = "none";
 
   db.on("value", (snap) => {
     if (isOverlayLocked) return;
     const data = snap.val();
-    if (!data) return;
-    latestData = data;
+    if (!data) {
+      roundHasValue = false;
+      latestData = null;
+      stageEl.style.display = "none";
+      return;
+    }
 
+    latestData = data;
     evaluatePlanStatus(data);
     if (isOverlayLocked) return;
+
+    const roundVal = (data.round !== undefined && data.round !== null) ? String(data.round).trim() : "";
+    roundHasValue = roundVal !== "";
+
+    if (!roundHasValue) {
+      stageEl.style.display = "none";
+      setFloatingWatermark("");
+      renderRightCornerLogo();
+      refreshAllTickers();
+      return;
+    }
+
+    stageEl.style.display = "block";
 
     document.getElementById("scoreboard-wrapper").style.opacity =
       (data.scoreVisible === false) ? "0" : "1";
@@ -778,10 +798,13 @@
       document.getElementById("scoreRight").innerText = scoreB;
     }
 
-    document.getElementById("roundDisplay").innerText = data.round || "";
+    document.getElementById("roundDisplay").innerText = roundVal;
 
     setFloatingWatermark(data.watermarkTxt);
-    setRightCornerLogo(getActiveLogo(data.logoUrl));
+
+    currentLogoUrl = getActiveLogo(data.logoUrl);
+    currentLogoVisible = (data.logoVisible !== false);
+    renderRightCornerLogo();
 
     if (Number(data.speedRow1) > 0 && !urlParams.get("r1Speed")) {
       lineSpeeds.trackTop = Number(data.speedRow1);
