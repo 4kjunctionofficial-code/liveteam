@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=1920, initial-scale=1.0">
-<title>Kabaddi Live Overlay</title>
+<title>Kabaddi Scoreboard & Ticker Overlay</title>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gurmukhi:wght@700;900&family=Oswald:wght@700&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet">
@@ -31,7 +31,8 @@
     left: 42px;
     display: flex;
     flex-direction: column;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.25s ease;
+    z-index: 15;
   }
 
   .sb-main {
@@ -41,7 +42,17 @@
     position: relative;
   }
 
-  /* Hexagons */
+  .hex-wrap {
+    width: 108px;
+    height: 98px;
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+  }
+
   .hex-box {
     width: 102px;
     height: 92px;
@@ -52,20 +63,6 @@
     font-family: 'Oswald', sans-serif;
     font-size: 52px;
     font-weight: 700;
-    z-index: 3;
-    position: relative;
-  }
-
-  /* Border effect for Hexagons using pseudo-element */
-  .hex-wrap {
-    width: 108px;
-    height: 98px;
-    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-    background: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 3;
   }
 
   .hex-left {
@@ -78,7 +75,6 @@
     color: #ffe600;
   }
 
-  /* Team Name Bars */
   .teams-bars {
     display: flex;
     flex-direction: column;
@@ -121,7 +117,6 @@
     margin-top: -2px;
   }
 
-  /* Round / Category Subtitle */
   .sb-round {
     margin-top: 6px;
     padding-left: 24px;
@@ -149,6 +144,7 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     display: none;
+    z-index: 15;
   }
 
   /* ==================== BOTTOM TICKER BAR ==================== */
@@ -161,9 +157,9 @@
     display: flex;
     background: #0a0a0a;
     border-top: 3px solid #f5d800;
+    z-index: 10;
   }
 
-  /* Left LIVE Box */
   .live-badge-box {
     width: 225px;
     height: 100%;
@@ -191,7 +187,6 @@
     50% { transform: scale(1.06); opacity: 0.85; }
   }
 
-  /* Center 3 Rows */
   .ticker-rows {
     flex: 1;
     display: flex;
@@ -200,9 +195,9 @@
     margin-right: -38px;
     z-index: 2;
     overflow: hidden;
+    background: #0d0d0d;
   }
 
-  /* Row 1: Village & Tournament Header */
   .t-row-1 {
     height: 44px;
     background: #0d0d0d;
@@ -219,7 +214,6 @@
     overflow: hidden;
   }
 
-  /* Row 2: Yellow Highlight Scrolling Ticker (Prizes, Results, Ads) */
   .t-row-2 {
     height: 42px;
     background: linear-gradient(180deg, #ffe600 0%, #e0b800 100%);
@@ -234,7 +228,6 @@
     border-bottom: 2px solid #000000;
   }
 
-  /* Row 3: Bottom Black Scrolling Ticker (Next Matches, Upcoming Events, Telecast) */
   .t-row-3 {
     height: 40px;
     background: #0d0d0d;
@@ -247,27 +240,32 @@
     position: relative;
   }
 
-  /* Smooth Continuous Marquee */
-  .marquee-track {
-    display: flex;
+  .ticker-viewport {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .ticker-stream {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translate3d(0, -50%, 0);
+    display: inline-flex;
+    align-items: center;
     white-space: nowrap;
     will-change: transform;
-    animation: scrollLeft 28s linear infinite;
   }
 
-  .marquee-track span {
-    padding-right: 60px;
+  .ticker-chunk {
     display: inline-block;
+    padding-right: 70px;
   }
 
-  @keyframes scrollLeft {
-    0% { transform: translateX(0%); }
-    100% { transform: translateX(-50%); }
-  }
-
-  /* Right Graphic Box */
+  /* Right PNG Logo Box */
   .right-graphic-box {
-    width: 215px;
+    width: 225px;
     height: 100%;
     background: linear-gradient(180deg, #ffe600 0%, #d4ad00 100%);
     clip-path: polygon(18% 0, 100% 0, 100% 100%, 0% 100%);
@@ -275,13 +273,28 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding-left: 24px;
+    padding-left: 26px;
+    padding-right: 12px;
     z-index: 5;
     flex-shrink: 0;
   }
 
+  #pngLogoImg {
+    max-width: 165px;
+    max-height: 104px;
+    object-fit: contain;
+    display: none;
+  }
+
+  #defaultLogoBadge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
   .prize-bag-icon {
-    font-size: 54px;
+    font-size: 50px;
     line-height: 1;
   }
 
@@ -296,7 +309,7 @@
 </head>
 <body>
 
-  <!-- TOP-LEFT SCOREBOARD -->
+  <!-- SCOREBOARD -->
   <div id="scoreboard-wrapper">
     <div class="sb-main">
       <div class="hex-wrap">
@@ -315,39 +328,44 @@
     <div class="sb-round" id="roundDisplay">KABADDI TOURNAMENT</div>
   </div>
 
-  <!-- TOP-RIGHT WATERMARK -->
+  <!-- WATERMARK -->
   <div id="watermark-box">M LIVE</div>
 
-  <!-- BOTTOM TICKER -->
+  <!-- 3-ROW TICKER -->
   <div id="bottom-ticker-bar">
     <div class="live-badge-box">
       <div class="live-text">LIVE</div>
     </div>
 
     <div class="ticker-rows">
-      <!-- Row 1: Village & Program -->
       <div class="t-row-1" id="row1Header">KABADDI TOURNAMENT LIVE</div>
 
-      <!-- Row 2: Prizes, Result & Special Ads -->
       <div class="t-row-2">
-        <div class="marquee-track" id="row2Track">
-          <span id="row2TextA">WELCOME TO LIVE KABADDI BROADCAST</span>
-          <span id="row2TextB">WELCOME TO LIVE KABADDI BROADCAST</span>
+        <div class="ticker-viewport">
+          <div class="ticker-stream" id="streamRow2">
+            <span class="ticker-chunk" id="chunk2A">WELCOME TO LIVE KABADDI BROADCAST</span>
+            <span class="ticker-chunk" id="chunk2B">WELCOME TO LIVE KABADDI BROADCAST</span>
+          </div>
         </div>
       </div>
 
-      <!-- Row 3: Next Matches, Upcoming Events & Telecast -->
       <div class="t-row-3">
-        <div class="marquee-track" id="row3Track" style="animation-duration: 34s;">
-          <span id="row3TextA">STAY TUNED FOR UPCOMING MATCHES</span>
-          <span id="row3TextB">STAY TUNED FOR UPCOMING MATCHES</span>
+        <div class="ticker-viewport">
+          <div class="ticker-stream" id="streamRow3">
+            <span class="ticker-chunk" id="chunk3A">STAY TUNED FOR UPCOMING MATCHES</span>
+            <span class="ticker-chunk" id="chunk3B">STAY TUNED FOR UPCOMING MATCHES</span>
+          </div>
         </div>
       </div>
     </div>
 
+    <!-- PNG LOGO AREA -->
     <div class="right-graphic-box">
-      <div class="prize-bag-icon">💰</div>
-      <div class="prize-bag-label">KABADDI CUP</div>
+      <img id="pngLogoImg" alt="PNG Logo">
+      <div id="defaultLogoBadge">
+        <div class="prize-bag-icon">💰</div>
+        <div class="prize-bag-label">KABADDI CUP</div>
+      </div>
     </div>
   </div>
 
@@ -359,7 +377,9 @@
 
   const urlParams = new URLSearchParams(window.location.search);
   const matchId = urlParams.get('id') || 'defaultMatch';
-  const langMode = urlParams.get('lang') || 'en'; // ?lang=pa use karke Punjabi text dikha sakde ho
+  const langMode = urlParams.get('lang') || 'en';
+  // Je URL vich ?logo=https://.../logo.png pass kita hove tan oh vi turant kam karega
+  const queryLogoUrl = (urlParams.get('logo') || "").trim();
 
   const db = firebase.database().ref("matchData/" + matchId);
 
@@ -368,15 +388,94 @@
     return (enVal || "").trim();
   }
 
+  function applyPngLogo(url) {
+    const imgEl = document.getElementById("pngLogoImg");
+    const defaultEl = document.getElementById("defaultLogoBadge");
+    const cleanUrl = (url || "").trim();
+
+    if (!cleanUrl) {
+      imgEl.onload = null;
+      imgEl.onerror = null;
+      imgEl.removeAttribute("src");
+      imgEl.style.display = "none";
+      defaultEl.style.display = "flex";
+      return;
+    }
+
+    imgEl.onload = () => {
+      imgEl.style.display = "block";
+      defaultEl.style.display = "none";
+    };
+    imgEl.onerror = () => {
+      imgEl.style.display = "none";
+      defaultEl.style.display = "flex";
+    };
+    imgEl.src = cleanUrl;
+  }
+
+  const scrollers = {};
+
+  function setupScroller(streamId, chunkAId, chunkBId, text, speedPxPerSec) {
+    const stream = document.getElementById(streamId);
+    const chunkA = document.getElementById(chunkAId);
+    const chunkB = document.getElementById(chunkBId);
+
+    const cleanText = (text && text.trim()) ? text.trim() : "LIVE KABADDI BROADCAST";
+    chunkA.textContent = cleanText;
+    chunkB.textContent = cleanText;
+
+    requestAnimationFrame(() => {
+      let singleWidth = chunkA.getBoundingClientRect().width;
+      const viewportWidth = stream.parentElement.getBoundingClientRect().width || 1500;
+
+      if (singleWidth < viewportWidth) {
+        const repeatCount = Math.ceil((viewportWidth * 1.4) / Math.max(singleWidth, 120));
+        const repeated = Array(repeatCount).fill(cleanText).join("   ★   ");
+        chunkA.textContent = repeated;
+        chunkB.textContent = repeated;
+        singleWidth = chunkA.getBoundingClientRect().width;
+      }
+
+      if (!scrollers[streamId]) {
+        scrollers[streamId] = {
+          el: stream,
+          x: 0,
+          width: singleWidth || 600,
+          speed: speedPxPerSec,
+          lastTime: performance.now()
+        };
+      } else {
+        scrollers[streamId].width = singleWidth || 600;
+        scrollers[streamId].speed = speedPxPerSec;
+      }
+    });
+  }
+
+  function tickScrollers(now) {
+    Object.values(scrollers).forEach((s) => {
+      const dt = Math.min((now - s.lastTime) / 1000, 0.1);
+      s.lastTime = now;
+      s.x -= s.speed * dt;
+      if (Math.abs(s.x) >= s.width) {
+        s.x += s.width;
+      }
+      s.el.style.transform = `translate3d(${s.x.toFixed(2)}px, -50%, 0)`;
+    });
+    requestAnimationFrame(tickScrollers);
+  }
+  requestAnimationFrame(tickScrollers);
+
+  if (queryLogoUrl) {
+    applyPngLogo(queryLogoUrl);
+  }
+
   db.on("value", (snap) => {
     const data = snap.val();
     if (!data) return;
 
-    // 1. Scoreboard Visibility
     const sbWrapper = document.getElementById("scoreboard-wrapper");
     sbWrapper.style.opacity = (data.scoreVisible === false) ? "0" : "1";
 
-    // 2. Teams & Scores (With Camera Opposite View Support)
     const nameA = getText(data.nameA, data.nameA_pa) || "TEAM A";
     const nameB = getText(data.nameB, data.nameB_pa) || "TEAM B";
     const scoreA = data.scoreA !== undefined ? data.scoreA : 0;
@@ -394,10 +493,8 @@
       document.getElementById("scoreRight").innerText = scoreB;
     }
 
-    // 3. Round / Category
     document.getElementById("roundDisplay").innerText = data.round || "";
 
-    // 4. Watermark
     const wmBox = document.getElementById("watermark-box");
     if (data.watermarkTxt && data.watermarkTxt.trim() !== "") {
       wmBox.innerText = data.watermarkTxt.trim();
@@ -406,7 +503,8 @@
       wmBox.style.display = "none";
     }
 
-    // 5. Row 1: Village + Program
+    applyPngLogo(queryLogoUrl || data.logoUrl);
+
     const village = getText(data.row1Txt, data.row1Txt_pa);
     const program = getText(data.programTxt, data.programTxt_pa);
     let headerParts = [];
@@ -414,40 +512,36 @@
     if (program) headerParts.push(program);
     document.getElementById("row1Header").innerText = headerParts.join(" — ") || "KABADDI LIVE";
 
-    // 6. Row 2: Prizes + Latest Result + Special Ads
     let row2Items = [];
 
-    // Category 1 Prizes
     let cat1Parts = [];
     if (data.pzTitle1) cat1Parts.push(`🏆 ${data.pzTitle1}:`);
     if (data.pzOp1) cat1Parts.push(`1st: ${data.pzOp1}`);
     if (data.pzOp2) cat1Parts.push(`2nd: ${data.pzOp2}`);
-    if (data.pzOpBest) cat1Parts.push(`Best Raider/Catcher: ${data.pzOpBest}`);
+    if (data.pzOpBest) cat1Parts.push(`Best: ${data.pzOpBest}`);
     if (cat1Parts.length > 0) row2Items.push(cat1Parts.join("  "));
 
-    // Category 2 Prizes
     let cat2Parts = [];
     if (data.pzTitle2) cat2Parts.push(`🏆 ${data.pzTitle2}:`);
     if (data.pzWt1) cat2Parts.push(`1st: ${data.pzWt1}`);
     if (data.pzWt2) cat2Parts.push(`2nd: ${data.pzWt2}`);
-    if (data.pzWtBest) cat2Parts.push(`Best Raider/Catcher: ${data.pzWtBest}`);
+    if (data.pzWtBest) cat2Parts.push(`Best: ${data.pzWtBest}`);
     if (cat2Parts.length > 0) row2Items.push(cat2Parts.join("  "));
 
-    // Last Match Result
     if (data.resultText && data.resultText !== "No Result Yet") {
       row2Items.push(`🏅 RESULT: ${data.resultText}`);
     }
 
-    // Ads (Commentator, Sound, Tent, Security)
     if (data.adsText && data.adsText.trim() !== "") {
       row2Items.push(data.adsText.trim());
     }
 
-    const finalRow2 = row2Items.length > 0 ? row2Items.join("   ★   ") : (headerParts.join(" ") || "LIVE KABADDI TOURNAMENT");
-    document.getElementById("row2TextA").innerText = finalRow2 + "   ★   ";
-    document.getElementById("row2TextB").innerText = finalRow2 + "   ★   ";
+    const finalRow2 = row2Items.length > 0
+      ? row2Items.join("   ★   ")
+      : (headerParts.join(" — ") || "LIVE KABADDI TOURNAMENT");
 
-    // 7. Row 3: Next Matches + Upcoming Events + Live Telecast
+    setupScroller("streamRow2", "chunk2A", "chunk2B", finalRow2, 115);
+
     let row3Items = [];
 
     const nextMatchesStr = getText(data.row5Txt, data.row5Txt_pa);
@@ -465,9 +559,11 @@
       row3Items.push(`📡 ${data.row6Txt.trim()}`);
     }
 
-    const finalRow3 = row3Items.length > 0 ? row3Items.join("   |   ") : "WATCH LIVE KABADDI ACTION";
-    document.getElementById("row3TextA").innerText = finalRow3 + "   |   ";
-    document.getElementById("row3TextB").innerText = finalRow3 + "   |   ";
+    const finalRow3 = row3Items.length > 0
+      ? row3Items.join("   |   ")
+      : "WATCH LIVE KABADDI ACTION";
+
+    setupScroller("streamRow3", "chunk3A", "chunk3B", finalRow3, 105);
   });
 </script>
 </body>
