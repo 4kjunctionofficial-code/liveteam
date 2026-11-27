@@ -68,6 +68,43 @@
         </div>
     </div>
 
+    
+    <div class="card">
+        <div class="header">Ticker & Branding</div>
+        <div class="settings-section">
+            <div class="line-scroll-box">
+                <label class="label">Row 1 (Top Black)</label>
+                <textarea id="row1Inp" rows="2" style="margin-bottom:8px;" placeholder="Title Line 1" oninput="updateDB()"></textarea>
+                <div class="line-scroll-top">
+                    <input type="number" id="speedRow1Inp" class="std-input" min="0" max="500" step="5" placeholder="Speed (0 = Center)" oninput="updateDB()">
+                    <button id="scr1Btn" class="btn-scroll-toggle" onclick="toggleScroll('scrollRow1')">Scroll ON</button>
+                </div>
+            </div>
+
+            <div class="line-scroll-box">
+                <label class="label">Row 2 (Middle Yellow)</label>
+                <textarea id="row2Inp" rows="2" style="margin-bottom:8px;" placeholder="Title Line 2" oninput="updateDB()"></textarea>
+                <div class="line-scroll-top">
+                    <input type="number" id="speedRow2Inp" class="std-input" min="0" max="500" step="5" placeholder="Speed (0 = Center)" oninput="updateDB()">
+                    <button id="scr2Btn" class="btn-scroll-toggle" onclick="toggleScroll('scrollRow2')">Scroll ON</button>
+                </div>
+            </div>
+
+            <div class="line-scroll-box">
+                <label class="label">Row 3 (Bottom Black)</label>
+                <textarea id="row3Inp" rows="2" style="margin-bottom:8px;" placeholder="Title Line 3" oninput="updateDB()"></textarea>
+                <div class="line-scroll-top">
+                    <input type="number" id="speedRow3Inp" class="std-input" min="0" max="500" step="5" placeholder="Speed (0 = Center)" oninput="updateDB()">
+                    <button id="scr3Btn" class="btn-scroll-toggle" onclick="toggleScroll('scrollRow3')">Scroll ON</button>
+                </div>
+            </div>
+
+            <button id="tickVisBtn" class="btn-full btn-blue" onclick="toggleVis('tickerVisible')">Show/Hide Ticker</button>
+            <input type="text" id="watermarkInp" class="std-input" placeholder="Channel Name" oninput="updateDB()">
+            <button id="logoBtn" class="btn-full btn-dark" onclick="toggleVis('logoVisible')">Show/Hide Logo</button>
+        </div>
+    </div>
+</div>
     <div class="card">
         <div class="header">Position & Size Controls</div>
         <div class="settings-section">
@@ -117,42 +154,6 @@
         </div>
     </div>
 
-    <div class="card">
-        <div class="header">Ticker & Branding</div>
-        <div class="settings-section">
-            <div class="line-scroll-box">
-                <label class="label">Row 1 (Top Black)</label>
-                <textarea id="row1Inp" rows="2" style="margin-bottom:8px;" placeholder="Title Line 1" oninput="updateDB()"></textarea>
-                <div class="line-scroll-top">
-                    <input type="number" id="speedRow1Inp" class="std-input" min="0" max="500" step="5" placeholder="Speed (0 = Center)" oninput="updateDB()">
-                    <button id="scr1Btn" class="btn-scroll-toggle" onclick="toggleScroll('scrollRow1')">Scroll ON</button>
-                </div>
-            </div>
-
-            <div class="line-scroll-box">
-                <label class="label">Row 2 (Middle Yellow)</label>
-                <textarea id="row2Inp" rows="2" style="margin-bottom:8px;" placeholder="Title Line 2" oninput="updateDB()"></textarea>
-                <div class="line-scroll-top">
-                    <input type="number" id="speedRow2Inp" class="std-input" min="0" max="500" step="5" placeholder="Speed (0 = Center)" oninput="updateDB()">
-                    <button id="scr2Btn" class="btn-scroll-toggle" onclick="toggleScroll('scrollRow2')">Scroll ON</button>
-                </div>
-            </div>
-
-            <div class="line-scroll-box">
-                <label class="label">Row 3 (Bottom Black)</label>
-                <textarea id="row3Inp" rows="2" style="margin-bottom:8px;" placeholder="Title Line 3" oninput="updateDB()"></textarea>
-                <div class="line-scroll-top">
-                    <input type="number" id="speedRow3Inp" class="std-input" min="0" max="500" step="5" placeholder="Speed (0 = Center)" oninput="updateDB()">
-                    <button id="scr3Btn" class="btn-scroll-toggle" onclick="toggleScroll('scrollRow3')">Scroll ON</button>
-                </div>
-            </div>
-
-            <button id="tickVisBtn" class="btn-full btn-blue" onclick="toggleVis('tickerVisible')">Show/Hide Ticker</button>
-            <input type="text" id="watermarkInp" class="std-input" placeholder="Channel Name" oninput="updateDB()">
-            <button id="logoBtn" class="btn-full btn-dark" onclick="toggleVis('logoVisible')">Show/Hide Logo</button>
-        </div>
-    </div>
-</div>
 
 <script>
     const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
