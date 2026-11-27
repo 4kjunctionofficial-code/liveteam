@@ -2,8 +2,8 @@
 <html lang="pa">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=1920, initial-scale=1.0">
-<title>Kabaddi Live Overlay</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kabaddi Scoreboard & Ticker Overlay</title>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gurmukhi:wght@700;900&family=Oswald:wght@700&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet">
@@ -15,13 +15,24 @@
     padding: 0;
   }
 
-  body {
-    width: 1920px;
-    height: 1080px;
+  html, body {
+    width: 100%;
+    height: 100%;
     background: transparent;
     overflow: hidden;
     font-family: 'Roboto Condensed', 'Noto Sans Gurmukhi', sans-serif;
-    position: relative;
+  }
+
+  #render-stage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1920px;
+    height: 1080px;
+    transform: translate(-50%, -50%) scale(1);
+    transform-origin: center center;
+    background: transparent;
+    overflow: hidden;
   }
 
   /* ==================== TOP-LEFT SCOREBOARD ==================== */
@@ -147,7 +158,7 @@
     z-index: 15;
   }
 
-  /* ==================== IMAGE-STYLE BOTTOM TICKER ==================== */
+  /* ==================== BOTTOM TICKER (MATCHING IMAGE) ==================== */
   #bottom-ticker-bar {
     position: absolute;
     bottom: 0;
@@ -160,7 +171,7 @@
     z-index: 10;
   }
 
-  /* Left Solid Yellow LIVE Panel */
+  /* Left Yellow LIVE Panel */
   .live-panel {
     width: 248px;
     height: 100%;
@@ -194,7 +205,6 @@
     z-index: 2;
   }
 
-  /* Row 1: Black Centered Header */
   .row-header {
     height: 40px;
     background: #0d0d0d;
@@ -212,7 +222,6 @@
     text-overflow: ellipsis;
   }
 
-  /* Row 2: Yellow Scrolling Strip */
   .row-yellow {
     height: 42px;
     background: #ffe600;
@@ -226,7 +235,6 @@
     position: relative;
   }
 
-  /* Row 3: Black Scrolling Strip */
   .row-bottom {
     height: 40px;
     background: #0d0d0d;
@@ -263,7 +271,7 @@
     padding-right: 65px;
   }
 
-  /* Right Yellow Logo Panel */
+  /* Right Yellow Panel (PNG Logo when provided, empty clean yellow otherwise) */
   .logo-panel {
     width: 248px;
     height: 100%;
@@ -284,95 +292,78 @@
     object-fit: contain;
     display: none;
   }
-
-  #defaultBadge {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #167c22;
-    font-weight: 900;
-    line-height: 1.05;
-    text-align: center;
-  }
-
-  #defaultBadge .bag-emoji {
-    font-size: 52px;
-  }
-
-  #defaultBadge .bag-tag {
-    font-size: 16px;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-  }
 </style>
 </head>
 <body>
+  <div id="render-stage">
 
-  <!-- SCOREBOARD -->
-  <div id="scoreboard-wrapper">
-    <div class="sb-main">
-      <div class="hex-wrap">
-        <div class="hex-box hex-left" id="scoreLeft">0</div>
+    <!-- SCOREBOARD -->
+    <div id="scoreboard-wrapper">
+      <div class="sb-main">
+        <div class="hex-wrap">
+          <div class="hex-box hex-left" id="scoreLeft">0</div>
+        </div>
+
+        <div class="teams-bars">
+          <div class="team-bar bar-top" id="teamTop">TEAM A</div>
+          <div class="team-bar bar-bottom" id="teamBottom">TEAM B</div>
+        </div>
+
+        <div class="hex-wrap">
+          <div class="hex-box hex-right" id="scoreRight">0</div>
+        </div>
       </div>
-
-      <div class="teams-bars">
-        <div class="team-bar bar-top" id="teamTop">TEAM A</div>
-        <div class="team-bar bar-bottom" id="teamBottom">TEAM B</div>
-      </div>
-
-      <div class="hex-wrap">
-        <div class="hex-box hex-right" id="scoreRight">0</div>
-      </div>
-    </div>
-    <div class="sb-round" id="roundDisplay">KABADDI OPEN MATCH</div>
-  </div>
-
-  <!-- WATERMARK -->
-  <div id="watermark-box"></div>
-
-  <!-- BOTTOM TICKER -->
-  <div id="bottom-ticker-bar">
-    <div class="live-panel">
-      <div class="live-label">LIVE</div>
+      <div class="sb-round" id="roundDisplay">KABADDI OPEN MATCH</div>
     </div>
 
-    <div class="ticker-center">
-      <!-- Top Black Row -->
-      <div class="row-header" id="tickerTopRow">OPEN KABADDI TOURNAMENT</div>
+    <!-- WATERMARK -->
+    <div id="watermark-box"></div>
 
-      <!-- Middle Yellow Scrolling Row -->
-      <div class="row-yellow">
-        <div class="scroll-box">
-          <div class="scroll-track" id="trackYellow">
-            <span class="scroll-item" id="itemYellowA">1st Prize :- 51,000/-  2nd Prize :- 31,000/-  Best Raider :- 21,000/-  Best Catcher :- 21,000/-</span>
-            <span class="scroll-item" id="itemYellowB">1st Prize :- 51,000/-  2nd Prize :- 31,000/-  Best Raider :- 21,000/-  Best Catcher :- 21,000/-</span>
+    <!-- BOTTOM TICKER -->
+    <div id="bottom-ticker-bar">
+      <div class="live-panel">
+        <div class="live-label">LIVE</div>
+      </div>
+
+      <div class="ticker-center">
+        <div class="row-header" id="tickerTopRow">OPEN KABADDI TOURNAMENT</div>
+
+        <div class="row-yellow">
+          <div class="scroll-box">
+            <div class="scroll-track" id="trackYellow">
+              <span class="scroll-item" id="itemYellowA">1st Prize :- 51,000/-  2nd Prize :- 31,000/-  Best Raider :- 21,000/-  Best Catcher :- 21,000/-</span>
+              <span class="scroll-item" id="itemYellowB">1st Prize :- 51,000/-  2nd Prize :- 31,000/-  Best Raider :- 21,000/-  Best Catcher :- 21,000/-</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row-bottom">
+          <div class="scroll-box">
+            <div class="scroll-track" id="trackBottom">
+              <span class="scroll-item" id="itemBottomA">LIVE KABADDI BROADCAST</span>
+              <span class="scroll-item" id="itemBottomB">LIVE KABADDI BROADCAST</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Bottom Black Scrolling Row -->
-      <div class="row-bottom">
-        <div class="scroll-box">
-          <div class="scroll-track" id="trackBottom">
-            <span class="scroll-item" id="itemBottomA">LIVE KABADDI BROADCAST</span>
-            <span class="scroll-item" id="itemBottomB">LIVE KABADDI BROADCAST</span>
-          </div>
-        </div>
+      <!-- Right Yellow Panel: PNG Logo if set, otherwise blank yellow -->
+      <div class="logo-panel">
+        <img id="pngLogoImg" alt="Logo">
       </div>
     </div>
 
-    <!-- Right PNG Logo Box -->
-    <div class="logo-panel">
-      <img id="pngLogoImg" alt="Logo">
-      <div id="defaultBadge">
-        <span class="bag-emoji">💰</span>
-        <span class="bag-tag">KABADDI CUP</span>
-      </div>
-    </div>
   </div>
 
 <script>
+  function fitStage() {
+    const stage = document.getElementById("render-stage");
+    const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    stage.style.transform = `translate(-50%, -50%) scale(${scale})`;
+  }
+  fitStage();
+  window.addEventListener("resize", fitStage);
+
   const firebaseConfig = {
     databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/"
   };
@@ -392,7 +383,6 @@
 
   function setPngLogo(url) {
     const img = document.getElementById("pngLogoImg");
-    const fallback = document.getElementById("defaultBadge");
     const clean = (url || "").trim();
 
     if (!clean) {
@@ -400,17 +390,14 @@
       img.onerror = null;
       img.removeAttribute("src");
       img.style.display = "none";
-      fallback.style.display = "flex";
       return;
     }
 
     img.onload = () => {
       img.style.display = "block";
-      fallback.style.display = "none";
     };
     img.onerror = () => {
       img.style.display = "none";
-      fallback.style.display = "flex";
     };
     img.src = clean;
   }
@@ -475,11 +462,9 @@
     const data = snap.val();
     if (!data) return;
 
-    // Scoreboard visibility
     document.getElementById("scoreboard-wrapper").style.opacity =
       (data.scoreVisible === false) ? "0" : "1";
 
-    // Teams & scores
     const nameA = getText(data.nameA, data.nameA_pa) || "TEAM A";
     const nameB = getText(data.nameB, data.nameB_pa) || "TEAM B";
     const scoreA = data.scoreA !== undefined ? data.scoreA : 0;
@@ -499,7 +484,6 @@
 
     document.getElementById("roundDisplay").innerText = data.round || "";
 
-    // Watermark
     const wm = document.getElementById("watermark-box");
     if (data.watermarkTxt && data.watermarkTxt.trim() !== "") {
       wm.innerText = data.watermarkTxt.trim();
@@ -508,10 +492,8 @@
       wm.style.display = "none";
     }
 
-    // PNG logo
     setPngLogo(queryLogoUrl || data.logoUrl);
 
-    // Top Black Header Row (Village + Program)
     const village = getText(data.row1Txt, data.row1Txt_pa);
     const program = getText(data.programTxt, data.programTxt_pa);
     const topParts = [];
@@ -520,7 +502,6 @@
     document.getElementById("tickerTopRow").innerText =
       topParts.join(" — ") || "OPEN KABADDI TOURNAMENT";
 
-    // Middle Yellow Scrolling Row (Prizes + Result + Ads)
     const yellowParts = [];
 
     const cat1 = [];
@@ -551,7 +532,6 @@
 
     updateTicker("trackYellow", "itemYellowA", "itemYellowB", yellowLine, 110);
 
-    // Bottom Black Scrolling Row (Next Matches + Upcoming Events + Telecast)
     const bottomParts = [];
 
     const nextMatches = getText(data.row5Txt, data.row5Txt_pa);
