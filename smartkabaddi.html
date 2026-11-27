@@ -6,13 +6,14 @@
 <title>Kabaddi Live Overlay - SmartKabaddi</title>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gurmukhi:wght@700;900&family=Oswald:wght@700&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@800;900&family=Noto+Sans+Gurmukhi:wght@800;900&family=Oswald:wght@700&family=Roboto+Condensed:wght@800;900&display=swap" rel="stylesheet">
 
 <style>
   * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    font-weight: 900;
   }
 
   html, body {
@@ -20,7 +21,8 @@
     height: 100%;
     background: transparent;
     overflow: hidden;
-    font-family: 'Roboto Condensed', 'Noto Sans Gurmukhi', sans-serif;
+    font-family: 'Roboto Condensed', 'Noto Sans Devanagari', 'Noto Sans Gurmukhi', sans-serif;
+    font-weight: 900;
   }
 
   #render-stage {
@@ -41,13 +43,13 @@
     position: absolute;
     top: 200px;
     left: 420px;
-    font-family: 'Roboto Condensed', 'Noto Sans Gurmukhi', sans-serif;
+    font-family: 'Roboto Condensed', 'Noto Sans Devanagari', 'Noto Sans Gurmukhi', sans-serif;
     font-size: 46px;
     font-weight: 900;
-    color: rgba(255, 255, 255, 0.42);
+    color: rgba(255, 255, 255, 0.45);
     text-transform: uppercase;
     letter-spacing: 2.5px;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
     pointer-events: none;
     white-space: pre;
     display: none;
@@ -59,6 +61,8 @@
     position: absolute;
     top: 14px;
     left: 40px;
+    transform: scale(1);
+    transform-origin: top left;
     display: flex;
     flex-direction: column;
     transition: opacity 0.25s ease;
@@ -68,13 +72,13 @@
   .sb-main {
     display: flex;
     align-items: center;
-    height: 92px;
+    height: 96px;
     position: relative;
   }
 
   .hex-wrap {
     width: 108px;
-    height: 98px;
+    height: 99px;
     clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
     background: #ffffff;
     display: flex;
@@ -90,9 +94,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Oswald', sans-serif;
+    font-family: 'Oswald', 'Noto Sans Devanagari', 'Noto Sans Gurmukhi', sans-serif;
     font-size: 52px;
-    font-weight: 700;
+    font-weight: 900;
   }
 
   .hex-left {
@@ -159,13 +163,15 @@
     paint-order: stroke fill;
   }
 
-  /* ==================== LARGE LOGO AT TOP-RIGHT CORNER ==================== */
+  /* ==================== CLIENT LOGO AT TOP-RIGHT CORNER ==================== */
   #sb-logo-box {
     position: absolute;
     top: 24px;
     right: 32px;
     width: 265px;
     height: 195px;
+    transform: scale(1);
+    transform-origin: top right;
     display: none;
     align-items: center;
     justify-content: center;
@@ -181,7 +187,7 @@
     filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.8));
   }
 
-  /* ==================== BOTTOM 3-LINE TICKER (TALLER HEIGHT) ==================== */
+  /* ==================== BOTTOM 3-LINE TICKER ==================== */
   #bottom-ticker-bar {
     position: absolute;
     bottom: 0;
@@ -209,7 +215,7 @@
   }
 
   .live-label {
-    font-family: 'Roboto Condensed', sans-serif;
+    font-family: 'Roboto Condensed', 'Noto Sans Devanagari', 'Noto Sans Gurmukhi', sans-serif;
     font-style: italic;
     font-size: 66px;
     font-weight: 900;
@@ -232,7 +238,8 @@
   }
 
   .row-top {
-    height: 48px;
+    flex: 1;
+    min-height: 0;
     background: #0d0d0d;
     color: #ffffff;
     display: flex;
@@ -246,7 +253,8 @@
   }
 
   .row-yellow {
-    height: 50px;
+    flex: 1.06;
+    min-height: 0;
     background: #ffe600;
     color: #111111;
     display: flex;
@@ -259,13 +267,14 @@
   }
 
   .row-bottom {
-    height: 46px;
+    flex: 1;
+    min-height: 0;
     background: #0d0d0d;
     color: #ffffff;
     display: flex;
     align-items: center;
     font-size: 28px;
-    font-weight: 800;
+    font-weight: 900;
     letter-spacing: 0.3px;
     overflow: hidden;
     position: relative;
@@ -284,6 +293,7 @@
     left: 0;
     transform: translate3d(0px, -50%, 0);
     display: inline-block;
+    font-weight: 900;
     white-space: pre;
     will-change: transform;
   }
@@ -341,7 +351,7 @@
   .expired-sub {
     margin-top: 18px;
     font-size: 34px;
-    font-weight: 800;
+    font-weight: 900;
     color: #ff5c52;
     line-height: 1.35;
   }
@@ -377,7 +387,7 @@
       <div class="sb-round" id="roundDisplay"></div>
     </div>
 
-    <!-- LARGE LOGO AT TOP-RIGHT CORNER -->
+    <!-- CLIENT LOGO AT TOP-RIGHT CORNER -->
     <div id="sb-logo-box">
       <img id="pngLogoImg" alt="SmartKabaddi Logo">
     </div>
@@ -523,6 +533,37 @@
 
   let currentLogoUrl = getActiveLogo("");
   let currentLogoVisible = true;
+  let currentTickerHeight = 144;
+  let currentTickerBottom = 0;
+
+  function applyLayoutAdjustments(data = {}) {
+    const sbEl = document.getElementById("scoreboard-wrapper");
+    const sbTop = Number.isFinite(Number(data.sbTop)) ? Number(data.sbTop) : 14;
+    const sbLeft = Number.isFinite(Number(data.sbLeft)) ? Number(data.sbLeft) : 40;
+    const sbScale = Number.isFinite(Number(data.sbScale)) ? Math.min(Math.max(Number(data.sbScale), 40), 200) / 100 : 1;
+    sbEl.style.top = `${sbTop}px`;
+    sbEl.style.left = `${sbLeft}px`;
+    sbEl.style.transform = `scale(${sbScale})`;
+
+    const logoBox = document.getElementById("sb-logo-box");
+    const logoTop = Number.isFinite(Number(data.logoTop)) ? Number(data.logoTop) : 24;
+    const logoRight = Number.isFinite(Number(data.logoRight)) ? Number(data.logoRight) : 32;
+    const logoScale = Number.isFinite(Number(data.logoSize)) ? Math.min(Math.max(Number(data.logoSize), 30), 250) / 100 : 1;
+    logoBox.style.top = `${logoTop}px`;
+    logoBox.style.right = `${logoRight}px`;
+    logoBox.style.transform = `scale(${logoScale})`;
+
+    const tickerBar = document.getElementById("bottom-ticker-bar");
+    currentTickerHeight = Number.isFinite(Number(data.tickerHeight)) ? Math.min(Math.max(Number(data.tickerHeight), 72), 540) : 144;
+    currentTickerBottom = Number.isFinite(Number(data.tickerBottom)) ? Math.min(Math.max(Number(data.tickerBottom), -200), 700) : 0;
+    tickerBar.style.height = `${currentTickerHeight}px`;
+    tickerBar.style.bottom = `${currentTickerBottom}px`;
+
+    const baseFont = Math.max(22, Math.min(44, Math.round(currentTickerHeight * 0.2)));
+    document.getElementById("rowTopWrap").style.fontSize = `${baseFont}px`;
+    document.getElementById("rowYellowWrap").style.fontSize = `${baseFont + 2}px`;
+    document.getElementById("rowBottomWrap").style.fontSize = `${Math.max(20, baseFont - 1)}px`;
+  }
 
   function renderRightCornerLogo() {
     const box = document.getElementById("sb-logo-box");
@@ -639,6 +680,7 @@
       if (tickers[itemId]) {
         tickers[itemId].active = false;
         tickers[itemId].raw = line;
+        tickers[itemId].wasScrolling = false;
       }
       return;
     }
@@ -657,7 +699,8 @@
         boxW: boxW,
         textW: textW,
         speed: numericSpeed,
-        active: true
+        active: true,
+        wasScrolling: true
       };
       item.style.transform = `translate3d(${boxW.toFixed(2)}px, -50%, 0)`;
     } else {
@@ -726,7 +769,7 @@
       const minX = 40;
       const minY = 140;
       const maxX = Math.max(minX + 100, 1920 - 315 - wmEl.offsetWidth);
-      const maxY = Math.max(minY + 60, 1080 - 144 - wmEl.offsetHeight - 30);
+      const maxY = Math.max(minY + 60, 1080 - currentTickerHeight - currentTickerBottom - wmEl.offsetHeight - 30);
 
       wmX += wmVx * dt;
       wmY += wmVy * dt;
@@ -754,6 +797,7 @@
   }
   rafId = requestAnimationFrame(animateLoop);
 
+  applyLayoutAdjustments({});
   renderRightCornerLogo();
 
   db.on("value", (snap) => {
@@ -761,6 +805,7 @@
     const data = snap.val();
     if (!data) {
       latestData = null;
+      applyLayoutAdjustments({});
       currentLogoUrl = getActiveLogo("");
       currentLogoVisible = true;
       renderRightCornerLogo();
@@ -771,6 +816,8 @@
     latestData = data;
     evaluatePlanStatus(data);
     if (isOverlayLocked) return;
+
+    applyLayoutAdjustments(data);
 
     document.getElementById("scoreboard-wrapper").style.opacity =
       (data.scoreVisible === false) ? "0" : "1";
