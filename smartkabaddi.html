@@ -181,7 +181,7 @@
     filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.75));
   }
 
-  /* ==================== BOTTOM 3-LINE SCROLLING TICKER WITH GREEN SIDE BOXES ==================== */
+  /* ==================== BOTTOM 3-LINE TICKER WITH GREEN SIDE BOXES ==================== */
   #bottom-ticker-bar {
     position: absolute;
     bottom: 0;
@@ -278,22 +278,14 @@
     overflow: hidden;
   }
 
-  .scroll-track {
+  .scroll-item {
     position: absolute;
     top: 50%;
     left: 0;
     transform: translate3d(0px, -50%, 0);
-    display: inline-flex;
-    align-items: center;
-    white-space: pre;
-    will-change: transform;
-  }
-
-  .scroll-item {
     display: inline-block;
     white-space: pre;
-    padding-right: 90px;
-    flex-shrink: 0;
+    will-change: transform;
   }
 
   .side-box-right {
@@ -396,28 +388,19 @@
       <div class="ticker-center">
         <div class="row-top" id="rowTopWrap">
           <div class="scroll-box">
-            <div class="scroll-track" id="trackTop">
-              <span class="scroll-item" id="itemTopA"></span>
-              <span class="scroll-item" id="itemTopB"></span>
-            </div>
+            <span class="scroll-item" id="itemTop"></span>
           </div>
         </div>
 
         <div class="row-yellow" id="rowYellowWrap">
           <div class="scroll-box">
-            <div class="scroll-track" id="trackYellow">
-              <span class="scroll-item" id="itemYellowA"></span>
-              <span class="scroll-item" id="itemYellowB"></span>
-            </div>
+            <span class="scroll-item" id="itemYellow"></span>
           </div>
         </div>
 
         <div class="row-bottom" id="rowBottomWrap">
           <div class="scroll-box">
-            <div class="scroll-track" id="trackBottom">
-              <span class="scroll-item" id="itemBottomA"></span>
-              <span class="scroll-item" id="itemBottomB"></span>
-            </div>
+            <span class="scroll-item" id="itemBottom"></span>
           </div>
         </div>
       </div>
@@ -561,7 +544,7 @@
   /* Floating Watermark State */
   const wmEl = document.getElementById("floating-watermark");
   let wmX = 420;
-  let wmY = 220;
+  let wmY = 290;
   let wmVx = 85;
   let wmVy = 62;
   let wmLastTs = performance.now();
@@ -582,9 +565,9 @@
 
   // Per-line speed (px/sec)
   const lineSpeeds = {
-    trackTop: Number(urlParams.get("r1Speed")) > 0 ? Number(urlParams.get("r1Speed")) : 95,
-    trackYellow: Number(urlParams.get("r2Speed")) > 0 ? Number(urlParams.get("r2Speed")) : 115,
-    trackBottom: Number(urlParams.get("r3Speed")) > 0 ? Number(urlParams.get("r3Speed")) : 105
+    itemTop: Number(urlParams.get("r1Speed")) > 0 ? Number(urlParams.get("r1Speed")) : 95,
+    itemYellow: Number(urlParams.get("r2Speed")) > 0 ? Number(urlParams.get("r2Speed")) : 115,
+    itemBottom: Number(urlParams.get("r3Speed")) > 0 ? Number(urlParams.get("r3Speed")) : 105
   };
 
   const tickers = {};
@@ -596,83 +579,73 @@
     return str.trim() === "" ? "" : str;
   }
 
-  function updateTicker(trackId, chunkAId, chunkBId, wrapId, rawText, speed) {
-    const track = document.getElementById(trackId);
-    const chunkA = document.getElementById(chunkAId);
-    const chunkB = document.getElementById(chunkBId);
+  function measureItemWidth(el) {
+    const prevTransform = el.style.transform;
+    el.style.transform = "translate3d(0px, -50%, 0)";
+    const w = el.getBoundingClientRect().width;
+    el.style.transform = prevTransform;
+    return w;
+  }
+
+  function updateTicker(itemId, wrapId, rawText, speed) {
+    const item = document.getElementById(itemId);
     const wrap = wrapId ? document.getElementById(wrapId) : null;
+    const box = item.parentElement;
 
     const line = normalizeTickerLine(rawText);
     const validSpeed = (Number.isFinite(speed) && speed > 0) ? speed : 100;
 
-    if (!line) {
+    if (!line || !roundHasValue || isOverlayLocked) {
       if (wrap) wrap.style.display = "none";
-      chunkA.textContent = "";
-      chunkB.textContent = "";
-      if (tickers[trackId]) {
-        tickers[trackId].active = false;
-        tickers[trackId].raw = "";
-        tickers[trackId].x = 0;
-        track.style.transform = "translate3d(0px, -50%, 0)";
+      item.textContent = "";
+      if (tickers[itemId]) {
+        tickers[itemId].active = false;
+        tickers[itemId].raw = "";
       }
       return;
     }
 
     if (wrap) wrap.style.display = "flex";
 
-    const prev = tickers[trackId];
+    const prev = tickers[itemId];
     const textChanged = !prev || prev.raw !== line;
 
-    chunkA.textContent = line;
-    chunkB.textContent = line;
+    item.textContent = line;
 
-    requestAnimationFrame(() => {
-      if (isOverlayLocked || !roundHasValue) return;
-      const boxW = track.parentElement.getBoundingClientRect().width || 1380;
-      let w = chunkA.getBoundingClientRect().width;
+    const boxW = box.getBoundingClientRect().width || 1380;
+    const textW = Math.max(measureItemWidth(item), 40);
 
-      if (w > 0 && w < boxW + 180) {
-        const spacer = "        ";
-        const count = Math.ceil((boxW + 240) / Math.max(w + 90, 1));
-        const repeated = Array(count).fill(line).join(spacer);
-        chunkA.textContent = repeated;
-        chunkB.textContent = repeated;
-        w = chunkA.getBoundingClientRect().width;
+    if (!prev) {
+      tickers[itemId] = {
+        el: item,
+        raw: line,
+        x: boxW,
+        boxW: boxW,
+        textW: textW,
+        speed: validSpeed,
+        active: true
+      };
+      item.style.transform = `translate3d(${boxW.toFixed(2)}px, -50%, 0)`;
+    } else {
+      prev.raw = line;
+      prev.speed = validSpeed;
+      prev.boxW = boxW;
+      prev.textW = textW;
+      prev.active = true;
+      if (textChanged) {
+        prev.x = boxW;
+        prev.el.style.transform = `translate3d(${boxW.toFixed(2)}px, -50%, 0)`;
       }
-
-      if (!prev) {
-        tickers[trackId] = {
-          el: track,
-          raw: line,
-          x: 0,
-          width: Math.max(w, 1),
-          speed: validSpeed,
-          active: true,
-          ts: performance.now()
-        };
-      } else {
-        prev.raw = line;
-        prev.speed = validSpeed;
-        prev.active = true;
-        if (w > 0) {
-          if (textChanged) {
-            prev.x = prev.x % w;
-            if (prev.x > 0) prev.x -= w;
-          }
-          prev.width = w;
-        }
-        prev.ts = performance.now();
-      }
-    });
+    }
   }
 
   function refreshAllTickers() {
     const bar = document.getElementById("bottom-ticker-bar");
 
     if (isOverlayLocked || !roundHasValue || !latestData) {
-      updateTicker("trackTop", "chunkTopA", "chunkTopB", "rowTopWrap", "", lineSpeeds.trackTop);
-      updateTicker("trackYellow", "chunkYellowA", "chunkYellowB", "rowYellowWrap", "", lineSpeeds.trackYellow);
-      updateTicker("trackBottom", "chunkBottomA", "chunkBottomB", "rowBottomWrap", "", lineSpeeds.trackBottom);
+      updateTicker("itemTop", "rowTopWrap", "", lineSpeeds.itemTop);
+      updateTicker("itemYellow", "rowYellowWrap", "", lineSpeeds.itemYellow);
+      updateTicker("itemBottom", "rowBottomWrap", "", lineSpeeds.itemBottom);
       if (bar) bar.style.display = "none";
       return;
     }
@@ -686,16 +659,16 @@
       bar.style.display = (anyLineActive && latestData.tickerVisible !== false) ? "flex" : "none";
     }
 
-    updateTicker("trackTop", "chunkTopA", "chunkTopB", "rowTopWrap", r1, lineSpeeds.trackTop);
-    updateTicker("trackYellow", "chunkYellowA", "chunkYellowB", "rowYellowWrap", r2, lineSpeeds.trackYellow);
-    updateTicker("trackBottom", "chunkBottomA", "chunkBottomB", "rowBottomWrap", r3, lineSpeeds.trackBottom);
+    updateTicker("itemTop", "rowTopWrap", r1, lineSpeeds.itemTop);
+    updateTicker("itemYellow", "rowYellowWrap", r2, lineSpeeds.itemYellow);
+    updateTicker("itemBottom", "rowBottomWrap", r3, lineSpeeds.itemBottom);
   }
 
   window.setRowSpeeds = function({ row1, row2, row3 } = {}) {
     if (isOverlayLocked) return;
-    if (Number(row1) > 0) lineSpeeds.trackTop = Number(row1);
-    if (Number(row2) > 0) lineSpeeds.trackYellow = Number(row2);
-    if (Number(row3) > 0) lineSpeeds.trackBottom = Number(row3);
+    if (Number(row1) > 0) lineSpeeds.itemTop = Number(row1);
+    if (Number(row2) > 0) lineSpeeds.itemYellow = Number(row2);
+    if (Number(row3) > 0) lineSpeeds.itemBottom = Number(row3);
     refreshAllTickers();
   };
 
@@ -708,8 +681,8 @@
     Object.values(tickers).forEach((t) => {
       if (!t.active) return;
       t.x -= t.speed * dt;
-      if (t.x <= -t.width) {
-        t.x += t.width;
+      if (t.x <= -t.textW - 40) {
+        t.x = t.boxW + 20;
       }
       t.el.style.transform = `translate3d(${t.x.toFixed(2)}px, -50%, 0)`;
     });
@@ -797,13 +770,13 @@
     renderScoreboardLogo();
 
     if (Number(data.speedRow1) > 0 && !urlParams.get("r1Speed")) {
-      lineSpeeds.trackTop = Number(data.speedRow1);
+      lineSpeeds.itemTop = Number(data.speedRow1);
     }
     if (Number(data.speedRow2) > 0 && !urlParams.get("r2Speed")) {
-      lineSpeeds.trackYellow = Number(data.speedRow2);
+      lineSpeeds.itemYellow = Number(data.speedRow2);
     }
     if (Number(data.speedRow3) > 0 && !urlParams.get("r3Speed")) {
-      lineSpeeds.trackBottom = Number(data.speedRow3);
+      lineSpeeds.itemBottom = Number(data.speedRow3);
     }
 
     refreshAllTickers();
