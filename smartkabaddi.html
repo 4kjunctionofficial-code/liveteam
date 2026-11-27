@@ -171,7 +171,6 @@
     z-index: 10;
   }
 
-  /* Left Angled LIVE Box (Scoreboard-style chamfered/angled edge) */
   .side-box-left {
     width: 250px;
     height: 100%;
@@ -196,7 +195,6 @@
     transform: skewX(-6deg);
   }
 
-  /* Center 3-Row Stack */
   .ticker-center {
     flex: 1;
     display: flex;
@@ -209,23 +207,22 @@
     z-index: 2;
   }
 
-  .row-header {
+  /* Line 1: Black Scrolling Strip */
+  .row-top {
     height: 40px;
     background: #0d0d0d;
     color: #ffffff;
     display: flex;
     align-items: center;
-    justify-content: center;
     font-size: 27px;
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 0.6px;
-    padding: 0 38px;
-    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    position: relative;
   }
 
+  /* Line 2: Yellow Scrolling Strip */
   .row-yellow {
     height: 42px;
     background: #ffe600;
@@ -239,6 +236,7 @@
     position: relative;
   }
 
+  /* Line 3: Black Scrolling Strip */
   .row-bottom {
     height: 40px;
     background: #0d0d0d;
@@ -272,10 +270,9 @@
 
   .scroll-item {
     display: inline-block;
-    padding-right: 65px;
+    padding-right: 75px;
   }
 
-  /* Right Angled Box (Same size & angled point as left box; PNG logo if provided, clean blank yellow otherwise) */
   .side-box-right {
     width: 250px;
     height: 100%;
@@ -325,15 +322,24 @@
     <!-- WATERMARK -->
     <div id="watermark-box"></div>
 
-    <!-- BOTTOM TICKER -->
+    <!-- BOTTOM 3-LINE SCROLLING TICKER -->
     <div id="bottom-ticker-bar">
       <div class="side-box-left">
         <div class="live-label">LIVE</div>
       </div>
 
       <div class="ticker-center">
-        <div class="row-header" id="tickerTopRow">OPEN KABADDI TOURNAMENT</div>
+        <!-- Line 1 (Scrolling) -->
+        <div class="row-top">
+          <div class="scroll-box">
+            <div class="scroll-track" id="trackTop">
+              <span class="scroll-item" id="itemTopA">OPEN KABADDI TOURNAMENT</span>
+              <span class="scroll-item" id="itemTopB">OPEN KABADDI TOURNAMENT</span>
+            </div>
+          </div>
+        </div>
 
+        <!-- Line 2 (Scrolling) -->
         <div class="row-yellow">
           <div class="scroll-box">
             <div class="scroll-track" id="trackYellow">
@@ -343,6 +349,7 @@
           </div>
         </div>
 
+        <!-- Line 3 (Scrolling) -->
         <div class="row-bottom">
           <div class="scroll-box">
             <div class="scroll-track" id="trackBottom">
@@ -422,25 +429,27 @@
       let w = itemA.getBoundingClientRect().width;
       const boxW = track.parentElement.getBoundingClientRect().width || 1400;
 
-      if (w < boxW) {
-        const count = Math.ceil((boxW * 1.4) / Math.max(w, 100));
-        const repeated = Array(count).fill(clean).join("    ");
+      if (w < boxW * 1.15) {
+        const count = Math.ceil((boxW * 1.4) / Math.max(w, 120));
+        const repeated = Array(count).fill(clean).join("     •     ");
         itemA.textContent = repeated;
         itemB.textContent = repeated;
         w = itemA.getBoundingClientRect().width;
       }
+
+      const validSpeed = (Number.isFinite(speed) && speed > 0) ? speed : 100;
 
       if (!tickers[trackId]) {
         tickers[trackId] = {
           el: track,
           x: 0,
           width: w || 600,
-          speed: speed,
+          speed: validSpeed,
           ts: performance.now()
         };
       } else {
         tickers[trackId].width = w || 600;
-        tickers[trackId].speed = speed;
+        tickers[trackId].speed = validSpeed;
       }
     });
   }
@@ -499,14 +508,20 @@
 
     setPngLogo(queryLogoUrl || data.logoUrl);
 
+    const speed1 = parseFloat(data.speedRow1) || 95;
+    const speed2 = parseFloat(data.speedRow2) || 115;
+    const speed3 = parseFloat(data.speedRow3) || 105;
+
+    // Line 1 (Scrolling): Village + Program
     const village = getText(data.row1Txt, data.row1Txt_pa);
     const program = getText(data.programTxt, data.programTxt_pa);
     const topParts = [];
     if (village) topParts.push(village);
     if (program) topParts.push(program);
-    document.getElementById("tickerTopRow").innerText =
-      topParts.join(" — ") || "OPEN KABADDI TOURNAMENT";
+    const topLine = topParts.join(" — ") || "OPEN KABADDI TOURNAMENT";
+    updateTicker("trackTop", "itemTopA", "itemTopB", topLine, speed1);
 
+    // Line 2 (Scrolling): Prizes + Result + Ads
     const yellowParts = [];
 
     const cat1 = [];
@@ -535,8 +550,9 @@
       ? yellowParts.join("     |     ")
       : (topParts.join(" — ") || "LIVE KABADDI TOURNAMENT");
 
-    updateTicker("trackYellow", "itemYellowA", "itemYellowB", yellowLine, 110);
+    updateTicker("trackYellow", "itemYellowA", "itemYellowB", yellowLine, speed2);
 
+    // Line 3 (Scrolling): Next Matches + Upcoming Events + Telecast
     const bottomParts = [];
 
     const nextMatches = getText(data.row5Txt, data.row5Txt_pa);
@@ -558,7 +574,7 @@
       ? bottomParts.join("     |     ")
       : "LIVE KABADDI BROADCAST";
 
-    updateTicker("trackBottom", "itemBottomA", "itemBottomB", bottomLine, 100);
+    updateTicker("trackBottom", "itemBottomA", "itemBottomB", bottomLine, speed3);
   });
 </script>
 </body>
