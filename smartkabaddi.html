@@ -39,7 +39,7 @@
   /* ==================== FLOATING WATERMARK ==================== */
   #floating-watermark {
     position: absolute;
-    top: 200px;
+    top: 190px;
     left: 420px;
     font-family: 'Roboto Condensed', 'Noto Sans Gurmukhi', sans-serif;
     font-size: 46px;
@@ -57,7 +57,7 @@
   /* ==================== TOP-LEFT SCOREBOARD ==================== */
   #scoreboard-wrapper {
     position: absolute;
-    top: 30px;
+    top: 14px;
     left: 40px;
     display: flex;
     flex-direction: column;
@@ -162,10 +162,10 @@
   /* ==================== LARGE LOGO AT TOP-RIGHT CORNER ==================== */
   #sb-logo-box {
     position: absolute;
-    top: 28px;
-    right: 36px;
-    width: 210px;
-    height: 156px;
+    top: 24px;
+    right: 32px;
+    width: 265px;
+    height: 195px;
     display: none;
     align-items: center;
     justify-content: center;
@@ -173,21 +173,21 @@
   }
 
   #pngLogoImg {
-    max-width: 202px;
-    max-height: 148px;
+    max-width: 256px;
+    max-height: 186px;
     width: auto;
     height: auto;
     object-fit: contain;
     filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.8));
   }
 
-  /* ==================== BOTTOM 3-LINE TICKER WITH GREEN SIDE BOXES ==================== */
+  /* ==================== BOTTOM 3-LINE TICKER (TALLER HEIGHT) ==================== */
   #bottom-ticker-bar {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 1920px;
-    height: 122px;
+    height: 144px;
     display: none;
     align-items: stretch;
     background: #0d0d0d;
@@ -211,7 +211,7 @@
   .live-label {
     font-family: 'Roboto Condensed', sans-serif;
     font-style: italic;
-    font-size: 60px;
+    font-size: 66px;
     font-weight: 900;
     color: #ffe600;
     letter-spacing: 1.5px;
@@ -232,12 +232,12 @@
   }
 
   .row-top {
-    height: 40px;
+    height: 48px;
     background: #0d0d0d;
     color: #ffffff;
     display: flex;
     align-items: center;
-    font-size: 27px;
+    font-size: 29px;
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 0.6px;
@@ -246,12 +246,12 @@
   }
 
   .row-yellow {
-    height: 42px;
+    height: 50px;
     background: #ffe600;
     color: #111111;
     display: flex;
     align-items: center;
-    font-size: 28px;
+    font-size: 31px;
     font-weight: 900;
     letter-spacing: 0.3px;
     overflow: hidden;
@@ -259,12 +259,12 @@
   }
 
   .row-bottom {
-    height: 40px;
+    height: 46px;
     background: #0d0d0d;
     color: #ffffff;
     display: flex;
     align-items: center;
-    font-size: 26px;
+    font-size: 28px;
     font-weight: 800;
     letter-spacing: 0.3px;
     overflow: hidden;
@@ -544,7 +544,7 @@
   /* Floating Watermark State */
   const wmEl = document.getElementById("floating-watermark");
   let wmX = 420;
-  let wmY = 220;
+  let wmY = 200;
   let wmVx = 85;
   let wmVy = 62;
   let wmLastTs = performance.now();
@@ -690,8 +690,8 @@
     if (wmActive) {
       const minX = 40;
       const minY = 140;
-      const maxX = Math.max(minX + 100, 1920 - 260 - wmEl.offsetWidth);
-      const maxY = Math.max(minY + 60, 1080 - 122 - wmEl.offsetHeight - 30);
+      const maxX = Math.max(minX + 100, 1920 - 315 - wmEl.offsetWidth);
+      const maxY = Math.max(minY + 60, 1080 - 144 - wmEl.offsetHeight - 30);
 
       wmX += wmVx * dt;
       wmY += wmVy * dt;
