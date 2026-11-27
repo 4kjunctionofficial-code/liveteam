@@ -39,7 +39,7 @@
   /* ==================== FLOATING WATERMARK ==================== */
   #floating-watermark {
     position: absolute;
-    top: 290px;
+    top: 200px;
     left: 420px;
     font-family: 'Roboto Condensed', 'Noto Sans Gurmukhi', sans-serif;
     font-size: 46px;
@@ -159,13 +159,13 @@
     paint-order: stroke fill;
   }
 
-  /* ==================== CLIENT LOGO BELOW SCOREBOARD ==================== */
+  /* ==================== LARGE LOGO AT TOP-RIGHT CORNER ==================== */
   #sb-logo-box {
     position: absolute;
-    top: 164px;
-    left: 52px;
-    width: 148px;
-    height: 112px;
+    top: 28px;
+    right: 36px;
+    width: 210px;
+    height: 156px;
     display: none;
     align-items: center;
     justify-content: center;
@@ -173,12 +173,12 @@
   }
 
   #pngLogoImg {
-    max-width: 144px;
-    max-height: 108px;
+    max-width: 202px;
+    max-height: 148px;
     width: auto;
     height: auto;
     object-fit: contain;
-    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.75));
+    filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.8));
   }
 
   /* ==================== BOTTOM 3-LINE TICKER WITH GREEN SIDE BOXES ==================== */
@@ -371,7 +371,7 @@
       <div class="sb-round" id="roundDisplay"></div>
     </div>
 
-    <!-- CLIENT LOGO BELOW SCOREBOARD -->
+    <!-- LARGE LOGO AT TOP-RIGHT CORNER -->
     <div id="sb-logo-box">
       <img id="pngLogoImg" alt="SmartKabaddi Logo">
     </div>
@@ -518,7 +518,7 @@
   let currentLogoUrl = getActiveLogo("");
   let currentLogoVisible = true;
 
-  function renderScoreboardLogo() {
+  function renderRightCornerLogo() {
     const box = document.getElementById("sb-logo-box");
     const img = document.getElementById("pngLogoImg");
     const clean = (currentLogoUrl || "").trim();
@@ -544,7 +544,7 @@
   /* Floating Watermark State */
   const wmEl = document.getElementById("floating-watermark");
   let wmX = 420;
-  let wmY = 290;
+  let wmY = 220;
   let wmVx = 85;
   let wmVy = 62;
   let wmLastTs = performance.now();
@@ -689,8 +689,8 @@
 
     if (wmActive) {
       const minX = 40;
-      const minY = 290;
-      const maxX = Math.max(minX + 100, 1920 - wmEl.offsetWidth - 40);
+      const minY = 140;
+      const maxX = Math.max(minX + 100, 1920 - 260 - wmEl.offsetWidth);
       const maxY = Math.max(minY + 60, 1080 - 122 - wmEl.offsetHeight - 30);
 
       wmX += wmVx * dt;
@@ -719,7 +719,7 @@
   }
   rafId = requestAnimationFrame(animateLoop);
 
-  renderScoreboardLogo();
+  renderRightCornerLogo();
 
   db.on("value", (snap) => {
     if (isOverlayLocked) return;
@@ -728,7 +728,7 @@
       latestData = null;
       currentLogoUrl = getActiveLogo("");
       currentLogoVisible = true;
-      renderScoreboardLogo();
+      renderRightCornerLogo();
       refreshAllTickers();
       return;
     }
@@ -756,7 +756,7 @@
 
     currentLogoUrl = getActiveLogo(data.logoUrl);
     currentLogoVisible = (data.logoVisible !== false);
-    renderScoreboardLogo();
+    renderRightCornerLogo();
 
     if (Number(data.speedRow1) > 0 && !urlParams.get("r1Speed")) {
       lineSpeeds.itemTop = Number(data.speedRow1);
