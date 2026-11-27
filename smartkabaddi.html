@@ -159,13 +159,13 @@
     paint-order: stroke fill;
   }
 
-  /* ==================== CLIENT LOGO BELOW SCOREBOARD ==================== */
+  /* ==================== TOP-RIGHT CLIENT LOGO ==================== */
   #sb-logo-box {
     position: absolute;
-    top: 164px;
-    left: 52px;
-    width: 148px;
-    height: 112px;
+    top: 30px;
+    right: 42px;
+    width: 132px;
+    height: 104px;
     display: none;
     align-items: center;
     justify-content: center;
@@ -173,8 +173,8 @@
   }
 
   #pngLogoImg {
-    max-width: 144px;
-    max-height: 108px;
+    max-width: 128px;
+    max-height: 100px;
     width: auto;
     height: auto;
     object-fit: contain;
@@ -278,14 +278,22 @@
     overflow: hidden;
   }
 
-  .scroll-item {
+  .scroll-track {
     position: absolute;
     top: 50%;
     left: 0;
     transform: translate3d(0px, -50%, 0);
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
     white-space: pre;
     will-change: transform;
+  }
+
+  .scroll-item {
+    display: inline-block;
+    white-space: pre;
+    padding-right: 90px;
+    flex-shrink: 0;
   }
 
   .side-box-right {
@@ -371,13 +379,13 @@
       <div class="sb-round" id="roundDisplay"></div>
     </div>
 
-    <!-- CLIENT LOGO BELOW SCOREBOARD -->
+    <!-- FLOATING WATERMARK -->
+    <div id="floating-watermark"></div>
+
+    <!-- TOP-RIGHT CLIENT LOGO -->
     <div id="sb-logo-box">
       <img id="pngLogoImg" alt="Client Logo">
     </div>
-
-    <!-- FLOATING WATERMARK -->
-    <div id="floating-watermark"></div>
 
     <!-- BOTTOM 3-LINE SCROLLING TICKER WITH GREEN SIDE BOXES -->
     <div id="bottom-ticker-bar">
@@ -388,19 +396,28 @@
       <div class="ticker-center">
         <div class="row-top" id="rowTopWrap">
           <div class="scroll-box">
-            <span class="scroll-item" id="itemTop"></span>
+            <div class="scroll-track" id="trackTop">
+              <span class="scroll-item" id="itemTopA"></span>
+              <span class="scroll-item" id="itemTopB"></span>
+            </div>
           </div>
         </div>
 
         <div class="row-yellow" id="rowYellowWrap">
           <div class="scroll-box">
-            <span class="scroll-item" id="itemYellow"></span>
+            <div class="scroll-track" id="trackYellow">
+              <span class="scroll-item" id="itemYellowA"></span>
+              <span class="scroll-item" id="itemYellowB"></span>
+            </div>
           </div>
         </div>
 
         <div class="row-bottom" id="rowBottomWrap">
           <div class="scroll-box">
-            <span class="scroll-item" id="itemBottom"></span>
+            <div class="scroll-track" id="trackBottom">
+              <span class="scroll-item" id="itemBottomA"></span>
+              <span class="scroll-item" id="itemBottomB"></span>
+            </div>
           </div>
         </div>
       </div>
@@ -442,7 +459,7 @@
   const queryLogoUrl = (urlParams.get('logo') || "").trim();
 
   const clientLogos = {
-    "smartkabaddi": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Picsart_24-01-02_09-57-53-097.jpg.jpeg"
+    "mudki1": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/KABADDI%20SPORTS%201%20Logo.png"
   };
 
   function getActiveLogo(dbLogoUrl) {
@@ -518,7 +535,7 @@
   let currentLogoVisible = true;
   let roundHasValue = false;
 
-  function renderScoreboardLogo() {
+  function renderRightCornerLogo() {
     const box = document.getElementById("sb-logo-box");
     const img = document.getElementById("pngLogoImg");
     const clean = (currentLogoUrl || "").trim();
@@ -544,7 +561,7 @@
   /* Floating Watermark State */
   const wmEl = document.getElementById("floating-watermark");
   let wmX = 420;
-  let wmY = 290;
+  let wmY = 220;
   let wmVx = 85;
   let wmVy = 62;
   let wmLastTs = performance.now();
@@ -565,9 +582,9 @@
 
   // Per-line speed (px/sec)
   const lineSpeeds = {
-    itemTop: Number(urlParams.get("r1Speed")) > 0 ? Number(urlParams.get("r1Speed")) : 95,
-    itemYellow: Number(urlParams.get("r2Speed")) > 0 ? Number(urlParams.get("r2Speed")) : 115,
-    itemBottom: Number(urlParams.get("r3Speed")) > 0 ? Number(urlParams.get("r3Speed")) : 105
+    trackTop: Number(urlParams.get("r1Speed")) > 0 ? Number(urlParams.get("r1Speed")) : 95,
+    trackYellow: Number(urlParams.get("r2Speed")) > 0 ? Number(urlParams.get("r2Speed")) : 115,
+    trackBottom: Number(urlParams.get("r3Speed")) > 0 ? Number(urlParams.get("r3Speed")) : 105
   };
 
   const tickers = {};
@@ -579,73 +596,83 @@
     return str.trim() === "" ? "" : str;
   }
 
-  function measureItemWidth(el) {
-    const prevTransform = el.style.transform;
-    el.style.transform = "translate3d(0px, -50%, 0)";
-    const w = el.getBoundingClientRect().width;
-    el.style.transform = prevTransform;
-    return w;
-  }
-
-  function updateTicker(itemId, wrapId, rawText, speed) {
-    const item = document.getElementById(itemId);
+  function updateTicker(trackId, chunkAId, chunkBId, wrapId, rawText, speed) {
+    const track = document.getElementById(trackId);
+    const chunkA = document.getElementById(chunkAId);
+    const chunkB = document.getElementById(chunkBId);
     const wrap = wrapId ? document.getElementById(wrapId) : null;
-    const box = item.parentElement;
 
     const line = normalizeTickerLine(rawText);
     const validSpeed = (Number.isFinite(speed) && speed > 0) ? speed : 100;
 
-    if (!line || !roundHasValue || isOverlayLocked) {
+    if (!line) {
       if (wrap) wrap.style.display = "none";
-      item.textContent = "";
-      if (tickers[itemId]) {
-        tickers[itemId].active = false;
-        tickers[itemId].raw = "";
+      chunkA.textContent = "";
+      chunkB.textContent = "";
+      if (tickers[trackId]) {
+        tickers[trackId].active = false;
+        tickers[trackId].raw = "";
+        tickers[trackId].x = 0;
+        track.style.transform = "translate3d(0px, -50%, 0)";
       }
       return;
     }
 
     if (wrap) wrap.style.display = "flex";
 
-    const prev = tickers[itemId];
+    const prev = tickers[trackId];
     const textChanged = !prev || prev.raw !== line;
 
-    item.textContent = line;
+    chunkA.textContent = line;
+    chunkB.textContent = line;
 
-    const boxW = box.getBoundingClientRect().width || 1380;
-    const textW = Math.max(measureItemWidth(item), 40);
+    requestAnimationFrame(() => {
+      if (isOverlayLocked || !roundHasValue) return;
+      const boxW = track.parentElement.getBoundingClientRect().width || 1380;
+      let w = chunkA.getBoundingClientRect().width;
 
-    if (!prev) {
-      tickers[itemId] = {
-        el: item,
-        raw: line,
-        x: boxW,
-        boxW: boxW,
-        textW: textW,
-        speed: validSpeed,
-        active: true
-      };
-      item.style.transform = `translate3d(${boxW.toFixed(2)}px, -50%, 0)`;
-    } else {
-      prev.raw = line;
-      prev.speed = validSpeed;
-      prev.boxW = boxW;
-      prev.textW = textW;
-      prev.active = true;
-      if (textChanged) {
-        prev.x = boxW;
-        prev.el.style.transform = `translate3d(${boxW.toFixed(2)}px, -50%, 0)`;
+      if (w > 0 && w < boxW + 180) {
+        const spacer = "        ";
+        const count = Math.ceil((boxW + 240) / Math.max(w + 90, 1));
+        const repeated = Array(count).fill(line).join(spacer);
+        chunkA.textContent = repeated;
+        chunkB.textContent = repeated;
+        w = chunkA.getBoundingClientRect().width;
       }
-    }
+
+      if (!prev) {
+        tickers[trackId] = {
+          el: track,
+          raw: line,
+          x: 0,
+          width: Math.max(w, 1),
+          speed: validSpeed,
+          active: true,
+          ts: performance.now()
+        };
+      } else {
+        prev.raw = line;
+        prev.speed = validSpeed;
+        prev.active = true;
+        if (w > 0) {
+          if (textChanged) {
+            prev.x = prev.x % w;
+            if (prev.x > 0) prev.x -= w;
+          }
+          prev.width = w;
+        }
+        prev.ts = performance.now();
+      }
+    });
   }
 
   function refreshAllTickers() {
     const bar = document.getElementById("bottom-ticker-bar");
 
     if (isOverlayLocked || !roundHasValue || !latestData) {
-      updateTicker("itemTop", "rowTopWrap", "", lineSpeeds.itemTop);
-      updateTicker("itemYellow", "rowYellowWrap", "", lineSpeeds.itemYellow);
-      updateTicker("itemBottom", "rowBottomWrap", "", lineSpeeds.itemBottom);
+      updateTicker("trackTop", "chunkTopA", "chunkTopB", "rowTopWrap", "", lineSpeeds.trackTop);
+      updateTicker("trackYellow", "chunkYellowA", "chunkYellowB", "rowYellowWrap", "", lineSpeeds.trackYellow);
+      updateTicker("trackBottom", "chunkBottomA", "chunkBottomB", "rowBottomWrap", "", lineSpeeds.trackBottom);
       if (bar) bar.style.display = "none";
       return;
     }
@@ -659,16 +686,16 @@
       bar.style.display = (anyLineActive && latestData.tickerVisible !== false) ? "flex" : "none";
     }
 
-    updateTicker("itemTop", "rowTopWrap", r1, lineSpeeds.itemTop);
-    updateTicker("itemYellow", "rowYellowWrap", r2, lineSpeeds.itemYellow);
-    updateTicker("itemBottom", "rowBottomWrap", r3, lineSpeeds.itemBottom);
+    updateTicker("trackTop", "chunkTopA", "chunkTopB", "rowTopWrap", r1, lineSpeeds.trackTop);
+    updateTicker("trackYellow", "chunkYellowA", "chunkYellowB", "rowYellowWrap", r2, lineSpeeds.trackYellow);
+    updateTicker("trackBottom", "chunkBottomA", "chunkBottomB", "rowBottomWrap", r3, lineSpeeds.trackBottom);
   }
 
   window.setRowSpeeds = function({ row1, row2, row3 } = {}) {
     if (isOverlayLocked) return;
-    if (Number(row1) > 0) lineSpeeds.itemTop = Number(row1);
-    if (Number(row2) > 0) lineSpeeds.itemYellow = Number(row2);
-    if (Number(row3) > 0) lineSpeeds.itemBottom = Number(row3);
+    if (Number(row1) > 0) lineSpeeds.trackTop = Number(row1);
+    if (Number(row2) > 0) lineSpeeds.trackYellow = Number(row2);
+    if (Number(row3) > 0) lineSpeeds.trackBottom = Number(row3);
     refreshAllTickers();
   };
 
@@ -681,15 +708,15 @@
     Object.values(tickers).forEach((t) => {
       if (!t.active) return;
       t.x -= t.speed * dt;
-      if (t.x <= -t.textW - 40) {
-        t.x = t.boxW + 20;
+      if (t.x <= -t.width) {
+        t.x += t.width;
       }
       t.el.style.transform = `translate3d(${t.x.toFixed(2)}px, -50%, 0)`;
     });
 
     if (wmActive) {
       const minX = 40;
-      const minY = 290;
+      const minY = 140;
       const maxX = Math.max(minX + 100, 1920 - wmEl.offsetWidth - 40);
       const maxY = Math.max(minY + 60, 1080 - 122 - wmEl.offsetHeight - 30);
 
@@ -729,7 +756,7 @@
       latestData = null;
       stageEl.style.display = "none";
       setFloatingWatermark("");
-      renderScoreboardLogo();
+      renderRightCornerLogo();
       refreshAllTickers();
       return;
     }
@@ -744,7 +771,7 @@
     if (!roundHasValue) {
       stageEl.style.display = "none";
       setFloatingWatermark("");
-      renderScoreboardLogo();
+      renderRightCornerLogo();
       refreshAllTickers();
       return;
     }
@@ -767,16 +794,16 @@
 
     currentLogoUrl = getActiveLogo(data.logoUrl);
     currentLogoVisible = (data.logoVisible !== false);
-    renderScoreboardLogo();
+    renderRightCornerLogo();
 
     if (Number(data.speedRow1) > 0 && !urlParams.get("r1Speed")) {
-      lineSpeeds.itemTop = Number(data.speedRow1);
+      lineSpeeds.trackTop = Number(data.speedRow1);
     }
     if (Number(data.speedRow2) > 0 && !urlParams.get("r2Speed")) {
-      lineSpeeds.itemYellow = Number(data.speedRow2);
+      lineSpeeds.trackYellow = Number(data.speedRow2);
     }
     if (Number(data.speedRow3) > 0 && !urlParams.get("r3Speed")) {
-      lineSpeeds.itemBottom = Number(data.speedRow3);
+      lineSpeeds.trackBottom = Number(data.speedRow3);
     }
 
     refreshAllTickers();
