@@ -22,8 +22,10 @@
         .settings-section { padding: 15px; background: #fafafa; box-sizing: border-box; }
         .label { font-size: 12px; font-weight: bold; color: #555; margin-bottom: 5px; display: block; text-transform: uppercase; }
         textarea, .std-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; margin-bottom: 12px; resize: none; box-sizing: border-box; font-family: inherit; }
-        .speed-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
-        .speed-row .std-input { margin-bottom: 0; text-align: center; }
+        .line-scroll-box { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px; margin-bottom: 12px; }
+        .line-scroll-top { display: flex; gap: 8px; align-items: center; }
+        .line-scroll-top .std-input { margin-bottom: 0; flex: 1; text-align: center; }
+        .btn-scroll-toggle { border: none; color: white; padding: 10px 14px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; text-transform: uppercase; min-width: 125px; }
         .controls { padding: 15px; display: flex; flex-direction: column; gap: 8px; }
         .btn-full { border: none; color: white; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-bottom: 5px; width: 100%; box-sizing: border-box;}
         .btn-blue { background: #1a73e8; } .btn-yellow { background: #fbbc05; color: #000; } .btn-red { background: #ea4335; } .btn-dark { background: #333; }
@@ -65,20 +67,31 @@
     <div class="card">
         <div class="header">Ticker & Branding</div>
         <div class="settings-section">
-            <label class="label">Row 1 (Top Black)</label>
-            <textarea id="row1Inp" rows="2" placeholder="Title Line 1" oninput="updateDB()"></textarea>
+            <div class="line-scroll-box">
+                <label class="label">Row 1 (Top Black)</label>
+                <textarea id="row1Inp" rows="2" style="margin-bottom:8px;" placeholder="Title Line 1" oninput="updateDB()"></textarea>
+                <div class="line-scroll-top">
+                    <input type="number" id="speedRow1Inp" class="std-input" min="0" max="500" step="5" placeholder="Speed (0 = Center)" oninput="updateDB()">
+                    <button id="scr1Btn" class="btn-scroll-toggle" onclick="toggleScroll('scrollRow1')">Scroll ON</button>
+                </div>
+            </div>
 
-            <label class="label">Row 2 (Middle Yellow)</label>
-            <textarea id="row2Inp" rows="2" placeholder="Title Line 2" oninput="updateDB()"></textarea>
+            <div class="line-scroll-box">
+                <label class="label">Row 2 (Middle Yellow)</label>
+                <textarea id="row2Inp" rows="2" style="margin-bottom:8px;" placeholder="Title Line 2" oninput="updateDB()"></textarea>
+                <div class="line-scroll-top">
+                    <input type="number" id="speedRow2Inp" class="std-input" min="0" max="500" step="5" placeholder="Speed (0 = Center)" oninput="updateDB()">
+                    <button id="scr2Btn" class="btn-scroll-toggle" onclick="toggleScroll('scrollRow2')">Scroll ON</button>
+                </div>
+            </div>
 
-            <label class="label">Row 3 (Bottom Black)</label>
-            <textarea id="row3Inp" rows="2" placeholder="Title Line 3" oninput="updateDB()"></textarea>
-
-            <label class="label">3-Line Scroll Speed (px/sec)</label>
-            <div class="speed-row">
-                <input type="number" id="speedRow1Inp" class="std-input" min="15" max="500" step="5" placeholder="Row 1 (95)" oninput="updateDB()">
-                <input type="number" id="speedRow2Inp" class="std-input" min="15" max="500" step="5" placeholder="Row 2 (115)" oninput="updateDB()">
-                <input type="number" id="speedRow3Inp" class="std-input" min="15" max="500" step="5" placeholder="Row 3 (105)" oninput="updateDB()">
+            <div class="line-scroll-box">
+                <label class="label">Row 3 (Bottom Black)</label>
+                <textarea id="row3Inp" rows="2" style="margin-bottom:8px;" placeholder="Title Line 3" oninput="updateDB()"></textarea>
+                <div class="line-scroll-top">
+                    <input type="number" id="speedRow3Inp" class="std-input" min="0" max="500" step="5" placeholder="Speed (0 = Center)" oninput="updateDB()">
+                    <button id="scr3Btn" class="btn-scroll-toggle" onclick="toggleScroll('scrollRow3')">Scroll ON</button>
+                </div>
             </div>
 
             <button id="tickVisBtn" class="btn-full btn-blue" onclick="toggleVis('tickerVisible')">Show/Hide Ticker</button>
@@ -92,10 +105,11 @@
     const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
     const urlParams = new URLSearchParams(window.location.search);
-    const matchId = urlParams.get('id') || 'defaultMatch';
+    const matchId = (urlParams.get('id') || 'defaultMatch').trim().toLowerCase();
     const db = firebase.database().ref("matchData/" + matchId);
 
     let curA = 0, curB = 0, sVis = true, tVis = true, lVis = true;
+    let scr1 = true, scr2 = true, scr3 = true;
 
     function setIfIdle(id, val) {
         const el = document.getElementById(id);
@@ -112,6 +126,9 @@
             sVis = data.scoreVisible !== false;
             tVis = data.tickerVisible !== false;
             lVis = data.logoVisible !== false;
+            scr1 = data.scrollRow1 !== false;
+            scr2 = data.scrollRow2 !== false;
+            scr3 = data.scrollRow3 !== false;
             
             document.getElementById('dispA').innerText = curA;
             document.getElementById('dispB').innerText = curB;
@@ -129,6 +146,9 @@
             updateBtnUI('visBtn', sVis, "Scoreboard");
             updateBtnUI('tickVisBtn', tVis, "Ticker");
             updateBtnUI('logoBtn', lVis, "Logo");
+            updateScrollBtnUI('scr1Btn', scr1, "Row 1");
+            updateScrollBtnUI('scr2Btn', scr2, "Row 2");
+            updateScrollBtnUI('scr3Btn', scr3, "Row 3");
         }
     });
 
@@ -137,6 +157,14 @@
         if(btn) {
             btn.innerText = val ? "Hide " + text : "Show " + text;
             btn.style.background = val ? (id==='logoBtn'?'#333':'#dc3545') : "#28a745";
+        }
+    }
+
+    function updateScrollBtnUI(id, isOn, rowLabel) {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.innerText = isOn ? `${rowLabel} Scroll: ON` : `${rowLabel} Center (OFF)`;
+            btn.style.background = isOn ? "#1a73e8" : "#6c757d";
         }
     }
 
@@ -154,9 +182,12 @@
         db.update({ [team]: newVal });
     }
 
-    function parseSpd(id, fallback) {
-        const n = parseFloat(document.getElementById(id).value);
-        return Number.isFinite(n) && n > 0 ? Math.min(Math.max(n, 15), 500) : fallback;
+    function parseSpdAllowZero(id, fallback) {
+        const raw = document.getElementById(id).value;
+        if (raw === "") return fallback;
+        const n = parseFloat(raw);
+        if (!Number.isFinite(n) || n <= 0) return 0;
+        return Math.min(n, 500);
     }
 
     function updateDB() {
@@ -167,15 +198,20 @@
             row1Txt: document.getElementById('row1Inp').value,
             row2Txt: document.getElementById('row2Inp').value,
             row3Txt: document.getElementById('row3Inp').value,
-            speedRow1: parseSpd('speedRow1Inp', 95),
-            speedRow2: parseSpd('speedRow2Inp', 115),
-            speedRow3: parseSpd('speedRow3Inp', 105),
+            speedRow1: parseSpdAllowZero('speedRow1Inp', 95),
+            speedRow2: parseSpdAllowZero('speedRow2Inp', 115),
+            speedRow3: parseSpdAllowZero('speedRow3Inp', 105),
             watermarkTxt: document.getElementById('watermarkInp').value
         });
     }
 
     function toggleVis(field) {
         let val = (field === 'scoreVisible') ? sVis : (field === 'tickerVisible' ? tVis : lVis);
+        db.child(field).set(!val);
+    }
+
+    function toggleScroll(field) {
+        let val = (field === 'scrollRow1') ? scr1 : (field === 'scrollRow2' ? scr2 : scr3);
         db.child(field).set(!val);
     }
 
