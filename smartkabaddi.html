@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kabaddi Live Overlay</title>
+<title>Kabaddi Live Overlay - SmartKabaddi</title>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gurmukhi:wght@700;900&family=Oswald:wght@700&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet">
@@ -33,12 +33,13 @@
     transform-origin: center center;
     background: transparent;
     overflow: hidden;
+    display: block;
   }
 
   /* ==================== FLOATING WATERMARK ==================== */
   #floating-watermark {
     position: absolute;
-    top: 220px;
+    top: 290px;
     left: 420px;
     font-family: 'Roboto Condensed', 'Noto Sans Gurmukhi', sans-serif;
     font-size: 46px;
@@ -158,13 +159,13 @@
     paint-order: stroke fill;
   }
 
-  /* ==================== TOP-RIGHT CLIENT LOGO ==================== */
+  /* ==================== CLIENT LOGO BELOW SCOREBOARD ==================== */
   #sb-logo-box {
     position: absolute;
-    top: 30px;
-    right: 42px;
-    width: 132px;
-    height: 104px;
+    top: 164px;
+    left: 52px;
+    width: 148px;
+    height: 112px;
     display: none;
     align-items: center;
     justify-content: center;
@@ -172,8 +173,8 @@
   }
 
   #pngLogoImg {
-    max-width: 128px;
-    max-height: 100px;
+    max-width: 144px;
+    max-height: 108px;
     width: auto;
     height: auto;
     object-fit: contain;
@@ -187,7 +188,7 @@
     left: 0;
     width: 1920px;
     height: 122px;
-    display: flex;
+    display: none;
     align-items: stretch;
     background: #0d0d0d;
     transition: opacity 0.25s ease;
@@ -277,22 +278,14 @@
     overflow: hidden;
   }
 
-  .scroll-track {
+  .scroll-item {
     position: absolute;
     top: 50%;
     left: 0;
     transform: translate3d(0px, -50%, 0);
-    display: inline-flex;
-    align-items: center;
-    white-space: pre;
-    will-change: transform;
-  }
-
-  .scroll-item {
     display: inline-block;
     white-space: pre;
-    padding-right: 90px;
-    flex-shrink: 0;
+    will-change: transform;
   }
 
   .side-box-right {
@@ -378,13 +371,13 @@
       <div class="sb-round" id="roundDisplay"></div>
     </div>
 
+    <!-- CLIENT LOGO BELOW SCOREBOARD -->
+    <div id="sb-logo-box">
+      <img id="pngLogoImg" alt="SmartKabaddi Logo">
+    </div>
+
     <!-- FLOATING WATERMARK -->
     <div id="floating-watermark"></div>
-
-    <!-- TOP-RIGHT CLIENT LOGO -->
-    <div id="sb-logo-box">
-      <img id="pngLogoImg" alt="Client Logo">
-    </div>
 
     <!-- BOTTOM 3-LINE SCROLLING TICKER WITH GREEN SIDE BOXES -->
     <div id="bottom-ticker-bar">
@@ -395,28 +388,19 @@
       <div class="ticker-center">
         <div class="row-top" id="rowTopWrap">
           <div class="scroll-box">
-            <div class="scroll-track" id="trackTop">
-              <span class="scroll-item" id="itemTopA"></span>
-              <span class="scroll-item" id="itemTopB"></span>
-            </div>
+            <span class="scroll-item" id="itemTop"></span>
           </div>
         </div>
 
         <div class="row-yellow" id="rowYellowWrap">
           <div class="scroll-box">
-            <div class="scroll-track" id="trackYellow">
-              <span class="scroll-item" id="itemYellowA"></span>
-              <span class="scroll-item" id="itemYellowB"></span>
-            </div>
+            <span class="scroll-item" id="itemYellow"></span>
           </div>
         </div>
 
         <div class="row-bottom" id="rowBottomWrap">
           <div class="scroll-box">
-            <div class="scroll-track" id="trackBottom">
-              <span class="scroll-item" id="itemBottomA"></span>
-              <span class="scroll-item" id="itemBottomB"></span>
-            </div>
+            <span class="scroll-item" id="itemBottom"></span>
           </div>
         </div>
       </div>
@@ -453,18 +437,19 @@
   firebase.initializeApp(firebaseConfig);
 
   const urlParams = new URLSearchParams(window.location.search);
-  const matchId = urlParams.get('id') || 'defaultMatch';
-  const langMode = urlParams.get('lang') || 'en';
+  const rawMatchId = (urlParams.get('id') || 'smartkabaddi').trim();
+  const matchId = rawMatchId.toLowerCase();
+  const langMode = (urlParams.get('lang') || 'en').trim().toLowerCase();
   const queryLogoUrl = (urlParams.get('logo') || "").trim();
 
   const clientLogos = {
-    "mudki1": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/KABADDI%20SPORTS%201%20Logo.png"
+    "smartkabaddi": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/Picsart_24-01-02_09-57-53-097.jpg.jpeg"
   };
 
   function getActiveLogo(dbLogoUrl) {
     if (queryLogoUrl) return queryLogoUrl;
     if (clientLogos[matchId]) return clientLogos[matchId];
-    if (dbLogoUrl && dbLogoUrl.trim() !== "") return dbLogoUrl.trim();
+    if (dbLogoUrl && String(dbLogoUrl).trim() !== "") return String(dbLogoUrl).trim();
     return "";
   }
 
@@ -526,27 +511,26 @@
   });
 
   function getText(enVal, paVal) {
-    if (langMode === 'pa' && paVal && paVal.trim() !== "") return paVal.trim();
+    if (langMode === 'pa' && paVal && String(paVal).trim() !== "") return String(paVal).trim();
     return (enVal || "").trim();
   }
 
-  let currentLogoUrl = "";
+  let currentLogoUrl = getActiveLogo("");
   let currentLogoVisible = true;
-  let roundHasValue = false;
 
-  function renderRightCornerLogo() {
+  function renderScoreboardLogo() {
     const box = document.getElementById("sb-logo-box");
     const img = document.getElementById("pngLogoImg");
     const clean = (currentLogoUrl || "").trim();
 
-    if (!roundHasValue || !clean || !currentLogoVisible) {
+    if (!clean || !currentLogoVisible) {
       box.style.display = "none";
       return;
     }
 
     if (img.src !== clean) {
       img.onload = () => {
-        if (roundHasValue && currentLogoVisible && img.src === clean) box.style.display = "flex";
+        if (currentLogoVisible && img.src === clean) box.style.display = "flex";
       };
       img.onerror = () => {
         box.style.display = "none";
@@ -560,7 +544,7 @@
   /* Floating Watermark State */
   const wmEl = document.getElementById("floating-watermark");
   let wmX = 420;
-  let wmY = 220;
+  let wmY = 290;
   let wmVx = 85;
   let wmVy = 62;
   let wmLastTs = performance.now();
@@ -568,7 +552,7 @@
 
   function setFloatingWatermark(txt) {
     const clean = String(txt || "").trim();
-    if (!roundHasValue || !clean) {
+    if (!clean) {
       wmActive = false;
       wmEl.textContent = "";
       wmEl.style.display = "none";
@@ -581,9 +565,9 @@
 
   // Per-line speed (px/sec)
   const lineSpeeds = {
-    trackTop: Number(urlParams.get("r1Speed")) > 0 ? Number(urlParams.get("r1Speed")) : 95,
-    trackYellow: Number(urlParams.get("r2Speed")) > 0 ? Number(urlParams.get("r2Speed")) : 115,
-    trackBottom: Number(urlParams.get("r3Speed")) > 0 ? Number(urlParams.get("r3Speed")) : 105
+    itemTop: Number(urlParams.get("r1Speed")) > 0 ? Number(urlParams.get("r1Speed")) : 95,
+    itemYellow: Number(urlParams.get("r2Speed")) > 0 ? Number(urlParams.get("r2Speed")) : 115,
+    itemBottom: Number(urlParams.get("r3Speed")) > 0 ? Number(urlParams.get("r3Speed")) : 105
   };
 
   const tickers = {};
@@ -595,106 +579,96 @@
     return str.trim() === "" ? "" : str;
   }
 
-  function updateTicker(trackId, chunkAId, chunkBId, wrapId, rawText, speed) {
-    const track = document.getElementById(trackId);
-    const chunkA = document.getElementById(chunkAId);
-    const chunkB = document.getElementById(chunkBId);
+  function measureItemWidth(el) {
+    const prevTransform = el.style.transform;
+    el.style.transform = "translate3d(0px, -50%, 0)";
+    const w = el.getBoundingClientRect().width;
+    el.style.transform = prevTransform;
+    return w;
+  }
+
+  function updateTicker(itemId, wrapId, rawText, speed) {
+    const item = document.getElementById(itemId);
     const wrap = wrapId ? document.getElementById(wrapId) : null;
+    const box = item.parentElement;
 
     const line = normalizeTickerLine(rawText);
     const validSpeed = (Number.isFinite(speed) && speed > 0) ? speed : 100;
 
-    if (!line) {
-      if (wrap) wrap.style.visibility = "hidden";
-      chunkA.textContent = "";
-      chunkB.textContent = "";
-      if (tickers[trackId]) {
-        tickers[trackId].active = false;
-        tickers[trackId].raw = "";
-        tickers[trackId].x = 0;
-        track.style.transform = "translate3d(0px, -50%, 0)";
+    if (!line || isOverlayLocked) {
+      if (wrap) wrap.style.display = "none";
+      item.textContent = "";
+      if (tickers[itemId]) {
+        tickers[itemId].active = false;
+        tickers[itemId].raw = "";
       }
       return;
     }
 
-    if (wrap) wrap.style.visibility = "visible";
+    if (wrap) wrap.style.display = "flex";
 
-    const prev = tickers[trackId];
+    const prev = tickers[itemId];
     const textChanged = !prev || prev.raw !== line;
 
-    chunkA.textContent = line;
-    chunkB.textContent = line;
+    item.textContent = line;
 
-    requestAnimationFrame(() => {
-      if (isOverlayLocked || !roundHasValue) return;
-      const boxW = track.parentElement.getBoundingClientRect().width || 1380;
-      let w = chunkA.getBoundingClientRect().width;
+    const boxW = box.getBoundingClientRect().width || 1380;
+    const textW = Math.max(measureItemWidth(item), 40);
 
-      if (w > 0 && w < boxW + 180) {
-        const spacer = "        ";
-        const count = Math.ceil((boxW + 240) / Math.max(w + 90, 1));
-        const repeated = Array(count).fill(line).join(spacer);
-        chunkA.textContent = repeated;
-        chunkB.textContent = repeated;
-        w = itemA.getBoundingClientRect().width;
+    if (!prev) {
+      tickers[itemId] = {
+        el: item,
+        raw: line,
+        x: boxW,
+        boxW: boxW,
+        textW: textW,
+        speed: validSpeed,
+        active: true
+      };
+      item.style.transform = `translate3d(${boxW.toFixed(2)}px, -50%, 0)`;
+    } else {
+      prev.raw = line;
+      prev.speed = validSpeed;
+      prev.boxW = boxW;
+      prev.textW = textW;
+      prev.active = true;
+      if (textChanged) {
+        prev.x = boxW;
+        prev.el.style.transform = `translate3d(${boxW.toFixed(2)}px, -50%, 0)`;
       }
-
-      if (!prev) {
-        tickers[trackId] = {
-          el: track,
-          raw: line,
-          x: 0,
-          width: Math.max(w, 1),
-          speed: validSpeed,
-          active: true,
-          ts: performance.now()
-        };
-      } else {
-        prev.raw = line;
-        prev.speed = validSpeed;
-        prev.active = true;
-        if (w > 0) {
-          if (textChanged) {
-            prev.x = prev.x % w;
-            if (prev.x > 0) prev.x -= w;
-          }
-          prev.width = w;
-        }
-        prev.ts = performance.now();
-      }
-    });
+    }
   }
 
   function refreshAllTickers() {
-    if (isOverlayLocked || !roundHasValue) {
-      updateTicker("trackTop", "chunkTopA", "chunkTopB", "rowTopWrap", "", lineSpeeds.trackTop);
-      updateTicker("trackYellow", "chunkYellowA", "chunkYellowB", "rowYellowWrap", "", lineSpeeds.trackYellow);
-      updateTicker("trackBottom", "chunkBottomA", "chunkBottomB", "rowBottomWrap", "", lineSpeeds.trackBottom);
-      const bar = document.getElementById("bottom-ticker-bar");
+    const bar = document.getElementById("bottom-ticker-bar");
+
+    if (isOverlayLocked || !latestData) {
+      updateTicker("itemTop", "rowTopWrap", "", lineSpeeds.itemTop);
+      updateTicker("itemYellow", "rowYellowWrap", "", lineSpeeds.itemYellow);
+      updateTicker("itemBottom", "rowBottomWrap", "", lineSpeeds.itemBottom);
       if (bar) bar.style.display = "none";
       return;
     }
 
-    const r1 = normalizeTickerLine(latestData ? latestData.row1Txt : "");
-    const r2 = normalizeTickerLine(latestData ? latestData.row2Txt : "");
-    const r3 = normalizeTickerLine(latestData ? latestData.row3Txt : "");
+    const r1 = normalizeTickerLine(latestData.row1Txt);
+    const r2 = normalizeTickerLine(latestData.row2Txt);
+    const r3 = normalizeTickerLine(latestData.row3Txt);
 
     const anyLineActive = Boolean(r1 || r2 || r3);
-    const bar = document.getElementById("bottom-ticker-bar");
     if (bar) {
-      bar.style.display = anyLineActive ? "flex" : "none";
+      bar.style.display = (anyLineActive && latestData.tickerVisible !== false) ? "flex" : "none";
     }
 
-    updateTicker("trackTop", "chunkTopA", "chunkTopB", "rowTopWrap", r1, lineSpeeds.trackTop);
-    updateTicker("trackYellow", "chunkYellowA", "chunkYellowB", r2, lineSpeeds.trackYellow);
-    updateTicker("trackBottom", "chunkBottomA", "chunkBottomB", r3, lineSpeeds.trackBottom);
+    updateTicker("itemTop", "rowTopWrap", r1, lineSpeeds.itemTop);
+    updateTicker("itemYellow", "rowYellowWrap", r2, lineSpeeds.itemYellow);
+    updateTicker("itemBottom", "rowBottomWrap", r3, lineSpeeds.itemBottom);
   }
 
   window.setRowSpeeds = function({ row1, row2, row3 } = {}) {
     if (isOverlayLocked) return;
-    if (Number(row1) > 0) lineSpeeds.trackTop = Number(row1);
-    if (Number(row2) > 0) lineSpeeds.trackYellow = Number(row2);
-    if (Number(row3) > 0) lineSpeeds.trackBottom = Number(row3);
+    if (Number(row1) > 0) lineSpeeds.itemTop = Number(row1);
+    if (Number(row2) > 0) lineSpeeds.itemYellow = Number(row2);
+    if (Number(row3) > 0) lineSpeeds.itemBottom = Number(row3);
     refreshAllTickers();
   };
 
@@ -707,15 +681,15 @@
     Object.values(tickers).forEach((t) => {
       if (!t.active) return;
       t.x -= t.speed * dt;
-      if (t.x <= -t.width) {
-        t.x += t.width;
+      if (t.x <= -t.textW - 40) {
+        t.x = t.boxW + 20;
       }
       t.el.style.transform = `translate3d(${t.x.toFixed(2)}px, -50%, 0)`;
     });
 
     if (wmActive) {
       const minX = 40;
-      const minY = 140;
+      const minY = 290;
       const maxX = Math.max(minX + 100, 1920 - wmEl.offsetWidth - 40);
       const maxY = Math.max(minY + 60, 1080 - 122 - wmEl.offsetHeight - 30);
 
@@ -745,16 +719,17 @@
   }
   rafId = requestAnimationFrame(animateLoop);
 
-  const stageEl = document.getElementById("render-stage");
-  stageEl.style.display = "none";
+  renderScoreboardLogo();
 
   db.on("value", (snap) => {
     if (isOverlayLocked) return;
     const data = snap.val();
     if (!data) {
-      roundHasValue = false;
       latestData = null;
-      stageEl.style.display = "none";
+      currentLogoUrl = getActiveLogo("");
+      currentLogoVisible = true;
+      renderScoreboardLogo();
+      refreshAllTickers();
       return;
     }
 
@@ -762,58 +737,35 @@
     evaluatePlanStatus(data);
     if (isOverlayLocked) return;
 
-    const roundVal = (data.round !== undefined && data.round !== null) ? String(data.round).trim() : "";
-    roundHasValue = roundVal !== "";
-
-    if (!roundHasValue) {
-      stageEl.style.display = "none";
-      setFloatingWatermark("");
-      renderRightCornerLogo();
-      refreshAllTickers();
-      return;
-    }
-
-    stageEl.style.display = "block";
-
     document.getElementById("scoreboard-wrapper").style.opacity =
       (data.scoreVisible === false) ? "0" : "1";
 
-    document.getElementById("bottom-ticker-bar").style.opacity =
-      (data.tickerVisible === false) ? "0" : "1";
-
     const nameA = getText(data.nameA, data.nameA_pa) || "TEAM A";
     const nameB = getText(data.nameB, data.nameB_pa) || "TEAM B";
-    const scoreA = data.scoreA !== undefined ? data.scoreA : 0;
-    const scoreB = data.scoreB !== undefined ? data.scoreB : 0;
+    document.getElementById("teamTop").innerText = nameA;
+    document.getElementById("scoreLeft").innerText = (data.scoreA !== undefined && data.scoreA !== null) ? data.scoreA : "0";
+    document.getElementById("teamBottom").innerText = nameB;
+    document.getElementById("scoreRight").innerText = (data.scoreB !== undefined && data.scoreB !== null) ? data.scoreB : "0";
 
-    if (data.cameraOpposite) {
-      document.getElementById("teamTop").innerText = nameB;
-      document.getElementById("scoreLeft").innerText = scoreB;
-      document.getElementById("teamBottom").innerText = nameA;
-      document.getElementById("scoreRight").innerText = scoreA;
-    } else {
-      document.getElementById("teamTop").innerText = nameA;
-      document.getElementById("scoreLeft").innerText = scoreA;
-      document.getElementById("teamBottom").innerText = nameB;
-      document.getElementById("scoreRight").innerText = scoreB;
-    }
-
-    document.getElementById("roundDisplay").innerText = roundVal;
+    const roundVal = (data.round !== undefined && data.round !== null) ? String(data.round).trim() : "";
+    const roundEl = document.getElementById("roundDisplay");
+    roundEl.innerText = roundVal;
+    roundEl.style.display = roundVal ? "block" : "none";
 
     setFloatingWatermark(data.watermarkTxt);
 
     currentLogoUrl = getActiveLogo(data.logoUrl);
     currentLogoVisible = (data.logoVisible !== false);
-    renderRightCornerLogo();
+    renderScoreboardLogo();
 
     if (Number(data.speedRow1) > 0 && !urlParams.get("r1Speed")) {
-      lineSpeeds.trackTop = Number(data.speedRow1);
+      lineSpeeds.itemTop = Number(data.speedRow1);
     }
     if (Number(data.speedRow2) > 0 && !urlParams.get("r2Speed")) {
-      lineSpeeds.trackYellow = Number(data.speedRow2);
+      lineSpeeds.itemYellow = Number(data.speedRow2);
     }
     if (Number(data.speedRow3) > 0 && !urlParams.get("r3Speed")) {
-      lineSpeeds.trackBottom = Number(data.speedRow3);
+      lineSpeeds.itemBottom = Number(data.speedRow3);
     }
 
     refreshAllTickers();
