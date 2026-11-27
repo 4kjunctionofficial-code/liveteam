@@ -39,7 +39,7 @@
   /* ==================== FLOATING WATERMARK ==================== */
   #floating-watermark {
     position: absolute;
-    top: 190px;
+    top: 200px;
     left: 420px;
     font-family: 'Roboto Condensed', 'Noto Sans Gurmukhi', sans-serif;
     font-size: 46px;
@@ -286,6 +286,12 @@
     display: inline-block;
     white-space: pre;
     will-change: transform;
+  }
+
+  .scroll-item.centered-static {
+    left: 50%;
+    transform: translate3d(-50%, -50%, 0) !important;
+    will-change: auto;
   }
 
   .side-box-right {
@@ -563,11 +569,17 @@
     wmActive = true;
   }
 
-  // Per-line speed (px/sec)
+  // Per-line speed (px/sec) & scroll state
   const lineSpeeds = {
-    itemTop: Number(urlParams.get("r1Speed")) > 0 ? Number(urlParams.get("r1Speed")) : 95,
-    itemYellow: Number(urlParams.get("r2Speed")) > 0 ? Number(urlParams.get("r2Speed")) : 115,
-    itemBottom: Number(urlParams.get("r3Speed")) > 0 ? Number(urlParams.get("r3Speed")) : 105
+    itemTop: urlParams.get("r1Speed") !== null ? Number(urlParams.get("r1Speed")) : 95,
+    itemYellow: urlParams.get("r2Speed") !== null ? Number(urlParams.get("r2Speed")) : 115,
+    itemBottom: urlParams.get("r3Speed") !== null ? Number(urlParams.get("r3Speed")) : 105
+  };
+
+  const lineScrollEnabled = {
+    itemTop: true,
+    itemYellow: true,
+    itemBottom: true
   };
 
   const tickers = {};
@@ -580,24 +592,32 @@
   }
 
   function measureItemWidth(el) {
+    const wasCentered = el.classList.contains("centered-static");
     const prevTransform = el.style.transform;
+    const prevLeft = el.style.left;
+    el.classList.remove("centered-static");
+    el.style.left = "0";
     el.style.transform = "translate3d(0px, -50%, 0)";
     const w = el.getBoundingClientRect().width;
+    el.style.left = prevLeft;
     el.style.transform = prevTransform;
+    if (wasCentered) el.classList.add("centered-static");
     return w;
   }
 
-  function updateTicker(itemId, wrapId, rawText, speed) {
+  function updateTicker(itemId, wrapId, rawText, speed, scrollOn) {
     const item = document.getElementById(itemId);
     const wrap = wrapId ? document.getElementById(wrapId) : null;
     const box = item.parentElement;
 
     const line = normalizeTickerLine(rawText);
-    const validSpeed = (Number.isFinite(speed) && speed > 0) ? speed : 100;
+    const numericSpeed = Number.isFinite(speed) ? Math.max(0, speed) : 100;
+    const shouldScroll = Boolean(scrollOn) && numericSpeed > 0;
 
     if (!line || isOverlayLocked) {
       if (wrap) wrap.style.display = "none";
       item.textContent = "";
+      item.classList.remove("centered-static");
       if (tickers[itemId]) {
         tickers[itemId].active = false;
         tickers[itemId].raw = "";
@@ -612,6 +632,20 @@
 
     item.textContent = line;
 
+    if (!shouldScroll) {
+      item.classList.add("centered-static");
+      item.style.left = "50%";
+      item.style.transform = "translate3d(-50%, -50%, 0)";
+      if (tickers[itemId]) {
+        tickers[itemId].active = false;
+        tickers[itemId].raw = line;
+      }
+      return;
+    }
+
+    item.classList.remove("centered-static");
+    item.style.left = "0";
+
     const boxW = box.getBoundingClientRect().width || 1380;
     const textW = Math.max(measureItemWidth(item), 40);
 
@@ -622,20 +656,21 @@
         x: boxW,
         boxW: boxW,
         textW: textW,
-        speed: validSpeed,
+        speed: numericSpeed,
         active: true
       };
       item.style.transform = `translate3d(${boxW.toFixed(2)}px, -50%, 0)`;
     } else {
       prev.raw = line;
-      prev.speed = validSpeed;
+      prev.speed = numericSpeed;
       prev.boxW = boxW;
       prev.textW = textW;
       prev.active = true;
-      if (textChanged) {
+      if (textChanged || !prev.wasScrolling) {
         prev.x = boxW;
         prev.el.style.transform = `translate3d(${boxW.toFixed(2)}px, -50%, 0)`;
       }
+      prev.wasScrolling = true;
     }
   }
 
@@ -643,9 +678,9 @@
     const bar = document.getElementById("bottom-ticker-bar");
 
     if (isOverlayLocked || !latestData) {
-      updateTicker("itemTop", "rowTopWrap", "", lineSpeeds.itemTop);
-      updateTicker("itemYellow", "rowYellowWrap", "", lineSpeeds.itemYellow);
-      updateTicker("itemBottom", "rowBottomWrap", "", lineSpeeds.itemBottom);
+      updateTicker("itemTop", "rowTopWrap", "", 0, false);
+      updateTicker("itemYellow", "rowYellowWrap", "", 0, false);
+      updateTicker("itemBottom", "rowBottomWrap", "", 0, false);
       if (bar) bar.style.display = "none";
       return;
     }
@@ -659,16 +694,16 @@
       bar.style.display = (anyLineActive && latestData.tickerVisible !== false) ? "flex" : "none";
     }
 
-    updateTicker("itemTop", "rowTopWrap", r1, lineSpeeds.itemTop);
-    updateTicker("itemYellow", "rowYellowWrap", r2, lineSpeeds.itemYellow);
-    updateTicker("itemBottom", "rowBottomWrap", r3, lineSpeeds.itemBottom);
+    updateTicker("itemTop", "rowTopWrap", r1, lineSpeeds.itemTop, lineScrollEnabled.itemTop);
+    updateTicker("itemYellow", "rowYellowWrap", r2, lineSpeeds.itemYellow, lineScrollEnabled.itemYellow);
+    updateTicker("itemBottom", "rowBottomWrap", r3, lineSpeeds.itemBottom, lineScrollEnabled.itemBottom);
   }
 
   window.setRowSpeeds = function({ row1, row2, row3 } = {}) {
     if (isOverlayLocked) return;
-    if (Number(row1) > 0) lineSpeeds.itemTop = Number(row1);
-    if (Number(row2) > 0) lineSpeeds.itemYellow = Number(row2);
-    if (Number(row3) > 0) lineSpeeds.itemBottom = Number(row3);
+    if (row1 !== undefined && Number.isFinite(Number(row1))) lineSpeeds.itemTop = Math.max(0, Number(row1));
+    if (row2 !== undefined && Number.isFinite(Number(row2))) lineSpeeds.itemYellow = Math.max(0, Number(row2));
+    if (row3 !== undefined && Number.isFinite(Number(row3))) lineSpeeds.itemBottom = Math.max(0, Number(row3));
     refreshAllTickers();
   };
 
@@ -758,15 +793,19 @@
     currentLogoVisible = (data.logoVisible !== false);
     renderRightCornerLogo();
 
-    if (Number(data.speedRow1) > 0 && !urlParams.get("r1Speed")) {
-      lineSpeeds.itemTop = Number(data.speedRow1);
+    if (data.speedRow1 !== undefined && urlParams.get("r1Speed") === null) {
+      lineSpeeds.itemTop = Math.max(0, Number(data.speedRow1) || 0);
     }
-    if (Number(data.speedRow2) > 0 && !urlParams.get("r2Speed")) {
-      lineSpeeds.itemYellow = Number(data.speedRow2);
+    if (data.speedRow2 !== undefined && urlParams.get("r2Speed") === null) {
+      lineSpeeds.itemYellow = Math.max(0, Number(data.speedRow2) || 0);
     }
-    if (Number(data.speedRow3) > 0 && !urlParams.get("r3Speed")) {
-      lineSpeeds.itemBottom = Number(data.speedRow3);
+    if (data.speedRow3 !== undefined && urlParams.get("r3Speed") === null) {
+      lineSpeeds.itemBottom = Math.max(0, Number(data.speedRow3) || 0);
     }
+
+    lineScrollEnabled.itemTop = data.scrollRow1 !== false;
+    lineScrollEnabled.itemYellow = data.scrollRow2 !== false;
+    lineScrollEnabled.itemBottom = data.scrollRow3 !== false;
 
     refreshAllTickers();
   });
