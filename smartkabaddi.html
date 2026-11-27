@@ -1,1 +1,474 @@
+<!DOCTYPE html>
+<html lang="pa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920, initial-scale=1.0">
+<title>Kabaddi Live Overlay</title>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gurmukhi:wght@700;900&family=Oswald:wght@700&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet">
 
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    width: 1920px;
+    height: 1080px;
+    background: transparent;
+    overflow: hidden;
+    font-family: 'Roboto Condensed', 'Noto Sans Gurmukhi', sans-serif;
+    position: relative;
+  }
+
+  /* ==================== TOP-LEFT SCOREBOARD ==================== */
+  #scoreboard-wrapper {
+    position: absolute;
+    top: 32px;
+    left: 42px;
+    display: flex;
+    flex-direction: column;
+    transition: opacity 0.3s ease;
+  }
+
+  .sb-main {
+    display: flex;
+    align-items: center;
+    height: 92px;
+    position: relative;
+  }
+
+  /* Hexagons */
+  .hex-box {
+    width: 102px;
+    height: 92px;
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Oswald', sans-serif;
+    font-size: 52px;
+    font-weight: 700;
+    z-index: 3;
+    position: relative;
+  }
+
+  /* Border effect for Hexagons using pseudo-element */
+  .hex-wrap {
+    width: 108px;
+    height: 98px;
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+  }
+
+  .hex-left {
+    background: linear-gradient(180deg, #ffe600 0%, #d4b800 100%);
+    color: #0b4619;
+  }
+
+  .hex-right {
+    background: linear-gradient(180deg, #1b7a2a 0%, #0d4a17 100%);
+    color: #ffe600;
+  }
+
+  /* Team Name Bars */
+  .teams-bars {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: -26px;
+    margin-right: -26px;
+    z-index: 2;
+    width: 390px;
+  }
+
+  .team-bar {
+    height: 41px;
+    display: flex;
+    align-items: center;
+    font-size: 27px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-top: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+  }
+
+  .bar-top {
+    background: linear-gradient(90deg, #f5d800 0%, #ffe933 100%);
+    color: #000000;
+    padding-left: 38px;
+    padding-right: 45px;
+    justify-content: flex-start;
+  }
+
+  .bar-bottom {
+    background: linear-gradient(90deg, #0e521b 0%, #197a2c 100%);
+    color: #ffffff;
+    padding-left: 45px;
+    padding-right: 38px;
+    justify-content: flex-end;
+    margin-top: -2px;
+  }
+
+  /* Round / Category Subtitle */
+  .sb-round {
+    margin-top: 6px;
+    padding-left: 24px;
+    font-size: 25px;
+    font-weight: 900;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    -webkit-text-stroke: 1px #000000;
+    paint-order: stroke fill;
+  }
+
+  /* ==================== TOP-RIGHT WATERMARK ==================== */
+  #watermark-box {
+    position: absolute;
+    top: 32px;
+    right: 45px;
+    background: linear-gradient(135deg, #111111 0%, #2b2b2b 100%);
+    border: 3px solid #f5d800;
+    border-radius: 12px;
+    padding: 8px 22px;
+    color: #f5d800;
+    font-size: 28px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: none;
+  }
+
+  /* ==================== BOTTOM TICKER BAR ==================== */
+  #bottom-ticker-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 1920px;
+    height: 126px;
+    display: flex;
+    background: #0a0a0a;
+    border-top: 3px solid #f5d800;
+  }
+
+  /* Left LIVE Box */
+  .live-badge-box {
+    width: 225px;
+    height: 100%;
+    background: linear-gradient(180deg, #ffe600 0%, #e5be00 100%);
+    clip-path: polygon(0 0, 100% 0, 84% 100%, 0% 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-right: 24px;
+    z-index: 5;
+    flex-shrink: 0;
+  }
+
+  .live-text {
+    font-family: 'Oswald', sans-serif;
+    font-size: 56px;
+    font-weight: 700;
+    color: #0e6b1d;
+    letter-spacing: 2px;
+    animation: pulseLive 1.4s infinite ease-in-out;
+  }
+
+  @keyframes pulseLive {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.06); opacity: 0.85; }
+  }
+
+  /* Center 3 Rows */
+  .ticker-rows {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-left: -38px;
+    margin-right: -38px;
+    z-index: 2;
+    overflow: hidden;
+  }
+
+  /* Row 1: Village & Tournament Header */
+  .t-row-1 {
+    height: 44px;
+    background: #0d0d0d;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 29px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0 50px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  /* Row 2: Yellow Highlight Scrolling Ticker (Prizes, Results, Ads) */
+  .t-row-2 {
+    height: 42px;
+    background: linear-gradient(180deg, #ffe600 0%, #e0b800 100%);
+    color: #000000;
+    display: flex;
+    align-items: center;
+    font-size: 27px;
+    font-weight: 900;
+    overflow: hidden;
+    position: relative;
+    border-top: 2px solid #000000;
+    border-bottom: 2px solid #000000;
+  }
+
+  /* Row 3: Bottom Black Scrolling Ticker (Next Matches, Upcoming Events, Telecast) */
+  .t-row-3 {
+    height: 40px;
+    background: #0d0d0d;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    font-size: 25px;
+    font-weight: 700;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Smooth Continuous Marquee */
+  .marquee-track {
+    display: flex;
+    white-space: nowrap;
+    will-change: transform;
+    animation: scrollLeft 28s linear infinite;
+  }
+
+  .marquee-track span {
+    padding-right: 60px;
+    display: inline-block;
+  }
+
+  @keyframes scrollLeft {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* Right Graphic Box */
+  .right-graphic-box {
+    width: 215px;
+    height: 100%;
+    background: linear-gradient(180deg, #ffe600 0%, #d4ad00 100%);
+    clip-path: polygon(18% 0, 100% 0, 100% 100%, 0% 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-left: 24px;
+    z-index: 5;
+    flex-shrink: 0;
+  }
+
+  .prize-bag-icon {
+    font-size: 54px;
+    line-height: 1;
+  }
+
+  .prize-bag-label {
+    font-size: 18px;
+    font-weight: 900;
+    color: #0e521b;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+</style>
+</head>
+<body>
+
+  <!-- TOP-LEFT SCOREBOARD -->
+  <div id="scoreboard-wrapper">
+    <div class="sb-main">
+      <div class="hex-wrap">
+        <div class="hex-box hex-left" id="scoreLeft">0</div>
+      </div>
+
+      <div class="teams-bars">
+        <div class="team-bar bar-top" id="teamTop">TEAM A</div>
+        <div class="team-bar bar-bottom" id="teamBottom">TEAM B</div>
+      </div>
+
+      <div class="hex-wrap">
+        <div class="hex-box hex-right" id="scoreRight">0</div>
+      </div>
+    </div>
+    <div class="sb-round" id="roundDisplay">KABADDI TOURNAMENT</div>
+  </div>
+
+  <!-- TOP-RIGHT WATERMARK -->
+  <div id="watermark-box">M LIVE</div>
+
+  <!-- BOTTOM TICKER -->
+  <div id="bottom-ticker-bar">
+    <div class="live-badge-box">
+      <div class="live-text">LIVE</div>
+    </div>
+
+    <div class="ticker-rows">
+      <!-- Row 1: Village & Program -->
+      <div class="t-row-1" id="row1Header">KABADDI TOURNAMENT LIVE</div>
+
+      <!-- Row 2: Prizes, Result & Special Ads -->
+      <div class="t-row-2">
+        <div class="marquee-track" id="row2Track">
+          <span id="row2TextA">WELCOME TO LIVE KABADDI BROADCAST</span>
+          <span id="row2TextB">WELCOME TO LIVE KABADDI BROADCAST</span>
+        </div>
+      </div>
+
+      <!-- Row 3: Next Matches, Upcoming Events & Telecast -->
+      <div class="t-row-3">
+        <div class="marquee-track" id="row3Track" style="animation-duration: 34s;">
+          <span id="row3TextA">STAY TUNED FOR UPCOMING MATCHES</span>
+          <span id="row3TextB">STAY TUNED FOR UPCOMING MATCHES</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-graphic-box">
+      <div class="prize-bag-icon">💰</div>
+      <div class="prize-bag-label">KABADDI CUP</div>
+    </div>
+  </div>
+
+<script>
+  const firebaseConfig = {
+    databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/"
+  };
+  firebase.initializeApp(firebaseConfig);
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const matchId = urlParams.get('id') || 'defaultMatch';
+  const langMode = urlParams.get('lang') || 'en'; // ?lang=pa use karke Punjabi text dikha sakde ho
+
+  const db = firebase.database().ref("matchData/" + matchId);
+
+  function getText(enVal, paVal) {
+    if (langMode === 'pa' && paVal && paVal.trim() !== "") return paVal.trim();
+    return (enVal || "").trim();
+  }
+
+  db.on("value", (snap) => {
+    const data = snap.val();
+    if (!data) return;
+
+    // 1. Scoreboard Visibility
+    const sbWrapper = document.getElementById("scoreboard-wrapper");
+    sbWrapper.style.opacity = (data.scoreVisible === false) ? "0" : "1";
+
+    // 2. Teams & Scores (With Camera Opposite View Support)
+    const nameA = getText(data.nameA, data.nameA_pa) || "TEAM A";
+    const nameB = getText(data.nameB, data.nameB_pa) || "TEAM B";
+    const scoreA = data.scoreA !== undefined ? data.scoreA : 0;
+    const scoreB = data.scoreB !== undefined ? data.scoreB : 0;
+
+    if (data.cameraOpposite) {
+      document.getElementById("teamTop").innerText = nameB;
+      document.getElementById("scoreLeft").innerText = scoreB;
+      document.getElementById("teamBottom").innerText = nameA;
+      document.getElementById("scoreRight").innerText = scoreA;
+    } else {
+      document.getElementById("teamTop").innerText = nameA;
+      document.getElementById("scoreLeft").innerText = scoreA;
+      document.getElementById("teamBottom").innerText = nameB;
+      document.getElementById("scoreRight").innerText = scoreB;
+    }
+
+    // 3. Round / Category
+    document.getElementById("roundDisplay").innerText = data.round || "";
+
+    // 4. Watermark
+    const wmBox = document.getElementById("watermark-box");
+    if (data.watermarkTxt && data.watermarkTxt.trim() !== "") {
+      wmBox.innerText = data.watermarkTxt.trim();
+      wmBox.style.display = "block";
+    } else {
+      wmBox.style.display = "none";
+    }
+
+    // 5. Row 1: Village + Program
+    const village = getText(data.row1Txt, data.row1Txt_pa);
+    const program = getText(data.programTxt, data.programTxt_pa);
+    let headerParts = [];
+    if (village) headerParts.push(village);
+    if (program) headerParts.push(program);
+    document.getElementById("row1Header").innerText = headerParts.join(" — ") || "KABADDI LIVE";
+
+    // 6. Row 2: Prizes + Latest Result + Special Ads
+    let row2Items = [];
+
+    // Category 1 Prizes
+    let cat1Parts = [];
+    if (data.pzTitle1) cat1Parts.push(`🏆 ${data.pzTitle1}:`);
+    if (data.pzOp1) cat1Parts.push(`1st: ${data.pzOp1}`);
+    if (data.pzOp2) cat1Parts.push(`2nd: ${data.pzOp2}`);
+    if (data.pzOpBest) cat1Parts.push(`Best Raider/Catcher: ${data.pzOpBest}`);
+    if (cat1Parts.length > 0) row2Items.push(cat1Parts.join("  "));
+
+    // Category 2 Prizes
+    let cat2Parts = [];
+    if (data.pzTitle2) cat2Parts.push(`🏆 ${data.pzTitle2}:`);
+    if (data.pzWt1) cat2Parts.push(`1st: ${data.pzWt1}`);
+    if (data.pzWt2) cat2Parts.push(`2nd: ${data.pzWt2}`);
+    if (data.pzWtBest) cat2Parts.push(`Best Raider/Catcher: ${data.pzWtBest}`);
+    if (cat2Parts.length > 0) row2Items.push(cat2Parts.join("  "));
+
+    // Last Match Result
+    if (data.resultText && data.resultText !== "No Result Yet") {
+      row2Items.push(`🏅 RESULT: ${data.resultText}`);
+    }
+
+    // Ads (Commentator, Sound, Tent, Security)
+    if (data.adsText && data.adsText.trim() !== "") {
+      row2Items.push(data.adsText.trim());
+    }
+
+    const finalRow2 = row2Items.length > 0 ? row2Items.join("   ★   ") : (headerParts.join(" ") || "LIVE KABADDI TOURNAMENT");
+    document.getElementById("row2TextA").innerText = finalRow2 + "   ★   ";
+    document.getElementById("row2TextB").innerText = finalRow2 + "   ★   ";
+
+    // 7. Row 3: Next Matches + Upcoming Events + Live Telecast
+    let row3Items = [];
+
+    const nextMatchesStr = getText(data.row5Txt, data.row5Txt_pa);
+    if (nextMatchesStr) {
+      let cleanMatches = nextMatchesStr.replace(/,\s*$/, "");
+      if (cleanMatches) row3Items.push(`📋 NEXT MATCHES: ${cleanMatches}`);
+    }
+
+    const upcomingStr = getText(data.row4Txt, data.row4Txt_pa);
+    if (upcomingStr && upcomingStr !== "UPCOMING EVENTS" && upcomingStr !== "ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ") {
+      row3Items.push(`📅 UPCOMING EVENTS: ${upcomingStr}`);
+    }
+
+    if (data.row6Txt && data.row6Txt.trim() !== "") {
+      row3Items.push(`📡 ${data.row6Txt.trim()}`);
+    }
+
+    const finalRow3 = row3Items.length > 0 ? row3Items.join("   |   ") : "WATCH LIVE KABADDI ACTION";
+    document.getElementById("row3TextA").innerText = finalRow3 + "   |   ";
+    document.getElementById("row3TextB").innerText = finalRow3 + "   |   ";
+  });
+</script>
+</body>
+</html>
