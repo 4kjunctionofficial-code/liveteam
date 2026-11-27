@@ -162,17 +162,16 @@
     filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.75));
   }
 
-  /* ==================== BOTTOM TICKER (~500px SPACE OF 1080) ==================== */
+  /* ==================== BOTTOM 3-LINE TICKER WITH GREEN SIDE BOXES ==================== */
   #bottom-ticker-bar {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 1920px;
-    height: 500px;
+    height: 122px;
     display: flex;
     align-items: stretch;
-    background: rgba(13, 13, 13, 0.92);
-    border-top: 3px solid #ffe600;
+    background: #0d0d0d;
     transition: opacity 0.25s ease;
     z-index: 10;
   }
@@ -193,7 +192,7 @@
   .live-label {
     font-family: 'Roboto Condensed', sans-serif;
     font-style: italic;
-    font-size: 64px;
+    font-size: 60px;
     font-weight: 900;
     color: #ffe600;
     letter-spacing: 1.5px;
@@ -209,43 +208,48 @@
     margin-left: -28px;
     margin-right: -28px;
     overflow: hidden;
+    background: #0d0d0d;
     z-index: 2;
   }
 
-  .ticker-line {
-    flex: 1;
-    min-height: 0;
+  .row-top {
+    height: 40px;
+    background: #0d0d0d;
+    color: #ffffff;
     display: flex;
     align-items: center;
+    font-size: 27px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
     overflow: hidden;
     position: relative;
   }
 
-  .row-top {
-    background: #0d0d0d;
-    color: #ffffff;
-    font-size: 32px;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.14);
-  }
-
   .row-yellow {
+    height: 42px;
     background: #ffe600;
     color: #111111;
-    font-size: 34px;
+    display: flex;
+    align-items: center;
+    font-size: 28px;
     font-weight: 900;
-    letter-spacing: 0.4px;
-    border-bottom: 2px solid #090909;
+    letter-spacing: 0.3px;
+    overflow: hidden;
+    position: relative;
   }
 
   .row-bottom {
+    height: 40px;
     background: #0d0d0d;
     color: #ffffff;
-    font-size: 30px;
+    display: flex;
+    align-items: center;
+    font-size: 26px;
     font-weight: 800;
-    letter-spacing: 0.4px;
+    letter-spacing: 0.3px;
+    overflow: hidden;
+    position: relative;
   }
 
   .scroll-box {
@@ -266,10 +270,10 @@
     will-change: transform;
   }
 
-  .scroll-chunk {
+  .scroll-item {
     display: inline-block;
     white-space: pre;
-    padding-right: 160px;
+    padding-right: 180px;
     flex-shrink: 0;
   }
 
@@ -310,36 +314,36 @@
       <img id="pngLogoImg" alt="Client Logo">
     </div>
 
-    <!-- BOTTOM TICKER (~500px SPACE) -->
+    <!-- BOTTOM 3-LINE SCROLLING TICKER WITH GREEN SIDE BOXES -->
     <div id="bottom-ticker-bar">
       <div class="side-box-left">
         <div class="live-label">LIVE</div>
       </div>
 
       <div class="ticker-center">
-        <div class="ticker-line row-top">
+        <div class="row-top">
           <div class="scroll-box">
             <div class="scroll-track" id="trackTop">
-              <span class="scroll-chunk" id="chunkTopA"></span>
-              <span class="scroll-chunk" id="chunkTopB"></span>
+              <span class="scroll-item" id="itemTopA">OPEN KABADDI TOURNAMENT</span>
+              <span class="scroll-item" id="itemTopB">OPEN KABADDI TOURNAMENT</span>
             </div>
           </div>
         </div>
 
-        <div class="ticker-line row-yellow">
+        <div class="row-yellow">
           <div class="scroll-box">
             <div class="scroll-track" id="trackYellow">
-              <span class="scroll-chunk" id="chunkYellowA"></span>
-              <span class="scroll-chunk" id="chunkYellowB"></span>
+              <span class="scroll-item" id="itemYellowA">LIVE KABADDI BROADCAST</span>
+              <span class="scroll-item" id="itemYellowB">LIVE KABADDI BROADCAST</span>
             </div>
           </div>
         </div>
 
-        <div class="ticker-line row-bottom">
+        <div class="row-bottom">
           <div class="scroll-box">
             <div class="scroll-track" id="trackBottom">
-              <span class="scroll-chunk" id="chunkBottomA"></span>
-              <span class="scroll-chunk" id="chunkBottomB"></span>
+              <span class="scroll-item" id="itemBottomA">STAY TUNED FOR UPDATES</span>
+              <span class="scroll-item" id="itemBottomB">STAY TUNED FOR UPDATES</span>
             </div>
           </div>
         </div>
@@ -409,96 +413,138 @@
     img.src = clean;
   }
 
-  /* Smooth Jump-Free Scroller Preserving Exact Spaces + Repeat Gap */
-  const scrollers = {};
+  // Per-line speed (px/sec) — editable anytime via Firebase (speedRow1/2/3), URL (?r1Speed=...&r2Speed=...&r3Speed=...), or window.setRowSpeeds(...)
+  const lineSpeeds = {
+    trackTop: Number(urlParams.get("r1Speed")) > 0 ? Number(urlParams.get("r1Speed")) : 95,
+    trackYellow: Number(urlParams.get("r2Speed")) > 0 ? Number(urlParams.get("r2Speed")) : 115,
+    trackBottom: Number(urlParams.get("r3Speed")) > 0 ? Number(urlParams.get("r3Speed")) : 105
+  };
 
-  function sanitizeLineKeepSpaces(rawText) {
-    if (rawText === null || rawText === undefined) return "";
-    // Preserve exact spaces typed in admin; only normalize line breaks into spaces
-    return String(rawText).replace(/\r?\n/g, " ");
-  }
+  const tickers = {};
+  let latestData = null;
 
-  function setSingleLineTicker(trackId, chunkAId, chunkBId, rawText, speed) {
-    const track = document.getElementById(trackId);
-    const chunkA = document.getElementById(chunkAId);
-    const chunkB = document.getElementById(chunkBId);
-
-    const line = sanitizeLineKeepSpaces(rawText);
-    const validSpeed = (Number.isFinite(speed) && speed > 0) ? speed : 100;
-
-    if (!line.trim()) {
-      chunkA.textContent = "";
-      chunkB.textContent = "";
-      if (scrollers[trackId]) {
-        scrollers[trackId].active = false;
-        scrollers[trackId].x = 0;
-        track.style.transform = "translate3d(0px, -50%, 0)";
-      }
-      return;
+  function buildLinesFromData(data) {
+    if (!data) {
+      return {
+        r1: "OPEN KABADDI TOURNAMENT",
+        r2: "LIVE KABADDI BROADCAST",
+        r3: "STAY TUNED FOR UPDATES"
+      };
     }
 
-    const prevState = scrollers[trackId];
-    const textChanged = !prevState || prevState.raw !== line;
+    const r1Raw = (data.row1Txt !== undefined && data.row1Txt !== null) ? String(data.row1Txt) : "";
+    const r1 = r1Raw.replace(/\r?\n/g, " ");
 
-    chunkA.textContent = line;
-    chunkB.textContent = line;
+    const r2Parts = [];
+    const r2MainRaw = (data.row2Txt !== undefined && data.row2Txt !== null && String(data.row2Txt).trim() !== "")
+      ? String(data.row2Txt)
+      : ((data.programTxt !== undefined && data.programTxt !== null) ? String(data.programTxt) : "");
+    if (r2MainRaw.trim() !== "") r2Parts.push(r2MainRaw.replace(/\r?\n/g, " "));
+    if (data.resultText && String(data.resultText).trim() !== "" && String(data.resultText).trim() !== "No Result Yet") {
+      r2Parts.push(`RESULT :- ${String(data.resultText).trim()}`);
+    }
+    const r2 = r2Parts.length > 0 ? r2Parts.join("        |        ") : (r1.trim() ? r1 : "LIVE KABADDI BROADCAST");
+
+    const r3Parts = [];
+    if (data.row3Txt !== undefined && data.row3Txt !== null && String(data.row3Txt).trim() !== "") {
+      r3Parts.push(String(data.row3Txt).replace(/\r?\n/g, " "));
+    }
+    if (Array.isArray(data.nextMatches) && data.nextMatches.length > 0) {
+      r3Parts.push(`NEXT MATCHES :- ${data.nextMatches.join(" , ")}`);
+    }
+    if (data.contactUs !== undefined && data.contactUs !== null && String(data.contactUs).trim() !== "") {
+      r3Parts.push(String(data.contactUs).trim());
+    }
+    const r3 = r3Parts.length > 0 ? r3Parts.join("        |        ") : "LIVE KABADDI BROADCAST";
+
+    return {
+      r1: r1.trim() !== "" ? r1 : "OPEN KABADDI TOURNAMENT",
+      r2,
+      r3
+    };
+  }
+
+  function updateTicker(trackId, itemAId, itemBId, text, speed) {
+    const track = document.getElementById(trackId);
+    const itemA = document.getElementById(itemAId);
+    const itemB = document.getElementById(itemBId);
+
+    const rawLine = (text !== undefined && text !== null && String(text).trim() !== "")
+      ? String(text)
+      : "LIVE KABADDI TOURNAMENT";
+
+    const validSpeed = (Number.isFinite(speed) && speed > 0) ? speed : 100;
+    const prev = tickers[trackId];
+    const textChanged = !prev || prev.raw !== rawLine;
+
+    itemA.textContent = rawLine;
+    itemB.textContent = rawLine;
 
     requestAnimationFrame(() => {
       const boxW = track.parentElement.getBoundingClientRect().width || 1380;
-      let chunkWidth = chunkA.getBoundingClientRect().width;
+      let w = itemA.getBoundingClientRect().width;
 
-      // If text is shorter than viewport, repeat exact line with a 160px spacer span
-      // so the repeat is clearly separated and still loops seamlessly without jump
-      if (chunkWidth > 0 && chunkWidth < boxW + 200) {
-        const spacer = " ".repeat(18);
-        const times = Math.ceil((boxW + 240) / Math.max(chunkWidth + 120, 1));
-        const repeated = Array(times).fill(line).join(spacer);
-        chunkA.textContent = repeated;
-        chunkB.textContent = repeated;
-        chunkWidth = chunkA.getBoundingClientRect().width;
+      if (w > 0 && w < boxW + 240) {
+        const spacer = " ".repeat(24);
+        const count = Math.ceil((boxW + 320) / Math.max(w + 180, 1));
+        const repeated = Array(count).fill(rawLine).join(spacer);
+        itemA.textContent = repeated;
+        itemB.textContent = repeated;
+        w = itemA.getBoundingClientRect().width;
       }
 
-      if (!scrollers[trackId]) {
-        scrollers[trackId] = {
+      if (!prev) {
+        tickers[trackId] = {
           el: track,
-          raw: line,
+          raw: rawLine,
           x: 0,
-          width: Math.max(chunkWidth, 1),
+          width: Math.max(w, 1),
           speed: validSpeed,
-          active: true,
-          lastTs: performance.now()
+          ts: performance.now()
         };
       } else {
-        const s = scrollers[trackId];
-        s.raw = line;
-        s.speed = validSpeed;
-        s.active = true;
-        if (chunkWidth > 0) {
+        prev.raw = rawLine;
+        prev.speed = validSpeed;
+        if (w > 0) {
           if (textChanged) {
-            s.x = s.x % chunkWidth;
-            if (s.x > 0) s.x -= chunkWidth;
+            prev.x = prev.x % w;
+            if (prev.x > 0) prev.x -= w;
           }
-          s.width = chunkWidth;
+          prev.width = w;
         }
-        s.lastTs = performance.now();
+        prev.ts = performance.now();
       }
     });
   }
 
-  function stepAllTickers(now) {
-    Object.values(scrollers).forEach((s) => {
-      if (!s.active) return;
-      const dt = Math.min((now - s.lastTs) / 1000, 0.04);
-      s.lastTs = now;
-      s.x -= s.speed * dt;
-      if (s.x <= -s.width) {
-        s.x += s.width;
-      }
-      s.el.style.transform = `translate3d(${s.x.toFixed(2)}px, -50%, 0)`;
-    });
-    requestAnimationFrame(stepAllTickers);
+  function refreshAllTickers() {
+    const lines = buildLinesFromData(latestData);
+    updateTicker("trackTop", "itemTopA", "itemTopB", lines.r1, lineSpeeds.trackTop);
+    updateTicker("trackYellow", "itemYellowA", "itemYellowB", lines.r2, lineSpeeds.trackYellow);
+    updateTicker("trackBottom", "itemBottomA", "itemBottomB", lines.r3, lineSpeeds.trackBottom);
   }
-  requestAnimationFrame(stepAllTickers);
+
+  // Helper to set speed of each line live (e.g. setRowSpeeds({ row1: 90, row2: 120, row3: 100 }))
+  window.setRowSpeeds = function({ row1, row2, row3 } = {}) {
+    if (Number(row1) > 0) lineSpeeds.trackTop = Number(row1);
+    if (Number(row2) > 0) lineSpeeds.trackYellow = Number(row2);
+    if (Number(row3) > 0) lineSpeeds.trackBottom = Number(row3);
+    refreshAllTickers();
+  };
+
+  function animateTickers(now) {
+    Object.values(tickers).forEach((t) => {
+      const dt = Math.min((now - t.ts) / 1000, 0.05);
+      t.ts = now;
+      t.x -= t.speed * dt;
+      if (t.x <= -t.width) {
+        t.x += t.width;
+      }
+      t.el.style.transform = `translate3d(${t.x.toFixed(2)}px, -50%, 0)`;
+    });
+    requestAnimationFrame(animateTickers);
+  }
+  requestAnimationFrame(animateTickers);
 
   const initialLogo = getActiveLogo("");
   if (initialLogo) {
@@ -508,6 +554,7 @@
   db.on("value", (snap) => {
     const data = snap.val();
     if (!data) return;
+    latestData = data;
 
     document.getElementById("scoreboard-wrapper").style.opacity =
       (data.scoreVisible === false) ? "0" : "1";
@@ -536,17 +583,17 @@
 
     setRightCornerLogo(getActiveLogo(data.logoUrl));
 
-    const speed1 = parseFloat(data.speedRow1) || 95;
-    const speed2 = parseFloat(data.speedRow2) || 115;
-    const speed3 = parseFloat(data.speedRow3) || 105;
+    if (Number(data.speedRow1) > 0 && !urlParams.get("r1Speed")) {
+      lineSpeeds.trackTop = Number(data.speedRow1);
+    }
+    if (Number(data.speedRow2) > 0 && !urlParams.get("r2Speed")) {
+      lineSpeeds.trackYellow = Number(data.speedRow2);
+    }
+    if (Number(data.speedRow3) > 0 && !urlParams.get("r3Speed")) {
+      lineSpeeds.trackBottom = Number(data.speedRow3);
+    }
 
-    const line1 = data.row1Txt ?? "";
-    const line2 = data.row2Txt ?? data.programTxt ?? "";
-    const line3 = data.row3Txt ?? data.contactUs ?? "";
-
-    setSingleLineTicker("trackTop", "chunkTopA", "chunkTopB", line1, speed1);
-    setSingleLineTicker("trackYellow", "chunkYellowA", "chunkYellowB", line2, speed2);
-    setSingleLineTicker("trackBottom", "chunkBottomA", "chunkBottomB", line3, speed3);
+    refreshAllTickers();
   });
 </script>
 </body>
