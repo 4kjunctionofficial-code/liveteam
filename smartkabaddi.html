@@ -33,7 +33,6 @@
     transform-origin: center center;
     background: transparent;
     overflow: hidden;
-    display: none;
   }
 
   /* ==================== FLOATING WATERMARK ==================== */
@@ -188,7 +187,7 @@
     left: 0;
     width: 1920px;
     height: 122px;
-    display: none;
+    display: flex;
     align-items: stretch;
     background: #0d0d0d;
     transition: opacity 0.25s ease;
@@ -368,8 +367,8 @@
         </div>
 
         <div class="teams-bars">
-          <div class="team-bar bar-top" id="teamTop"></div>
-          <div class="team-bar bar-bottom" id="teamBottom"></div>
+          <div class="team-bar bar-top" id="teamTop">TEAM A</div>
+          <div class="team-bar bar-bottom" id="teamBottom">TEAM B</div>
         </div>
 
         <div class="hex-wrap">
@@ -606,7 +605,7 @@
     const validSpeed = (Number.isFinite(speed) && speed > 0) ? speed : 100;
 
     if (!line) {
-      if (wrap) wrap.style.display = "none";
+      if (wrap) wrap.style.visibility = "hidden";
       chunkA.textContent = "";
       chunkB.textContent = "";
       if (tickers[trackId]) {
@@ -618,7 +617,7 @@
       return;
     }
 
-    if (wrap) wrap.style.display = "flex";
+    if (wrap) wrap.style.visibility = "visible";
 
     const prev = tickers[trackId];
     const textChanged = !prev || prev.raw !== line;
@@ -637,7 +636,7 @@
         const repeated = Array(count).fill(line).join(spacer);
         chunkA.textContent = repeated;
         chunkB.textContent = repeated;
-        w = chunkA.getBoundingClientRect().width;
+        w = itemA.getBoundingClientRect().width;
       }
 
       if (!prev) {
@@ -667,28 +666,28 @@
   }
 
   function refreshAllTickers() {
-    const bar = document.getElementById("bottom-ticker-bar");
-
-    if (isOverlayLocked || !roundHasValue || !latestData) {
+    if (isOverlayLocked || !roundHasValue) {
       updateTicker("trackTop", "chunkTopA", "chunkTopB", "rowTopWrap", "", lineSpeeds.trackTop);
       updateTicker("trackYellow", "chunkYellowA", "chunkYellowB", "rowYellowWrap", "", lineSpeeds.trackYellow);
       updateTicker("trackBottom", "chunkBottomA", "chunkBottomB", "rowBottomWrap", "", lineSpeeds.trackBottom);
+      const bar = document.getElementById("bottom-ticker-bar");
       if (bar) bar.style.display = "none";
       return;
     }
 
-    const r1 = normalizeTickerLine(latestData.row1Txt);
-    const r2 = normalizeTickerLine(latestData.row2Txt);
-    const r3 = normalizeTickerLine(latestData.row3Txt);
+    const r1 = normalizeTickerLine(latestData ? latestData.row1Txt : "");
+    const r2 = normalizeTickerLine(latestData ? latestData.row2Txt : "");
+    const r3 = normalizeTickerLine(latestData ? latestData.row3Txt : "");
 
     const anyLineActive = Boolean(r1 || r2 || r3);
+    const bar = document.getElementById("bottom-ticker-bar");
     if (bar) {
-      bar.style.display = (anyLineActive && latestData.tickerVisible !== false) ? "flex" : "none";
+      bar.style.display = anyLineActive ? "flex" : "none";
     }
 
     updateTicker("trackTop", "chunkTopA", "chunkTopB", "rowTopWrap", r1, lineSpeeds.trackTop);
-    updateTicker("trackYellow", "chunkYellowA", "chunkYellowB", "rowYellowWrap", r2, lineSpeeds.trackYellow);
-    updateTicker("trackBottom", "chunkBottomA", "chunkBottomB", "rowBottomWrap", r3, lineSpeeds.trackBottom);
+    updateTicker("trackYellow", "chunkYellowA", "chunkYellowB", r2, lineSpeeds.trackYellow);
+    updateTicker("trackBottom", "chunkBottomA", "chunkBottomB", r3, lineSpeeds.trackBottom);
   }
 
   window.setRowSpeeds = function({ row1, row2, row3 } = {}) {
@@ -747,6 +746,7 @@
   rafId = requestAnimationFrame(animateLoop);
 
   const stageEl = document.getElementById("render-stage");
+  stageEl.style.display = "none";
 
   db.on("value", (snap) => {
     if (isOverlayLocked) return;
@@ -755,9 +755,6 @@
       roundHasValue = false;
       latestData = null;
       stageEl.style.display = "none";
-      setFloatingWatermark("");
-      renderRightCornerLogo();
-      refreshAllTickers();
       return;
     }
 
@@ -781,12 +778,25 @@
     document.getElementById("scoreboard-wrapper").style.opacity =
       (data.scoreVisible === false) ? "0" : "1";
 
-    const nameA = getText(data.nameA, data.nameA_pa);
-    const nameB = getText(data.nameB, data.nameB_pa);
-    document.getElementById("teamTop").innerText = nameA;
-    document.getElementById("scoreLeft").innerText = (data.scoreA !== undefined && data.scoreA !== null) ? data.scoreA : "";
-    document.getElementById("teamBottom").innerText = nameB;
-    document.getElementById("scoreRight").innerText = (data.scoreB !== undefined && data.scoreB !== null) ? data.scoreB : "";
+    document.getElementById("bottom-ticker-bar").style.opacity =
+      (data.tickerVisible === false) ? "0" : "1";
+
+    const nameA = getText(data.nameA, data.nameA_pa) || "TEAM A";
+    const nameB = getText(data.nameB, data.nameB_pa) || "TEAM B";
+    const scoreA = data.scoreA !== undefined ? data.scoreA : 0;
+    const scoreB = data.scoreB !== undefined ? data.scoreB : 0;
+
+    if (data.cameraOpposite) {
+      document.getElementById("teamTop").innerText = nameB;
+      document.getElementById("scoreLeft").innerText = scoreB;
+      document.getElementById("teamBottom").innerText = nameA;
+      document.getElementById("scoreRight").innerText = scoreA;
+    } else {
+      document.getElementById("teamTop").innerText = nameA;
+      document.getElementById("scoreLeft").innerText = scoreA;
+      document.getElementById("teamBottom").innerText = nameB;
+      document.getElementById("scoreRight").innerText = scoreB;
+    }
 
     document.getElementById("roundDisplay").innerText = roundVal;
 
