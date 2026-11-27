@@ -259,16 +259,17 @@
     position: absolute;
     top: 50%;
     left: 0;
-    transform: translate3d(0, -50%, 0);
+    transform: translate3d(0px, -50%, 0);
     display: inline-flex;
     align-items: center;
-    white-space: nowrap;
+    white-space: pre;
     will-change: transform;
   }
 
   .scroll-chunk {
     display: inline-block;
-    padding-right: 90px;
+    white-space: pre;
+    padding-right: 160px;
     flex-shrink: 0;
   }
 
@@ -408,18 +409,24 @@
     img.src = clean;
   }
 
-  /* Jump-Free Continuous Pixel Scroller (Exact Admin Line Only) */
+  /* Smooth Jump-Free Scroller Preserving Exact Spaces + Repeat Gap */
   const scrollers = {};
+
+  function sanitizeLineKeepSpaces(rawText) {
+    if (rawText === null || rawText === undefined) return "";
+    // Preserve exact spaces typed in admin; only normalize line breaks into spaces
+    return String(rawText).replace(/\r?\n/g, " ");
+  }
 
   function setSingleLineTicker(trackId, chunkAId, chunkBId, rawText, speed) {
     const track = document.getElementById(trackId);
     const chunkA = document.getElementById(chunkAId);
     const chunkB = document.getElementById(chunkBId);
 
-    const line = String(rawText || "").replace(/\s+/g, " ").trim();
+    const line = sanitizeLineKeepSpaces(rawText);
     const validSpeed = (Number.isFinite(speed) && speed > 0) ? speed : 100;
 
-    if (!line) {
+    if (!line.trim()) {
       chunkA.textContent = "";
       chunkB.textContent = "";
       if (scrollers[trackId]) {
@@ -430,45 +437,49 @@
       return;
     }
 
-    const prevKey = scrollers[trackId] ? scrollers[trackId].key : "";
-    const textChanged = (prevKey !== line);
+    const prevState = scrollers[trackId];
+    const textChanged = !prevState || prevState.raw !== line;
 
     chunkA.textContent = line;
     chunkB.textContent = line;
 
     requestAnimationFrame(() => {
       const boxW = track.parentElement.getBoundingClientRect().width || 1380;
-      let w = chunkA.getBoundingClientRect().width;
+      let chunkWidth = chunkA.getBoundingClientRect().width;
 
-      // Repeat the exact admin line enough times to fill past the viewport cleanly
-      if (w > 0 && w < boxW + 160) {
-        const times = Math.ceil((boxW + 240) / w);
-        const filled = Array(times).fill(line).join("     •     ");
-        chunkA.textContent = filled;
-        chunkB.textContent = filled;
-        w = chunkA.getBoundingClientRect().width;
+      // If text is shorter than viewport, repeat exact line with a 160px spacer span
+      // so the repeat is clearly separated and still loops seamlessly without jump
+      if (chunkWidth > 0 && chunkWidth < boxW + 200) {
+        const spacer = " ".repeat(18);
+        const times = Math.ceil((boxW + 240) / Math.max(chunkWidth + 120, 1));
+        const repeated = Array(times).fill(line).join(spacer);
+        chunkA.textContent = repeated;
+        chunkB.textContent = repeated;
+        chunkWidth = chunkA.getBoundingClientRect().width;
       }
 
       if (!scrollers[trackId]) {
         scrollers[trackId] = {
           el: track,
-          key: line,
+          raw: line,
           x: 0,
-          width: Math.max(w, 1),
+          width: Math.max(chunkWidth, 1),
           speed: validSpeed,
           active: true,
           lastTs: performance.now()
         };
       } else {
         const s = scrollers[trackId];
-        s.key = line;
+        s.raw = line;
         s.speed = validSpeed;
         s.active = true;
-        if (textChanged && w > 0) {
-          s.x = s.x % w;
-          if (s.x > 0) s.x -= w;
+        if (chunkWidth > 0) {
+          if (textChanged) {
+            s.x = s.x % chunkWidth;
+            if (s.x > 0) s.x -= chunkWidth;
+          }
+          s.width = chunkWidth;
         }
-        if (w > 0) s.width = w;
         s.lastTs = performance.now();
       }
     });
@@ -477,7 +488,7 @@
   function stepAllTickers(now) {
     Object.values(scrollers).forEach((s) => {
       if (!s.active) return;
-      const dt = Math.min((now - s.lastTs) / 1000, 0.05);
+      const dt = Math.min((now - s.lastTs) / 1000, 0.04);
       s.lastTs = now;
       s.x -= s.speed * dt;
       if (s.x <= -s.width) {
@@ -529,9 +540,9 @@
     const speed2 = parseFloat(data.speedRow2) || 115;
     const speed3 = parseFloat(data.speedRow3) || 105;
 
-    const line1 = data.row1Txt || "";
-    const line2 = data.row2Txt || data.programTxt || "";
-    const line3 = data.row3Txt || data.contactUs || "";
+    const line1 = data.row1Txt ?? "";
+    const line2 = data.row2Txt ?? data.programTxt ?? "";
+    const line3 = data.row3Txt ?? data.contactUs ?? "";
 
     setSingleLineTicker("trackTop", "chunkTopA", "chunkTopB", line1, speed1);
     setSingleLineTicker("trackYellow", "chunkYellowA", "chunkYellowB", line2, speed2);
