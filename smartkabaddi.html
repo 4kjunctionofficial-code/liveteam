@@ -203,3 +203,329 @@
 
   .ticker-center {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin-left: -28px;
+    margin-right: -28px;
+    overflow: hidden;
+    z-index: 2;
+  }
+
+  .ticker-line {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .row-top {
+    background: #0d0d0d;
+    color: #ffffff;
+    font-size: 32px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.14);
+  }
+
+  .row-yellow {
+    background: #ffe600;
+    color: #111111;
+    font-size: 34px;
+    font-weight: 900;
+    letter-spacing: 0.4px;
+    border-bottom: 2px solid #090909;
+  }
+
+  .row-bottom {
+    background: #0d0d0d;
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+  }
+
+  .scroll-box {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .scroll-track {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translate3d(0px, -50%, 0);
+    display: inline-flex;
+    align-items: center;
+    white-space: pre;
+    will-change: transform;
+  }
+
+  .scroll-chunk {
+    display: inline-block;
+    white-space: pre;
+    padding-right: 180px;
+    flex-shrink: 0;
+  }
+
+  .side-box-right {
+    width: 240px;
+    height: 100%;
+    background: linear-gradient(180deg, #1b8a2b 0%, #0d4a17 100%);
+    clip-path: polygon(28px 0, 100% 0, 100% 100%, 28px 100%, 0 50%);
+    flex-shrink: 0;
+    z-index: 5;
+  }
+</style>
+</head>
+<body>
+  <div id="render-stage">
+
+    <!-- SCOREBOARD -->
+    <div id="scoreboard-wrapper">
+      <div class="sb-main">
+        <div class="hex-wrap">
+          <div class="hex-box hex-left" id="scoreLeft">0</div>
+        </div>
+
+        <div class="teams-bars">
+          <div class="team-bar bar-top" id="teamTop">TEAM A</div>
+          <div class="team-bar bar-bottom" id="teamBottom">TEAM B</div>
+        </div>
+
+        <div class="hex-wrap">
+          <div class="hex-box hex-right" id="scoreRight">0</div>
+        </div>
+      </div>
+      <div class="sb-round" id="roundDisplay">KABADDI OPEN MATCH</div>
+    </div>
+
+    <!-- TOP-RIGHT CLIENT LOGO -->
+    <div id="sb-logo-box">
+      <img id="pngLogoImg" alt="Client Logo">
+    </div>
+
+    <!-- BOTTOM TICKER (~500px SPACE) -->
+    <div id="bottom-ticker-bar">
+      <div class="side-box-left">
+        <div class="live-label">LIVE</div>
+      </div>
+
+      <div class="ticker-center">
+        <div class="ticker-line row-top">
+          <div class="scroll-box">
+            <div class="scroll-track" id="trackTop">
+              <span class="scroll-chunk" id="chunkTopA"></span>
+              <span class="scroll-chunk" id="chunkTopB"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ticker-line row-yellow">
+          <div class="scroll-box">
+            <div class="scroll-track" id="trackYellow">
+              <span class="scroll-chunk" id="chunkYellowA"></span>
+              <span class="scroll-chunk" id="chunkYellowB"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ticker-line row-bottom">
+          <div class="scroll-box">
+            <div class="scroll-track" id="trackBottom">
+              <span class="scroll-chunk" id="chunkBottomA"></span>
+              <span class="scroll-chunk" id="chunkBottomB"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-box-right"></div>
+    </div>
+
+  </div>
+
+<script>
+  function fitStage() {
+    const stage = document.getElementById("render-stage");
+    const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    stage.style.transform = `translate(-50%, -50%) scale(${scale})`;
+  }
+  fitStage();
+  window.addEventListener("resize", fitStage);
+
+  const firebaseConfig = {
+    databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/"
+  };
+  firebase.initializeApp(firebaseConfig);
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const matchId = urlParams.get('id') || 'defaultMatch';
+  const queryLogoUrl = (urlParams.get('logo') || "").trim();
+
+  const clientLogos = {
+    "mudki1": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/KABADDI%20SPORTS%201%20Logo.png"
+  };
+
+  function getActiveLogo(dbLogoUrl) {
+    if (queryLogoUrl) return queryLogoUrl;
+    if (clientLogos[matchId]) return clientLogos[matchId];
+    if (dbLogoUrl && dbLogoUrl.trim() !== "") return dbLogoUrl.trim();
+    return "";
+  }
+
+  const db = firebase.database().ref("matchData/" + matchId);
+
+  let currentLogoUrl = "";
+  let currentLogoVisible = true;
+
+  function renderRightCornerLogo() {
+    const box = document.getElementById("sb-logo-box");
+    const img = document.getElementById("pngLogoImg");
+    const clean = (currentLogoUrl || "").trim();
+
+    if (!clean || !currentLogoVisible) {
+      box.style.display = "none";
+      return;
+    }
+
+    if (img.src !== clean) {
+      img.onload = () => {
+        if (currentLogoVisible && img.src === clean) box.style.display = "flex";
+      };
+      img.onerror = () => {
+        box.style.display = "none";
+      };
+      img.src = clean;
+    } else if (img.complete && img.naturalWidth > 0) {
+      box.style.display = "flex";
+    }
+  }
+
+  const scrollers = {};
+
+  function sanitizeLineKeepSpaces(rawText) {
+    if (rawText === null || rawText === undefined) return "";
+    return String(rawText).replace(/\r?\n/g, " ");
+  }
+
+  function setSingleLineTicker(trackId, chunkAId, chunkBId, rawText, speed) {
+    const track = document.getElementById(trackId);
+    const chunkA = document.getElementById(chunkAId);
+    const chunkB = document.getElementById(chunkBId);
+
+    const line = sanitizeLineKeepSpaces(rawText);
+    const validSpeed = (Number.isFinite(speed) && speed > 0) ? speed : 100;
+
+    if (!line.trim()) {
+      chunkA.textContent = "";
+      chunkB.textContent = "";
+      if (scrollers[trackId]) {
+        scrollers[trackId].active = false;
+        scrollers[trackId].x = 0;
+        track.style.transform = "translate3d(0px, -50%, 0)";
+      }
+      return;
+    }
+
+    const prevState = scrollers[trackId];
+    const textChanged = !prevState || prevState.raw !== line;
+
+    chunkA.textContent = line;
+    chunkB.textContent = line;
+
+    requestAnimationFrame(() => {
+      const boxW = track.parentElement.getBoundingClientRect().width || 1380;
+      let chunkWidth = chunkA.getBoundingClientRect().width;
+
+      if (chunkWidth > 0 && chunkWidth < boxW + 240) {
+        const spacer = " ".repeat(24);
+        const times = Math.ceil((boxW + 320) / Math.max(chunkWidth + 180, 1));
+        const repeated = Array(times).fill(line).join(spacer);
+        chunkA.textContent = repeated;
+        chunkB.textContent = repeated;
+        chunkWidth = chunkA.getBoundingClientRect().width;
+      }
+
+      if (!scrollers[trackId]) {
+        scrollers[trackId] = {
+          el: track,
+          raw: line,
+          x: 0,
+          width: Math.max(chunkWidth, 1),
+          speed: validSpeed,
+          active: true,
+          lastTs: performance.now()
+        };
+      } else {
+        const s = scrollers[trackId];
+        s.raw = line;
+        s.speed = validSpeed;
+        s.active = true;
+        if (chunkWidth > 0) {
+          if (textChanged) {
+            s.x = s.x % chunkWidth;
+            if (s.x > 0) s.x -= chunkWidth;
+          }
+          s.width = chunkWidth;
+        }
+        s.lastTs = performance.now();
+      }
+    });
+  }
+
+  function stepAllTickers(now) {
+    Object.values(scrollers).forEach((s) => {
+      if (!s.active) return;
+      const dt = Math.min((now - s.lastTs) / 1000, 0.04);
+      s.lastTs = now;
+      s.x -= s.speed * dt;
+      if (s.x <= -s.width) {
+        s.x += s.width;
+      }
+      s.el.style.transform = `translate3d(${s.x.toFixed(2)}px, -50%, 0)`;
+    });
+    requestAnimationFrame(stepAllTickers);
+  }
+  requestAnimationFrame(stepAllTickers);
+
+  currentLogoUrl = getActiveLogo("");
+  renderRightCornerLogo();
+
+  db.on("value", (snap) => {
+    const data = snap.val();
+    if (!data) return;
+
+    document.getElementById("scoreboard-wrapper").style.opacity =
+      (data.scoreVisible === false) ? "0" : "1";
+
+    document.getElementById("bottom-ticker-bar").style.opacity =
+      (data.tickerVisible === false) ? "0" : "1";
+
+    document.getElementById("teamTop").innerText = (data.nameA || "TEAM A").trim();
+    document.getElementById("scoreLeft").innerText = data.scoreA !== undefined ? data.scoreA : 0;
+    document.getElementById("teamBottom").innerText = (data.nameB || "TEAM B").trim();
+    document.getElementById("scoreRight").innerText = data.scoreB !== undefined ? data.scoreB : 0;
+
+    document.getElementById("roundDisplay").innerText = data.round || "";
+
+    currentLogoUrl = getActiveLogo(data.logoUrl);
+    currentLogoVisible = (data.logoVisible !== false);
+    renderRightCornerLogo();
+
+    const speed1 = parseFloat(data.speedRow1) || 95;
+    const speed2 = parseFloat(data.speedRow2) || 115;
+    const speed3 = parseFloat(data.speedRow3) || 105;
+
+    setSingleLineTicker("trackTop", "chunkTopA", "chunkTopB", data.row1Txt ?? "", speed1);
+    setSingleLineTicker("trackYellow", "chunkYellowA", "chunkYellowB", data.row2Txt ?? "", speed2);
+    setSingleLineTicker("trackBottom", "chunkBottomA", "chunkBottomB", data.row3Txt ?? "", speed3);
+  });
+</script>
+</body>
+</html>
