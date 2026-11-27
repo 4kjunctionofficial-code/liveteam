@@ -35,6 +35,24 @@
     overflow: hidden;
   }
 
+  /* ==================== FLOATING WATERMARK ==================== */
+  #floating-watermark {
+    position: absolute;
+    top: 220px;
+    left: 420px;
+    font-family: 'Roboto Condensed', 'Noto Sans Gurmukhi', sans-serif;
+    font-size: 46px;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.42);
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
+    pointer-events: none;
+    white-space: nowrap;
+    display: none;
+    z-index: 12;
+  }
+
   /* ==================== TOP-LEFT SCOREBOARD ==================== */
   #scoreboard-wrapper {
     position: absolute;
@@ -285,6 +303,57 @@
     flex-shrink: 0;
     z-index: 5;
   }
+
+  /* ==================== PLAN EXPIRED LOCK SCREEN ==================== */
+  #plan-expired-lock {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #07090d;
+    color: #ffffff;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px;
+    z-index: 999999;
+  }
+
+  .expired-card {
+    background: #12161f;
+    border: 3px solid #ff3b30;
+    border-radius: 20px;
+    padding: 46px 64px;
+    max-width: 980px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
+  }
+
+  .expired-title {
+    font-size: 56px;
+    font-weight: 900;
+    color: #ffe600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    line-height: 1.25;
+  }
+
+  .expired-sub {
+    margin-top: 18px;
+    font-size: 34px;
+    font-weight: 800;
+    color: #ff5c52;
+    line-height: 1.35;
+  }
+
+  .expired-phone {
+    margin-top: 24px;
+    font-size: 44px;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: 2px;
+  }
 </style>
 </head>
 <body>
@@ -308,6 +377,9 @@
       </div>
       <div class="sb-round" id="roundDisplay">KABADDI OPEN MATCH</div>
     </div>
+
+    <!-- FLOATING WATERMARK -->
+    <div id="floating-watermark"></div>
 
     <!-- TOP-RIGHT CLIENT LOGO -->
     <div id="sb-logo-box">
@@ -354,7 +426,19 @@
 
   </div>
 
+  <!-- PLAN EXPIRED LOCK SCREEN -->
+  <div id="plan-expired-lock">
+    <div class="expired-card">
+      <div class="expired-title">🛑 ਪਲਾਨ ਖਤਮ ਹੋ ਗਿਆ ਹੈ</div>
+      <div class="expired-sub">ਮਾਸਟਰ ਵੱਲੋਂ ਪਲਾਨ ਖਤਮ ਕਰ ਦਿੱਤਾ ਗਿਆ ਹੈ • ਓਵਰਲੇਅ ਬੰਦ ਹੈ</div>
+      <div class="expired-phone">ਹੈਲਪਲਾਈਨ: 8699640061</div>
+    </div>
+  </div>
+
 <script>
+  let isOverlayLocked = false;
+  let rafId = null;
+
   function fitStage() {
     const stage = document.getElementById("render-stage");
     const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
@@ -385,6 +469,61 @@
   }
 
   const db = firebase.database().ref("matchData/" + matchId);
+  const masterPlanDb = firebase.database().ref("masterPlans/" + matchId);
+  const userPlanDb = firebase.database().ref("users/" + matchId);
+
+  function lockOverlayDueToExpiry() {
+    if (isOverlayLocked) return;
+    isOverlayLocked = true;
+
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+
+    try {
+      db.off();
+      masterPlanDb.off();
+      userPlanDb.off();
+    } catch (e) {}
+
+    const stage = document.getElementById("render-stage");
+    if (stage) stage.style.display = "none";
+
+    const lockEl = document.getElementById("plan-expired-lock");
+    if (lockEl) lockEl.style.display = "flex";
+  }
+
+  function evaluatePlanStatus(planObj) {
+    if (!planObj || isOverlayLocked) return;
+
+    const explicitExpired =
+      planObj.planExpired === true ||
+      planObj.expired === true ||
+      planObj.isExpired === true ||
+      planObj.active === false ||
+      String(planObj.status || "").toLowerCase() === "expired";
+
+    let dateExpired = false;
+    if (planObj.expiryDate) {
+      const expTime = new Date(planObj.expiryDate).getTime();
+      if (!Number.isNaN(expTime) && Date.now() > expTime) {
+        dateExpired = true;
+      }
+    }
+
+    if (explicitExpired || dateExpired) {
+      lockOverlayDueToExpiry();
+    }
+  }
+
+  masterPlanDb.on("value", (snap) => {
+    evaluatePlanStatus(snap.val());
+  });
+
+  userPlanDb.on("value", (snap) => {
+    evaluatePlanStatus(snap.val());
+  });
 
   function getText(enVal, paVal) {
     if (langMode === 'pa' && paVal && paVal.trim() !== "") return paVal.trim();
@@ -411,6 +550,28 @@
       box.style.display = "none";
     };
     img.src = clean;
+  }
+
+  /* Floating Watermark State */
+  const wmEl = document.getElementById("floating-watermark");
+  let wmX = 420;
+  let wmY = 220;
+  let wmVx = 85;
+  let wmVy = 62;
+  let wmLastTs = performance.now();
+  let wmActive = false;
+
+  function setFloatingWatermark(txt) {
+    const clean = String(txt || "").trim();
+    if (!clean) {
+      wmActive = false;
+      wmEl.textContent = "";
+      wmEl.style.display = "none";
+      return;
+    }
+    wmEl.textContent = clean;
+    wmEl.style.display = "block";
+    wmActive = true;
   }
 
   // Per-line speed (px/sec)
@@ -481,6 +642,7 @@
     itemB.textContent = rawLine;
 
     requestAnimationFrame(() => {
+      if (isOverlayLocked) return;
       const boxW = track.parentElement.getBoundingClientRect().width || 1380;
       let w = itemA.getBoundingClientRect().width;
 
@@ -518,6 +680,7 @@
   }
 
   function refreshAllTickers() {
+    if (isOverlayLocked) return;
     const lines = buildLinesFromData(latestData);
     updateTicker("trackTop", "itemTopA", "itemTopB", lines.r1, lineSpeeds.trackTop);
     updateTicker("trackYellow", "itemYellowA", "itemYellowB", lines.r2, lineSpeeds.trackYellow);
@@ -525,25 +688,58 @@
   }
 
   window.setRowSpeeds = function({ row1, row2, row3 } = {}) {
+    if (isOverlayLocked) return;
     if (Number(row1) > 0) lineSpeeds.trackTop = Number(row1);
     if (Number(row2) > 0) lineSpeeds.trackYellow = Number(row2);
     if (Number(row3) > 0) lineSpeeds.trackBottom = Number(row3);
     refreshAllTickers();
   };
 
-  function animateTickers(now) {
+  function animateLoop(now) {
+    if (isOverlayLocked) return;
+
+    const dt = Math.min((now - wmLastTs) / 1000, 0.08);
+    wmLastTs = now;
+
     Object.values(tickers).forEach((t) => {
-      const dt = Math.min((now - t.ts) / 1000, 0.1);
-      t.ts = now;
       t.x -= t.speed * dt;
       if (t.x <= -t.width) {
         t.x += t.width;
       }
       t.el.style.transform = `translate3d(${t.x.toFixed(2)}px, -50%, 0)`;
     });
-    requestAnimationFrame(animateTickers);
+
+    if (wmActive) {
+      const minX = 40;
+      const minY = 140;
+      const maxX = Math.max(minX + 100, 1920 - wmEl.offsetWidth - 40);
+      const maxY = Math.max(minY + 60, 1080 - 122 - wmEl.offsetHeight - 30);
+
+      wmX += wmVx * dt;
+      wmY += wmVy * dt;
+
+      if (wmX <= minX) {
+        wmX = minX;
+        wmVx = Math.abs(wmVx);
+      } else if (wmX >= maxX) {
+        wmX = maxX;
+        wmVx = -Math.abs(wmVx);
+      }
+
+      if (wmY <= minY) {
+        wmY = minY;
+        wmVy = Math.abs(wmVy);
+      } else if (wmY >= maxY) {
+        wmY = maxY;
+        wmVy = -Math.abs(wmVy);
+      }
+
+      wmEl.style.transform = `translate3d(${wmX.toFixed(1)}px, ${wmY.toFixed(1)}px, 0)`;
+    }
+
+    rafId = requestAnimationFrame(animateLoop);
   }
-  requestAnimationFrame(animateTickers);
+  rafId = requestAnimationFrame(animateLoop);
 
   const initialLogo = getActiveLogo("");
   if (initialLogo) {
@@ -551,9 +747,13 @@
   }
 
   db.on("value", (snap) => {
+    if (isOverlayLocked) return;
     const data = snap.val();
     if (!data) return;
     latestData = data;
+
+    evaluatePlanStatus(data);
+    if (isOverlayLocked) return;
 
     document.getElementById("scoreboard-wrapper").style.opacity =
       (data.scoreVisible === false) ? "0" : "1";
@@ -580,6 +780,7 @@
 
     document.getElementById("roundDisplay").innerText = data.round || "";
 
+    setFloatingWatermark(data.watermarkTxt);
     setRightCornerLogo(getActiveLogo(data.logoUrl));
 
     if (Number(data.speedRow1) > 0 && !urlParams.get("r1Speed")) {
