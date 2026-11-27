@@ -207,7 +207,6 @@
     z-index: 2;
   }
 
-  /* Line 1: Black Scrolling Strip */
   .row-top {
     height: 40px;
     background: #0d0d0d;
@@ -222,7 +221,6 @@
     position: relative;
   }
 
-  /* Line 2: Yellow Scrolling Strip */
   .row-yellow {
     height: 42px;
     background: #ffe600;
@@ -236,7 +234,6 @@
     position: relative;
   }
 
-  /* Line 3: Black Scrolling Strip */
   .row-bottom {
     height: 40px;
     background: #0d0d0d;
@@ -329,7 +326,6 @@
       </div>
 
       <div class="ticker-center">
-        <!-- Line 1 (Scrolling) -->
         <div class="row-top">
           <div class="scroll-box">
             <div class="scroll-track" id="trackTop">
@@ -339,7 +335,6 @@
           </div>
         </div>
 
-        <!-- Line 2 (Scrolling) -->
         <div class="row-yellow">
           <div class="scroll-box">
             <div class="scroll-track" id="trackYellow">
@@ -349,7 +344,6 @@
           </div>
         </div>
 
-        <!-- Line 3 (Scrolling) -->
         <div class="row-bottom">
           <div class="scroll-box">
             <div class="scroll-track" id="trackBottom">
@@ -385,6 +379,16 @@
   const matchId = urlParams.get('id') || 'defaultMatch';
   const langMode = urlParams.get('lang') || 'en';
   const queryLogoUrl = (urlParams.get('logo') || "").trim();
+
+  const clientLogos = {
+    "mudki1": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/KABADDI%20SPORTS%201%20Logo.png"
+  };
+
+  function getActiveLogo(dbLogoUrl) {
+    if (queryLogoUrl) return queryLogoUrl;
+    if (clientLogos[matchId]) return clientLogos[matchId];
+    return (dbLogoUrl || "").trim();
+  }
 
   const db = firebase.database().ref("matchData/" + matchId);
 
@@ -468,8 +472,8 @@
   }
   requestAnimationFrame(animateTickers);
 
-  if (queryLogoUrl) {
-    setPngLogo(queryLogoUrl);
+  if (queryLogoUrl || clientLogos[matchId]) {
+    setPngLogo(getActiveLogo(""));
   }
 
   db.on("value", (snap) => {
@@ -506,13 +510,12 @@
       wm.style.display = "none";
     }
 
-    setPngLogo(queryLogoUrl || data.logoUrl);
+    setPngLogo(getActiveLogo(data.logoUrl));
 
     const speed1 = parseFloat(data.speedRow1) || 95;
     const speed2 = parseFloat(data.speedRow2) || 115;
     const speed3 = parseFloat(data.speedRow3) || 105;
 
-    // Line 1 (Scrolling): Village + Program
     const village = getText(data.row1Txt, data.row1Txt_pa);
     const program = getText(data.programTxt, data.programTxt_pa);
     const topParts = [];
@@ -521,7 +524,6 @@
     const topLine = topParts.join(" — ") || "OPEN KABADDI TOURNAMENT";
     updateTicker("trackTop", "itemTopA", "itemTopB", topLine, speed1);
 
-    // Line 2 (Scrolling): Prizes + Result + Ads
     const yellowParts = [];
 
     const cat1 = [];
@@ -552,7 +554,6 @@
 
     updateTicker("trackYellow", "itemYellowA", "itemYellowB", yellowLine, speed2);
 
-    // Line 3 (Scrolling): Next Matches + Upcoming Events + Telecast
     const bottomParts = [];
 
     const nextMatches = getText(data.row5Txt, data.row5Txt_pa);
