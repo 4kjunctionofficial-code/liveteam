@@ -1,569 +1,1016 @@
 <!DOCTYPE html>
 <html lang="pa">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kabaddi Live Overlay</title>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gurmukhi:wght@700;900&family=Oswald:wght@700&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kabaddi Sports 1 - Skewed Broadcast Ticker & Clock</title>
 
-<style>
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@800&family=Bebas+Neue&family=Noto+Sans+Gurmukhi:wght@800;900&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
-  html, body {
-    width: 100%;
-    height: 100%;
-    background: transparent;
-    overflow: hidden;
-    font-family: 'Roboto Condensed', 'Noto Sans Gurmukhi', sans-serif;
-  }
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-  #render-stage {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 1920px;
-    height: 1080px;
-    transform: translate(-50%, -50%) scale(1);
-    transform-origin: center center;
-    background: transparent;
-    overflow: hidden;
-  }
+        body {
+            width: 1920px;
+            height: 1080px;
+            background: transparent;
+            font-family: 'Noto Sans Gurmukhi', 'Mukta', Arial, sans-serif;
+            overflow: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            user-select: none;
+            text-transform: uppercase;
+            transform-origin: top left;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
 
-  /* ==================== TOP-LEFT SCOREBOARD + CLIENT LOGO ==================== */
-  #scoreboard-wrapper {
-    position: absolute;
-    top: 30px;
-    left: 40px;
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    transition: opacity 0.25s ease;
-    z-index: 15;
-  }
+        /* =========================================================
+            SCOREBOARD (COMPACT HEIGHT + GOLD + ROYAL BLUE)
+        ========================================================= */
+        #top-scoreboard-container {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            z-index: 9999;
+            transition: opacity 0.4s ease;
+        }
 
-  .sb-left-col {
-    display: flex;
-    flex-direction: column;
-  }
+        #top-scoreboard-container.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
 
-  .sb-main {
-    display: flex;
-    align-items: center;
-    height: 92px;
-    position: relative;
-  }
+        #main-score-strip {
+            display: flex;
+            align-items: stretch;
+            height: 58px;
+            border-radius: 7px;
+            overflow: hidden;
+            border: 2px solid #ffd000;
+            transform: skewX(16deg);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.75);
+        }
 
-  .hex-wrap {
-    width: 108px;
-    height: 98px;
-    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-    background: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 3;
-  }
+        .unskew {
+            transform: skewX(-16deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
 
-  .hex-box {
-    width: 102px;
-    height: 92px;
-    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Oswald', sans-serif;
-    font-size: 52px;
-    font-weight: 700;
-  }
+        .score-a {
+            background: linear-gradient(180deg, #ffe24a 0%, #f5b400 65%, #c98600 100%);
+            color: #090909;
+            font-size: 44px;
+            font-weight: 900;
+            padding: 0 28px;
+            font-family: 'Bebas Neue', sans-serif;
+        }
 
-  .hex-left {
-    background: linear-gradient(180deg, #ffe600 0%, #d4b800 100%);
-    color: #0b4619;
-  }
+        .team-a-panel {
+            background: linear-gradient(180deg, #1b78ff 0%, #0047cc 60%, #002773 100%);
+            color: #ffffff;
+            font-size: 29px;
+            font-weight: 800;
+            padding: 0 32px;
+            white-space: nowrap;
+            min-width: 140px;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+        }
 
-  .hex-right {
-    background: linear-gradient(180deg, #1b7a2a 0%, #0d4a17 100%);
-    color: #ffe600;
-  }
+        .vs-divider {
+            width: 10px;
+            background: #090909;
+            border-left: 1.5px solid #ffd000;
+            border-right: 1.5px solid #ffd000;
+        }
 
-  .teams-bars {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin-left: -26px;
-    margin-right: -26px;
-    z-index: 2;
-    width: 390px;
-  }
+        .team-b-panel {
+            background: linear-gradient(180deg, #1b78ff 0%, #0047cc 60%, #002773 100%);
+            color: #ffffff;
+            font-size: 29px;
+            font-weight: 800;
+            padding: 0 32px;
+            white-space: nowrap;
+            min-width: 140px;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+        }
 
-  .team-bar {
-    height: 41px;
-    display: flex;
-    align-items: center;
-    font-size: 27px;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    border-top: 2px solid #ffffff;
-    border-bottom: 2px solid #ffffff;
-  }
+        .score-b {
+            background: linear-gradient(180deg, #ffe24a 0%, #f5b400 65%, #c98600 100%);
+            color: #090909;
+            font-size: 44px;
+            font-weight: 900;
+            padding: 0 28px;
+            font-family: 'Bebas Neue', sans-serif;
+        }
 
-  .bar-top {
-    background: linear-gradient(90deg, #f5d800 0%, #ffe933 100%);
-    color: #000000;
-    padding-left: 38px;
-    padding-right: 45px;
-    justify-content: flex-start;
-  }
+        #match-details-strip {
+            background: linear-gradient(90deg, #002b80 0%, #0055ff 50%, #002b80 100%);
+            color: #ffe24a;
+            font-size: 19px;
+            font-weight: 800;
+            padding: 4px 30px;
+            margin-top: 6px;
+            border-radius: 5px;
+            letter-spacing: 1.5px;
+            border: 1.5px solid #ffd000;
+            transform: skewX(16deg);
+            margin-right: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.65);
+        }
 
-  .bar-bottom {
-    background: linear-gradient(90deg, #0e521b 0%, #197a2c 100%);
-    color: #ffffff;
-    padding-left: 45px;
-    padding-right: 38px;
-    justify-content: flex-end;
-    margin-top: -2px;
-  }
+        #match-details-strip.hidden {
+            display: none;
+        }
 
-  .sb-round {
-    margin-top: 6px;
-    padding-left: 24px;
-    font-size: 25px;
-    font-weight: 900;
-    color: #ffffff;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    -webkit-text-stroke: 1px #000000;
-    paint-order: stroke fill;
-  }
+        /* =========================================================
+            LOGO & WATERMARK (COMPACT STATIC LOGO - NO ANIMATION)
+        ========================================================= */
+        #logo-container {
+            position: absolute;
+            top: 25px;
+            left: 30px;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            transition: opacity 0.3s ease;
+            opacity: 1;
+        }
 
-  /* Client PNG Logo Attached Beside Scoreboard */
-  #sb-logo-box {
-    width: 112px;
-    height: 98px;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
+        #logo-container.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
 
-  #pngLogoImg {
-    max-width: 108px;
-    max-height: 96px;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.75));
-  }
+        #main-logo {
+            height: 72px;
+            width: auto;
+            object-fit: contain;
+        }
 
-  /* ==================== TOP-RIGHT WATERMARK ==================== */
-  #watermark-box {
-    position: absolute;
-    top: 30px;
-    right: 42px;
-    background: rgba(12, 12, 12, 0.88);
-    border: 2px solid #ffe600;
-    border-radius: 10px;
-    padding: 7px 20px;
-    color: #ffe600;
-    font-size: 26px;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    display: none;
-    z-index: 15;
-  }
+        #single-wm {
+            position: absolute;
+            left: 300px;
+            top: 300px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 50px;
+            font-weight: bold;
+            color: #ffffff;
+            opacity: 0.45;
+            letter-spacing: 3px;
+            pointer-events: none;
+        }
 
-  /* ==================== BOTTOM 3-LINE TICKER WITH GREEN SIDE BOXES ==================== */
-  #bottom-ticker-bar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 1920px;
-    height: 122px;
-    display: flex;
-    align-items: stretch;
-    background: #0d0d0d;
-    transition: opacity 0.25s ease;
-    z-index: 10;
-  }
+        /* =========================================================
+            IMAGE-STYLE SKEWED TICKER + GOLD TRACK + BLUE BAR & CLOCK
+        ========================================================= */
+        #ticker-wrap {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 1920px;
+            z-index: 9998;
+            display: flex;
+            flex-direction: column;
+            filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.8));
+            transition: opacity 0.4s ease;
+        }
 
-  .side-box-left {
-    width: 240px;
-    height: 100%;
-    background: linear-gradient(180deg, #1b8a2b 0%, #0d4a17 100%);
-    clip-path: polygon(0 0, calc(100% - 28px) 0, 100% 50%, calc(100% - 28px) 100%, 0 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-right: 16px;
-    flex-shrink: 0;
-    z-index: 5;
-  }
+        #ticker-wrap.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
 
-  .live-label {
-    font-family: 'Roboto Condensed', sans-serif;
-    font-style: italic;
-    font-size: 60px;
-    font-weight: 900;
-    color: #ffe600;
-    letter-spacing: 1.5px;
-    line-height: 1;
-    transform: skewX(-6deg);
-  }
+        .upper-tier {
+            position: relative;
+            display: flex;
+            align-items: center;
+            height: 54px;
+            width: 100%;
+            z-index: 2;
+        }
 
-  .ticker-center {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    margin-left: -28px;
-    margin-right: -28px;
-    overflow: hidden;
-    background: #0d0d0d;
-    z-index: 2;
-  }
+        .skewed-badge {
+            position: relative;
+            z-index: 3;
+            height: 54px;
+            min-width: 630px;
+            max-width: 780px;
+            background: linear-gradient(180deg, #1b78ff 0%, #0047cc 60%, #002773 100%);
+            border: 3px solid #ffe24a;
+            border-left: none;
+            transform: skewX(-24deg);
+            margin-left: -14px;
+            padding: 0 38px 0 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.6);
+        }
 
-  .row-top {
-    height: 40px;
-    background: #0d0d0d;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    font-size: 27px;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    overflow: hidden;
-    position: relative;
-  }
+        .skewed-badge.empty-badge {
+            opacity: 0;
+            pointer-events: none;
+        }
 
-  .row-yellow {
-    height: 42px;
-    background: #ffe600;
-    color: #111111;
-    display: flex;
-    align-items: center;
-    font-size: 28px;
-    font-weight: 900;
-    letter-spacing: 0.3px;
-    overflow: hidden;
-    position: relative;
-  }
+        .skewed-badge-unskew {
+            transform: skewX(24deg);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            color: #ffffff;
+            font-size: 30px;
+            font-weight: 900;
+            letter-spacing: 0.8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.75);
+            white-space: nowrap;
+        }
 
-  .row-bottom {
-    height: 40px;
-    background: #0d0d0d;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    font-size: 26px;
-    font-weight: 800;
-    letter-spacing: 0.3px;
-    overflow: hidden;
-    position: relative;
-  }
+        .gold-track {
+            position: relative;
+            flex: 1;
+            height: 44px;
+            background: linear-gradient(180deg, #ffe600 0%, #f5c400 55%, #dca000 100%);
+            border-top: 3.5px solid #090909;
+            border-bottom: 3.5px solid #090909;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            margin-left: -26px;
+            padding-left: 34px;
+        }
 
-  .scroll-box {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-  }
+        .gold-track.empty-track {
+            opacity: 0;
+            pointer-events: none;
+        }
 
-  .scroll-track {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    transform: translate3d(0, -50%, 0);
-    display: inline-flex;
-    align-items: center;
-    white-space: nowrap;
-    will-change: transform;
-  }
+        .gold-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            color: #090909;
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+        }
 
-  .scroll-item {
-    display: inline-block;
-    padding-right: 75px;
-  }
+        .lower-tier {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 44px;
+            margin-top: -3px;
+            background: linear-gradient(90deg, #001f66 0%, #0047cc 25%, #0066ff 55%, #003b99 85%, #001a54 100%);
+            border-top: 1.5px solid rgba(255, 226, 74, 0.55);
+            border-bottom: none;
+            display: flex;
+            align-items: stretch;
+            overflow: hidden;
+        }
 
-  .side-box-right {
-    width: 240px;
-    height: 100%;
-    background: linear-gradient(180deg, #1b8a2b 0%, #0d4a17 100%);
-    clip-path: polygon(28px 0, 100% 0, 100% 100%, 28px 100%, 0 50%);
-    flex-shrink: 0;
-    z-index: 5;
-  }
-</style>
+        .lower-content {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            padding: 0 24px;
+            color: #ffffff;
+            font-size: 26px;
+            font-weight: 900;
+            letter-spacing: 0.8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.75);
+        }
+
+        .clock-time-box {
+            flex: 0 0 245px;
+            height: 100%;
+            background: linear-gradient(180deg, #ffe24a 0%, #f5b400 65%, #c98600 100%);
+            color: #090909;
+            border-left: 3px solid #090909;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 0 14px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            white-space: nowrap;
+        }
+
+        .clock-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #d90429;
+            box-shadow: 0 0 8px rgba(217, 4, 41, 0.85);
+            animation: clockPulse 1s infinite alternate;
+        }
+
+        @keyframes clockPulse {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0.35; transform: scale(0.8); }
+        }
+
+        .dot-sep {
+            color: #090909;
+            margin: 0 10px;
+            font-weight: 900;
+        }
+
+        .star-accent {
+            color: #ffe24a;
+            font-weight: 900;
+            margin: 0 10px;
+            letter-spacing: 1.5px;
+        }
+
+        .round-tag {
+            color: #ffe24a;
+            font-weight: 900;
+            margin-right: 4px;
+        }
+
+        .match-vs-pill {
+            display: inline-block;
+            background: #090909;
+            color: #ffe24a;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 24px;
+            padding: 0 8px;
+            border-radius: 4px;
+            margin: 0 5px;
+            vertical-align: middle;
+        }
+
+        .anim-wrap {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .anim-center-in {
+            animation: tickerFadeSlide 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes tickerFadeSlide {
+            0% { opacity: 0; transform: translateY(8px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .anim-wrap.marquee-mode {
+            justify-content: flex-start;
+        }
+
+        .anim-wrap.marquee-mode .ticker-text {
+            display: inline-block;
+            flex: 0 0 auto;
+            width: max-content;
+            white-space: nowrap;
+            will-change: transform;
+            animation: tickerMarquee var(--marquee-duration, 20s) linear 1 forwards;
+        }
+
+        @keyframes tickerMarquee {
+            0% { transform: translateX(var(--start-x, 0px)); }
+            100% { transform: translateX(var(--end-x, -200px)); }
+        }
+    </style>
 </head>
+
 <body>
-  <div id="render-stage">
 
-    <!-- SCOREBOARD + CLIENT LOGO -->
-    <div id="scoreboard-wrapper">
-      <div class="sb-left-col">
-        <div class="sb-main">
-          <div class="hex-wrap">
-            <div class="hex-box hex-left" id="scoreLeft">0</div>
-          </div>
-
-          <div class="teams-bars">
-            <div class="team-bar bar-top" id="teamTop">TEAM A</div>
-            <div class="team-bar bar-bottom" id="teamBottom">TEAM B</div>
-          </div>
-
-          <div class="hex-wrap">
-            <div class="hex-box hex-right" id="scoreRight">0</div>
-          </div>
-        </div>
-        <div class="sb-round" id="roundDisplay">KABADDI OPEN MATCH</div>
-      </div>
-
-      <div id="sb-logo-box">
-        <img id="pngLogoImg" alt="Client Logo">
-      </div>
+    <!-- STATIC LOGO -->
+    <div id="logo-container" class="hidden">
+        <img id="main-logo" src="" alt="Logo">
     </div>
 
     <!-- WATERMARK -->
-    <div id="watermark-box"></div>
+    <div id="single-wm">ਐੱਮ ਲਾਈਵ</div>
 
-    <!-- BOTTOM 3-LINE SCROLLING TICKER -->
-    <div id="bottom-ticker-bar">
-      <div class="side-box-left">
-        <div class="live-label">LIVE</div>
-      </div>
-
-      <div class="ticker-center">
-        <div class="row-top">
-          <div class="scroll-box">
-            <div class="scroll-track" id="trackTop">
-              <span class="scroll-item" id="itemTopA">OPEN KABADDI TOURNAMENT</span>
-              <span class="scroll-item" id="itemTopB">OPEN KABADDI TOURNAMENT</span>
-            </div>
-          </div>
+    <!-- SCOREBOARD -->
+    <div id="top-scoreboard-container">
+        <div id="main-score-strip">
+            <div class="score-a"><div class="unskew" id="sA">0</div></div>
+            <div class="team-a-panel"><div class="unskew" id="nA">ਟੀਮ 1</div></div>
+            <div class="vs-divider"><div class="unskew"></div></div>
+            <div class="team-b-panel"><div class="unskew" id="nB">ਟੀਮ 2</div></div>
+            <div class="score-b"><div class="unskew" id="sB">0</div></div>
         </div>
-
-        <div class="row-yellow">
-          <div class="scroll-box">
-            <div class="scroll-track" id="trackYellow">
-              <span class="scroll-item" id="itemYellowA">LIVE KABADDI BROADCAST</span>
-              <span class="scroll-item" id="itemYellowB">LIVE KABADDI BROADCAST</span>
-            </div>
-          </div>
+        <div id="match-details-strip" class="hidden">
+            <div class="unskew" id="match-round"></div>
         </div>
-
-        <div class="row-bottom">
-          <div class="scroll-box">
-            <div class="scroll-track" id="trackBottom">
-              <span class="scroll-item" id="itemBottomA">STAY TUNED FOR UPDATES</span>
-              <span class="scroll-item" id="itemBottomB">STAY TUNED FOR UPDATES</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="side-box-right"></div>
     </div>
 
-  </div>
+    <!-- BROADCAST TICKER -->
+    <div id="ticker-wrap">
+        <div class="upper-tier">
+            <div class="skewed-badge empty-badge" id="badge-box">
+                <div class="skewed-badge-unskew">
+                    <div id="badge-ticker" class="anim-wrap"></div>
+                </div>
+            </div>
 
-<script>
-  function fitStage() {
-    const stage = document.getElementById("render-stage");
-    const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
-    stage.style.transform = `translate(-50%, -50%) scale(${scale})`;
-  }
-  fitStage();
-  window.addEventListener("resize", fitStage);
+            <div class="gold-track empty-track" id="gold-track-box">
+                <div class="gold-content">
+                    <div id="gold-ticker" class="anim-wrap"></div>
+                </div>
+            </div>
+        </div>
 
-  const firebaseConfig = {
-    databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/"
-  };
-  firebase.initializeApp(firebaseConfig);
+        <div class="lower-tier">
+            <div class="lower-content">
+                <div id="lower-ticker" class="anim-wrap"></div>
+            </div>
+            <div class="clock-time-box" id="row3-clock-box">
+                <span class="clock-dot"></span>
+                <span id="live-clock-text">11:27:00 AM</span>
+            </div>
+        </div>
+    </div>
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const matchId = urlParams.get('id') || 'defaultMatch';
-  const langMode = urlParams.get('lang') || 'en';
-  const queryLogoUrl = (urlParams.get('logo') || "").trim();
+    <script>
+        function autoResizeOverlay() {
+            const baseWidth = 1920;
+            const baseHeight = 1080;
+            const scale = Math.min(window.innerWidth / baseWidth, window.innerHeight / baseHeight);
+            document.body.style.transform = `scale(${scale})`;
+            document.body.style.width = `${baseWidth}px`;
+            document.body.style.height = `${baseHeight}px`;
+        }
 
-  // Client logo map (add your client IDs & PNG links here)
-  const clientLogos = {
-    "mudki1": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/KABADDI%20SPORTS%201%20Logo.png"
-  };
+        window.addEventListener('resize', autoResizeOverlay);
+        window.addEventListener('load', autoResizeOverlay);
+        autoResizeOverlay();
 
-  function getActiveLogo(dbLogoUrl) {
-    if (queryLogoUrl) return queryLogoUrl;
-    if (clientLogos[matchId]) return clientLogos[matchId];
-    if (dbLogoUrl && dbLogoUrl.trim() !== "") return dbLogoUrl.trim();
-    return "";
-  }
+        function updateLiveClock() {
+            const now = new Date();
+            const clockEl = document.getElementById("live-clock-text");
+            if (clockEl) {
+                clockEl.innerText = now.toLocaleTimeString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: true
+                });
+            }
+        }
+        updateLiveClock();
+        setInterval(updateLiveClock, 1000);
 
-  const db = firebase.database().ref("matchData/" + matchId);
-
-  function getText(enVal, paVal) {
-    if (langMode === 'pa' && paVal && paVal.trim() !== "") return paVal.trim();
-    return (enVal || "").trim();
-  }
-
-  function setScoreboardLogo(url) {
-    const box = document.getElementById("sb-logo-box");
-    const img = document.getElementById("pngLogoImg");
-    const clean = (url || "").trim();
-
-    if (!clean) {
-      img.onload = null;
-      img.onerror = null;
-      img.removeAttribute("src");
-      box.style.display = "none";
-      return;
-    }
-
-    img.onload = () => {
-      box.style.display = "flex";
-    };
-    img.onerror = () => {
-      box.style.display = "none";
-    };
-    img.src = clean;
-  }
-
-  const tickers = {};
-
-  function updateTicker(trackId, itemAId, itemBId, text, speed) {
-    const track = document.getElementById(trackId);
-    const itemA = document.getElementById(itemAId);
-    const itemB = document.getElementById(itemBId);
-
-    const clean = (text && text.trim()) ? text.trim() : "LIVE KABADDI TOURNAMENT";
-    itemA.textContent = clean;
-    itemB.textContent = clean;
-
-    requestAnimationFrame(() => {
-      let w = itemA.getBoundingClientRect().width;
-      const boxW = track.parentElement.getBoundingClientRect().width || 1400;
-
-      if (w < boxW * 1.15) {
-        const count = Math.ceil((boxW * 1.4) / Math.max(w, 120));
-        const repeated = Array(count).fill(clean).join("     •     ");
-        itemA.textContent = repeated;
-        itemB.textContent = repeated;
-        w = itemA.getBoundingClientRect().width;
-      }
-
-      const validSpeed = (Number.isFinite(speed) && speed > 0) ? speed : 100;
-
-      if (!tickers[trackId]) {
-        tickers[trackId] = {
-          el: track,
-          x: 0,
-          width: w || 600,
-          speed: validSpeed,
-          ts: performance.now()
+        const firebaseConfig = {
+            databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/"
         };
-      } else {
-        tickers[trackId].width = w || 600;
-        tickers[trackId].speed = validSpeed;
-      }
-    });
-  }
+        firebase.initializeApp(firebaseConfig);
 
-  function animateTickers(now) {
-    Object.values(tickers).forEach((t) => {
-      const dt = Math.min((now - t.ts) / 1000, 0.1);
-      t.ts = now;
-      t.x -= t.speed * dt;
-      if (Math.abs(t.x) >= t.width) {
-        t.x += t.width;
-      }
-      t.el.style.transform = `translate3d(${t.x.toFixed(2)}px, -50%, 0)`;
-    });
-    requestAnimationFrame(animateTickers);
-  }
-  requestAnimationFrame(animateTickers);
+        const urlParams = new URLSearchParams(window.location.search);
+        const matchId = urlParams.get('id') || 'defaultMatch';
 
-  const initialLogo = getActiveLogo("");
-  if (initialLogo) {
-    setScoreboardLogo(initialLogo);
-  }
+        const DEFAULT_ROW_SPEEDS = {
+            "badge-ticker": 80,
+            "gold-ticker": 90,
+            "lower-ticker": 85
+        };
 
-  db.on("value", (snap) => {
-    const data = snap.val();
-    if (!data) return;
+        let rowSpeeds = { ...DEFAULT_ROW_SPEEDS };
 
-    document.getElementById("scoreboard-wrapper").style.opacity =
-      (data.scoreVisible === false) ? "0" : "1";
+        function loadSavedRowSpeeds() {
+            try {
+                const saved = JSON.parse(localStorage.getItem("kabaddi_row_speeds") || "{}");
+                if (Number(saved.row1) > 0) rowSpeeds["badge-ticker"] = Number(saved.row1);
+                if (Number(saved.row2) > 0) rowSpeeds["gold-ticker"] = Number(saved.row2);
+                if (Number(saved.row3) > 0) rowSpeeds["lower-ticker"] = Number(saved.row3);
+            } catch (e) {}
 
-    document.getElementById("bottom-ticker-bar").style.opacity =
-      (data.tickerVisible === false) ? "0" : "1";
+            const q1 = Number(urlParams.get("r1Speed"));
+            const q2 = Number(urlParams.get("r2Speed"));
+            const q3 = Number(urlParams.get("r3Speed"));
+            if (q1 > 0) rowSpeeds["badge-ticker"] = q1;
+            if (q2 > 0) rowSpeeds["gold-ticker"] = q2;
+            if (q3 > 0) rowSpeeds["lower-ticker"] = q3;
+        }
+        loadSavedRowSpeeds();
 
-    const nameA = getText(data.nameA, data.nameA_pa) || "TEAM A";
-    const nameB = getText(data.nameB, data.nameB_pa) || "TEAM B";
-    const scoreA = data.scoreA !== undefined ? data.scoreA : 0;
-    const scoreB = data.scoreB !== undefined ? data.scoreB : 0;
+        window.setRowSpeeds = function({ row1, row2, row3 } = {}) {
+            if (Number(row1) > 0) rowSpeeds["badge-ticker"] = Number(row1);
+            if (Number(row2) > 0) rowSpeeds["gold-ticker"] = Number(row2);
+            if (Number(row3) > 0) rowSpeeds["lower-ticker"] = Number(row3);
+            try {
+                localStorage.setItem("kabaddi_row_speeds", JSON.stringify({
+                    row1: rowSpeeds["badge-ticker"],
+                    row2: rowSpeeds["gold-ticker"],
+                    row3: rowSpeeds["lower-ticker"]
+                }));
+            } catch (e) {}
+        };
 
-    if (data.cameraOpposite) {
-      document.getElementById("teamTop").innerText = nameB;
-      document.getElementById("scoreLeft").innerText = scoreB;
-      document.getElementById("teamBottom").innerText = nameA;
-      document.getElementById("scoreRight").innerText = scoreA;
-    } else {
-      document.getElementById("teamTop").innerText = nameA;
-      document.getElementById("scoreLeft").innerText = scoreA;
-      document.getElementById("teamBottom").innerText = nameB;
-      document.getElementById("scoreRight").innerText = scoreB;
-    }
+        const db = firebase.database().ref("matchData/" + matchId);
+        const userDb = firebase.database().ref("users/" + matchId);
 
-    document.getElementById("roundDisplay").innerText = data.round || "";
+        userDb.on("value", (snap) => {
+            const user = snap.val();
+            if (user && user.expiryDate && Date.now() > new Date(user.expiryDate).getTime()) {
+                document.body.innerHTML = `
+                    <div style="width:100vw;height:100vh;display:flex;justify-content:center;align-items:center;background:black;color:white;font-size:50px;text-align:center;">
+                        🛑 ਪਲਾਨ ਖਤਮ ਹੋ ਗਿਆ ਹੈ<br>ਹੈਲਪ ਲਾਈਨ: ਮਨਪ੍ਰੀਤ ਮੁਦਕੀ<br>9115426711
+                    </div>
+                `;
+            }
+        });
 
-    const wm = document.getElementById("watermark-box");
-    if (data.watermarkTxt && data.watermarkTxt.trim() !== "") {
-      wm.innerText = data.watermarkTxt.trim();
-      wm.style.display = "block";
-    } else {
-      wm.style.display = "none";
-    }
+        const clientLogos = {
+            "mudki1": "https://raw.githubusercontent.com/4kjunctionofficial-code/liveteam/main/KABADDI%20SPORTS%201%20Logo.png"
+        };
 
-    setScoreboardLogo(getActiveLogo(data.logoUrl));
+        const dict = {
+            "Kabaddi": "ਕਬੱਡੀ",
+            "Open": "ਓਪਨ",
+            "Quarter Final": "ਕੁਆਰਟਰ ਫਾਈਨਲ",
+            "Semi Final": "ਸੈਮੀ ਫਾਈਨਲ",
+            "Final": "ਫਾਈਨਲ",
+            "1st Round": "ਪਹਿਲਾ ਰਾਊਂਡ",
+            "2nd Round": "ਦੂਜਾ ਰਾਊਂਡ",
+            "3rd Round": "ਤੀਜਾ ਰਾਊਂਡ",
+            "4th Round": "ਚੌਥਾ ਰਾਊਂਡ",
+            "Pool A": "ਪੂਲ ਏ",
+            "Pool B": "ਪੂਲ ਬੀ",
+            "Winner": "ਵਿੰਨਰ",
+            "Tournament": "ਟੂਰਨਾਮੈਂਟ"
+        };
 
-    const speed1 = parseFloat(data.speedRow1) || 95;
-    const speed2 = parseFloat(data.speedRow2) || 115;
-    const speed3 = parseFloat(data.speedRow3) || 105;
+        function translateToPunjabi(text) {
+            if (!text) return "";
+            let translated = String(text).trim();
+            for (let key in dict) {
+                let regex = new RegExp(key, 'gi');
+                translated = translated.replace(regex, dict[key]);
+            }
+            return translated.replace(/KG/gi, "ਕਿਲੋ");
+        }
 
-    const r1 = (data.row1Txt || "").trim() || "OPEN KABADDI TOURNAMENT";
-    updateTicker("trackTop", "itemTopA", "itemTopB", r1, speed1);
+        function hasValue(val) {
+            return val !== null && val !== undefined && String(val).trim() !== "";
+        }
 
-    const r2Parts = [];
-    const r2Main = ((data.row2Txt || data.programTxt) || "").trim();
-    if (r2Main) r2Parts.push(r2Main);
-    if (data.resultText && data.resultText !== "No Result Yet") {
-      r2Parts.push(`RESULT :- ${data.resultText}`);
-    }
-    const r2Line = r2Parts.length > 0 ? r2Parts.join("     |     ") : r1;
-    updateTicker("trackYellow", "itemYellowA", "itemYellowB", r2Line, speed2);
+        function normalizeArray(value) {
+            if (Array.isArray(value)) {
+                return value.filter(item => {
+                    if (item === null || item === undefined) return false;
+                    if (typeof item === "string") return item.trim() !== "";
+                    if (typeof item === "object") {
+                        return Object.values(item).some(v => v !== null && v !== undefined && String(v).trim() !== "");
+                    }
+                    return false;
+                });
+            }
+            if (value && typeof value === "object") {
+                return Object.values(value).filter(item => {
+                    if (item === null || item === undefined) return false;
+                    if (typeof item === "string") return item.trim() !== "";
+                    if (typeof item === "object") {
+                        return Object.values(item).some(v => v !== null && v !== undefined && String(v).trim() !== "");
+                    }
+                    return false;
+                });
+            }
+            return [];
+        }
 
-    const r3Parts = [];
-    if (data.row3Txt && data.row3Txt.trim() !== "") {
-      r3Parts.push(data.row3Txt.trim());
-    }
-    if (Array.isArray(data.nextMatches) && data.nextMatches.length > 0) {
-      r3Parts.push(`NEXT MATCHES :- ${data.nextMatches.join(" , ")}`);
-    }
-    if (data.contactUs && data.contactUs.trim() !== "") {
-      r3Parts.push(data.contactUs.trim());
-    }
-    const r3Line = r3Parts.length > 0 ? r3Parts.join("     |     ") : "LIVE KABADDI BROADCAST";
-    updateTicker("trackBottom", "itemBottomA", "itemBottomB", r3Line, speed3);
-  });
-</script>
+        function formatMatchString(m, index, isEnglishMode) {
+            m = String(m || "").trim();
+            let bracketContent = "";
+            let teamPart = m;
+
+            if (m.startsWith("(")) {
+                const closeIdx = m.indexOf(")");
+                if (closeIdx !== -1) {
+                    bracketContent = m.substring(1, closeIdx).trim();
+                    teamPart = m.substring(closeIdx + 1).trim();
+                }
+            }
+
+            const tms = teamPart.split(/\s+VS\s+/i);
+            const t1Parts = (tms[0] || "").trim().split("=");
+            const t2Parts = (tms[1] || "").trim().split("=");
+
+            const t1En = (t1Parts[0] || "").trim();
+            const t2En = (t2Parts[0] || "").trim();
+            const t1Pa = translateToPunjabi((t1Parts[1] || t1Parts[0] || "").trim());
+            const t2Pa = translateToPunjabi((t2Parts[1] || t2Parts[0] || "").trim());
+
+            const tagPa = hasValue(bracketContent) ? `<span class="round-tag">[${translateToPunjabi(bracketContent)}]</span> ` : "";
+            const tagEn = hasValue(bracketContent) ? `<span class="round-tag">[${bracketContent}]</span> ` : "";
+            const num = `${index + 1}. `;
+
+            if (isEnglishMode) {
+                return `${num}${tagEn}${t1En} <span class="match-vs-pill">VS</span> ${t2En}`;
+            }
+            return `${num}${tagPa}${t1Pa} <span class="match-vs-pill">ਬਨਾਮ</span> ${t2Pa}`;
+        }
+
+        const slotState = {
+            "badge-ticker": {
+                items: [],
+                cursor: 0,
+                useEn: false,
+                activeKey: "",
+                timer: null
+            },
+            "gold-ticker": {
+                items: [],
+                cursor: 0,
+                useEn: false,
+                activeKey: "",
+                timer: null
+            },
+            "lower-ticker": {
+                items: [],
+                cursor: 0,
+                useEn: false,
+                activeKey: "",
+                timer: null
+            }
+        };
+
+        function buildSlotItems(data) {
+            const badgeItems = [];
+            const goldItems = [];
+            const lowerItems = [];
+
+            const r1En = (data.row1Txt || data.programTxt || data.location || "").trim();
+            const r1Pa = (data.row1Txt_pa || data.programTxt_pa || data.location_pa || r1En).trim();
+
+            if (hasValue(r1Pa) || hasValue(r1En)) {
+                badgeItems.push({
+                    id: "r1-only:" + r1En + "|" + r1Pa,
+                    pa: `** ${translateToPunjabi(r1Pa || r1En)}`,
+                    en: `** ${r1En || r1Pa}`
+                });
+            }
+
+            const badgeBox = document.getElementById("badge-box");
+            if (badgeBox) {
+                badgeBox.classList.toggle("empty-badge", badgeItems.length === 0);
+            }
+
+            if (hasValue(data.row2Txt) || hasValue(data.row2Txt_pa)) {
+                const r2En = String(data.row2Txt || data.row2Txt_pa).trim();
+                const r2Pa = String(data.row2Txt_pa || data.row2Txt).trim();
+                goldItems.push({
+                    id: "r2-only:" + r2En + "|" + r2Pa,
+                    pa: translateToPunjabi(r2Pa),
+                    en: r2En
+                });
+            }
+
+            const prizePartsEn = [];
+            const prizePartsPa = [];
+
+            if (hasValue(data.pzOp1) || hasValue(data.pzOp2) || hasValue(data.pzOpBest)) {
+                const t1 = hasValue(data.pzTitle1) ? String(data.pzTitle1).trim() : "OPEN";
+                const t1Pa = translateToPunjabi(t1);
+                const p1En = [
+                    hasValue(data.pzOp1) && `1st: ${String(data.pzOp1).trim()}`,
+                    hasValue(data.pzOp2) && `2nd: ${String(data.pzOp2).trim()}`,
+                    hasValue(data.pzOpBest) && `Best: ${String(data.pzOpBest).trim()}`
+                ].filter(Boolean).join(" • ");
+                const p1Pa = [
+                    hasValue(data.pzOp1) && `ਪਹਿਲਾ: ${String(data.pzOp1).trim()}`,
+                    hasValue(data.pzOp2) && `ਦੂਜਾ: ${String(data.pzOp2).trim()}`,
+                    hasValue(data.pzOpBest) && `ਬੈਸਟ: ${String(data.pzOpBest).trim()}`
+                ].filter(Boolean).join(" • ");
+                if (p1En) {
+                    prizePartsEn.push(`🏆 ${t1}: ${p1En}`);
+                    prizePartsPa.push(`🏆 ${t1Pa}: ${p1Pa}`);
+                }
+            }
+
+            if (hasValue(data.pzWt1) || hasValue(data.pzWt2) || hasValue(data.pzWtBest)) {
+                const t2 = hasValue(data.pzTitle2) ? String(data.pzTitle2).trim() : "WEIGHT";
+                const t2Pa = translateToPunjabi(t2);
+                const p2En = [
+                    hasValue(data.pzWt1) && `1st: ${String(data.pzWt1).trim()}`,
+                    hasValue(data.pzWt2) && `2nd: ${String(data.pzWt2).trim()}`,
+                    hasValue(data.pzWtBest) && `Best: ${String(data.pzWtBest).trim()}`
+                ].filter(Boolean).join(" • ");
+                const p2Pa = [
+                    hasValue(data.pzWt1) && `ਪਹਿਲਾ: ${String(data.pzWt1).trim()}`,
+                    hasValue(data.pzWt2) && `ਦੂਜਾ: ${String(data.pzWt2).trim()}`,
+                    hasValue(data.pzWtBest) && `ਬੈਸਟ: ${String(data.pzWtBest).trim()}`
+                ].filter(Boolean).join(" • ");
+                if (p2En) {
+                    prizePartsEn.push(`🏆 ${t2}: ${p2En}`);
+                    prizePartsPa.push(`🏆 ${t2Pa}: ${p2Pa}`);
+                }
+            }
+
+            if (prizePartsEn.length > 0) {
+                goldItems.push({
+                    id: "r2-prize:" + prizePartsEn.join("|"),
+                    pa: `${prizePartsPa.join(" <span class='dot-sep'>•</span> ")}`,
+                    en: `${prizePartsEn.join(" <span class='dot-sep'>•</span> ")}`
+                });
+            }
+
+            const upcomingArr = normalizeArray(data.upcomingEvents);
+            upcomingArr.forEach((ev, idx) => {
+                const nameEn = ev.name || ev.eventName || "";
+                const namePa = ev.name_pa || ev.eventName_pa || translateToPunjabi(nameEn);
+                const datePart = hasValue(ev.date) ? ` (${ev.date})` : "";
+                if (hasValue(nameEn) || hasValue(namePa)) {
+                    goldItems.push({
+                        id: "r2-up:" + nameEn + ":" + ev.date + ":" + idx,
+                        pa: `📡 ਆਉਣ ਵਾਲਾ ਲਾਈਵ: ${namePa}${datePart}`,
+                        en: `📡 UPCOMING LIVE: ${nameEn}${datePart}`
+                    });
+                }
+            });
+
+            const rawMatches = normalizeArray(data.nextMatches);
+            const winnersFromMatches = rawMatches.filter(m => /winner|ਵਿੰਨਰ|\(win\)/i.test(String(m)));
+            if (winnersFromMatches.length > 0) {
+                winnersFromMatches.forEach((m, idx) => {
+                    goldItems.push({
+                        id: "r2-winm:" + String(m).trim() + ":" + idx,
+                        pa: `🥇 ਵਿੰਨਰ: ${formatMatchString(m, idx, false)}`,
+                        en: `🥇 WINNER: ${formatMatchString(m, idx, true)}`
+                    });
+                });
+            } else if (hasValue(data.qualifiedTeams)) {
+                const qLines = String(data.qualifiedTeams).split("\n").map(s => s.trim()).filter(Boolean);
+                qLines.forEach((qLine, idx) => {
+                    goldItems.push({
+                        id: "r2-qual:" + qLine + ":" + idx,
+                        pa: `🥇 ਵਿੰਨਰ: ${translateToPunjabi(qLine)}`,
+                        en: `🥇 WINNER: ${qLine}`
+                    });
+                });
+            }
+
+            if (hasValue(data.resultText) && String(data.resultText).trim() !== "No Result Yet") {
+                goldItems.push({
+                    id: "r2-res:" + String(data.resultText).trim(),
+                    pa: `🥇 ਨਤੀਜਾ: ${translateToPunjabi(data.resultText)}`,
+                    en: `🥇 RESULT: ${data.resultText}`
+                });
+            }
+
+            const goldTrackBox = document.getElementById("gold-track-box");
+            if (goldTrackBox) {
+                goldTrackBox.classList.toggle("empty-track", goldItems.length === 0);
+            }
+
+            const r3En = (data.row3Txt || "").trim();
+            const r3Pa = (data.row3Txt_pa || r3En).trim();
+            const contactText = hasValue(data.contactUs || data.row6Txt)
+                ? String(data.contactUs || data.row6Txt).trim()
+                : "MANPREET MUDKI • +91 8699640061 / 9115426711";
+
+            rawMatches.forEach((m, idx) => {
+                lowerItems.push({
+                    id: "r3-match:" + String(m).trim() + ":" + idx,
+                    pa: `📋 ਮੈਚ: ${formatMatchString(m, idx, false)}`,
+                    en: `📋 MATCH: ${formatMatchString(m, idx, true)}`
+                });
+            });
+
+            if (rawMatches.length === 0 && (hasValue(data.row5Txt) || hasValue(data.row5Txt_pa))) {
+                const mRawPa = translateToPunjabi(data.row5Txt_pa || data.row5Txt);
+                const mRawEn = data.row5Txt || data.row5Txt_pa;
+                lowerItems.push({
+                    id: "r3-row5:" + (mRawEn || mRawPa),
+                    pa: `📋 ਮੈਚ ਲਿਸਟ: ${mRawPa}`,
+                    en: `📋 MATCH LIST: ${mRawEn}`
+                });
+            }
+
+            if (hasValue(r3En) || hasValue(r3Pa)) {
+                lowerItems.push({
+                    id: "r3-txt:" + (r3En || r3Pa),
+                    pa: translateToPunjabi(r3Pa || r3En),
+                    en: r3En || r3Pa
+                });
+            }
+
+            if (hasValue(contactText)) {
+                lowerItems.push({
+                    id: "r3-contact:" + contactText,
+                    pa: `ਸੰਪਰਕ: ${translateToPunjabi(contactText)} <span class="star-accent">******</span> ਕਬੱਡੀ ਸਪੋਰਟਸ 1 ਲਾਈਵ`,
+                    en: `CONTACT US: ${contactText} <span class="star-accent">******</span> KABADDI SPORTS 1 LIVE`
+                });
+            }
+
+            return {
+                "badge-ticker": badgeItems,
+                "gold-ticker": goldItems,
+                "lower-ticker": lowerItems
+            };
+        }
+
+        function syncSlotData(slotId, newItems) {
+            const st = slotState[slotId];
+            if (!st) return;
+
+            const oldItems = st.items;
+            const currentItem = oldItems.length > 0 ? oldItems[st.cursor % oldItems.length] : null;
+
+            st.items = newItems;
+
+            if (newItems.length === 0) {
+                st.cursor = 0;
+                st.activeKey = "";
+                if (st.timer) {
+                    clearTimeout(st.timer);
+                    st.timer = null;
+                }
+                const el = document.getElementById(slotId);
+                if (el) el.innerHTML = "";
+                return;
+            }
+
+            if (currentItem) {
+                const idxById = newItems.findIndex(x => x.id === currentItem.id);
+                if (idxById !== -1) {
+                    st.cursor = idxById;
+                } else {
+                    st.cursor = st.cursor % newItems.length;
+                }
+            } else {
+                st.cursor = 0;
+            }
+
+            const targetItem = newItems[st.cursor];
+            const desiredKey = `${targetItem.id}::${st.useEn ? "en" : "pa"}`;
+
+            if (st.activeKey === desiredKey) {
+                return;
+            }
+
+            startSlotItem(slotId, targetItem);
+        }
+
+        function startSlotItem(slotId, item) {
+            const st = slotState[slotId];
+            const el = document.getElementById(slotId);
+            if (!st || !el || !item) return;
+
+            if (st.timer) {
+                clearTimeout(st.timer);
+                st.timer = null;
+            }
+
+            const desiredKey = `${item.id}::${st.useEn ? "en" : "pa"}`;
+            st.activeKey = desiredKey;
+
+            const textToShow = st.useEn ? item.en : item.pa;
+
+            el.className = "anim-wrap";
+            el.innerHTML = "";
+            el.style.removeProperty("--marquee-duration");
+            el.style.removeProperty("--start-x");
+            el.style.removeProperty("--end-x");
+
+            const span = document.createElement("span");
+            span.className = "ticker-text";
+            span.innerHTML = textToShow;
+            el.appendChild(span);
+
+            requestAnimationFrame(() => {
+                const boxWidth = el.clientWidth;
+                const textWidth = span.scrollWidth;
+
+                if (textWidth > boxWidth - 16) {
+                    const startX = boxWidth - 12;
+                    const endX = -(textWidth + 24);
+                    const totalDistance = Math.abs(endX - startX);
+                    const speedPxPerSec = rowSpeeds[slotId] || 85;
+                    const duration = Math.max(4, totalDistance / speedPxPerSec);
+
+                    el.classList.add("marquee-mode");
+                    el.style.setProperty("--start-x", `${startX}px`);
+                    el.style.setProperty("--end-x", `${endX}px`);
+                    el.style.setProperty("--marquee-duration", `${duration}s`);
+                    span.style.animation = "none";
+                    void span.offsetWidth;
+                    span.style.animation = `tickerMarquee ${duration}s linear 1 forwards`;
+
+                    st.timer = setTimeout(() => {
+                        onSlotItemFinished(slotId);
+                    }, duration * 1000);
+                } else {
+                    el.classList.add("anim-center-in");
+                    st.timer = setTimeout(() => {
+                        onSlotItemFinished(slotId);
+                    }, 6000);
+                }
+            });
+        }
+
+        function onSlotItemFinished(slotId) {
+            const st = slotState[slotId];
+            if (!st || st.items.length === 0) return;
+
+            st.useEn = !st.useEn;
+
+            if (!st.useEn) {
+                st.cursor = (st.cursor + 1) % st.items.length;
+            }
+
+            const nextItem = st.items[st.cursor % st.items.length];
+            startSlotItem(slotId, nextItem);
+        }
+
+        db.on("value", (snap) => {
+            const data = snap.val() || {};
+            window.currentData = data;
+
+            if (Number(data.row1Speed) > 0) rowSpeeds["badge-ticker"] = Number(data.row1Speed);
+            if (Number(data.row2Speed) > 0) rowSpeeds["gold-ticker"] = Number(data.row2Speed);
+            if (Number(data.row3Speed) > 0) rowSpeeds["lower-ticker"] = Number(data.row3Speed);
+
+            const logoCont = document.getElementById('logo-container');
+            const logoKey = matchId.trim().toLowerCase();
+            const activeLogo = (data.logoUrl && String(data.logoUrl).trim()) || clientLogos[logoKey] || "";
+
+            if (activeLogo && data.logoVisible !== false) {
+                document.getElementById('main-logo').src = activeLogo;
+                logoCont.classList.remove('hidden');
+            } else {
+                logoCont.classList.add('hidden');
+            }
+
+            document.getElementById('top-scoreboard-container').classList.toggle('hidden', data.scoreVisible === false);
+            document.getElementById('ticker-wrap').classList.toggle('hidden', data.tickerVisible === false);
+
+            const roundText = data.round || "";
+            const detailsStrip = document.getElementById('match-details-strip');
+            if (String(roundText).trim() === "") {
+                detailsStrip.classList.add('hidden');
+            } else {
+                detailsStrip.classList.remove('hidden');
+                document.getElementById('match-round').innerText = translateToPunjabi(roundText);
+            }
+
+            document.getElementById('sA').innerText = data.scoreA ?? "0";
+            document.getElementById('sB').innerText = data.scoreB ?? "0";
+            document.getElementById('single-wm').innerText = data.watermarkTxt || "ਐੱਮ ਲਾਈਵ";
+
+            const grouped = buildSlotItems(data);
+            syncSlotData("badge-ticker", grouped["badge-ticker"]);
+            syncSlotData("gold-ticker", grouped["gold-ticker"]);
+            syncSlotData("lower-ticker", grouped["lower-ticker"]);
+        });
+
+        setInterval(() => {
+            const d = window.currentData;
+            if (!d) return;
+            const showEn = !!slotState["badge-ticker"].useEn;
+            document.getElementById('nA').innerText = (!showEn && d.nameA_pa) ? d.nameA_pa : (d.nameA || "ਟੀਮ 1");
+            document.getElementById('nB').innerText = (!showEn && d.nameB_pa) ? d.nameB_pa : (d.nameB || "ਟੀਮ 2");
+        }, 1500);
+
+        const wm = document.getElementById('single-wm');
+        let x = 200, y = 200, dx = 1.8, dy = 1.4;
+        function animateWatermark() {
+            const maxX = 1920 - wm.offsetWidth - 50;
+            const maxY = 850 - wm.offsetHeight;
+            x += dx;
+            y += dy;
+            if (x <= 50 || x >= maxX) dx *= -1;
+            if (y <= 120 || y >= maxY) dy *= -1;
+            wm.style.left = x + 'px';
+            wm.style.top = y + 'px';
+            requestAnimationFrame(animateWatermark);
+        }
+        animateWatermark();
+    </script>
 </body>
 </html>
