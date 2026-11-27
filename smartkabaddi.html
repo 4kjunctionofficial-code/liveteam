@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=1920, initial-scale=1.0">
-<title>Kabaddi Scoreboard & Ticker Overlay</title>
+<title>Kabaddi Live Overlay</title>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gurmukhi:wght@700;900&family=Oswald:wght@700&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet">
@@ -27,8 +27,8 @@
   /* ==================== TOP-LEFT SCOREBOARD ==================== */
   #scoreboard-wrapper {
     position: absolute;
-    top: 32px;
-    left: 42px;
+    top: 30px;
+    left: 40px;
     display: flex;
     flex-direction: column;
     transition: opacity 0.25s ease;
@@ -132,14 +132,14 @@
   /* ==================== TOP-RIGHT WATERMARK ==================== */
   #watermark-box {
     position: absolute;
-    top: 32px;
-    right: 45px;
-    background: linear-gradient(135deg, #111111 0%, #2b2b2b 100%);
-    border: 3px solid #f5d800;
-    border-radius: 12px;
-    padding: 8px 22px;
-    color: #f5d800;
-    font-size: 28px;
+    top: 30px;
+    right: 42px;
+    background: rgba(12, 12, 12, 0.88);
+    border: 2px solid #ffe600;
+    border-radius: 10px;
+    padding: 7px 20px;
+    color: #ffe600;
+    font-size: 26px;
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -147,107 +147,107 @@
     z-index: 15;
   }
 
-  /* ==================== BOTTOM TICKER BAR ==================== */
+  /* ==================== IMAGE-STYLE BOTTOM TICKER ==================== */
   #bottom-ticker-bar {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 1920px;
-    height: 126px;
+    height: 122px;
     display: flex;
-    background: #0a0a0a;
-    border-top: 3px solid #f5d800;
+    align-items: stretch;
+    background: #0d0d0d;
     z-index: 10;
   }
 
-  .live-badge-box {
-    width: 225px;
+  /* Left Solid Yellow LIVE Panel */
+  .live-panel {
+    width: 248px;
     height: 100%;
-    background: linear-gradient(180deg, #ffe600 0%, #e5be00 100%);
-    clip-path: polygon(0 0, 100% 0, 84% 100%, 0% 100%);
+    background: #ffe600;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-right: 24px;
-    z-index: 5;
     flex-shrink: 0;
+    z-index: 4;
   }
 
-  .live-text {
-    font-family: 'Oswald', sans-serif;
-    font-size: 56px;
-    font-weight: 700;
-    color: #0e6b1d;
-    letter-spacing: 2px;
-    animation: pulseLive 1.4s infinite ease-in-out;
+  .live-label {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-style: italic;
+    font-size: 62px;
+    font-weight: 900;
+    color: #167c22;
+    letter-spacing: 1px;
+    line-height: 1;
+    transform: skewX(-6deg);
   }
 
-  @keyframes pulseLive {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.06); opacity: 0.85; }
-  }
-
-  .ticker-rows {
+  /* Center 3-Row Stack */
+  .ticker-center {
     flex: 1;
     display: flex;
     flex-direction: column;
-    margin-left: -38px;
-    margin-right: -38px;
+    height: 100%;
+    overflow: hidden;
+    background: #0d0d0d;
     z-index: 2;
-    overflow: hidden;
-    background: #0d0d0d;
   }
 
-  .t-row-1 {
-    height: 44px;
-    background: #0d0d0d;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 29px;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    padding: 0 50px;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-
-  .t-row-2 {
-    height: 42px;
-    background: linear-gradient(180deg, #ffe600 0%, #e0b800 100%);
-    color: #000000;
-    display: flex;
-    align-items: center;
-    font-size: 27px;
-    font-weight: 900;
-    overflow: hidden;
-    position: relative;
-    border-top: 2px solid #000000;
-    border-bottom: 2px solid #000000;
-  }
-
-  .t-row-3 {
+  /* Row 1: Black Centered Header */
+  .row-header {
     height: 40px;
     background: #0d0d0d;
     color: #ffffff;
     display: flex;
     align-items: center;
-    font-size: 25px;
-    font-weight: 700;
+    justify-content: center;
+    font-size: 27px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 0 24px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Row 2: Yellow Scrolling Strip */
+  .row-yellow {
+    height: 42px;
+    background: #ffe600;
+    color: #111111;
+    display: flex;
+    align-items: center;
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 0.3px;
     overflow: hidden;
     position: relative;
   }
 
-  .ticker-viewport {
+  /* Row 3: Black Scrolling Strip */
+  .row-bottom {
+    height: 40px;
+    background: #0d0d0d;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .scroll-box {
     position: relative;
     width: 100%;
     height: 100%;
     overflow: hidden;
   }
 
-  .ticker-stream {
+  .scroll-track {
     position: absolute;
     top: 50%;
     left: 0;
@@ -258,52 +258,52 @@
     will-change: transform;
   }
 
-  .ticker-chunk {
+  .scroll-item {
     display: inline-block;
-    padding-right: 70px;
+    padding-right: 65px;
   }
 
-  /* Right PNG Logo Box */
-  .right-graphic-box {
-    width: 225px;
+  /* Right Yellow Logo Panel */
+  .logo-panel {
+    width: 248px;
     height: 100%;
-    background: linear-gradient(180deg, #ffe600 0%, #d4ad00 100%);
-    clip-path: polygon(18% 0, 100% 0, 100% 100%, 0% 100%);
+    background: #ffe600;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding-left: 26px;
-    padding-right: 12px;
-    z-index: 5;
+    padding: 8px 18px;
     flex-shrink: 0;
+    z-index: 4;
   }
 
   #pngLogoImg {
-    max-width: 165px;
-    max-height: 104px;
+    max-width: 210px;
+    max-height: 106px;
+    width: auto;
+    height: auto;
     object-fit: contain;
     display: none;
   }
 
-  #defaultLogoBadge {
+  #defaultBadge {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-  }
-
-  .prize-bag-icon {
-    font-size: 50px;
-    line-height: 1;
-  }
-
-  .prize-bag-label {
-    font-size: 18px;
+    color: #167c22;
     font-weight: 900;
-    color: #0e521b;
+    line-height: 1.05;
+    text-align: center;
+  }
+
+  #defaultBadge .bag-emoji {
+    font-size: 52px;
+  }
+
+  #defaultBadge .bag-tag {
+    font-size: 16px;
+    letter-spacing: 0.8px;
     text-transform: uppercase;
-    margin-top: 2px;
   }
 </style>
 </head>
@@ -325,46 +325,49 @@
         <div class="hex-box hex-right" id="scoreRight">0</div>
       </div>
     </div>
-    <div class="sb-round" id="roundDisplay">KABADDI TOURNAMENT</div>
+    <div class="sb-round" id="roundDisplay">KABADDI OPEN MATCH</div>
   </div>
 
   <!-- WATERMARK -->
-  <div id="watermark-box">M LIVE</div>
+  <div id="watermark-box"></div>
 
-  <!-- 3-ROW TICKER -->
+  <!-- BOTTOM TICKER -->
   <div id="bottom-ticker-bar">
-    <div class="live-badge-box">
-      <div class="live-text">LIVE</div>
+    <div class="live-panel">
+      <div class="live-label">LIVE</div>
     </div>
 
-    <div class="ticker-rows">
-      <div class="t-row-1" id="row1Header">KABADDI TOURNAMENT LIVE</div>
+    <div class="ticker-center">
+      <!-- Top Black Row -->
+      <div class="row-header" id="tickerTopRow">OPEN KABADDI TOURNAMENT</div>
 
-      <div class="t-row-2">
-        <div class="ticker-viewport">
-          <div class="ticker-stream" id="streamRow2">
-            <span class="ticker-chunk" id="chunk2A">WELCOME TO LIVE KABADDI BROADCAST</span>
-            <span class="ticker-chunk" id="chunk2B">WELCOME TO LIVE KABADDI BROADCAST</span>
+      <!-- Middle Yellow Scrolling Row -->
+      <div class="row-yellow">
+        <div class="scroll-box">
+          <div class="scroll-track" id="trackYellow">
+            <span class="scroll-item" id="itemYellowA">1st Prize :- 51,000/-  2nd Prize :- 31,000/-  Best Raider :- 21,000/-  Best Catcher :- 21,000/-</span>
+            <span class="scroll-item" id="itemYellowB">1st Prize :- 51,000/-  2nd Prize :- 31,000/-  Best Raider :- 21,000/-  Best Catcher :- 21,000/-</span>
           </div>
         </div>
       </div>
 
-      <div class="t-row-3">
-        <div class="ticker-viewport">
-          <div class="ticker-stream" id="streamRow3">
-            <span class="ticker-chunk" id="chunk3A">STAY TUNED FOR UPCOMING MATCHES</span>
-            <span class="ticker-chunk" id="chunk3B">STAY TUNED FOR UPCOMING MATCHES</span>
+      <!-- Bottom Black Scrolling Row -->
+      <div class="row-bottom">
+        <div class="scroll-box">
+          <div class="scroll-track" id="trackBottom">
+            <span class="scroll-item" id="itemBottomA">LIVE KABADDI BROADCAST</span>
+            <span class="scroll-item" id="itemBottomB">LIVE KABADDI BROADCAST</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- PNG LOGO AREA -->
-    <div class="right-graphic-box">
-      <img id="pngLogoImg" alt="PNG Logo">
-      <div id="defaultLogoBadge">
-        <div class="prize-bag-icon">💰</div>
-        <div class="prize-bag-label">KABADDI CUP</div>
+    <!-- Right PNG Logo Box -->
+    <div class="logo-panel">
+      <img id="pngLogoImg" alt="Logo">
+      <div id="defaultBadge">
+        <span class="bag-emoji">💰</span>
+        <span class="bag-tag">KABADDI CUP</span>
       </div>
     </div>
   </div>
@@ -378,7 +381,6 @@
   const urlParams = new URLSearchParams(window.location.search);
   const matchId = urlParams.get('id') || 'defaultMatch';
   const langMode = urlParams.get('lang') || 'en';
-  // Je URL vich ?logo=https://.../logo.png pass kita hove tan oh vi turant kam karega
   const queryLogoUrl = (urlParams.get('logo') || "").trim();
 
   const db = firebase.database().ref("matchData/" + matchId);
@@ -388,94 +390,96 @@
     return (enVal || "").trim();
   }
 
-  function applyPngLogo(url) {
-    const imgEl = document.getElementById("pngLogoImg");
-    const defaultEl = document.getElementById("defaultLogoBadge");
-    const cleanUrl = (url || "").trim();
+  function setPngLogo(url) {
+    const img = document.getElementById("pngLogoImg");
+    const fallback = document.getElementById("defaultBadge");
+    const clean = (url || "").trim();
 
-    if (!cleanUrl) {
-      imgEl.onload = null;
-      imgEl.onerror = null;
-      imgEl.removeAttribute("src");
-      imgEl.style.display = "none";
-      defaultEl.style.display = "flex";
+    if (!clean) {
+      img.onload = null;
+      img.onerror = null;
+      img.removeAttribute("src");
+      img.style.display = "none";
+      fallback.style.display = "flex";
       return;
     }
 
-    imgEl.onload = () => {
-      imgEl.style.display = "block";
-      defaultEl.style.display = "none";
+    img.onload = () => {
+      img.style.display = "block";
+      fallback.style.display = "none";
     };
-    imgEl.onerror = () => {
-      imgEl.style.display = "none";
-      defaultEl.style.display = "flex";
+    img.onerror = () => {
+      img.style.display = "none";
+      fallback.style.display = "flex";
     };
-    imgEl.src = cleanUrl;
+    img.src = clean;
   }
 
-  const scrollers = {};
+  const tickers = {};
 
-  function setupScroller(streamId, chunkAId, chunkBId, text, speedPxPerSec) {
-    const stream = document.getElementById(streamId);
-    const chunkA = document.getElementById(chunkAId);
-    const chunkB = document.getElementById(chunkBId);
+  function updateTicker(trackId, itemAId, itemBId, text, speed) {
+    const track = document.getElementById(trackId);
+    const itemA = document.getElementById(itemAId);
+    const itemB = document.getElementById(itemBId);
 
-    const cleanText = (text && text.trim()) ? text.trim() : "LIVE KABADDI BROADCAST";
-    chunkA.textContent = cleanText;
-    chunkB.textContent = cleanText;
+    const clean = (text && text.trim()) ? text.trim() : "LIVE KABADDI TOURNAMENT";
+    itemA.textContent = clean;
+    itemB.textContent = clean;
 
     requestAnimationFrame(() => {
-      let singleWidth = chunkA.getBoundingClientRect().width;
-      const viewportWidth = stream.parentElement.getBoundingClientRect().width || 1500;
+      let w = itemA.getBoundingClientRect().width;
+      const boxW = track.parentElement.getBoundingClientRect().width || 1400;
 
-      if (singleWidth < viewportWidth) {
-        const repeatCount = Math.ceil((viewportWidth * 1.4) / Math.max(singleWidth, 120));
-        const repeated = Array(repeatCount).fill(cleanText).join("   ★   ");
-        chunkA.textContent = repeated;
-        chunkB.textContent = repeated;
-        singleWidth = chunkA.getBoundingClientRect().width;
+      if (w < boxW) {
+        const count = Math.ceil((boxW * 1.4) / Math.max(w, 100));
+        const repeated = Array(count).fill(clean).join("    ");
+        itemA.textContent = repeated;
+        itemB.textContent = repeated;
+        w = itemA.getBoundingClientRect().width;
       }
 
-      if (!scrollers[streamId]) {
-        scrollers[streamId] = {
-          el: stream,
+      if (!tickers[trackId]) {
+        tickers[trackId] = {
+          el: track,
           x: 0,
-          width: singleWidth || 600,
-          speed: speedPxPerSec,
-          lastTime: performance.now()
+          width: w || 600,
+          speed: speed,
+          ts: performance.now()
         };
       } else {
-        scrollers[streamId].width = singleWidth || 600;
-        scrollers[streamId].speed = speedPxPerSec;
+        tickers[trackId].width = w || 600;
+        tickers[trackId].speed = speed;
       }
     });
   }
 
-  function tickScrollers(now) {
-    Object.values(scrollers).forEach((s) => {
-      const dt = Math.min((now - s.lastTime) / 1000, 0.1);
-      s.lastTime = now;
-      s.x -= s.speed * dt;
-      if (Math.abs(s.x) >= s.width) {
-        s.x += s.width;
+  function animateTickers(now) {
+    Object.values(tickers).forEach((t) => {
+      const dt = Math.min((now - t.ts) / 1000, 0.1);
+      t.ts = now;
+      t.x -= t.speed * dt;
+      if (Math.abs(t.x) >= t.width) {
+        t.x += t.width;
       }
-      s.el.style.transform = `translate3d(${s.x.toFixed(2)}px, -50%, 0)`;
+      t.el.style.transform = `translate3d(${t.x.toFixed(2)}px, -50%, 0)`;
     });
-    requestAnimationFrame(tickScrollers);
+    requestAnimationFrame(animateTickers);
   }
-  requestAnimationFrame(tickScrollers);
+  requestAnimationFrame(animateTickers);
 
   if (queryLogoUrl) {
-    applyPngLogo(queryLogoUrl);
+    setPngLogo(queryLogoUrl);
   }
 
   db.on("value", (snap) => {
     const data = snap.val();
     if (!data) return;
 
-    const sbWrapper = document.getElementById("scoreboard-wrapper");
-    sbWrapper.style.opacity = (data.scoreVisible === false) ? "0" : "1";
+    // Scoreboard visibility
+    document.getElementById("scoreboard-wrapper").style.opacity =
+      (data.scoreVisible === false) ? "0" : "1";
 
+    // Teams & scores
     const nameA = getText(data.nameA, data.nameA_pa) || "TEAM A";
     const nameB = getText(data.nameB, data.nameB_pa) || "TEAM B";
     const scoreA = data.scoreA !== undefined ? data.scoreA : 0;
@@ -495,75 +499,81 @@
 
     document.getElementById("roundDisplay").innerText = data.round || "";
 
-    const wmBox = document.getElementById("watermark-box");
+    // Watermark
+    const wm = document.getElementById("watermark-box");
     if (data.watermarkTxt && data.watermarkTxt.trim() !== "") {
-      wmBox.innerText = data.watermarkTxt.trim();
-      wmBox.style.display = "block";
+      wm.innerText = data.watermarkTxt.trim();
+      wm.style.display = "block";
     } else {
-      wmBox.style.display = "none";
+      wm.style.display = "none";
     }
 
-    applyPngLogo(queryLogoUrl || data.logoUrl);
+    // PNG logo
+    setPngLogo(queryLogoUrl || data.logoUrl);
 
+    // Top Black Header Row (Village + Program)
     const village = getText(data.row1Txt, data.row1Txt_pa);
     const program = getText(data.programTxt, data.programTxt_pa);
-    let headerParts = [];
-    if (village) headerParts.push(village);
-    if (program) headerParts.push(program);
-    document.getElementById("row1Header").innerText = headerParts.join(" — ") || "KABADDI LIVE";
+    const topParts = [];
+    if (village) topParts.push(village);
+    if (program) topParts.push(program);
+    document.getElementById("tickerTopRow").innerText =
+      topParts.join(" — ") || "OPEN KABADDI TOURNAMENT";
 
-    let row2Items = [];
+    // Middle Yellow Scrolling Row (Prizes + Result + Ads)
+    const yellowParts = [];
 
-    let cat1Parts = [];
-    if (data.pzTitle1) cat1Parts.push(`🏆 ${data.pzTitle1}:`);
-    if (data.pzOp1) cat1Parts.push(`1st: ${data.pzOp1}`);
-    if (data.pzOp2) cat1Parts.push(`2nd: ${data.pzOp2}`);
-    if (data.pzOpBest) cat1Parts.push(`Best: ${data.pzOpBest}`);
-    if (cat1Parts.length > 0) row2Items.push(cat1Parts.join("  "));
+    const cat1 = [];
+    if (data.pzTitle1) cat1.push(data.pzTitle1);
+    if (data.pzOp1) cat1.push(`1st :- ${data.pzOp1}`);
+    if (data.pzOp2) cat1.push(`2nd :- ${data.pzOp2}`);
+    if (data.pzOpBest) cat1.push(`Best :- ${data.pzOpBest}`);
+    if (cat1.length > 0) yellowParts.push(cat1.join("   "));
 
-    let cat2Parts = [];
-    if (data.pzTitle2) cat2Parts.push(`🏆 ${data.pzTitle2}:`);
-    if (data.pzWt1) cat2Parts.push(`1st: ${data.pzWt1}`);
-    if (data.pzWt2) cat2Parts.push(`2nd: ${data.pzWt2}`);
-    if (data.pzWtBest) cat2Parts.push(`Best: ${data.pzWtBest}`);
-    if (cat2Parts.length > 0) row2Items.push(cat2Parts.join("  "));
+    const cat2 = [];
+    if (data.pzTitle2) cat2.push(data.pzTitle2);
+    if (data.pzWt1) cat2.push(`1st :- ${data.pzWt1}`);
+    if (data.pzWt2) cat2.push(`2nd :- ${data.pzWt2}`);
+    if (data.pzWtBest) cat2.push(`Best :- ${data.pzWtBest}`);
+    if (cat2.length > 0) yellowParts.push(cat2.join("   "));
 
     if (data.resultText && data.resultText !== "No Result Yet") {
-      row2Items.push(`🏅 RESULT: ${data.resultText}`);
+      yellowParts.push(`RESULT :- ${data.resultText}`);
     }
 
     if (data.adsText && data.adsText.trim() !== "") {
-      row2Items.push(data.adsText.trim());
+      yellowParts.push(data.adsText.trim());
     }
 
-    const finalRow2 = row2Items.length > 0
-      ? row2Items.join("   ★   ")
-      : (headerParts.join(" — ") || "LIVE KABADDI TOURNAMENT");
+    const yellowLine = yellowParts.length > 0
+      ? yellowParts.join("     |     ")
+      : (topParts.join(" — ") || "LIVE KABADDI TOURNAMENT");
 
-    setupScroller("streamRow2", "chunk2A", "chunk2B", finalRow2, 115);
+    updateTicker("trackYellow", "itemYellowA", "itemYellowB", yellowLine, 110);
 
-    let row3Items = [];
+    // Bottom Black Scrolling Row (Next Matches + Upcoming Events + Telecast)
+    const bottomParts = [];
 
-    const nextMatchesStr = getText(data.row5Txt, data.row5Txt_pa);
-    if (nextMatchesStr) {
-      let cleanMatches = nextMatchesStr.replace(/,\s*$/, "");
-      if (cleanMatches) row3Items.push(`📋 NEXT MATCHES: ${cleanMatches}`);
+    const nextMatches = getText(data.row5Txt, data.row5Txt_pa);
+    if (nextMatches) {
+      const cleanNext = nextMatches.replace(/,\s*$/, "");
+      if (cleanNext) bottomParts.push(`NEXT MATCHES :- ${cleanNext}`);
     }
 
-    const upcomingStr = getText(data.row4Txt, data.row4Txt_pa);
-    if (upcomingStr && upcomingStr !== "UPCOMING EVENTS" && upcomingStr !== "ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ") {
-      row3Items.push(`📅 UPCOMING EVENTS: ${upcomingStr}`);
+    const upcoming = getText(data.row4Txt, data.row4Txt_pa);
+    if (upcoming && upcoming !== "UPCOMING EVENTS" && upcoming !== "ਆਉਣ ਵਾਲੇ ਖੇਡ ਮੇਲੇ") {
+      bottomParts.push(`UPCOMING EVENTS :- ${upcoming}`);
     }
 
     if (data.row6Txt && data.row6Txt.trim() !== "") {
-      row3Items.push(`📡 ${data.row6Txt.trim()}`);
+      bottomParts.push(data.row6Txt.trim());
     }
 
-    const finalRow3 = row3Items.length > 0
-      ? row3Items.join("   |   ")
-      : "WATCH LIVE KABADDI ACTION";
+    const bottomLine = bottomParts.length > 0
+      ? bottomParts.join("     |     ")
+      : "LIVE KABADDI BROADCAST";
 
-    setupScroller("streamRow3", "chunk3A", "chunk3B", finalRow3, 105);
+    updateTicker("trackBottom", "itemBottomA", "itemBottomB", bottomLine, 100);
   });
 </script>
 </body>
