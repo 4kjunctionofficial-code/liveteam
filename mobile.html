@@ -68,7 +68,6 @@
         </div>
     </div>
 
-    
     <div class="card">
         <div class="header">Ticker & Branding</div>
         <div class="settings-section">
@@ -104,7 +103,7 @@
             <button id="logoBtn" class="btn-full btn-dark" onclick="toggleVis('logoVisible')">Show/Hide Logo</button>
         </div>
     </div>
-</div>
+
     <div class="card">
         <div class="header">Position & Size Controls</div>
         <div class="settings-section">
@@ -153,7 +152,7 @@
             </div>
         </div>
     </div>
-
+</div>
 
 <script>
     const firebaseConfig = { databaseURL: "https://my-scorebord-default-rtdb.firebaseio.com/" };
@@ -236,15 +235,8 @@
 
     function changeScore(team, val) {
         let current = (team === 'scoreA' ? curA : curB);
-        let newVal;
-        if (val > 0) {
-            if (curA === 0 && curB === 0) newVal = 1.5;
-            else newVal = current + 1;
-        } else {
-            if (current === 1.5) newVal = 0;
-            else newVal = current - 1;
-            if (newVal < 0) newVal = 0;
-        }
+        let newVal = current + val;
+        if (newVal < 0) newVal = 0;
         db.update({ [team]: newVal });
     }
 
